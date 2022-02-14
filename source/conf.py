@@ -31,7 +31,8 @@ release = 'v0.169'
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = ['sphinx.ext.autodoc', 'sphinx.ext.napoleon', 'rst2pdf.pdfbuilder']
+# extensions = ['sphinx.ext.autodoc', 'sphinx.ext.napoleon', 'rst2pdf.pdfbuilder']
+extensions = ['sphinx.ext.autodoc']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -76,11 +77,11 @@ html_static_path = ['_static']
 # would mean that specific document would be compressed
 # regardless of the global pdf_compressed setting.
  
-pdf_documents = [
-  ('index',u'HanLP Handbook',u'hankcs'),]
+#pdf_documents = [
+#  ('index',u'HanLP Handbook',u'hankcs'),]
  
 # A comma-separated list of custom stylesheets. Example:
-pdf_stylesheets = ['a3','zh_CN']
+# pdf_stylesheets = ['a3','zh_CN']
  
 # Create a compressed PDF
 # Use True/False or 1/0
@@ -88,14 +89,14 @@ pdf_stylesheets = ['a3','zh_CN']
 #pdf_compressed = False
  
 # A colon-separated list of folders to search for fonts. Example:
-pdf_font_path = ['C:\\Windows\\Fonts']
+# pdf_font_path = ['C:\\Windows\\Fonts']
  
 # Language to be used for hyphenation support
-pdf_language = "zh_CN"
+# pdf_language = "zh_CN"
  
 # Mode for literal blocks wider than the frame. Can be
 # overflow,shrink or truncate
-pdf_fit_mode = "shrink"
+# pdf_fit_mode = "shrink"
  
 # Section level that forces a break page.
 # For example: 1 means top-level sections start in a new page
@@ -139,33 +140,33 @@ pdf_fit_mode = "shrink"
 #pdf_page_template = 'cutePage'
  
 # Show Table Of Contents at the beginning?
-pdf_use_toc = False
+# pdf_use_toc = False
  
 # How many levels deep should the table of contents be?
-pdf_toc_depth = 2
+# pdf_toc_depth = 2
  
 # Add section number to section references
-pdf_use_numbered_links = False
+# pdf_use_numbered_links = False
  
 # Background images fitting mode
-pdf_fit_background_mode = 'scale'
+# pdf_fit_background_mode = 'scale'
 
 
-latex_engine = 'xelatex'
-latex_elements = {
-    'papersize': 'a4paper',
-    'pointsize': '11pt',
-    'preamble': r'''
-\usepackage{xeCJK}
-\setCJKmainfont[BoldFont=STZhongsong, ItalicFont=STKaiti]{STSong}
-\setCJKsansfont[BoldFont=STHeiti]{STXihei}
-\setCJKmonofont{STFangsong}
-\XeTeXlinebreaklocale "zh"
-\XeTeXlinebreakskip = 0pt plus 1pt
-\parindent 2em
-\definecolor{VerbatimColor}{rgb}{0.95,0.95,0.95}
-\setcounter{tocdepth}{3}
-\renewcommand\familydefault{\ttdefault}
-\renewcommand\CJKfamilydefault{\CJKrmdefault}
-'''
-}
+#latex_engine = 'xelatex'
+#latex_elements = {
+#    'papersize': 'a4paper',
+#    'pointsize': '11pt',
+#    'preamble': r'''
+# \usepackage{xeCJK}
+# \setCJKmainfont[BoldFont=STZhongsong, ItalicFont=STKaiti]{STSong}
+# \setCJKsansfont[BoldFont=STHeiti]{STXihei}
+# \setCJKmonofont{STFangsong}
+# \XeTeXlinebreaklocale "zh"
+# \XeTeXlinebreakskip = 0pt plus 1pt
+# \parindent 2em
+# \definecolor{VerbatimColor}{rgb}{0.95,0.95,0.95}
+# \setcounter{tocdepth}{3}
+# \renewcommand\familydefault{\ttdefault}
+# \renewcommand\CJKfamilydefault{\CJKrmdefault}
+# '''
+# }
