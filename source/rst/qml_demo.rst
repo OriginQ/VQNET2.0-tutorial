@@ -15,7 +15,7 @@
     接下来是参数可变的量子线路部分。我们这里使用HardwareEfficientAnsatz，首先是4个量子比特上RX门，接下来插入多个3个Z门以及4个RZ门的组合模块。
     使用PQC量子线路的哈密顿测量作为机器学习预测值，进行分类任务的优化。
 
-    `PQC算法文档介绍 <../../../../../tutorials/PQC/PQC_demo_cn.md>`_ , `PQC 实现示例代码 <../../../../examples/pqc_test.py>`_ 。
+    `PQC算法文档介绍 <../../../source/tutorials/PQC/PQC_demo_cn.md>`_ 
 
     编码线路
 
@@ -31,7 +31,7 @@
 
     Parameterized Quantum Circuits demo
 
-    ref: ..\\..\\tutorials\PQC\\PQC demo.md
+    ref: ..\\tutorials\PQC\\PQC demo.md
 
     """
 
@@ -207,7 +207,7 @@
 这个例子使用VQNet实现了论文 `Circuit-centric quantum classifiers <https://arxiv.org/pdf/1804.00633.pdf>`_ 中可变量子线路进行二分类任务。
 该例子用来判断一个二进制数是奇数还是偶数。通过将二进制数编码到量子比特上，通过优化线路中的可变参数，使得该线路z方向观测量可以指示该输入为奇数还是偶数。
 
-`QVC算法文档介绍 <../../../../../tutorials/QVC/QVC_demo_cn.md>`_   ,  `QVC 实现示例代码 <../../../../examples/qvc_quantumlayer_test.py>`_ 。
+`QVC算法文档介绍 <../../../source/tutorials/QVC/QVC_demo_cn.md>`_ 
 
 量子线路
 """""""""""""""""
@@ -435,14 +435,14 @@ QVC在测试数据上准确率变化情况：
 
 .. figure:: ./images/qdrl.png
 
-`data re-uploading模型文档介绍 <../../../../../tutorials/QDRL/QDRL_demo_cn.md>`_  ,   `QDRL 实现示例代码 <../../../../examples/qdrl_test.py>`_ 。
+`data re-uploading模型文档介绍 <../../../source/tutorials/QDRL/QDRL_demo_cn.md>`_  。
 
 .. code-block::
 
     """
     Parameterized quantum circuit for Quantum Data Re-upLoading
 
-    ref: ..\\..\\tutorials\QDRL\\QDRL demo.md
+    ref: ..\\tutorials\QDRL\\QDRL demo.md
     """
     import os
     import sys
@@ -599,14 +599,14 @@ VSQL中各个量子比特上的局部量子线路图如下：
 .. figure:: ./images/vsql_7.png
 .. figure:: ./images/vsql_8.png
 
-`VSQL模型文档介绍 <../../../../../tutorials/VSQL/VSQL_demo_cn.md>`_  ,  `VSQL 实现示例代码 <../../../../examples/qnn_mnist_vsql.py>`_ 。
+`VSQL模型文档介绍 <../../../source/tutorials/VSQL/VSQL_demo_cn.md>`_ 
 
 .. code-block::
 
     """
     Parameterized quantum circuit for VSQL
 
-    ref: ..\\..\\tutorials\VSQL\\VSQL demo.md
+    ref: ..\\tutorials\VSQL\\VSQL demo.md
     """
     import os
     from pyvqnet.nn.module import Module
@@ -970,7 +970,7 @@ VSQL在测试数据上准确率变化情况：
 我们展示了一个简单的可编程线路的例子，它可以被训练成一个高效的自动编码器。我们在量子模拟的背景下应用我们的模型来压缩哈伯德模型和分子哈密顿量的基态。
 该例子参考自 `Quantum autoencoders for efficient compression of quantum data <https://arxiv.org/pdf/1612.02806.pdf>`_ .
 
-`QAE算法文档介绍 <../../../../../tutorials/QAE/QuantumAutoEncoder_demo_CN.md>`_  ,  `QAE 示例代码 <../../../../examples/qae_test.py>`_ 。
+`QAE算法文档介绍 <../../../source/tutorials/QAE/QuantumAutoEncoder_demo_CN.md>`_ 
 
 QAE量子线路：
 
@@ -981,7 +981,7 @@ QAE量子线路：
     """
     Quantum AutoEncoder demo
 
-    ref: ..\\..\\tutorials\QAE\\QuantumAutoEncoder.md
+    ref: ..\\tutorials\QAE\\QuantumAutoEncoder.md
 
     """
 
@@ -1190,14 +1190,14 @@ QAE量子线路：
 Quantum circuit structure learning任务的核心目标就是找到最优的带参量子门组合。
 这里的做法是这一组最优的量子逻辑门要使得目标函数（loss function）取得最小值。
 
-`QCSL算法文档介绍 <../../../../../tutorials/QCSL/QCSL_demo_cn.md>`_  ,  `QCSL 示例代码 <../../../../examples/qcsl_test.py>`_ 。
+`QCSL算法文档介绍 <../../../source/tutorials/QCSL/QCSL_demo_cn.md>`_ 
 
 .. code-block::
 
     """
     Quantum Circuits Strcture Learning Demo
 
-    ref: ..\\..\\tutorials\QCSL\\QCSL demo.md
+    ref: ..\\tutorials\QCSL\\QCSL demo.md
     """
 
     import os
@@ -1325,7 +1325,7 @@ Quantum circuit structure learning任务的核心目标就是找到最优的带�
 在本章中，我们将探讨如何部分量化经典神经网络以创建混合量子经典神经网络。量子线路由量子逻辑门构成，这些逻辑门实现的量子计算被论文 `Quantum Circuit Learning <https://arxiv.org/abs/1803.00745>`_ 证明是可微分。因此研究者尝试将量子线路与经典神经网络模块放到一起同时进行混合量子经典机器学习任务的训练。
 我们将编写一个简单的示例，使用VQNet实现一个神经网络模型训练任务。此示例的目的是展示VQNet的简便性，并鼓励 ML 从业者探索量子计算的可能性。
 
-`HQCNN算法文档介绍 <../../../../../tutorials/HQCNN/HQCNN_demo_CN.md>`_   ,  `HQCNN 示例代码 <../../../../examples/hqcnn_test.py>`_ 。
+`HQCNN算法文档介绍 <../../../source/tutorials/HQCNN/HQCNN_demo_CN.md>`_ 
 
 数据准备
 """""""""""
@@ -1669,7 +1669,7 @@ Quantum circuit structure learning任务的核心目标就是找到最优的带�
 我们将一种称为迁移学习的机器学习方法应用于基于混合经典量子网络的图像分类器。我们将编写一个将pyQPanda与VQNet集成的简单示例。
 迁移学习是一种成熟的人工神经网络训练技术，它基于一般直觉，即如果预训练的网络擅长解决给定的问题，那么，只需一些额外的训练，它也可以用来解决一个不同但相关的问题。
 
-`QTransferLearning算法文档介绍 <../../../../../tutorials/QTransferLearning/QTransferLearning_demo_CN.md>`_  , `QTransferLearning 示例代码 <../../../../examples/qcnn_TransferLearning_test.py>`_ 。
+`QTransferLearning算法文档介绍 <../../../source/tutorials/QTransferLearning/QTransferLearning_demo_CN.md>`_  
 
                                                             .. centered:: 量子部分线路图
 
@@ -1680,7 +1680,7 @@ Quantum circuit structure learning任务的核心目标就是找到最优的带�
     """
     Quantum Classic Nerual Network Transfer Learning demo
 
-    ref: ..\\..\\tutorials\\QTransferLearning\\QTransferLearning_demo.md
+    ref: ..\\tutorials\\QTransferLearning\\QTransferLearning_demo.md
     """
 
     import numpy as np
@@ -2370,7 +2370,7 @@ Quantum circuit structure learning任务的核心目标就是找到最优的带�
 在这里我们探索如何将经典神经网络部分量化，以创建适合量子数据的 `QUnet - Quantum Unet` 神经网络。我们将编写一个将 `pyQPanda <https://pyqpanda-toturial.readthedocs.io/zh/latest/>`_ 与 `VQNet` 集成的简单示例。
 QUnet主要是用于解决图像分割的技术。
 
-`QUnet算法文档介绍 <../../../../../tutorials/QUnet/QUnet_demo_CN.md>`_  ， `QUnet 示例代码 <../../../../examples/qunet_test.py>`_ 。
+`QUnet算法文档介绍 <../../../source/tutorials/QUnet/QUnet_demo_CN.md>`_ 
 
 
 数据准备

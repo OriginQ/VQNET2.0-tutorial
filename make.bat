@@ -25,6 +25,15 @@ if errorlevel 9009 (
 	exit /b 1
 )
 
+if "%1" == "pdf" (
+  %sphinxBUILD% -b pdf %SPHINXOPTS% %SOURCEDIR% %BUILDDIR%/pdf
+  if errorlevel 1 exit /b 1
+  echo.
+  echo.Build finished. The pdf files are in %BUILDDIR%/pdf.
+  goto end
+)
+
+
 %SPHINXBUILD% -M %1 %SOURCEDIR% %BUILDDIR% %SPHINXOPTS% %O%
 goto end
 
