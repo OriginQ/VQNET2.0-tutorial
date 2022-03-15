@@ -108,7 +108,7 @@ VQNet支持将量子计算模块与经典计算模块（例如：卷积，池化
     from pyvqnet.qnn.quantumlayer import QuantumLayer
     from pyvqnet.optim import adam
     from pyvqnet.nn.loss import CategoricalCrossEntropy
-    from pyvqnet.tensor.tensor import QTensor
+    from pyvqnet.tensor import QTensor
     import numpy as np
     from pyvqnet.nn.module import Module
 
