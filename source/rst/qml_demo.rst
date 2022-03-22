@@ -3578,11 +3578,11 @@ QUnet主要是用于解决图像分割的技术。
 		
 对比含噪量子线路与理想量子线路的机器学习模型分类结果，其loss变化曲线以及acc变化曲线如下：
 
-.. image:: ./images/noise_1.png
+.. image:: ./images/noise_1.PNG
    :width: 600 px
    :align: center
 
-.. image:: ./images/noise_2.png
+.. image:: ./images/noise_2.PNG
    :width: 600 px
    :align: center
 
