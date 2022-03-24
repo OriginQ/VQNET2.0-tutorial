@@ -264,7 +264,7 @@ QVC在测试数据上准确率变化情况：
     """
     Parameterized quantum circuit for Quantum Data Re-upLoading
 
-    ref: ..\\..\\tutorials\QDRL\\QDRL demo.md
+    
     """
     import os
     import sys
@@ -856,7 +856,7 @@ QAE量子线路：
     """
     Quantum AutoEncoder demo
 
-    ref: ..\\..\\tutorials\QAE\\QuantumAutoEncoder.md
+    
 
     """
 
@@ -1100,7 +1100,7 @@ Quantum circuit structure learning任务的核心目标就是找到最优的带�
     """
     Quantum Circuits Strcture Learning Demo
 
-    ref: ..\\..\\tutorials\QCSL\\QCSL demo.md
+    
     """
 
     import os
@@ -1643,7 +1643,7 @@ Quantum circuit structure learning任务的核心目标就是找到最优的带�
     """
     Quantum Classic Nerual Network Transfer Learning demo
 
-    ref: ..\\..\\tutorials\\QTransferLearning\\QTransferLearning_demo.md
+    
     """
 
     import os
@@ -3127,7 +3127,7 @@ QUnet主要是用于解决图像分割的技术。
 
 在VQNet使用量子计算层进行模型训练
 ----------------------------------
-以下是使用 ``QuantumLayer``，``NoiseQuantumLayer`` ，``VQCLayer`` ，``Compatiblelayer`` 等VQNet接口实现量子机器学习的例子。
+以下是使用 ``QuantumLayer``，``NoiseQuantumLayer`` ，``VQCLayer`` 等VQNet接口实现量子机器学习的例子。
 
 在VQNet中使用QuantumLayer进行模型训练
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -3624,349 +3624,6 @@ QUnet主要是用于解决图像分割的技术。
     epoch:  9
     9 loss is : 0.0649107647
     Eval Accuracy: 1.0
-
-|
-
-在VQNet中使用QiskitLayer运行qiskit线路的模型训练
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-在VQNet中，我们同样可以使用IBM的qiskit量子计算库进行量子机器学习任务。
-
-VQNet实现了自动微分的qiskit量子线路运算类 ``QiskitLayer``,其继承于 ``Compatiblelayer``, ``Compatiblelayer`` 是用来兼容其他框架线路到VQNet的类。构建 ``QiskitLayer`` 的参数中需要传入一个类，其中定义了qiksit量子线路 ``qiskit.QuantumCircuit`` ，以及其运行和测量函数 ``run`` 。``run`` 函数需要把输入的数值绑定到qiskit的量子线路上。使用 ``QiskitLayer`` ,量子线路的输入以及参数的自动微分就可交由vqnet进行实现。
-
-参照上面的混合量子经典机器学习示例HQCNN进行MNIST分类任务,我们用qiskit构建了一个类 ``QISKIT_VQC`` 。其中 ``self._circuit`` 变量为量子线路。``self.input`` 为可变输入参数。在 ``run`` 函数中，需要使用qiskit的 ``assign_parameters`` 绑定参数并使用 ``self.backend.run`` 运行。
-
-.. note:: 如线路中还有其他可变参数，需要定义新的参数例如 ``self.theta = [qiskit.circuit.Parameter('theta1'),qiskit.circuit.Parameter('theta2')]`` ，并在 ``run`` 函数中，需要使用qiskit的 ``assign_parameters`` 绑定参数。
-
-.. code-block::
-
-    import sys,os
-
-    import pyvqnet.tensor.tensor as tensor
-    from pyvqnet.nn.linear import Linear
-    from pyvqnet.nn.conv import Conv2D
-
-    from pyvqnet.nn import activation as F
-    from pyvqnet.nn.pooling import MaxPool2D
-    from pyvqnet.nn.module import Module
-    from pyvqnet.optim.adam import Adam
-    import numpy as np
-    from pyvqnet.nn.linear import Linear
-    from pyvqnet.nn.loss import CategoricalCrossEntropy
-
-    from pyvqnet.tensor.tensor import QTensor
-    import random
-
-    random.seed(1234)
-
-    import qiskit
-    simulator = qiskit.Aer.get_backend('aer_simulator')
-
-    from pyvqnet.qnn.utils.qiskitlayer import QiskitLayer
-    from pyvqnet.data.data import data_generator
-    import time
-    import datetime
-
-    import matplotlib
-    try:
-        matplotlib.use('TkAgg')
-    except:
-        pass
-    import matplotlib.pyplot as plt
-
-    try:
-        matplotlib.use('TkAgg')
-    except:
-        pass
-
-    try:
-        import urllib.request
-    except ImportError:
-        raise ImportError('You should use Python 3.x')
-    import os.path
-    import gzip
-
-    url_base = 'http://yann.lecun.com/exdb/mnist/'
-    key_file = {
-        'train_img':'train-images-idx3-ubyte.gz',
-        'train_label':'train-labels-idx1-ubyte.gz',
-        'test_img':'t10k-images-idx3-ubyte.gz',
-        'test_label':'t10k-labels-idx1-ubyte.gz'
-    }
-
-
-
-    def _download(dataset_dir,file_name):
-        file_path = dataset_dir + "/" + file_name
-        
-        if os.path.exists(file_path):
-            with gzip.GzipFile(file_path) as f:
-                file_path_ungz = file_path[:-3].replace('\\', '/')
-                if not os.path.exists(file_path_ungz):
-                    open(file_path_ungz,"wb").write(f.read())
-            return
-
-        print("Downloading " + file_name + " ... ")
-        urllib.request.urlretrieve(url_base + file_name, file_path)
-        if os.path.exists(file_path):
-                with gzip.GzipFile(file_path) as f:
-                    file_path_ungz = file_path[:-3].replace('\\', '/')
-                    file_path_ungz = file_path_ungz.replace('-idx', '.idx')
-                    if not os.path.exists(file_path_ungz):
-                        open(file_path_ungz,"wb").write(f.read())
-        print("Done")
-        
-    def download_mnist(dataset_dir):
-        for v in key_file.values():
-            _download(dataset_dir,v)
-
-    class QISKIT_VQC:
-        """
-        This class provides a simple interface for interaction
-        with the quantum circuit
-        """
-
-        def __init__(self, n_qubits, backend, shots):
-            # --- Circuit definition ---
-            self._circuit = qiskit.QuantumCircuit(n_qubits)
-
-            all_qubits = [i for i in range(n_qubits)]
-            self.input = [qiskit.circuit.Parameter('input')]
-
-            self._circuit.h(all_qubits)
-            self._circuit.barrier()
-            self._circuit.ry(self.input[0], all_qubits)
-
-            self._circuit.measure_all()
-            # ---------------------------
-
-            self.backend = backend
-            self.shots = shots
-
-        def run(self,x):
-
-            params = dict(zip(self.input, x))
-            c1 = self._circuit.assign_parameters(params)
-
-            job = self.backend.run(c1,shots=self.shots)
-            result = job.result().get_counts()
-
-            counts = np.array(list(result.values()))
-            states = np.array(list(result.keys())).astype(float)
-
-            # Compute probabilities for each state
-            probabilities = counts / self.shots
-            # Get state expectation
-            expectation = np.sum(states * probabilities)
-
-            return expectation
-
-接下来就是使用vqnet定义模型以及训练流程了，使用 ``QiskitLayer`` 把qiskit线路加入vqnet的模型中。
-
-.. code-block::
-
-    #define qiskit circuits class
-    circuit = QISKIT_VQC(1, simulator, 100)
-
-
-    """
-    use QiskitLayer in Module
-    """
-    class Net(Module):
-        def __init__(self):
-            super(Net, self).__init__()
-            self.conv1 = Conv2D(input_channels=1, output_channels=6, kernel_size=(5, 5), stride=(1, 1), padding="valid")
-            self.maxpool1 = MaxPool2D([2, 2], [2, 2], padding="valid")
-            self.conv2 = Conv2D(input_channels=6, output_channels=16, kernel_size=(5, 5), stride=(1, 1), padding="valid")
-            self.maxpool2 = MaxPool2D([2, 2], [2, 2], padding="valid")
-            self.fc1 = Linear(input_channels=256, output_channels=64)
-            self.fc2 = Linear(input_channels=64, output_channels=1)
-            self.hybrid = QiskitLayer(circuit,0)
-            self.fc3 = Linear(input_channels=1, output_channels=2)
-
-        def forward(self, x):
-            x = F.ReLu()(self.conv1(x))  
-            x = self.maxpool1(x)
-            x = F.ReLu()(self.conv2(x)) 
-            x = self.maxpool2(x)
-            x = tensor.flatten(x, 1)  
-            x = F.ReLu()(self.fc1(x))  
-            x = self.fc2(x)   
-            x = self.hybrid(x)
-            x = self.fc3(x)
-            return x
-
-    def load_mnist(dataset="training_data", digits=np.arange(2), path="./"):         # 下载数据
-        import os, struct
-        from array import array as pyarray
-        download_mnist(path)
-        if dataset == "training_data":
-            fname_image = os.path.join(path, 'train-images-idx3-ubyte').replace('\\', '/')
-            fname_label = os.path.join(path, 'train-labels-idx1-ubyte').replace('\\', '/')
-        elif dataset == "testing_data":
-            fname_image = os.path.join(path, 't10k-images-idx3-ubyte').replace('\\', '/')
-            fname_label = os.path.join(path, 't10k-labels-idx1-ubyte').replace('\\', '/')
-        else:
-            raise ValueError("dataset must be 'training_data' or 'testing_data'")
-
-        flbl = open(fname_label, 'rb')
-        magic_nr, size = struct.unpack(">II", flbl.read(8))
-        lbl = pyarray("b", flbl.read())
-        flbl.close()
-
-        fimg = open(fname_image, 'rb')
-        magic_nr, size, rows, cols = struct.unpack(">IIII", fimg.read(16))
-        img = pyarray("B", fimg.read())
-        fimg.close()
-
-        ind = [k for k in range(size) if lbl[k] in digits]
-        N = len(ind)
-        images = np.zeros((N, rows, cols))
-        labels = np.zeros((N, 1), dtype=int)
-        for i in range(len(ind)):
-            images[i] = np.array(img[ind[i] * rows * cols: (ind[i] + 1) * rows * cols]).reshape((rows, cols))
-            labels[i] = lbl[ind[i]]
-
-        return images, labels
-
-    def data_select(train_num, test_num):
-        x_train, y_train = load_mnist("training_data")  # 下载训练数据
-        x_test, y_test = load_mnist("testing_data")
-
-        # Train Leaving only labels 0 and 1
-        idx_train = np.append(np.where(y_train == 0)[0][:train_num],
-                        np.where(y_train == 1)[0][:train_num])
-
-        x_train = x_train[idx_train]
-        y_train = y_train[idx_train]
-        x_train = x_train / 255
-        y_train = np.eye(2)[y_train].reshape(-1, 2)
-
-        # Test Leaving only labels 0 and 1
-        idx_test = np.append(np.where(y_test == 0)[0][:test_num],
-                        np.where(y_test == 1)[0][:test_num])
-
-        x_test = x_test[idx_test]
-        y_test = y_test[idx_test]
-        x_test = x_test / 255
-        y_test = np.eye(2)[y_test].reshape(-1, 2)
-        return x_train, y_train, x_test, y_test
-
-    if __name__=="__main__":
-        x_train, y_train, x_test, y_test = data_select(100, 300)
-
-        model = Net()
-        optimizer = Adam(model.parameters(), lr=0.005)
-        loss_func = CategoricalCrossEntropy()
-
-        epochs = 30
-        train_loss_list = []
-        val_loss_list = []
-        train_acc_list =[]
-        val_acc_list = []
-        model.train()
-        start = time.time()
-        start_init = time.time()
-        eval_time = []
-
-        for epoch in range(1, epochs+1):
-            total_loss = []
-            model.train()
-            batch_size = 1
-            correct = 0
-            n_train = 0
-            for x, y in data_generator(x_train, y_train, batch_size=1, shuffle=True):
-                start_time = time.time()
-                x = x.reshape(-1, 1, 28, 28)
-
-                optimizer.zero_grad()
-                output = model(x)       
-                loss = loss_func(y, output)  
-                loss_np = np.array(loss.data)
-                
-                np_output = np.array(output.data, copy=False)
-                mask = (np_output.argmax(1) == y.argmax(1))
-                correct += np.sum(np.array(mask))
-                n_train += batch_size
-
-                loss.backward()
-                optimizer._step()
-                end_time = time.time()
-                eval_time.append(end_time - start_time)
-                total_loss.append(loss_np)
-
-            train_loss_list.append(np.sum(total_loss) / len(total_loss))
-            train_acc_list.append(np.sum(correct) / n_train)
-            print("{:.0f} loss is : {:.10f}".format(epoch, train_loss_list[-1]))
-
-
-            model.eval()
-            correct = 0
-            total_loss1 = []
-            n_eval = 0
-            eval_time1 = []
-            start_init1 = time.time()
-            total_loss = []
-            for x, y in data_generator(x_test, y_test, batch_size=1, shuffle=True):
-                start_time1 = time.time()
-                x = x.reshape(-1, 1, 28, 28)
-                output = model(x)
-                loss = loss_func(y, output)
-                loss_np = np.array(loss.data)
-                np_output = np.array(output.data, copy=False)
-                mask = (np_output.argmax(1) == y.argmax(1))
-                correct += np.sum(np.array(mask))
-                n_eval += 1
-                
-                end_time1 = time.time()
-                eval_time1.append(end_time1 - start_time1)
-                total_loss.append(loss_np)
-            print(f"Eval Accuracy: {correct / n_eval}")
-            val_loss_list.append(np.sum(total_loss) / len(total_loss))
-            val_acc_list.append(np.sum(correct) / n_eval)
-
-        if IF_SHOW_IMAGE:
-            plt.figure()
-            figure_path = os.path.join(os.getcwd(), 'QiskitLayer LOSS.png')
-            xrange = range(1,len(train_loss_list)+1)
-            plt.plot(xrange,train_loss_list, color="blue", label="train")
-            plt.plot(xrange,val_loss_list, color="red", label="validation")
-            plt.title('VQNet combines with Qiskit')
-            plt.xlabel("Epochs")
-            plt.ylabel("Loss")
-            plt.xticks(np.arange(1, epochs +1,step = 2))
-            plt.legend(loc="upper right")
-            plt.savefig(figure_path)
-            plt.show()
-
-            plt.figure()
-            figure_path = os.path.join(os.getcwd(), 'QiskitLayer Accuracy.png')
-            plt.plot(xrange,train_acc_list, color="blue", label="train")
-            plt.plot(xrange,val_acc_list, color="red", label="validation")
-            plt.title('VQNet combines with Qiskit')
-            plt.xlabel("Epochs")
-            plt.ylabel("Accuracy")
-            plt.xticks(np.arange(1, epochs +1,step = 2))
-            plt.legend(loc="lower right")
-            plt.savefig(figure_path)
-            plt.show()
-
-
-.. note:: 以上示例在如下qiskit版本中验证qiskit: 0.31.0 , qiskit-aer: 0.9.1 , qiskit-aqua: 0.9.5 , qiskit-ibmq-provider: 0.17.0 , qiskit-ignis: 0.6.0 , qiskit-terra: 0.18.3 。
-
-训练集上Loss情况
-
-.. image:: ./images/qiskit_hqcnn_train_loss.png
-   :width: 600 px
-   :align: center
-
-|
-
-测试集上运行分类情况
-
-.. image:: ./images/qiskit_eval_test.png
-   :width: 600 px
-   :align: center
 
 |
 
