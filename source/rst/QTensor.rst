@@ -206,7 +206,7 @@ argmax
 
     返回输入 QTensor 中所有元素的最大值的索引，或返回 QTensor 按某一维度的最大值的索引。
 
-    :param dim: dim ([int]]) – 计算argmax的维度，只接受单个维度。 如果 dim == None，则返回输入张量中所有元素的最大值的索引。有效的 dim 范围是 [-R, R)，其中 R 是输入的 ndim。 当 dim < 0 时，它的工作方式与 dim + R 相同。
+    :param dim: 计算argmax的轴，只接受单个维度。 如果 dim == None，则返回输入张量中所有元素的最大值的索引。有效的 dim 范围是 [-R, R)，其中 R 是输入的 ndim。 当 dim < 0 时，它的工作方式与 dim + R 相同。
     :param keepdims: 输出 QTensor 是否保留了最大值索引操作的轴，默认是False。
 
     :return: 输入 QTensor 中最大值的索引。
@@ -248,7 +248,7 @@ argmin
 
     返回输入 QTensor 中所有元素的最小值的索引，或返回 QTensor 按某一维度的最小值的索引。
 
-    :param dim: dim ([int]]) – 计算argmax的维度，只接受单个维度。 如果 dim == None，则返回输入张量中所有元素的最小值的索引。有效的 dim 范围是 [-R, R)，其中 R 是输入的 ndim。 当 dim < 0 时，它的工作方式与 dim + R 相同。
+    :param dim: 计算argmax的轴，只接受单个维度。 如果 dim == None，则返回输入张量中所有元素的最小值的索引。有效的 dim 范围是 [-R, R)，其中 R 是输入的 ndim。 当 dim < 0 时，它的工作方式与 dim + R 相同。
     :param keepdims: 输出 QTensor 是否保留了最小值索引操作的轴，默认是False。
 
     :return: 输入 QTensor 中最小值的索引。
@@ -446,7 +446,7 @@ fill_rand_normal\_
     :param s: 方差，默认1。
     :param fast_math: 是否使用快速方法产生高斯分布，默认True。
 
-    :return: 无
+    :return: 无。
 
     Example::
 
@@ -1432,7 +1432,6 @@ topK
 
 .. py:function:: pyvqnet.tensor.topK(t, k, axis=-1, if_descent=True)
 
-    """
     返回给定输入张量沿给定维度的 k 个最大元素。
 
     如果 if_descent 为 False，则返回 k 个最小元素。
@@ -1467,7 +1466,6 @@ argtopK
 
 .. py:function:: pyvqnet.tensor.argtopK(t, k, axis=-1, if_descent=True)
 
-    """
     返回给定输入张量沿给定维度的 k 个最大元素的索引。
 
     如果 if_descent 为 False，则返回 k 个最小元素的索引。
@@ -1696,7 +1694,7 @@ std
     :param t: 输入 QTensor 。
     :param axis: 用于求标准差的轴，默认为None。
     :param keepdims: 输出张量是否保留了减小的维度。默认为False。
-    :param unbiased: unbiased (bool) -- 是否使用贝塞尔修正,默认使用。
+    :param unbiased: 是否使用贝塞尔修正,默认使用。
     :return: 输出 QTensor 。
 
     Example::
@@ -1729,7 +1727,7 @@ var
     :param t: 输入 QTensor 。
     :param axis: 用于求方差的轴，默认为None。
     :param keepdims: 输出张量是否保留了减小的维度。默认为False。
-    :param unbiased: unbiased (bool) -- 是否使用贝塞尔修正,默认使用。
+    :param unbiased: 是否使用贝塞尔修正,默认使用。
     :return: 输出 QTensor 。
 
     Example::
@@ -1829,7 +1827,7 @@ neg
 
 .. py:function:: pyvqnet.tensor.neg(t: pyvqnet.tensor.QTensor)
 
-    计算输入 t 每个元素的相反数并返回
+    计算输入 t 每个元素的相反数并返回。
 
     :param t: 输入 QTensor 。
 
@@ -2316,7 +2314,7 @@ clip
 
 .. py:function:: pyvqnet.tensor.clip(t: pyvqnet.tensor.QTensor, min_val, max_val)
 
-    将输入的所有元素进行剪裁，使得输出元素限制在[min_val, max_val]
+    将输入的所有元素进行剪裁，使得输出元素限制在[min_val, max_val]。
 
     :param t: 输入 QTensor 。
     :param min_val:  裁剪下限值。

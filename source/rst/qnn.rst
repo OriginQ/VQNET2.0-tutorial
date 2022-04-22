@@ -33,33 +33,33 @@ QuantumLayer是一个支持量子含参线路作为参数的自动求导模块�
 
 .. py:class:: pyvqnet.qnn.quantumlayer.QuantumLayer(qprog_with_measure,para_num,machine_type_or_cloud_token,num_of_qubits:int,num_of_cbits:int = 1,diff_method:str = "parameter_shift",delta:float = 0.01)
 
-	Abstract Calculation module for Variational Quantum Layer. It simulate a parameterized quantum circuit and get the measurement result. It inherits from Module,so that it can calculate gradients of circuits parameters,and trains Variational Quantum Circuits model or embeds Variational Quantum Circuits into hybird Quantum and Classic model.
+    变分量子层的抽象计算模块。对一个参数化的量子线路进行仿真，得到测量结果。该变分量子层继承了VQNet框架的梯度计算模块，可以计算线路参数的梯度，训练变分量子线路模型或将变分量子线路嵌入混合量子和经典模型。
 
-    :param qprog_with_measure: callable quantum circuits functions ,cosntructed by qpanda
-    :param para_num: `int` - Number of parameter
-    :param machine_type_or_cloud_token: qpanda machine type or pyQPANDA QCLOUD token : https://pyqpanda-toturial.readthedocs.io/zh/latest/Realchip.html
-    :param num_of_qubits: num of qubits
-    :param num_of_cbits: num of classic bits
-    :param diff_method: 'parameter_shift' or 'finite_diff'
-    :param delta:  delta for diff
-    :return: a module can calculate quantum circuits .
+    :param qprog_with_measure: 可调用量子线路函数，与qpanda共同构造。
+    :param para_num: `int` - 参数个数。
+    :param machine_type_or_cloud_token: qpanda量子虚拟机类型或pyQPANDA 量子云令牌 : https://pyqpanda-toturial.readthedocs.io/zh/latest/Realchip.html。
+    :param num_of_qubits: 量子比特数。
+    :param num_of_cbits: 经典比特数，默认为1。
+    :param diff_method: 求解量子线路参数梯度的方法，“参数位移”或“有限差分”，默认参数偏移。
+    :param delta: 有限差分计算梯度时的 \delta。
+    :return: 一个可以计算量子线路的模块。
 
     .. note::
-        qprog_with_measure is quantum circuits function defined in pyQPanda :https://pyqpanda-toturial.readthedocs.io/zh/latest/QCircuit.html.
+        qprog_with_measure是pyQPanda中定义的量子线路函数 :https://pyqpanda-toturial.readthedocs.io/zh/latest/QCircuit.html。
         
-        This function should contains following parameters,otherwise it can not run properly in QuantumLayer.
+        此函数应包含以下参数，否则无法在QuantumLayer中正常运行。
 
         qprog_with_measure (input,param,qubits,cbits,m_machine)
         
-            `input`: array_like input 1-dim classic data
+            `input`: 输入一维经典数据。
             
-            `param`: array_like input 1-dim quantum circuit's parameters
+            `param`: 输入一维量子线路的参数。
             
-            `qubits`: qubits allocated by QuantumLayer
+            `qubits`: 量子层分配的量子比特。
             
-            `cbits`: cbits allocated by QuantumLayer.if your circuits does not use cbits,you should also reserve this parameter.
+            `cbits`: cbits由QuantumLayer分配。如果线路不使用cbits，也应保留此参数。
             
-            `m_machine`: simulator created by QuantumLayer
+            `m_machine`: QuantumLayer创建的模拟器。
 
     Example::
 
@@ -99,7 +99,7 @@ QuantumLayer是一个支持量子含参线路作为参数的自动求导模块�
             rlt_prob = ProbsMeasure([0,2],prog,m_machine,qubits)
             return rlt_prob
 
-        pqc = QuantumLayer(pqctest,3,"cpu",4,1)
+        pqc = QuantumLayer(pqctest,3,"CPU",4,1)
         #classic data as input       
         input = QTensor([[1,2,3,4],[40,22,2,3],[33,3,25,2]] )
         #forward circuits
@@ -122,30 +122,28 @@ QuantumLayerV2
 
 .. py:class:: pyvqnet.qnn.quantumlayer.QuantumLayerV2(qprog_with_measure,para_num,diff_method:str = "parameter_shift",delta:float = 0.01)
 
-	Abstract Calculation module for Variational Quantum Layer. It simulate a parameterized quantum circuit and get the measurement result. It inherits from Module,so that it can calculate gradients of circuits parameters,and trains Variational Quantum Circuits model or embeds Variational Quantum Circuits into hybird Quantum and Classic model.
-
-    To use this module,you need to create your quantum virtual machine and allocate qubits and cbits by yourself.
+	变分量子层的抽象计算模块。对一个参数化的量子线路进行仿真，得到测量结果。该变分量子层继承了VQNet框架的梯度计算模块，可以计算线路参数的梯度，训练变分量子线路模型或将变分量子线路嵌入混合量子和经典模型。
     
-    :param qprog_with_measure: callable quantum circuits functions ,cosntructed by qpanda
-    :param para_num: `int` - Number of parameter
-    :param diff_method: 'parameter_shift' or 'finite_diff'
-    :param delta:  delta for diff
-    :return: a module can calculate quantum circuits .
+    :param qprog_with_measure: 可调用量子线路函数，与qpanda共同构造。
+    :param para_num: `int` - 参数个数。
+    :param diff_method: 求解量子线路参数梯度的方法，“参数位移”或“有限差分”，默认参数偏移。
+    :param delta: 有限差分计算梯度时的 \delta。
+    :return: 一个可以计算量子线路的模块。
 
     .. note::
-        qprog_with_measure is quantum circuits function defined in pyQPanda :https://pyqpanda-toturial.readthedocs.io/zh/latest/QCircuit.html.
+        qprog_with_measure是pyQPanda中定义的量子线路函数 :https://pyqpanda-toturial.readthedocs.io/zh/latest/QCircuit.html。
         
-        This function should contains following parameters,otherwise it can not run properly in QuantumLayerV2.
+        此函数应包含以下参数，否则无法在QuantumLayerV2中正常运行。
 
-        Compare to QuantumLayer.you should allocate qubits and simulator: https://pyqpanda-toturial.readthedocs.io/zh/latest/QuantumMachine.html,
+        与QuantumLayer相比。应该分配量子比特和模拟器: https://pyqpanda-toturial.readthedocs.io/zh/latest/QuantumMachine.html,
 
-        you may also need to allocate cbits if qprog_with_measure needs quantum measure: https://pyqpanda-toturial.readthedocs.io/zh/latest/Measure.html
+        如果qprog_with_measure需要quantum measure，您可能还需要分配cbits: https://pyqpanda-toturial.readthedocs.io/zh/latest/Measure.html
         
         qprog_with_measure (input,param)
         
-        `input`: array_like input 1-dim classic data
+        `input`: 输入一维经典数据。
         
-        `param`: array_like input 1-dim quantum circuit's parameters
+        `param`: 输入一维量子线路的参数。
         
 
     Example::
@@ -219,40 +217,42 @@ NoiseQuantumLayer
 在真实的量子计算机中，受制于量子比特自身的物理特性，常常存在不可避免的计算误差。为了能在量子虚拟机中更好的模拟这种误差，VQNet同样支持含噪声量子虚拟机。含噪声量子虚拟机的模拟更贴近真实的量子计算机，我们可以自定义支持的逻辑门类型，自定义逻辑门支持的噪声模型。
 现有可支持的量子噪声模型依据QPanda中定义，具体参考链接 `QPANDA2 <https://pyqpanda-toturial.readthedocs.io/zh/latest/NoiseQVM.html>`_ 中的介绍。
 
-使用 NoiseQuantumLayer 定义一个量子线路自动微分类,该类支持QPanda噪声虚拟机。用户定义一个函数作为参数 ``qprog_with_measure`` ，该函数需要包含pyQPanda定义的量子线路，同样需要传入一个参数 ``noise_set_config``,使用pyQPanda接口，设置噪声模型。
+使用 NoiseQuantumLayer 定义一个量子线路自动微分类，该类支持QPanda噪声虚拟机。用户定义一个函数作为参数 ``qprog_with_measure`` ，该函数需要包含pyQPanda定义的量子线路，同样需要传入一个参数 ``noise_set_config``，使用pyQPanda接口，设置噪声模型。
 
 .. py:class:: pyvqnet.qnn.quantumlayer.NoiseQuantumLayer(qprog_with_measure,para_num,machine_type,num_of_qubits:int,num_of_cbits:int=1,diff_method:str= "parameter_shift",delta:float=0.01,noise_set_config = None)
 
-	Abstract Calculation module for Variational Quantum Layer. It simulate a parameterized quantum circuit and get the measurement result. It inherits from Module,so that it can calculate gradients of circuits parameters,and trains Variational Quantum Circuits model or embeds Variational Quantum Circuits into hybird Quantum and Classic model.
+	变分量子层的抽象计算模块。对一个参数化的量子线路进行仿真，得到测量结果。该变分量子层继承了VQNet框架的梯度计算模块，可以计算线路参数的梯度，训练变分量子线路模型或将变分量子线路嵌入混合量子和经典模型。
 
-    This layer can use noise model in quantum circuits.
+    这一层可以在量子线路中使用噪声模型。
 
-    :param qprog_with_measure: callable quantum circuits functions ,cosntructed by qpanda
-    :param para_num: `int` - Number of parameters
-    :param machine_type: qpanda machine type
-    :param num_of_qubits: num of quantum bits
-    :param num_of_cbits: num of classic bits
-    :param diff_method: 'parameter_shift' or 'finite_diff'
-    :param delta:  delta for diff
-    :param noise_set_config: noise set function
-    :return: a module can calculate quantum circuits with noise model.
-    
+    :param qprog_with_measure: 可调用量子线路函数，与qpanda共同构造。
+    :param para_num: `int` - 参数个数。
+    :param machine_type: qpanda机器类型。
+    :param num_of_qubits: 量子比特数。
+    :param num_of_cbits: 经典比特数，默认为1。
+    :param diff_method: 求解量子线路参数梯度的方法，“参数位移”或“有限差分”，默认参数偏移。
+    :param delta: 有限差分计算梯度时的 \delta。
+    :param noise_set_config: 噪声设置函数。
+    :return: 一个可以计算含噪声量子线路的模块。
+
+
     .. note::
-        qprog_with_measure is quantum circuits function defined in pyQPanda :https://pyqpanda-toturial.readthedocs.io/zh/latest/QCircuit.html.
+        qprog_with_measure是pyQPanda中定义的量子线路函数 :https://pyqpanda-toturial.readthedocs.io/zh/latest/QCircuit.html。
         
-        This function should contains following parameters,otherwise it can not run properly in NoiseQuantumLayer.
+        此函数应包含以下参数，否则无法在NoiseQuantumLayer中正常运行。
         
         qprog_with_measure (input,param,qubits,cbits,m_machine)
         
-            `input`: array_like input 1-dim classic data
+            `input`: 输入一维经典数据。
             
-            `param`: array_like input 1-dim quantum circuit's parameters
+            `param`: 输入一维量子线路的参数。
             
-            `qubits`: qubits allocated by NoiseQuantumLayer
+            `qubits`: 量子层分配的量子比特。
             
-            `cbits`: cbits allocated by NoiseQuantumLayer.if your circuits does not use cbits,you should also reserve this parameter.
+            `cbits`: cbits由QuantumLayer分配。如果线路不使用cbits，也应保留此参数。
             
-            `m_machine`: simulator created by NoiseQuantumLayer
+            `m_machine`: QuantumLayer创建的模拟器。
+
 
     Example::
 
@@ -357,13 +357,13 @@ VQCLayer
 
 .. py:class:: pyvqnet.qnn.quantumlayer.VQC_wrapper
 
-    ``VQC_wrapper`` is a abstract class help to run VariationalQuantumCircuit on VQNet.
+    ``VQC_wrapper`` 是一个抽象类，用于在VQNet上运行VariationalQuantumCircuit。
 
-    ``build_common_circuits`` function contains circuits may be varaible according to the input.
+    ``build_common_circuits`` 线路根据输入的不同而变化。
 
-    ``build_vqc_circuits`` function contains VQC circuits with trainable weights.
+    ``build_vqc_circuits`` 构建带有可训练重量的VQC线路。
 
-    ``run`` function contains run function for VQC.
+    ``run`` VQC的运行函数。
     
     Example::
 
@@ -424,13 +424,17 @@ VQCLayer
 
 .. py:class:: pyvqnet.qnn.quantumlayer.VQCLayer(vqc_wrapper,para_num,machine_type_or_cloud_token,num_of_qubits:int,num_of_cbits:int = 1,diff_method:str = "parameter_shift",delta:float = 0.01)
 
-    Abstract Calculation module for Variational Quantum Circuits in pyQPanda.Please reference to :https://pyqpanda-toturial.readthedocs.io/zh/latest/VQG.html.
+    pyQPanda中变分量子线路的抽象计算模块。详情请访问： https://pyqpanda-toturial.readthedocs.io/zh/latest/VQG.html。
     
-    :param vqc_wrapper: VQC_wrapper class
-    :param para_num: `int` - Number of parameter
-    :param diff_method: 'parameter_shift' or 'finite_diff'
-    :param delta:  delta for diff
-    :return: a module can calculate VQC quantum circuits .
+    :param vqc_wrapper: VQC_wrapper类。
+    :param para_num: `int` - 参数个数。
+    :param machine_type: qpanda机器类型。
+    :param num_of_qubits: 量子比特数。
+    :param num_of_cbits: 经典比特数，默认为1。
+    :param diff_method: 求解量子线路参数梯度的方法，“参数位移”或“有限差分”，默认参数偏移。
+    :param delta: 有限差分计算梯度时的 \delta。
+    :return: 一个可以计算量子VQC线路的模块。
+
 
     Example::
 
@@ -504,7 +508,7 @@ VQCLayer
                 return prob
 
         qvc_vqc = QVC_demo()
-        VQCLayer(qvc_vqc,24,"cpu",4)
+        VQCLayer(qvc_vqc,24,"CPU",4)
 
 Qconv
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -519,18 +523,18 @@ Qconv是一种量子卷积算法接口。
 
 .. image:: ./images/qcnn_cir.png
 
-.. py:class:: pyvqnet.qnn.qcnn.qconv.QConv(input_channels,output_channels,quantum_number,stride=(1, 1),padding=(0, 0),kernel_initializer=normal,machine:str = "cpu"))
+.. py:class:: pyvqnet.qnn.qcnn.qconv.QConv(input_channels,output_channels,quantum_number,stride=(1, 1),padding=(0, 0),kernel_initializer=normal,machine:str = "CPU"))
 
-	Quantum Convolution module. Replace Conv2D kernal with quantum circuits.Inputs to the conv module are of shape (batch_size, input_channels, height, width).reference `Samuel et al. (2020) <https://arxiv.org/abs/2012.12177>`_.
+	量子卷积模块。用量子线路取代Conv2D内核，conv模块的输入为形状（批次大小、输入通道、高度、宽度） `Samuel et al. (2020) <https://arxiv.org/abs/2012.12177>`_ 。
 
-    :param input_channels: `int` - Number of input channels
-    :param output_channels: `int` - Number of output channels
-    :param quantum_number: `int` - Size of a single kernel. 
-    :param stride: `tuple` - Stride, defaults to (1, 1)
-    :param padding: `tuple` - Padding, defaults to (0, 0)
-    :param kernel_initializer: `callable` - Defaults to normal
-    :param machine: `str` - cpu simulation 
-    :return: a quantum cnn class
+    :param input_channels: `int` - 输入通道数。
+    :param output_channels: `int` - 输出通道数。
+    :param quantum_number: `int` - 单个内核的大小。
+    :param stride: `tuple` - 步长，默认为（1,1）。
+    :param padding: `tuple` - 填充，默认为（0，0）。
+    :param kernel_initializer: `callable` - 默认为正态分布。
+    :param machine: `str` - 使用的虚拟机CPU模拟。
+    :return: 量子卷积层。
     
     Example::
 
@@ -555,14 +559,14 @@ QLinear 实现了一种量子全连接算法。首先将数据编码到量子态
 
 .. image:: ./images/qlinear_cir.png
 
-.. py:class:: pyvqnet.qnn.qlinear.QLinear(input_channels,output_channels,machine: str = "cpu"))
+.. py:class:: pyvqnet.qnn.qlinear.QLinear(input_channels,output_channels,machine: str = "CPU"))
 
-    Quantum Linear module. Inputs to the linear module are of shape (input_channels, output_channels)
+    量子全连接模块。全连接模块的输入为形状（输入通道、输出通道）。
 
-    :param input_channels: `int` - Number of input channels
-    :param output_channels: `int` - Number of output channels
-    :param machine: `str` - cpu simulation
-    :return: a quantum linear layer
+    :param input_channels: `int` - 输入通道数。
+    :param output_channels: `int` - 输出通道数。
+    :param machine: `str` - CPU模拟。
+    :return: 量子全连接层。
 
     Exmaple::
 
@@ -606,14 +610,13 @@ BasicEmbeddingCircuit
 
 .. py:function:: pyvqnet.qnn.template.BasicEmbeddingCircuit(input_feat,qlist)
 
-    Encodes n binary features into a basis state of n qubits.
+    将n个二进制特征编码为n个量子比特的基态。
 
-    For example, for ``features=([0, 1, 1])``, the quantum system will be
-    prepared in state :math:`|011 \rangle`.
+    例如, 对于 ``features=([0, 1, 1])``, 在量子系统下其基态为 :math:`|011 \rangle`。
 
-    :param input_feat: binary input of shape ``(n)``
-    :param qlist: qubit lists that the template acts on
-    :return: quantum circuits
+    :param input_feat:  ``(n)`` 大小的二进制输入。
+    :param qlist: 构建该模板线路量子比特。
+    :return: 量子线路。
 
     Example::
         
@@ -638,23 +641,22 @@ AngleEmbeddingCircuit
 
 .. py:function:: pyvqnet.qnn.template.AngleEmbeddingCircuit(input_feat,qubits,rotation:str='X')
 
-    Encodes :math:`N` features into the rotation angles of :math:`n` qubits, where :math:`N \leq n`.
+    将 :math:`N` 特征编码到 :math:`n` 量子比特的旋转角度中, 其中 :math:`N \leq n`。
 
-    The rotations can be chosen as either : 'X' , 'Y' , 'Z', as defined by the ``rotation`` parameter:
+    旋转可以选择为 : 'X' , 'Y' , 'Z', 如 ``rotation`` 的参数定义为:
 
-    * ``rotation='X'`` uses the features as angles of RX rotations
+    * ``rotation='X'`` 将特征用作RX旋转的角度。
 
-    * ``rotation='Y'`` uses the features as angles of RY rotations
+    * ``rotation='Y'`` 将特征用作RY旋转的角度。
 
-    * ``rotation='Z'`` uses the features as angles of RZ rotations
+    * ``rotation='Z'`` 将特征用作RZ旋转的角度。
 
-    The length of ``features`` has to be smaller or equal to the number of qubits. If there are fewer entries in
-    ``features`` than qubits, the circuit does not Applies the remaining rotation gates.
-    
-    :param input_feat: numpy array which represents paramters
-    :param qubits: qubits allocated by pyQPanda
-    :param rotation: use what rotation ,default 'X'
-    :return: quantum circuits
+     ``features`` 的长度必须小于或等于量子比特的数量。如果 ``features`` 中的长度少于量子比特，则线路不应用剩余的旋转门。
+
+    :param input_feat: 表示参数的numpy数组。
+    :param qubits: pyQPanda分配的量子比特。
+    :param rotation: 使用什么旋转，默认为“X”。
+    :return: 量子线路。
 
     Example::
 
@@ -702,11 +704,11 @@ AmplitudeEmbeddingCircuit
 
 .. py:function:: pyvqnet.qnn.template.AmplitudeEmbeddingCircuit(input_feat,qubits)
 
-	Encodes :math:`2^n` features into the amplitude vector of :math:`n` qubits.To represent a valid quantum state vector, the L2-norm of ``features`` must be one.
+    将 :math:`2^n` 特征编码为 :math:`n` 量子比特的振幅向量。为了表示一个有效的量子态向量， ``features`` 的L2范数必须是1。
 
-    :param input_feat: numpy array which represents paramters
-    :param qubits: qubits list allocated by pyQPanda
-    :return: quantum circuits
+    :param input_feat: 表示参数的numpy数组。
+    :param qubits: pyQPanda分配的量子比特列表。
+    :return: 量子线路。
 
     Example::
 
@@ -733,16 +735,16 @@ IQPEmbeddingCircuits
 
 .. py:function:: pyvqnet.qnn.template.IQPEmbeddingCircuits(input_feat,qubits,rep:int = 1)
 
-	Encodes :math:`n` features into :math:`n` qubits using diagonal gates of an IQP circuit.
+    使用IQP线路的对角门将 :math:`n` 特征编码为 :math:`n` 量子比特。
 
-    The embedding was proposed by `Havlicek et al. (2018) <https://arxiv.org/pdf/1804.11326.pdf>`_.
+    编码是由 `Havlicek et al. (2018) <https://arxiv.org/pdf/1804.11326.pdf>`_ 提出。
 
-    The basic IQP circuit can be repeated by specifying ``n_repeats``. 
+    通过指定 ``n_repeats`` ，可以重复基本IQP线路。
 
-    :param input_feat: numpy array which represents paramters
-    :param qubits: qubits list allocated by pyQPanda
-    :param rep: repeat circuits block
-    :return: quantum circuits
+    :param input_feat: 表示参数的numpy数组。
+    :param qubits: pyQPanda分配的量子比特列表。
+    :param rep: 重复量子线路块。
+    :return: 量子线路。
 
     Example::
 
@@ -769,7 +771,7 @@ RotCircuit
 
 .. py:function:: pyvqnet.qnn.template.RotCircuit(para,qubits)
 
-	Arbitrary single qubit rotation.Number of qlist should be 1,and number of parameters should be 3
+    任意单量子比特旋转。qlist的数量应该是1，参数的数量应该是3。
 
     .. math::
 
@@ -779,9 +781,9 @@ RotCircuit
         \end{bmatrix}.
 
 
-    :param para: numpy array which represents paramters [\phi, \theta, \omega]
-    :param qubits: qubits allocated by pyQPanda,only accepted single qubits.
-    :return: quantum circuits
+    :param para: 表示参数  :math:`[\phi, \theta, \omega]` 的numpy数组。
+    :param qubits: pyQPanda分配的量子比特，只接受单个量子比特。
+    :return: 量子线路。
 
     Example::
 
@@ -808,7 +810,7 @@ CRotCircuit
 
 .. py:function:: pyvqnet.qnn.template.CRotCircuit(para,control_qubits,rot_qubits)
 
-	The controlled-Rot operator	
+	受控Rot操作符。
 
     .. math:: CR(\phi, \theta, \omega) = \begin{bmatrix}
             1 & 0 & 0 & 0 \\
@@ -817,10 +819,10 @@ CRotCircuit
             0 & 0 & e^{-i(\phi-\omega)/2}\sin(\theta/2) & e^{i(\phi+\omega)/2}\cos(\theta/2)
         \end{bmatrix}.
     
-    :param para: numpy array which represents paramters [\phi, \theta, \omega]
-    :param control_qubits: control qubit allocated by pyQPanda,number of qubit should be 1.
-    :param rot_qubits: Rot qubit allocated by pyQPanda,number of qubit should be 1.
-    :return: quantum circuits
+    :param para: 表示参数  :math:`[\phi, \theta, \omega]` 的numpy数组。
+    :param control_qubits: pyQPanda分配的控制量子比特，量子比特的数量应为1。
+    :param rot_qubits: 由pyQPanda分配的Rot量子比特，量子比特的数量应为1。
+    :return: 量子线路。
 
     Example::
 
@@ -849,7 +851,7 @@ CSWAPcircuit
 
 .. py:function:: pyvqnet.qnn.template.CSWAPcircuit(qubits)
 
-    The controlled-swap circuit
+    受控SWAP线路。
 
     .. math:: CSWAP = \begin{bmatrix}
             1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
@@ -862,10 +864,10 @@ CSWAPcircuit
             0 & 0 & 0 & 0 & 0 & 0 & 0 & 1
         \end{bmatrix}.
 
-    .. note:: The first qubits provided corresponds to the **control qubit**.
+    .. note:: 提供的第一个量子比特对应于 **control qubit** 。
 
-    :param qubits: list of qubits allocated by pyQPanda the first qubits is control qubit. length of qlists have to be 3.
-    :return: quantum circuits
+    :param qubits: pyQPanda分配的量子比特列表第一个量子比特是控制量子比特。qlist的长度必须为3。
+    :return: 量子线路。
 
     Example::
 
@@ -893,18 +895,18 @@ expval
 
 .. py:function:: pyvqnet.qnn.measure.expval(machine,prog,pauli_str_dict,qubits)
 
-	Expectation value of the supplied Hamiltonian observables 
+	提供的哈密顿量观测值的期望值。
     
-    if the observables are :math:`0.7Z\otimes X\otimes I+0.2I\otimes Z\otimes I`,
-    then ``Hamiltonian`` ``dict`` would be ``{{'Z0, X1':0.7} ,{'Z1':0.2}}`` .
+    如果观测值是 :math:`0.7Z\otimes X\otimes I+0.2I\otimes Z\otimes I`,
+    那么 Hamiltonian dict 将是 ``{{'Z0, X1':0.7} ,{'Z1':0.2}}`` 。
 
-    expval api only supports on QPanda CPUQVM now.Please checks  https://pyqpanda-toturial.readthedocs.io/zh/latest/index.html for alternative api.
+    expval api现在只支持pyQPanda CPUQVM。更多详情请访问  https://pyqpanda-toturial.readthedocs.io/zh/latest/index.html。
     
-    :param machine: machine created by qpanda
-    :param prog: quantum program created by qpanda
-    :param pauli_str_dict: Hamiltonian observables 
-    :param qubits: qubits allocated by pyQPanda
-    :return: expectation
+    :param machine: 由pyQPanda创建的量子虚拟机。
+    :param prog: pyQPanda创建的量子工程。
+    :param pauli_str_dict: 哈密顿量观测值。
+    :param qubits: pyQPanda分配的量子比特。
+    :return: 期望值。
                
 
     Example::
@@ -931,19 +933,19 @@ QuantumMeasure
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:function:: pyvqnet.qnn.measure.QuantumMeasure(measure_qubits:list,prog,machine,qubits,slots:int = 1000)
-	
-    Calculates circuits quantum measurement. Return the normalized result of the measurements obtained by the Monte Carlo method.
-    
-    Please checks  https://pyqpanda-toturial.readthedocs.io/zh/latest/Measure.html?highlight=measure_all for alternative api.
-    
-    QuantumMeasure api only supports on QPanda CPUQVM or QCloud now.
 
-    :param measure_qubits: list contains measure qubits index.
-    :param prog: quantum program from qpanda
-    :param machine: quantum virtual machine allocated by pyQPanda
-    :param qubits: qubits allocated by pyQPanda
-    :param slots: measure time,default 1000
-    :return: returns the normalized result of the measurements obtained by the Monte Carlo method.
+    计算量子线路测量。返回通过蒙特卡罗方法获得的归一化的测量结果。
+
+    更多详情请访问  https://pyqpanda-toturial.readthedocs.io/zh/latest/Measure.html?highlight=measure_all 。
+    
+    QuantumMeasure api现在只支持QPanda CPUQVM或QCloud。
+
+    :param measure_qubits: 列表包含测量比特索引。
+    :param prog: pyQPanda创建的量子工程。
+    :param machine: pyQPanda分配的量子虚拟机。
+    :param qubits: pyQPanda分配的量子比特。
+    :param slots: 测量次数，默认值为1000次。
+    :return: 返回通过蒙特卡罗方法获得的归一化的测量结果。
 
     Example::
 
@@ -974,17 +976,18 @@ ProbsMeasure
 
 .. py:function:: pyvqnet.qnn.measure.ProbsMeasure(measure_qubits:list,prog,machine,qubits)
 
-	Calculates circuits probabilities measurement.
+	计算线路概率测量。
     
-    Please checks https://pyqpanda-toturial.readthedocs.io/zh/latest/PMeasure.html for alternative api.
+    更多详情请访问 https://pyqpanda-toturial.readthedocs.io/zh/latest/PMeasure.html。
 
-    ProbsMeasure api only supports on QPanda CPUQVM or QCloud now.
+    ProbsMeasure api现在只支持pyQPanda CPUQVM或QCloud。
 
-    :param measure_qubits: list contains measure qubits index.
-    :param prog: quantum program from qpanda
-    :param machine: quantum virtual machine allocated by pyQPanda
-    :param qubits: qubit allocated by pyQPanda
-    :return: prob of measure qubits in lexicographic order.
+    :param measure_qubits: 列表包含测量比特索引
+    :param prog: qpanda创建的量子工程。
+    :param machine: pyQPanda分配的量子虚拟机。
+    :param qubits: pyQPanda分配的量子比特。
+    :return: 按字典顺序测量量子比特。
+
 
     Example::
 
