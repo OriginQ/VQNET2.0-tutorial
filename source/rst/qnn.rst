@@ -35,7 +35,7 @@ QuantumLayer是一个支持量子含参线路作为参数的自动求导模块�
 
     变分量子层的抽象计算模块。对一个参数化的量子线路进行仿真，得到测量结果。该变分量子层继承了VQNet框架的梯度计算模块，可以计算线路参数的梯度，训练变分量子线路模型或将变分量子线路嵌入混合量子和经典模型。
 
-    :param qprog_with_measure: 可调用量子线路函数，与qpanda共同构造。
+    :param qprog_with_measure: 用pyQPand构建的量子线路运行和测量函数。
     :param para_num: `int` - 参数个数。
     :param machine_type_or_cloud_token: qpanda量子虚拟机类型或pyQPANDA 量子云令牌 : https://pyqpanda-toturial.readthedocs.io/zh/latest/Realchip.html。
     :param num_of_qubits: 量子比特数。
@@ -124,7 +124,7 @@ QuantumLayerV2
 
 	变分量子层的抽象计算模块。对一个参数化的量子线路进行仿真，得到测量结果。该变分量子层继承了VQNet框架的梯度计算模块，可以计算线路参数的梯度，训练变分量子线路模型或将变分量子线路嵌入混合量子和经典模型。
     
-    :param qprog_with_measure: 可调用量子线路函数，与qpanda共同构造。
+    :param qprog_with_measure: 用pyQPand构建的量子线路运行和测量函数。
     :param para_num: `int` - 参数个数。
     :param diff_method: 求解量子线路参数梯度的方法，“参数位移”或“有限差分”，默认参数偏移。
     :param delta: 有限差分计算梯度时的 \delta。
@@ -225,7 +225,7 @@ NoiseQuantumLayer
 
     这一层可以在量子线路中使用噪声模型。
 
-    :param qprog_with_measure: 可调用量子线路函数，与qpanda共同构造。
+    :param qprog_with_measure: 用pyQPand构建的量子线路运行和测量函数。
     :param para_num: `int` - 参数个数。
     :param machine_type: qpanda机器类型。
     :param num_of_qubits: 量子比特数。
@@ -533,7 +533,7 @@ Qconv是一种量子卷积算法接口。
     :param stride: `tuple` - 步长，默认为（1,1）。
     :param padding: `tuple` - 填充，默认为（0，0）。
     :param kernel_initializer: `callable` - 默认为正态分布。
-    :param machine: `str` - 使用的虚拟机CPU模拟。
+    :param machine: `str` - 使用的虚拟机，默认使用CPU模拟。
     :return: 量子卷积层。
     
     Example::
@@ -565,7 +565,7 @@ QLinear 实现了一种量子全连接算法。首先将数据编码到量子态
 
     :param input_channels: `int` - 输入通道数。
     :param output_channels: `int` - 输出通道数。
-    :param machine: `str` - CPU模拟。
+    :param machine: `str` - 使用的虚拟机，默认使用CPU模拟。
     :return: 量子全连接层。
 
     Exmaple::
@@ -743,7 +743,7 @@ IQPEmbeddingCircuits
 
     :param input_feat: 表示参数的numpy数组。
     :param qubits: pyQPanda分配的量子比特列表。
-    :param rep: 重复量子线路块。
+    :param rep: 重复量子线路块,默认次数1。
     :return: 量子线路。
 
     Example::
@@ -900,7 +900,7 @@ expval
     如果观测值是 :math:`0.7Z\otimes X\otimes I+0.2I\otimes Z\otimes I`,
     那么 Hamiltonian dict 将是 ``{{'Z0, X1':0.7} ,{'Z1':0.2}}`` 。
 
-    expval api现在只支持pyQPanda CPUQVM。更多详情请访问  https://pyqpanda-toturial.readthedocs.io/zh/latest/index.html。
+    expval api现在只支持pyQPanda ``CPUQVM`` 。更多详情请访问  https://pyqpanda-toturial.readthedocs.io/zh/latest/index.html。
     
     :param machine: 由pyQPanda创建的量子虚拟机。
     :param prog: pyQPanda创建的量子工程。
@@ -938,7 +938,7 @@ QuantumMeasure
 
     更多详情请访问  https://pyqpanda-toturial.readthedocs.io/zh/latest/Measure.html?highlight=measure_all 。
     
-    QuantumMeasure api现在只支持QPanda CPUQVM或QCloud。
+    QuantumMeasure api现在只支持QPanda ``CPUQVM`` 或 ``QCloud`` 。
 
     :param measure_qubits: 列表包含测量比特索引。
     :param prog: pyQPanda创建的量子工程。
@@ -980,7 +980,7 @@ ProbsMeasure
     
     更多详情请访问 https://pyqpanda-toturial.readthedocs.io/zh/latest/PMeasure.html。
 
-    ProbsMeasure api现在只支持pyQPanda CPUQVM或QCloud。
+    ProbsMeasure api现在只支持pyQPanda ``CPUQVM`` 或 ``QCloud`` 。
 
     :param measure_qubits: 列表包含测量比特索引
     :param prog: qpanda创建的量子工程。

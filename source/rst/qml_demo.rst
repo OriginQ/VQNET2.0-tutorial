@@ -3826,3 +3826,114 @@ VQNet提供了封装类 ``VQC_wrapper`` ，用户使用普通逻辑门在函数 
     start testing..............
     [0.3132616580]
     test:--------------->loss:QTensor(None, requires_grad=True) #####accuray:1.0
+
+
+QGAN制备任意分布初态
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+已实现IBM 提出的 `QGAN算法 <https://www.nature.com/articles/s41534-019-0223-2>`_ 。该算法使用纯量子变分线路制备特定随机分布的生成量子态，可以减少原先生成特定量子态所需的逻辑门，降低量子线路复杂度。
+QGAN使用经典的GAN模型结构，分为Generator生成器与Discriminator鉴别器两个子模型，Generator为量子线路产生特定分布，而Generator生成的分布generated data samples 以及真实的随机分布training data samples 输入Discriminator模型进行鉴别真伪。
+
+.. image:: ./images/qgan-arch.PNG
+   :width: 600 px
+   :align: center
+
+|
+
+
+构建VQNet的量子生成对抗网络接口 ``QGANAPI`` 类，我们可以对真实分布的数据 real_data 使用量子生成器进行初态制备。这里使用量子比特数为3，量子生成器内部含参线路模块重复次数为1。
+使用的评价指标为KL散度。
+
+.. code-block::
+
+    import pickle
+    import os
+    import pyqpanda as pq
+    from pyvqnet.qnn.qgan.qgan_utils import QGANAPI
+    import numpy as np
+
+
+
+    number_of_data = 10000
+    # Load data samples from different distributions
+    mu = 1
+    sigma = 1
+    real_data = np.random.lognormal(mean=mu, sigma=sigma, size=number_of_data)
+
+
+    # intial
+    save_dir = None
+    qgan_model = QGANAPI(
+        real_data,
+        # numpy generated data distribution, 1 - dim.
+        num_of_qubits,
+        batch_size=2000,
+        num_epochs=2000,
+        q_g_cir=None,
+        bounds = [0.0,2**num_of_qubits -1],
+        reps=rep,
+        metric="kl",
+        tol_rel_ent=0.01,
+        if_save_param_dir=save_dir  
+    )
+
+接下来使用其训练接口 ``train`` 训练。
+.. code-block::
+
+    # train
+    qgan_model.train()  # train qgan
+
+``eval`` 画出其与真实分布之间的概率分布函数对比:
+
+.. code-block::
+
+    # show probability distribution function of generated distribution and real distribution
+    qgan_model.eval(real_data)  #draw pdf
+
+
+``get_trained_quantum_parameters`` 获取训练参数并输出为一个numpy数组形式。如果 ``save_dir`` 不为空，则该类将保存参数到文件中。可以通过 ``load_param_and_eval`` 函数载入参数，并可以通过
+``get_circuits_with_trained_param`` 获取训练完参数的量子生成器pyQPanda线路。
+
+.. code-block::
+
+    # get trained quantum parameters
+    param = qgan_model.get_trained_quantum_parameters()
+    print(f" trained param {param}")
+
+    #load saved parameters files 
+    if save_dir is not None:
+        path = os.path.join(
+            save_dir, qgan_model._start_time + "trained_qgan_param.pickle")
+        with open(path, "rb") as file:
+            t3 = pickle.load(file)
+        param = t3["quantum_parameters"]
+        print(f" trained param {param}")
+
+    #show probability distribution function of generated distribution and real distribution
+    qgan_model.load_param_and_eval(param)
+
+    #calculate metric
+    print(qgan_model.eval_metric(param, "kl"))
+
+    #get generator quantum circuit
+    m_machine = pq.CPUQVM()
+    m_machine.init_qvm()
+    qubits = m_machine.qAlloc_many(num_of_qubits)
+    qpanda_cir = qgan_model.get_circuits_with_trained_param(qubits)
+    print(qpanda_cir)
+
+生成lognormal分布的损失函数以及概率分布函数图，一般来说需要使用不同的随机种子多次训练该模型可得到较好接口。:
+
+.. image:: ./images/qgan-loss.PNG
+   :width: 600 px
+   :align: center
+
+|
+
+.. image:: ./images/qgan-pdf.PNG
+   :width: 600 px
+   :align: center
+
+|
+
+

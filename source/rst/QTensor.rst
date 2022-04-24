@@ -629,7 +629,7 @@ __getitem__
     若作为索引的 QTensor 为逻辑运算的结果，则进行 布尔数组索引。
 
     .. note:: a[3][4][1] 形式的索引暂不支持, 使用 a[3,4,1] 形式代替。
-                Ellipsis `...` 暂不支持 。
+                ``Ellipsis`` `...` 暂不支持 。
 
     :param item: 以 pyslice , 整数, QTensor 构成切片索引。
 
@@ -722,7 +722,7 @@ __setitem__
     若作为索引的 QTensor 为逻辑运算的结果，则进行 布尔数组索引。
 
     .. note:: a[3][4][1] 形式的索引暂不支持, 使用 a[3,4,1] 形式代替。
-                Ellipsis `...` 暂不支持 。
+                ``Ellipsis`` `...` 暂不支持 。
 
     :param item: 以 pyslice , 整数, QTensor 构成切片索引。
 
@@ -1040,7 +1040,7 @@ linspace
 
 .. py:function:: pyvqnet.tensor.linspace(start, end, num, device: int = 0, requires_grad= False)
 
-    创建一维 QTensor ，其中的元素为区间start和stop上均匀间隔的num个值。
+    创建一维 QTensor ，其中的元素为区间 start 和 end 上均匀间隔的共 num 个值。
 
     :param start: 间隔开始。
     :param end: 间隔结束。
@@ -1439,6 +1439,8 @@ topK
     :param t: 输入 QTensor 。
     :param k: 取排序后的 k 的个数。
     :param axis: 要排序的维度。默认 = -1，最后一个轴。
+    :param if_descent: 排序使用升序还是降序，默认降序。
+
     :return: 新的 QTensor 。
 
     Examples::
@@ -1473,6 +1475,8 @@ argtopK
     :param t: 输入 QTensor 。
     :param k: 取排序后的 k 的个数。
     :param axis: 要排序的维度。默认 = -1，最后一个轴。
+    :param if_descent: 排序使用升序还是降序，默认降序。
+
     :return: 新的 QTensor 。
 
     Examples::
@@ -1655,7 +1659,7 @@ mean
 median
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:function:: pyvqnet.tensor.median(t: pyvqnet.tensor.QTensor, *kargs)
+.. py:function:: pyvqnet.tensor.median(t: pyvqnet.tensor.QTensor, axis=None, keepdims=False)
 
     对输入的 QTensor 按 axis 设定的轴计算元素的平均，如果 axis 是None，则返回所有元素平均。
 
@@ -1720,7 +1724,7 @@ std
 var
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:function:: pyvqnet.tensor.var(t: pyvqnet.tensor.QTensor, *kargs)
+.. py:function:: pyvqnet.tensor.var(t: pyvqnet.tensor.QTensor, axis=None, keepdims=False, unbiased=True)
 
     对输入的 QTensor 按 axis 设定的轴计算元素的方差，如果 axis 是None，则返回所有元素方差。
 
@@ -2429,7 +2433,7 @@ isinf
 isnan
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:function:: pyvqnet.tensor.isnan(A)
+.. py:function:: pyvqnet.tensor.isnan(t)
 
     逐元素判断输入的每一个值是否为 +/-NaN 。
 
@@ -2450,7 +2454,7 @@ isnan
 isneginf
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:function:: pyvqnet.tensor.isneginf(A)
+.. py:function:: pyvqnet.tensor.isneginf(t)
 
     逐元素判断输入的每一个值是否为 -INF 。
 
@@ -2471,7 +2475,7 @@ isneginf
 isposinf
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:function:: pyvqnet.tensor.isposinf(A)
+.. py:function:: pyvqnet.tensor.isposinf(t)
 
     逐元素判断输入的每一个值是否为 +INF 。
 
@@ -2639,7 +2643,7 @@ greater_equal
 less
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:function:: pyvqnet.tensor.less(A, B)
+.. py:function:: pyvqnet.tensor.less(t1, t2)
 
     逐元素比较 t1 是否小于 t2 ，满足条件则返回1，否则返回0。
 
@@ -2666,7 +2670,7 @@ less
 less_equal
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:function:: pyvqnet.tensor.less_equal(A, B)
+.. py:function:: pyvqnet.tensor.less_equal(t1, t2)
 
     逐元素比较 t1 是否小于等于 t2 ，满足条件则返回1，否则返回0。
 
@@ -2693,7 +2697,7 @@ less_equal
 equal
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:function:: pyvqnet.tensor.equal(A, B)
+.. py:function:: pyvqnet.tensor.equal(t1, t2)
 
     逐元素比较 t1 是否等于 t2 ，满足条件则返回1，否则返回0。
 
@@ -2720,7 +2724,7 @@ equal
 not_equal
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:function:: pyvqnet.tensor.not_equal(A, B)
+.. py:function:: pyvqnet.tensor.not_equal(t1, t2)
 
     逐元素比较 t1 是否不等于 t2 ，满足条件则返回1，否则返回0。
 
@@ -2810,7 +2814,7 @@ stack
 
     沿新轴 axis 堆叠输入的 QTensors ，返回一个新的 QTensor。
 
-    :param args: 包含输入 QTensor 。
+    :param QTensors: 包含输入 QTensor 。
     :param axis: 要堆叠的维度。 必须介于 0 和输入张量的最大维数之间。
     :return: 输出 QTensor 。
 

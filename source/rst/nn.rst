@@ -210,7 +210,7 @@ Conv1D
     :param output_channels: `int` - 输出数据的通道数。
     :param kernel_size: `int` - 卷积核的尺寸. 卷积核形状 = [input_channels,output_channels,kernel_size,1]。
     :param stride: `int` - 步长, 默认为1。
-    :param padding: `str` - 填充选项, "valid" or "same". 默认 "valid"。
+    :param padding: `str` - 填充选项, "valid" or "same"。 默认 "valid"。
     :param use_bias: `bool` - 是否使用偏置项, 默认使用。
     :param kernel_initializer: `callable` - 卷积核初始化方法。默认为空，使用kaiming_uniform。
     :param bias_initializer: `callable` - 偏置初始化方法。默认为空，使用kaiming_uniform。
@@ -255,7 +255,7 @@ Conv2D
     :param output_channels: `int` - 输出数据的通道数。
     :param kernel_size: `tuple|list` - 卷积核的尺寸. 卷积核形状 = [input_channels,output_channels,kernel_size,kernel_size]。
     :param stride: `tuple|list` - 步长, 默认为 (1, 1)|[1,1]。
-    :param padding: `str` - 填充选项, "valid" or "same". 默认 "valid"。
+    :param padding: `str` - 填充选项, "valid" or "same"。 默认 "valid"。
     :param use_bias: `bool` - 是否使用偏置项, 默认使用。
     :param kernel_initializer: `callable` - 卷积核初始化方法。默认为空，使用kaiming_uniform。
     :param bias_initializer: `callable` - 偏置初始化方法。默认为空，使用kaiming_uniform。
@@ -307,7 +307,7 @@ ConvT2D
     :param output_channels: `int` - 输出数据的通道数。
     :param kernel_size: `tuple|list` - 卷积核的尺寸，卷积核形状 = [input_channels,output_channels,kernel_size,kernel_size]。 
     :param stride: `tuple|list` - 步长, 默认为 (1, 1)|[1,1]。
-    :param padding:  填充选项, "valid" or "same". 默认 "valid"。
+    :param padding:  填充选项, "valid" or "same"。 默认 "valid"。
     :param use_bias: `bool` - 是否使用偏置项, 默认使用。
     :param kernel_initializer: `callable` - 卷积核初始化方法。默认为空，使用kaiming_uniform。
     :param bias_initializer: `callable` - 偏置项初始化方法。默认为空，使用kaiming_uniform。
@@ -357,8 +357,8 @@ AvgPool1D
 
     :param kernel: 平均池化的窗口大小。
     :param strides: 窗口移动的步长。
-    :param padding: 填充选项, "valid" or "same". 默认 "valid"。
-    :param name: 命名，默认为”“。
+    :param padding: 填充选项, "valid" or "same"。 默认 "valid"。
+    :param name: 命名，默认为""。
     :return: 一维平均池化层实例。
 
     .. note::
@@ -399,8 +399,8 @@ MaxPool1D
 
     :param kernel: 最大池化的窗口大小。
     :param strides: 窗口移动的步长。
-    :param padding: 填充选项, "valid" or "same". 默认 "valid"。
-    :param name: 命名，默认为”“。
+    :param padding: 填充选项, "valid" or "same"。 默认 "valid"。
+    :param name: 命名，默认为""。
 
     :return: 一维最大池化层实例。
 
@@ -441,8 +441,8 @@ AvgPool2D
 
     :param kernel: 平均池化的窗口大小。
     :param strides: 窗口移动的步长。
-    :param padding: 填充选项, "valid" or "same". 默认 "valid"。
-    :param name: 命名，默认为”“。
+    :param padding: 填充选项, "valid" or "same"。 默认 "valid"。
+    :param name: 命名，默认为""。
 
     :return: 二维平均池化层实例。
 
@@ -481,8 +481,8 @@ MaxPool2D
 
     :param kernel: 最大池化的窗口大小。
     :param strides: 窗口移动的步长。
-    :param padding: 填充选项, "valid" or "same". 默认 "valid"。
-    :param name: 命名，默认为”“。
+    :param padding: 填充选项, "valid" or "same"。 默认 "valid"。
+    :param name: 命名，默认为""。
 
     :return: 二维最大池化层实例。
 
@@ -524,7 +524,7 @@ Embedding
     :param num_embeddings: `int` - 嵌入字典的大小。
     :param embedding_dim: `int` - 每个嵌入向量的大小
     :param weight_initializer: `callable` - 参数初始化方式，默认正态分布。
-    :param name: 嵌入层的命名，默认为”“。
+    :param name: 嵌入层的命名，默认为""。
 
     :return: a Embedding 实例。
 
@@ -587,7 +587,7 @@ BatchNorm2d
     :param beta_initializer: `callable` - beta的初始化方式，默认全零初始化。
     :param gamma_initializer: `callable` - gamma的的初始化方式，默认全一初始化。
     :param epsilon: `float` - 数值稳定参数, 默认 1e-5。
-    :param name: 批归一化层命名，默认为”“。
+    :param name: 批归一化层命名，默认为""。
 
     :return: 二维批归一化层实例。
 
@@ -644,8 +644,8 @@ BatchNorm1d
     :param momentum: `float` - 计算指数加权平均时的动量，默认为 0.1。
     :param beta_initializer: `callable` - beta的初始化方式，默认全零初始化。
     :param gamma_initializer: `callable` - gamma的的初始化方式，默认全一初始化。
-    :param epsilon: `float` - 数值稳定性常数，默认为 1e-5
-    :param name: 批归一化层命名，默认为”“。
+    :param epsilon: `float` - 数值稳定性常数，默认为 1e-5。
+    :param name: 批归一化层命名，默认为""。
 
     :return: 一维批归一化层实例。
 
@@ -683,7 +683,7 @@ LayerNorm2d
 
     :param norm_size: `float` - 归一化大小，应该等于 C * H * W。
     :param epsilon: `float` - 数值稳定性常数，默认为 1e-5。
-    :param name: 层归一化层命名，默认为”“。
+    :param name: 层归一化层命名，默认为""。
     :return: 二维层归一化实例。
 
     Example::
@@ -732,7 +732,7 @@ LayerNorm1d
 
     :param norm_size: `float` - 归一化大小，应该等于最后一维大小。
     :param epsilon: `float` - 数值稳定性常数，默认为 1e-5。
-    :param name: 层归一化层命名，默认为”“。
+    :param name: 层归一化层命名，默认为""。
 
     :return: 一维层归一化实例。
 
@@ -767,7 +767,7 @@ Linear
     :param weight_initializer: `callable` - 权重初始化函数，默认为空，使用he_uniform。
     :param bias_initializer: `callable` - 偏置初始化参数，默认为空，使用he_uniform。
     :param use_bias: `bool` - 是否使用偏置项, 默认使用。
-    :param name: 线性层的命名，默认为”“。
+    :param name: 线性层的命名，默认为""。
 
     :return: 线性层实例。
 
@@ -859,19 +859,19 @@ MeanSquaredError
 
     均方根误差前向计算函数的所需参数:
 
-    Target: :math:`(N, *)`, 目标值， 和输入一样维度的 QTensor 。
+    target: :math:`(N, *)`, 目标值， 和输入一样维度的 QTensor 。
 
-    Input: :math:`(N, *)` 输入值，其中 :math:`*` 表示任意维度。
+    output: :math:`(N, *)` 输入值，其中 :math:`*` 表示任意维度。
 
     Example::
 
         from pyvqnet.tensor import QTensor 
         from pyvqnet.nn import MeanSquaredError
         target = QTensor([[0, 0, 1, 0, 0, 0, 0, 0, 0, 0]], requires_grad=True)
-        input = QTensor([[0.1, 0.05, 0.7, 0, 0.05, 0.1, 0, 0, 0, 0]], requires_grad=True)
+        output = QTensor([[0.1, 0.05, 0.7, 0, 0.05, 0.1, 0, 0, 0, 0]], requires_grad=True)
 
         loss_result = MeanSquaredError()
-        result = loss_result(target, input)
+        result = loss_result(target, output)
         print(result)
 
         # [0.0115000]
@@ -900,9 +900,9 @@ BinaryCrossEntropy
 
     平均二元交叉熵误差前向计算函数的所需参数:
 
-    Target: :math:`(N, *)`, 目标值，和输入一样维度的 QTensor 。
+    target: :math:`(N, *)`, 目标值，和输入一样维度的 QTensor 。
 
-    Input: :math:`(N, *)` 输入值，其中 :math:`*` 表示任意维度。
+    output: :math:`(N, *)` 输入值，其中 :math:`*` 表示任意维度。
     
     Example::
 
@@ -938,9 +938,9 @@ CategoricalCrossEntropy
 
     误差前向计算函数的所需参数:
 
-    Target: :math:`(N, *)`, 目标值，和输入一样维度的 QTensor 。
+    target: :math:`(N, *)`, 目标值，和输入一样维度的 QTensor 。
 
-    Input: :math:`(N, *)` 输入值，其中 :math:`*` 表示任意维度。
+    output: :math:`(N, *)` 输入值，其中 :math:`*` 表示任意维度。
     
     Example::
 
@@ -975,9 +975,9 @@ SoftmaxCrossEntropy
 
     误差前向计算函数的所需参数:
 
-    Target: :math:`(N, *)`, 目标值，和输入一样维度的 QTensor 。
+    target: :math:`(N, *)`, 目标值，和输入一样维度的 QTensor 。
 
-    Input: :math:`(N, *)` 输入值，其中 :math:`*` 表示任意维度。
+    output: :math:`(N, *)` 输入值，其中 :math:`*` 表示任意维度。
     
     Example::
 
@@ -1014,7 +1014,7 @@ Sigmoid
     .. math::
         \text{Sigmoid}(x) = \frac{1}{1 + \exp(-x)}
 
-    :param name: 激活函数层的命名，默认为”“。
+    :param name: 激活函数层的命名，默认为""。
 
     :return: 一个Sigmoid激活函数层实例。
 
@@ -1038,7 +1038,7 @@ Softplus
     .. math::
         \text{Softplus}(x) = \log(1 + \exp(x))
 
-    :param name: 激活函数层的命名，默认为”“。
+    :param name: 激活函数层的命名，默认为""。
 
     :return: 一个Softplus激活函数层实例。
 
@@ -1062,7 +1062,7 @@ Softsign
     .. math::
         \text{SoftSign}(x) = \frac{x}{ 1 + |x|}
 
-    :param name: 激活函数层的命名，默认为”“。
+    :param name: 激活函数层的命名，默认为""。
 
     :return: 一个Softsign 激活函数层实例。
 
@@ -1089,7 +1089,7 @@ Softmax
 
 
     :param axis: 计算的维度（最后一个轴为-1），默认值 = -1。
-    :param name: 激活函数层的命名，默认为”“。
+    :param name: 激活函数层的命名，默认为""。
 
     :return: 一个Softmax 激活函数层实例。
 
@@ -1117,7 +1117,7 @@ HardSigmoid
             x / 5 + 1 / 2 & \text{otherwise}
         \end{cases}
 
-    :param name: 激活函数层的命名，默认为”“。
+    :param name: 激活函数层的命名，默认为""。
 
     :return: 一个HardSigmoid 激活函数层实例。
 
@@ -1145,7 +1145,7 @@ ReLu
         \end{cases}
 
 
-    :param name: 激活函数层的命名，默认为”“。
+    :param name: 激活函数层的命名，默认为""。
 
     :return: 一个ReLu 激活函数层实例。
 
@@ -1175,7 +1175,7 @@ LeakyReLu
         \end{cases}
 
     :param alpha: LeakyRelu 系数，默认:0.01。
-    :param name: 激活函数层的命名，默认为”“。
+    :param name: 激活函数层的命名，默认为""。
 
     :return: 一个LeakyReLu 激活函数层实例。
 
@@ -1204,7 +1204,7 @@ ELU
         \end{cases}
 
     :param alpha: ELU 系数，默认:1。
-    :param name: 激活函数层的命名，默认为”“。
+    :param name: 激活函数层的命名，默认为""。
 
     :return: ELU 激活函数层实例。
 
@@ -1228,7 +1228,7 @@ Tanh
     .. math::
         \text{Tanh}(x) = \frac{\exp(x) - \exp(-x)} {\exp(x) + \exp(-x)}
 
-    :param name: 激活函数层的命名，默认为”“。
+    :param name: 激活函数层的命名，默认为""。
 
     :return: Tanh 激活函数层实例。
 
