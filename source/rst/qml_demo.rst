@@ -3878,6 +3878,7 @@ QGAN使用经典的GAN模型结构，分为Generator生成器与Discriminator鉴
     )
 
 接下来使用其训练接口 ``train`` 训练。
+
 .. code-block::
 
     # train
