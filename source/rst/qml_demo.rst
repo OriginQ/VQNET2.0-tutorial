@@ -2371,7 +2371,7 @@ QUnet主要是用于解决图像分割的技术。
 
 数据准备
 """""""""""
-我们将使用VOCdevkit/VOC2012官方库的数据: `VOC2012 <http://host.robots.ox.ac.uk/pascal/VOC/voc2012/VOCtrainval_11-May-2012.tar>`_ , 作为图像分割数据。
+我们将使用VOCdevkit/VOC2012官方库的数据: `VOC2012 <http://host.robots.ox.ac.uk/pascal/VOC/voc2012/#devkit>`_ , 作为图像分割数据。
 这些样本分为训练数据 training_data 和测试数据 testing_data。 
 
 .. image:: ./images/Unet_data_imshow.png
@@ -2521,6 +2521,13 @@ QUnet主要是用于解决图像分割的技术。
                     out[j // 2, k // 2, c] = q_results[c]
         return out
 
+    def quantum_data_preprocessing(images):
+        quantum_images = []
+        for _, img in enumerate(images):
+            quantum_images.append(quanconv_(img))
+        quantum_images = np.asarray(quantum_images)
+        return quantum_images
+
 构建混合经典量子神经网络
 """"""""""""""""""""""""""
 
@@ -2664,6 +2671,7 @@ QUnet主要是用于解决图像分割的技术。
 定义损失函数以及优化器以及定义整个训练测试流程。 对于形如下图的混合神经网络模型，我们通过循环输入数据前向计算损失值，
 并在反向计算中自动计算出各个待训练参数的梯度，并使用优化器进行参数优化，直到迭代次数满足预设值。
 我们这里使用前面下载的VOC2012数据中选取100张作为训练集，10张作为测试集。训练集目录指定为 `path0`,测试集目录指定为 `path1`。
+其中，图像以及其对应的标签图像都经过了量子卷积模块 ``quantum_data_preprocessing`` 进行预处理，我们Unet的训练目标是使得同时经过量子线路预处理的图像和标签尽可能贴近。
 
 .. code-block::
 
@@ -2710,10 +2718,10 @@ QUnet主要是用于解决图像分割的技术。
     
     if PREPROCESS == True:
         print("Quantum pre-processing of train images:")
-        q_train_images = QuantumDataPreprocessing(train_images)
-        q_test_images = QuantumDataPreprocessing(test_images)
-        q_train_label = QuantumDataPreprocessing(train_labels)
-        q_test_label = QuantumDataPreprocessing(test_labels)
+        q_train_images = quantum_data_preprocessing(train_images)
+        q_test_images = quantum_data_preprocessing(test_images)
+        q_train_label = quantum_data_preprocessing(train_labels)
+        q_test_label = quantum_data_preprocessing(test_labels)
 
         # Save pre-processed images
         print('Quantum Data Saving...')
@@ -2738,7 +2746,7 @@ QUnet主要是用于解决图像分割的技术。
     test_y = test_labels
 
     trainset = MyDataset(train_x, train_y)
-
+    testset = MyDataset(test_x, test_y)
     x_train = []
     y_label = []
     model = UNet()
@@ -2828,9 +2836,10 @@ QUnet主要是用于解决图像分割的技术。
 
     modela = load_parameters("./result/Q-Unet_End.model")
     print("----------------PREDICT-------------")
-    model.train()
+    model.load_state_dict(modela)
+    model.eval()
 
-    for i, (x1, y1) in enumerate(trainset):
+    for i, (x1, y1) in enumerate(testset):
         x_img = QTensor(x1)
         x_img_Qtensor = tensor.unsqueeze(x_img, 0)
         y_img = QTensor(y1)
@@ -2854,7 +2863,7 @@ QUnet主要是用于解决图像分割的技术。
             plt.imshow(np.array(y_img_tensor.data).transpose([1, 2, 0]))
         else:
             plt.imshow(np.array(y_img_tensor.data).transpose([1, 2, 0]).squeeze(2))
-        plt.savefig("./result/" + str(i) + "_1" + ".jpg")
+        plt.savefig("./result/eval_" + str(i) + "_1" + ".jpg")
     print("end!")
 
 训练集上Loss情况
@@ -3149,6 +3158,23 @@ QUnet主要是用于解决图像分割的技术。
     from pyqpanda import *
     random.seed(1234)
 
+    qvc_train_data = [0,1,0,0,1,
+    0, 1, 0, 1, 0,
+    0, 1, 1, 0, 0,
+    0, 1, 1, 1, 1,
+    1, 0, 0, 0, 1,
+    1, 0, 0, 1, 0,
+    1, 0, 1, 0, 0,
+    1, 0, 1, 1, 1,
+    1, 1, 0, 0, 0,
+    1, 1, 0, 1, 1,
+    1, 1, 1, 0, 1,
+    1, 1, 1, 1, 0]
+    qvc_test_data= [0, 0, 0, 0, 0,
+    0, 0, 0, 1, 1,
+    0, 0, 1, 0, 1,
+    0, 0, 1, 1, 0]
+
     def qvc_circuits(input,weights,qlist,clist,machine):
 
         def get_cnot(nqubits):
@@ -3207,14 +3233,6 @@ QUnet主要是用于解决图像分割的技术。
         def forward(self, x):
             return self.qvc(x)
 
-
-    def get_data(PATH):
-        datasets = np.loadtxt(PATH) 
-        data = datasets[:,:-1]
-        label = datasets[:,-1].astype(int)
-        label = np.eye(2)[label].reshape(-1,2)
-        return data, label
-
     def dataloader(data,label,batch_size, shuffle = True)->np:
         if shuffle:
             for _ in range(len(data)//batch_size):
@@ -3223,6 +3241,19 @@ QUnet主要是用于解决图像分割的技术。
         else:
             for i in range(0,len(data)-batch_size+1,batch_size):
                 yield data[i:i+batch_size], label[i:i+batch_size]
+
+    def get_data(dataset_str):
+        if dataset_str == "train":
+            datasets = np.array(qvc_train_data)
+
+        else:
+            datasets = np.array(qvc_test_data)
+
+        datasets = datasets.reshape([-1,5])
+        data = datasets[:,:-1]
+        label = datasets[:,-1].astype(int)
+        label = np.eye(2)[label].reshape(-1,2)
+        return data, label
 
     def get_accuary(result,label):
         result,label = np.array(result.data), np.array(label.data)
@@ -3239,8 +3270,8 @@ QUnet主要是用于解决图像分割的技术。
         loss = CategoricalCrossEntropy()
         print("start training..............")
         model.train()
-        PATH = os.path.abspath('..//..//data//qvc_data.txt')
-        datas,labels = get_data(PATH)
+
+        datas,labels = get_data("train")
         print(datas)
         print(labels)
         print(datas.shape)
@@ -3267,8 +3298,7 @@ QUnet主要是用于解决图像分割的技术。
         print("start testing..............")
         model.eval()
         count = 0
-        test_PATH = os.path.abspath('../../data/qvc_data_test.txt')
-        test_data, test_label = get_data(test_PATH)
+        test_data, test_label = get_data("test")
         test_batch_size = 1
         accuary = 0
         sum_loss = 0
@@ -3658,6 +3688,12 @@ VQNet提供了封装类 ``VQC_wrapper`` ，用户使用普通逻辑门在函数 
     import pyqpanda as pq
 
     random.seed(1234)
+    qvc_train_data = [
+        0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1,
+        1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 0, 1, 1,
+        1, 1, 1, 0, 1, 1, 1, 1, 1, 0
+    ]
+    qvc_test_data = [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 1, 0, 0, 1, 1, 0]
 
     class QVC_demo(VQC_wrapper):
 
@@ -3728,11 +3764,20 @@ VQNet提供了封装类 ``VQC_wrapper`` ，用户使用普通逻辑门在函数 
             return self.qvc(x)
 
 
-    def get_data(PATH):
-        datasets = np.loadtxt(PATH)
-        data = datasets[:,:-1]
-        label = datasets[:,-1].astype(int)
-        label = np.eye(2)[label].reshape(-1,2)
+    def get_data(dataset_str):
+        """
+        Tranform data to valid form
+        """
+        if dataset_str == "train":
+            datasets = np.array(qvc_train_data)
+
+        else:
+            datasets = np.array(qvc_test_data)
+
+        datasets = datasets.reshape([-1, 5])
+        data = datasets[:, :-1]
+        label = datasets[:, -1].astype(int)
+        label = np.eye(2)[label].reshape(-1, 2)
         return data, label
 
     def dataloader(data,label,batch_size, shuffle = True)->np:
@@ -3760,7 +3805,7 @@ VQNet提供了封装类 ``VQC_wrapper`` ，用户使用普通逻辑门在函数 
         loss = CategoricalCrossEntropy()
         print("start training..............")
         model.train()
-        PATH = os.path.abspath('..//..//data//qvc_data.txt')
+        PATH = os.path.abspath('train')
         datas,labels = get_data(PATH)
         for i in range(epoch):
             count=0
@@ -3782,8 +3827,7 @@ VQNet提供了封装类 ``VQC_wrapper`` ，用户使用普通逻辑门在函数 
         print("start testing..............")
         model.eval()
         count = 0
-        test_PATH = os.path.abspath('../../data/qvc_data_test.txt')
-        test_data, test_label = get_data(test_PATH)
+        test_data, test_label = get_data("test")
         test_batch_size = 1
         accuary = 0
         sum_loss = 0
