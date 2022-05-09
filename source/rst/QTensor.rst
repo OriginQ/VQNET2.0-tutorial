@@ -622,8 +622,6 @@ __getitem__
 
     针对2-D及以上的 QTensor ，则会有多个轴上的索引或切片。
 
-    针对2-D及以上的 QTensor ，则会有多个轴上的索引或切片。
-
     使用 QTensor 作为 索引，则进行高级索引，请参考numpy中 `高级索引 <https://docs.scipy.org/doc/numpy-1.10.1/reference/arrays.indexing.html>`_ 部分。
 
     若作为索引的 QTensor 为逻辑运算的结果，则进行 布尔数组索引。
@@ -712,8 +710,6 @@ __setitem__
     通过冒号 ``:``  分隔切片参数 start:stop:step 来进行切片操作，其中 start、stop、step 均可缺省。
 
     针对1-D QTensor，则仅有单个轴上的索引或切片。
-
-    针对2-D及以上的 QTensor ，则会有多个轴上的索引或切片。
 
     针对2-D及以上的 QTensor ，则会有多个轴上的索引或切片。
 
@@ -2395,7 +2391,7 @@ isfinite
 
     逐元素判断输入是否为Finite （既非 +/-INF 也非 +/-NaN ）。
 
-    :param A: 输入 QTensor 。
+    :param t: 输入 QTensor 。
     :return: 输出 QTensor , 其中对应位置元素满足条件时返回1，否则返回0。
 
     Example::

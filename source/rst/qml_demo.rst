@@ -3875,7 +3875,7 @@ VQNet提供了封装类 ``VQC_wrapper`` ，用户使用普通逻辑门在函数 
 QGAN制备任意分布初态
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-已实现IBM 提出的 `QGAN算法 <https://www.nature.com/articles/s41534-019-0223-2>`_ 。该算法使用纯量子变分线路制备特定随机分布的生成量子态，可以减少原先生成特定量子态所需的逻辑门，降低量子线路复杂度。
+基于2019年 Christa Zoufal 的论文 `Quantum Generative Adversarial Networks for learning and loading random distributions <https://www.nature.com/articles/s41534-019-0223-2>`_ , VQNet提供了一个QGAN制备任意分布初态的例子。该算法使用纯量子变分线路制备特定随机分布的生成量子态，可以减少原先生成特定量子态所需的逻辑门，降低量子线路复杂度。
 QGAN使用经典的GAN模型结构，分为Generator生成器与Discriminator鉴别器两个子模型，Generator为量子线路产生特定分布，而Generator生成的分布generated data samples 以及真实的随机分布training data samples 输入Discriminator模型进行鉴别真伪。
 
 .. image:: ./images/qgan-arch.PNG
@@ -3967,7 +3967,7 @@ QGAN使用经典的GAN模型结构，分为Generator生成器与Discriminator鉴
     qpanda_cir = qgan_model.get_circuits_with_trained_param(qubits)
     print(qpanda_cir)
 
-生成lognormal分布的损失函数以及概率分布函数图，一般来说需要使用不同的随机种子多次训练该模型可得到较好接口。:
+生成lognormal分布的损失函数以及概率分布函数图，一般来说需要使用不同的随机种子多次训练该模型可得到较好结果:
 
 .. image:: ./images/qgan-loss.PNG
    :width: 600 px
