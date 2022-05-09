@@ -1614,9 +1614,9 @@ cumsum
 
     返回维度轴中输入元素的累积总和。
 
-     :param t: 输入 QTensor 。
-     :param axis: 计算的轴，默认 -1，使用最后一个轴。
-     :return: 输出 QTensor 。
+    :param t: 输入 QTensor 。
+    :param axis: 计算的轴，默认 -1，使用最后一个轴。
+    :return: 输出 QTensor 。
 
     Example::
 
