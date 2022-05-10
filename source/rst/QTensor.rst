@@ -18,7 +18,7 @@ __init__
 
     :param data: 输入数据，可以是 _core.Tensor 或numpy 数组。
     :param requires_grad: 是否应该跟踪张量的梯度，默认为 False。
-    :param 节点: 计算图中的后继者列表，默认为无。
+    :param nodes: 计算图中的后继者列表，默认为无。
     :param device: 当前保存 QTensor 的设备，默认 = 0。
 
     :return: 输出 QTensor。
@@ -1241,7 +1241,7 @@ triu
     返回输入 t 的上三角矩阵，其余部分被设为0。
 
     :param t: 输入 QTensor。
-    :param 对角线: 偏移量（主对角线为 0，正数为向上偏移，负数为向下偏移），默认=0。
+    :param diagonal: 偏移量（主对角线为 0，正数为向上偏移，负数为向下偏移），默认=0。
 
     :return: 输出 QTensor。
 
@@ -1274,7 +1274,7 @@ tril
     返回输入 t 的下三角矩阵，其余部分被设为0。
 
     :param t: 输入 QTensor。
-    :param 对角线: 偏移量（主对角线为 0，正数为向上偏移，负数为向下偏移），默认=0。
+    :param diagonal: 偏移量（主对角线为 0，正数为向上偏移，负数为向下偏移），默认=0。
 
     :return: 输出 QTensor。
 
@@ -3115,8 +3115,8 @@ to_tensor
 
     将输入数值或 numpy.ndarray 等转换为 QTensor 。
 
-     :param x: 整数、浮点数或 numpy.ndarray
-     :return: 输出 QTensor
+    :param x: 整数、浮点数或 numpy.ndarray
+    :return: 输出 QTensor
 
     Example::
 
