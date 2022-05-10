@@ -1235,17 +1235,38 @@ Quantum circuit structure learning任务的核心目标就是找到最优的带�
 我们将使用 `MNIST datasets <http://yann.lecun.com/exdb/mnist/>`_ 这一神经网络最基础的手写数字数据库作为分类数据 。
 我们首先加载MNIST并过滤包含0和1的数据样本。这些样本分为训练数据 training_data 和测试数据 testing_data，它们每条数据均为1*784的维度大小。
 
-.. code-block:
+.. code-block::
+
+    import time
+    import os
+    import struct
+    import gzip
+    from pyvqnet.nn.module import Module
+    from pyvqnet.nn.linear import Linear
+    from pyvqnet.nn.conv import Conv2D
+
+    from pyvqnet.nn import activation as F
+    from pyvqnet.nn.pooling import MaxPool2D
+    from pyvqnet.nn.loss import CategoricalCrossEntropy
+    from pyvqnet.optim.adam import Adam
+    from pyvqnet.data.data import data_generator
+    from pyvqnet.tensor import tensor
+    from pyvqnet.tensor import QTensor
+    import pyqpanda as pq
 
     import numpy as np
     import matplotlib.pyplot as plt
+    import matplotlib
+    try:
+        matplotlib.use("TkAgg")
+    except:  #pylint:disable=bare-except
+        print("Can not use matplot TkAgg")
+        pass
 
     try:
         import urllib.request
     except ImportError:
-        raise ImportError('You should use Python 3.x')
-    import os.path
-    import gzip
+        raise ImportError("You should use Python 3.x")
 
     url_base = 'http://yann.lecun.com/exdb/mnist/'
     key_file = {
@@ -1496,6 +1517,7 @@ Quantum circuit structure learning任务的核心目标就是找到最优的带�
 
 .. code-block::
 
+    x_train, y_train, x_test, y_test = data_select(1000, 100)
     #实例化
     model = Net() 
     #使用Adam完成此任务就足够了，model.parameters（）是模型需要计算的参数。
@@ -1797,39 +1819,14 @@ Quantum circuit structure learning任务的核心目标就是找到最优的带�
 
         return images, labels
 
-    def data_select(train_num, test_num):
-        x_train, y_train = load_mnist("training_data")  # 下载训练数据
-
-        x_test, y_test = load_mnist("testing_data")
-
-        # Train Leaving only labels 0 and 1
-        idx_train = np.append(np.where(y_train == 0)[0][:train_num],
-                              np.where(y_train == 1)[0][:train_num])
-
-        x_train = x_train[idx_train]
-        y_train = y_train[idx_train]
-
-        x_train = x_train / 255
-        y_train = np.eye(2)[y_train].reshape(-1, 2)
-
-        # Test Leaving only labels 0 and 1
-        idx_test = np.append(np.where(y_test == 0)[0][:test_num],
-                             np.where(y_test == 1)[0][:test_num])
-
-        x_test = x_test[idx_test]
-        y_test = y_test[idx_test]
-        x_test = x_test / 255
-        y_test = np.eye(2)[y_test].reshape(-1, 2)
-
-        return x_train, y_train, x_test, y_test
 
     """
     to get cnn model parameters for transfer learning
     """
 
-    train_size =50
-    eval_size = 50
-    EPOCHES = 10
+    train_size = 10000
+    eval_size = 1000
+    EPOCHES = 100
     def classcal_cnn_model_making():
         # load train data
         x_train, y_train = load_mnist("training_data", digits=np.arange(10))
@@ -2286,7 +2283,7 @@ Quantum circuit structure learning任务的核心目标就是找到最优的带�
         model_hybrid.fc3 = Q_DressedQuantumNet()
         for param in model_hybrid.parameters():
             param.requires_grad = False
-        model_param_quantum = load_parameters("QCNN_TL_ALL.model")
+        model_param_quantum = load_parameters("./result/QCNN_TL_ALL.model")
 
         model_hybrid.load_state_dict(model_param_quantum)
         model_hybrid.eval()
@@ -2372,7 +2369,7 @@ QUnet主要是用于解决图像分割的技术。
 数据准备
 """""""""""
 我们将使用VOCdevkit/VOC2012官方库的数据: `VOC2012 <http://host.robots.ox.ac.uk/pascal/VOC/voc2012/#devkit>`_ , 作为图像分割数据。
-这些样本分为训练数据 training_data 和测试数据 testing_data。 
+这些样本分为训练数据 training_data 和测试数据 testing_data,文件夹中包含images 和 labels。 
 
 .. image:: ./images/Unet_data_imshow.png
    :width: 600 px
@@ -2432,16 +2429,16 @@ QUnet主要是用于解决图像分割的技术。
 
 
         def processing(self):
-            list_path = os.listdir((self.path+"/train"))
+            list_path = os.listdir((self.path+"/images"))
             for i in range(len(list_path)):
 
-                temp_data = cv2.imread(self.path+"/train" + '/' + list_path[i], cv2.IMREAD_COLOR)
+                temp_data = cv2.imread(self.path+"/images" + '/' + list_path[i], cv2.IMREAD_COLOR)
                 temp_data = cv2.resize(temp_data, (128, 128))
                 grayimg = cv2.cvtColor(temp_data, cv2.COLOR_BGR2GRAY)
                 temp_data = grayimg.reshape(temp_data.shape[0], temp_data.shape[0], 1)
                 self.x_data.append(temp_data)
 
-                label_data = cv2.imread(self.path+"/label" + '/' +list_path[i].split(".")[0] + ".png", cv2.IMREAD_COLOR)
+                label_data = cv2.imread(self.path+"/labels" + '/' +list_path[i].split(".")[0] + ".png", cv2.IMREAD_COLOR)
                 label_data = cv2.resize(label_data, (128, 128))
 
                 label_data = cv2.cvtColor(label_data, cv2.COLOR_BGR2GRAY)
@@ -2702,8 +2699,8 @@ QUnet主要是用于解决图像分割的技术。
         pass
 
     # prepare train/test data and label
-    path0 = '../../data/dataset/Unet_data_src'
-    path1 = '../../data/dataset/Unet_data_test'
+    path0 = 'training_data'
+    path1 = 'testing_data'
     train_images, train_labels = PreprocessingData(path0).read()
     test_images, test_labels = PreprocessingData(path1).read()
 
@@ -2725,14 +2722,14 @@ QUnet主要是用于解决图像分割的技术。
 
         # Save pre-processed images
         print('Quantum Data Saving...')
-        np.save("../../data/dataset/q_train.npy", q_train_images)
-        np.save("../../data/dataset/q_test.npy", q_test_images)
-        np.save("../../data/dataset/q_train_label.npy", q_train_label)
-        np.save("../../data/dataset/q_test_label.npy", q_test_label)
+        np.save("./result/q_train.npy", q_train_images)
+        np.save("./result/q_test.npy", q_test_images)
+        np.save("./result/q_train_label.npy", q_train_label)
+        np.save("./result/q_test_label.npy", q_test_label)
         print('Quantum Data Saving Over!')
 
     # loading quantum data
-    SAVE_PATH = "../../data/dataset/"
+    SAVE_PATH = "./result/"
     train_x = np.load(SAVE_PATH + "q_train.npy")
     train_labels = np.load(SAVE_PATH + "q_train_label.npy")
     test_x = np.load(SAVE_PATH + "q_test.npy")
@@ -2948,7 +2945,19 @@ QUnet主要是用于解决图像分割的技术。
 
 .. code-block::
 
-    from scipy import make_blobs
+    import math
+    import numpy as np
+    from pyvqnet.tensor import QTensor, zeros
+    import pyvqnet.tensor as tensor
+    import pyqpanda as pq
+    from sklearn.datasets import make_blobs
+    import matplotlib.pyplot as plt
+    import matplotlib
+    try:
+        matplotlib.use("TkAgg")
+    except:  #pylint:disable=bare-except
+        print("Can not use matplot TkAgg")
+        pass
     # 根据数据的数据量n，聚类中心k和数据标准差std返回对应数据点和聚类中心点
     def get_data(n, k, std):
         data = make_blobs(n_samples=n, n_features=2, centers=k, cluster_std=std, random_state=100)
@@ -3346,7 +3355,7 @@ QUnet主要是用于解决图像分割的技术。
 在VQNet中使用NoiseQuantumLayer进行模型训练
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-在examples中实现了一个使用 ``NoiseQuantumLayer`` 进行可变量子线路的完整实例 hqcnn_noise_test.py
+使用 ``NoiseQuantumLayer`` 可以使用QPanda的噪声虚拟机构建含噪量子线路，并进行训练。
 
 一个完整的含噪模型量子机器学习模型的例子如下：
 

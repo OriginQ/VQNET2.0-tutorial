@@ -1640,7 +1640,7 @@ mean
     :param t: 输入 QTensor 。
     :param axis: 用于求平均的轴，默认为None。
     :param keepdims: 输出张量是否保留了减小的维度。默认为False。
-    :return: 输出 QTensor 。
+    :return: 输出 QTensor 或 均值。
 
     Example::
 
@@ -1662,7 +1662,7 @@ median
     :param t: 输入 QTensor 。
     :param axis: 用于求平均的轴，默认为None。
     :param keepdims: 输出张量是否保留了减小的维度。默认为False。
-    :return: 输出 QTensor 。
+    :return: 输出 QTensor 或 中值。
 
     Example::
 
@@ -1695,7 +1695,7 @@ std
     :param axis: 用于求标准差的轴，默认为None。
     :param keepdims: 输出张量是否保留了减小的维度。默认为False。
     :param unbiased: 是否使用贝塞尔修正,默认使用。
-    :return: 输出 QTensor 。
+    :return: 输出 QTensor 或 标准差。
 
     Example::
 
@@ -1728,7 +1728,7 @@ var
     :param axis: 用于求方差的轴，默认为None。
     :param keepdims: 输出张量是否保留了减小的维度。默认为False。
     :param unbiased: 是否使用贝塞尔修正,默认使用。
-    :return: 输出 QTensor 。
+    :return: 输出 QTensor 或方差。
 
     Example::
 
@@ -1746,7 +1746,7 @@ matmul
 
 .. py:function:: pyvqnet.tensor.matmul(t1: pyvqnet.tensor.QTensor, t2: pyvqnet.tensor.QTensor)
 
-    二维矩阵点乘或4维张量进行批矩阵乘法.
+    二维矩阵点乘或3、4维张量进行批矩阵乘法.
 
     :param t1: 第一个 QTensor 。
     :param t2: 第二个 QTensor 。
