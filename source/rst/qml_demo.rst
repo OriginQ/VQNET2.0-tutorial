@@ -2711,7 +2711,7 @@ QUnet主要是用于解决图像分割的技术。
 
     # use quantum encoder to preprocess data
     # PREPROCESS = True
-    PREPROCESS = False
+    PREPROCESS = True
     
     if PREPROCESS == True:
         print("Quantum pre-processing of train images:")
@@ -3906,6 +3906,9 @@ QGAN使用经典的GAN模型结构，分为Generator生成器与Discriminator鉴
     import numpy as np
 
 
+    ##################################
+    num_of_qubits = 3  # paper config
+    rep = 1
 
     number_of_data = 10000
     # Load data samples from different distributions
