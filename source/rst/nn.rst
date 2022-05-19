@@ -1112,9 +1112,9 @@ HardSigmoid
 
     .. math::
         \text{Hardsigmoid}(x) = \begin{cases}
-            0 & \text{ if } x \le -2.5, \\
-            1 & \text{ if } x \ge +2.5, \\
-            x / 5 + 1 / 2 & \text{otherwise}
+            0 & \text{ if } x \le -3, \\
+            1 & \text{ if } x \ge +3, \\
+            x / 6 + 1 / 2 & \text{otherwise}
         \end{cases}
 
     :param name: 激活函数层的命名，默认为""。
@@ -1129,7 +1129,7 @@ HardSigmoid
         y = layer(QTensor([1.0, 2.0, 3.0, 4.0]))
         print(y)
 
-        # [0.7000000, 0.9000000, 1.0000000, 1.0000000]
+        # [0.6666667, 0.8333334, 1.0000000, 1.0000000]
         
 
 ReLu
