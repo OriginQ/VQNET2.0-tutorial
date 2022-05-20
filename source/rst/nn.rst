@@ -60,36 +60,32 @@ Module
 
 .. py:class:: pyvqnet.nn.module.Module
 
-    Base class for all neural network modules including quantum modules or classic modules.
-    Your models should also be subclass of this class for autograd calculation.
-
-    Modules can also contain other Modules, allowing to nest them in
-    a tree structure. You can assign the submodules as regular attributes::
+    所有神经网络模块的基类，包括量子模块或经典模块。您的模型也应该是此类的子类，用于 autograd 计算。
+    模块还可以包含其他Module类，允许将它们嵌套在树状结构。 您可以将子模块分配为常规属性::
 
         class Model(Module):
             def __init__(self):
                 super(Model, self).__init__()
                 self.conv1 = pyvqnet.nn.Conv2d(1, 20, (5,5))
                 self.conv2 = pyvqnet.nn.Conv2d(20, 20, (5,5))
-
             def forward(self, x):
                 x = pyvqnet.nn.activation.relu(self.conv1(x))
                 return pyvqnet.nn.activation.relu(self.conv2(x))
 
-    Submodules assigned in this way will be registered
+    以这种方式分配的子模块将被注册。
 
 forward
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:function:: pyvqnet.nn.module.Module.forward(x, param_keys=None, circuits=None, func=None)
+.. py:function:: pyvqnet.nn.module.Module.forward(x, *args, **kwargs)
 
-    Abstract method which performs forward pass.
+    Module类抽象前向计算函数
 
-    :param x: input QTensor
-    :param param_keys: specific param keys for QNLP algorithm,default None.
-    :param circuits: specific circuits from other code for QNLP algorithm,default None.
-    :param func: specific convert function to qpanda circuits for QNLP algorithm,default None.
-    :return: module output
+    :param x: 输入QTensor。
+    :param \*args: 非关键字可变参数。
+    :param \*\*kwargs: 关键字可变参数。
+
+    :return: 模型输出。
 
     Example::
 
@@ -125,16 +121,13 @@ state_dict
 
 .. py:function:: pyvqnet.nn.module.Module.state_dict(destination=None, prefix='')
 
-    Return a dictionary containing a whole state of the module.
+    返回包含模块整个状态的字典:包括参数和缓存值。
+    键是对应的参数和缓存值名称。
 
-    Both parameters and persistent buffers (e.g. running averages) are
-    included. Keys are corresponding parameter and buffer names.
+    :param destination: 返回保存模型内部模块，参数的字典。
+    :param prefix: 使用的参数和缓存值的命名前缀。
 
-    :param destination: a dict where state will be stored
-    :param prefix: the prefix for parameters and buffers used in this
-        module
-
-    :return: a dictionary containing a whole state of the module
+    :return: 包含模块整个状态的字典。
 
     Example::
 
@@ -149,11 +142,12 @@ save_parameters
 
 .. py:function:: pyvqnet.utils.storage.save_parameters(obj, f)
 
-    Saves model parmeters to a disk file.
+    保存模型参数的字典到一个文件。
 
-    :param obj: saved OrderedDict from ``state_dict()``
-    :param f: a string or os.PathLike object containing a file name
-    :return: None
+    :param obj: 需要保存的字典。
+    :param f: 保存参数的文件名。
+
+    :return: 无。
 
     Example::
 
@@ -175,12 +169,11 @@ load_parameters
 
 .. py:function:: pyvqnet.utils.storage.load_parameters(f)
 
-    Loads model paramters from a disk file.
+    从文件中载入参数到一个字典中。
 
-    The model instance should be created first.
+    :param f: 保存参数的文件名。
 
-    :param f: a string or os.PathLike object containing a file name
-    :return: saved OrderedDict for ``load_state_dict()``
+    :return: 保存参数的字典。
 
     Example::
 
@@ -209,24 +202,25 @@ load_parameters
 Conv1D
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:class:: pyvqnet.nn.Conv1D(input_channels:int,output_channels:int,kernel_size:int ,stride:int= 1,padding:str="valid",use_bias:str = True,kernel_initializer = None,bias_initializer =None)
+.. py:class:: pyvqnet.nn.Conv1D(input_channels:int,output_channels:int,kernel_size:int ,stride:int= 1,padding:str="valid",use_bias:bool = True,kernel_initializer = None,bias_initializer =None)
 
-    Apply a 1-dimensional convolution kernel over an input . Inputs to the conv module are of shape (batch_size, input_channels, height)
+    在输入上进行一维卷积运算。 Conv1D模块的输入具有形状(batch_size、input_channels、in_height)。
 
-    :param input_channels: `int` - Number of input channels
-    :param output_channels: `int` - Number of kernels
-    :param kernel_size: `int` - Size of a single kernel. kernel shape = [input_channels,output_channels,kernel_size,1]
-    :param stride: `int` - Stride, defaults to 1
-    :param padding: `str` - Padding, defaults to "valid"
-    :param use_bias: `bool` - if use bias, defaults to True
-    :param kernel_initializer: `callable` - Defaults to None
-    :param bias_initializer: `callable` - Defaults to None
-    :return: a Conv1D class
+    :param input_channels: `int` - 输入数据的通道数。
+    :param output_channels: `int` - 输出数据的通道数。
+    :param kernel_size: `int` - 卷积核的尺寸. 卷积核形状 = [input_channels,output_channels,kernel_size,1]。
+    :param stride: `int` - 步长, 默认为1。
+    :param padding: `str` - 填充选项, "valid" or "same"。 默认 "valid"。
+    :param use_bias: `bool` - 是否使用偏置项, 默认使用。
+    :param kernel_initializer: `callable` - 卷积核初始化方法。默认为空，使用kaiming_uniform。
+    :param bias_initializer: `callable` - 偏置初始化方法。默认为空，使用kaiming_uniform。
+
+    :return: 一维卷积实例。
 
     .. note::
-        ``padding='valid'`` is the same as no padding.
+        ``padding='valid'`` 不进行填充。
 
-        ``padding='same'`` pads the input so the output has the shape as the input.
+        ``padding='same'`` 补零填充输入，输出的out_height 为 = ceil(in_height / stride)。
 
     
     Example::
@@ -255,23 +249,23 @@ Conv2D
 
 .. py:class:: pyvqnet.nn.Conv2D(input_channels:int,output_channels:int,kernel_size:tuple,stride:tuple=(1, 1),padding="valid",use_bias = True,kernel_initializer=None,bias_initializer=None)
 
-    Apply a two-dimensional convolution kernel over an input . Inputs to the conv module are of shape (batch_size, input_channels, height, width)
+    在输入上进行二维卷积运算。 Conv2D模块的输入具有形状(batch_size, input_channels, height, width)。
 
-    :param input_channels: `int` - Number of input channels
-    :param output_channels: `int` - Number of kernels
-    :param kernel_size: `tuple|list` - Size of a single kernel.
-    :param stride: `tuple|list` - Stride, defaults to (1, 1)|[1,1]
-    :param padding: `str` - Padding, defaults to "valid"
-    :param use_bias: `bool` - if use bias, defaults to True
-    :param kernel_initializer: `callable` - Defaults to None
-    :param bias_initializer: `callable` - Defaults to None
-    :return: a Conv2D class
+    :param input_channels: `int` - 输入数据的通道数。
+    :param output_channels: `int` - 输出数据的通道数。
+    :param kernel_size: `tuple|list` - 卷积核的尺寸. 卷积核形状 = [input_channels,output_channels,kernel_size,kernel_size]。
+    :param stride: `tuple|list` - 步长, 默认为 (1, 1)|[1,1]。
+    :param padding: `str` - 填充选项, "valid" or "same"。 默认 "valid"。
+    :param use_bias: `bool` - 是否使用偏置项, 默认使用。
+    :param kernel_initializer: `callable` - 卷积核初始化方法。默认为空，使用kaiming_uniform。
+    :param bias_initializer: `callable` - 偏置初始化方法。默认为空，使用kaiming_uniform。
+
+    :return: 二维卷积实例。
 
     .. note::
-        ``padding='valid'`` is the same as no padding.
+        ``padding='valid'`` 不进行填充。
 
-        ``padding='same'`` pads the input so the output has the shape as the input.
-
+        ``padding='same'`` 补零填充输入，输出的height 为 = ceil(height / stride)， 输出的width 为 = ceil(width / stride)。
 
     Example::
 
@@ -305,23 +299,25 @@ Conv2D
 ConvT2D
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:class:: pyvqnet.nn.ConvT2D(input_channels,output_channels,kernel_size,stride=[1, 1],padding="valid",kernel_initializer=None,bias_initializer=None)
+.. py:class:: pyvqnet.nn.ConvT2D(input_channels,output_channels,kernel_size,stride=[1, 1],padding="valid",use_bias="True", kernel_initializer=None,bias_initializer=None)
 
-    Apply a two-dimensional transposed convolution kernel over an input. Inputs to the convT module are of shape (batch_size, input_channels, height, width)
+    在输入上进行二维转置卷积运算。 Conv2D模块的输入具有形状(batch_size, input_channels, height, width)。
 
-    :param input_channels: `int` - Number of input channels
-    :param output_channels: `int` - Number of kernels
-    :param kernel_size: `tuple|list` - Size of a single kernel. 
-    :param stride: `tuple|list` - Stride, defaults to (1, 1)|[1,1]
-    :param padding:  Padding, defaults to "valid"
-    :param kernel_initializer: `callable` - Defaults to None
-    :param bias_initializer: `callable` - Defaults to None
-    :return: a ConvT2D class
+    :param input_channels: `int` - 输入数据的通道数。
+    :param output_channels: `int` - 输出数据的通道数。
+    :param kernel_size: `tuple|list` - 卷积核的尺寸，卷积核形状 = [input_channels,output_channels,kernel_size,kernel_size]。 
+    :param stride: `tuple|list` - 步长, 默认为 (1, 1)|[1,1]。
+    :param padding:  填充选项, "valid" or "same"。 默认 "valid"。
+    :param use_bias: `bool` - 是否使用偏置项, 默认使用。
+    :param kernel_initializer: `callable` - 卷积核初始化方法。默认为空，使用kaiming_uniform。
+    :param bias_initializer: `callable` - 偏置项初始化方法。默认为空，使用kaiming_uniform。
+
+    :return: 二维转置卷积实例。
     
     .. note::
-        ``padding='valid'`` is the same as no padding.
+        ``padding='valid'`` 不进行填充。
 
-        ``padding='same'`` pads the input so the output has the shape as the input.
+        ``padding='same'`` 补零填充输入，输出的height 为 = ceil(height / stride)。
 
 
     Example::
@@ -357,22 +353,19 @@ AvgPool1D
 
 .. py:class:: pyvqnet.nn.AvgPool1D(kernel, stride, padding="valid",name="")
 
-    This operation applies a 1D average pooling over an input signal composed of several input planes.
-    reference https://pytorch.org/docs/stable/generated/torch.nn.AvgPool1d.html#torch.nn.AvgPool1d
+    对一维输入进行平均池化。输入具有形状(batch_size, input_channels, in_height)。
 
-    :param kernel: size of the average pooling windows
-    :param strides: factor by which to downscale
-    :param padding: one of "none", "valid" or "same" ,defaults to "valid"
-    :param name: name of the output layer
-    :return: AvgPool1D layer
+    :param kernel: 平均池化的窗口大小。
+    :param strides: 窗口移动的步长。
+    :param padding: 填充选项, "valid" or "same"。 默认 "valid"。
+    :param name: 命名，默认为""。
+    :return: 一维平均池化层实例。
 
     .. note::
-        ``padding='valid'`` is the same as no padding.
+        ``padding='valid'`` 不进行填充。
 
-        ``padding='same'`` pads the input so the output has the shape as the input.
+        ``padding='same'`` 补零填充输入，输出的out_height 为 = ceil(in_height / stride)。
 
-
-        
     Example::
 
         import numpy as np
@@ -402,21 +395,19 @@ MaxPool1D
 
 .. py:class:: pyvqnet.nn.MaxPool1D(kernel, stride, padding="valid",name="")
 
-    This operation applies a 1D max pooling over an input signal composed of several input planes.
-    reference https://pytorch.org/docs/stable/generated/torch.nn.MaxPool1d.html#torch.nn.MaxPool1d
+    对一维输入进行最大池化。输入具有形状(batch_size, input_channels, in_height)。
 
-    :param kernel: size of the max pooling windows
-    :param strides: factor by which to downscale
-    :param padding: one of "none", "valid" or "same" ,defaults to "valid"
-    :param name: name of the output layer
-    :return: MaxPool1D layer
+    :param kernel: 最大池化的窗口大小。
+    :param strides: 窗口移动的步长。
+    :param padding: 填充选项, "valid" or "same"。 默认 "valid"。
+    :param name: 命名，默认为""。
+
+    :return: 一维最大池化层实例。
 
     .. note::
-    
-        ``padding='valid'`` is the same as no padding.
+        ``padding='valid'`` 不进行填充。
 
-        ``padding='same'`` pads the input so the output has the shape as the input.
-
+        ``padding='same'`` 补零填充输入，输出的out_height 为 = ceil(in_height / stride)。
 
     Example::
 
@@ -446,21 +437,19 @@ AvgPool2D
 
 .. py:class:: pyvqnet.nn.AvgPool2D( kernel, stride, padding="valid",name="")
 
-    This operation applies 2D average pooling over input features .
-    
-    reference: https://pytorch.org/docs/stable/generated/torch.nn.AvgPool2d.html?highlight=avgpooling
-    
-    :param kernel: size of the average pooling windows
-    :param strides: factors by which to downscale
-    :param padding: one of  "valid" or "same",defaults to "valid"
-    :param name: name of the output layer
-    :return: AvgPool2D layer
+    对二维输入进行平均池化。输入具有形状(batch_size, input_channels, height, width)。
+
+    :param kernel: 平均池化的窗口大小。
+    :param strides: 窗口移动的步长。
+    :param padding: 填充选项, "valid" or "same"。 默认 "valid"。
+    :param name: 命名，默认为""。
+
+    :return: 二维平均池化层实例。
 
     .. note::
-        ``padding='valid'`` is the same as no padding.
+        ``padding='valid'`` 不进行填充。
 
-        ``padding='same'`` pads the input so the output has the shape as the input.
-
+        ``padding='same'`` 补零填充输入，输出的height 为 = ceil(height / stride)， 输出的width 为 = ceil(width / stride)。
 
     Example::
 
@@ -488,19 +477,19 @@ MaxPool2D
 
 .. py:class:: pyvqnet.nn.MaxPool2D(kernel, stride, padding="valid",name="")
 
-    This operation applies 2D max pooling over input features. 
-    reference https://pytorch.org/docs/stable/generated/torch.nn.MaxPool2d.html?highlight=pooling
+    对二维输入进行最大池化。输入具有形状(batch_size, input_channels, height, width)。
 
-    :param kernel: size of the max pooling windows
-    :param strides: factor by which to downscale
-    :param padding: one of "none", "valid" or "same" ,defaults to "valid"
-    :param name: name of the output layer
-    :return: MaxPool2D layer
+    :param kernel: 最大池化的窗口大小。
+    :param strides: 窗口移动的步长。
+    :param padding: 填充选项, "valid" or "same"。 默认 "valid"。
+    :param name: 命名，默认为""。
+
+    :return: 二维最大池化层实例。
 
     .. note::
-        ``padding='valid'`` is the same as no padding.
+        ``padding='valid'`` 不进行填充。
 
-        ``padding='same'`` pads the input so the output has the shape as the input.
+        ``padding='same'`` 补零填充输入，输出的height 为 = ceil(height / stride)， 输出的width 为 = ceil(width / stride)。
 
 
     Example::
@@ -530,16 +519,14 @@ Embedding
 
 .. py:class:: pyvqnet.nn.embedding.Embedding(num_embeddings, embedding_dim, weight_initializer=xavier_normal, name: str = "")
 
-    This module is often used to store word embeddings and retrieve them using indices.
-    The input to the module is a list of indices, and the output is the corresponding
-    word embeddings.
+    该模块通常用于存储词嵌入并使用索引检索它们。模块的输入是索引列表，输出是对应的词嵌入。
 
-    :param num_embeddings: `int` - size of the dictionary of embeddings
-    :param embedding_dim: `int` - the size of each embedding vector
-    :param weight_initializer: `callable` - defaults to normal
-    :param name: name of the output layer
+    :param num_embeddings: `int` - 嵌入字典的大小。
+    :param embedding_dim: `int` - 每个嵌入向量的大小
+    :param weight_initializer: `callable` - 参数初始化方式，默认正态分布。
+    :param name: 嵌入层的命名，默认为""。
 
-    :return: a Embedding class
+    :return: a Embedding 实例。
 
     Example::
 
@@ -578,7 +565,6 @@ Embedding
         #  [-0.0246447, -0.0241158, -0.1402829]]]]
         # ]
         
-        
 
 
 BatchNorm2d
@@ -586,25 +572,24 @@ BatchNorm2d
 
 .. py:class:: pyvqnet.nn.BatchNorm2d(channel_num:int, momentum:float=0.1, epsilon:float = 1e-5,beta_initializer=zeros, gamma_initializer=ones, name="")
     
-    Applies Batch Normalization over a 4D input (B,C,H,W) as described in the paper
+    在 4D 输入（B、C、H、W）上应用批归一化。参照论文
     `Batch Normalization: Accelerating Deep Network Training by Reducing
-    Internal Covariate Shift <https://arxiv.org/abs/1502.03167>`__ .
+    Internal Covariate Shift <https://arxiv.org/abs/1502.03167>`__ 。
     
     .. math::
 
         y = \frac{x - \mathrm{E}[x]}{\sqrt{\mathrm{Var}[x] + \epsilon}} * \gamma + \beta
 
-    where :math:`\gamma` and :math:`\beta` are learnable parameters.Also by default, during training this layer keeps running 
-    estimates of its computed mean and variance, which are then used for normalization during evaluation. 
-    The running estimates are kept with a default momentum of 0.1.
+    其中 :math:`\gamma` 和 :math:`\beta` 为待训练参数。此外，默认情况下，在训练期间，该层会继续运行估计其计算的均值和方差，然后在评估期间用于归一化。平均方差均值保持默认动量 0.1。
 
-    :param channel_num: `int` - the number of input features channels
-    :param momentum: `float` - momentum when calculation exponentially weighted average, defaults to 0.1
-    :param beta_initializer: `callable` - defaults to zeros
-    :param gamma_initializer: `callable` - defaults to ones
-    :param epsilon: `float` - numerical stability constant, defaults to 1e-5
-    :param name: name of the output layer
-    :return: a BatchNorm2d class
+    :param channel_num: `int` - 输入通道数。
+    :param momentum: `float` - 计算指数加权平均时的动量，默认为 0.1。
+    :param beta_initializer: `callable` - beta的初始化方式，默认全零初始化。
+    :param gamma_initializer: `callable` - gamma的的初始化方式，默认全一初始化。
+    :param epsilon: `float` - 数值稳定参数, 默认 1e-5。
+    :param name: 批归一化层命名，默认为""。
+
+    :return: 二维批归一化层实例。
 
     Example::
 
@@ -644,26 +629,25 @@ BatchNorm1d
 
 .. py:class:: pyvqnet.nn.BatchNorm1d(channel_num:int, momentum:float=0.1, epsilon:float = 1e-5, beta_initializer=zeros, gamma_initializer=ones, name="")
 
-    Applies Batch Normalization over a 2D input (B,C) as described in the paper
+    在 2D 输入 (B,C) 上进行批归一化操作。 参照论文
     `Batch Normalization: Accelerating Deep Network Training by Reducing
-    Internal Covariate Shift <https://arxiv.org/abs/1502.03167>`__ .
+    Internal Covariate Shift <https://arxiv.org/abs/1502.03167>`__ 。
     
     .. math::
 
         y = \frac{x - \mathrm{E}[x]}{\sqrt{\mathrm{Var}[x] + \epsilon}} * \gamma + \beta
 
-    where :math:`\gamma` and :math:`\beta` are learnable parameters.Also by default, during training this layer keeps running 
-    estimates of its computed mean and variance, which are then used for normalization during evaluation. 
-    The running estimates are kept with a default momentum of 0.1.
+    其中 :math:`\gamma` 和 :math:`\beta` 为待训练参数。此外，默认情况下，在训练期间，该层会继续运行估计其计算的均值和方差，然后在评估期间用于归一化。平均方差均值保持默认动量 0.1。
 
 
-    :param channel_num: `int` - the number of input features channels
-    :param momentum: `float` - momentum when calculation exponentially weighted average, defaults to 0.1
-    :param beta_initializer: `callable` - defaults to zeros
-    :param gamma_initializer: `callable` - defaults to ones
-    :param epsilon: `float` - numerical stability constant, defaults to 1e-5
-    :param name: name of the output layer
-    :return: a BatchNorm1d class
+    :param channel_num: `int` - 输入通道数。
+    :param momentum: `float` - 计算指数加权平均时的动量，默认为 0.1。
+    :param beta_initializer: `callable` - beta的初始化方式，默认全零初始化。
+    :param gamma_initializer: `callable` - gamma的的初始化方式，默认全一初始化。
+    :param epsilon: `float` - 数值稳定性常数，默认为 1e-5。
+    :param name: 批归一化层命名，默认为""。
+
+    :return: 一维批归一化层实例。
 
     Example::
 
@@ -689,20 +673,18 @@ LayerNorm2d
 
 .. py:class:: pyvqnet.nn.layer_norm.LayerNorm2d(norm_size:int, epsilon:float = 1e-5, name="")
 
-    Applies Layer Normalization over a mini-batch of 4D inputs as described in
-    the paper `Layer Normalization <https://arxiv.org/abs/1607.06450>`__
+    在 4D 输入上进行层归一化。具体方式如论文所述:
+    `Layer Normalization <https://arxiv.org/abs/1607.06450>`__。
 
     .. math::
         y = \frac{x - \mathrm{E}[x]}{ \sqrt{\mathrm{Var}[x] + \epsilon}} * \gamma + \beta
 
-    The mean and standard-deviation are calculated over the last  `D` dimensions size.
-    
-    For input like (B,C,H,W), :attr:`norm_size` should equals to C * H * W.
+    平均值和标准差是在除去第一个维度以外的剩余维度数据上计算的。对于像 (B,C,H,W) 这样的输入，:attr:`norm_size` 应该等于 C * H * W。
 
-    :param norm_size: `float` - normalize size，equals to C * H * W
-    :param epsilon: `float` - numerical stability constant, defaults to 1e-5
-    :param name: name of the output layer
-    :return: a LayerNorm2d class
+    :param norm_size: `float` - 归一化大小，应该等于 C * H * W。
+    :param epsilon: `float` - 数值稳定性常数，默认为 1e-5。
+    :param name: 层归一化层命名，默认为""。
+    :return: 二维层归一化实例。
 
     Example::
 
@@ -740,19 +722,19 @@ LayerNorm1d
 
 .. py:class:: pyvqnet.nn.layer_norm.LayerNorm1d(norm_size:int, epsilon:float = 1e-5, name="")
     
-    Applies Layer Normalization over a mini-batch of 2D inputs as described in
-    the paper `Layer Normalization <https://arxiv.org/abs/1607.06450>`__
+    在 2D 输入上进行层归一化。具体方式如论文所述:
+    `Layer Normalization <https://arxiv.org/abs/1607.06450>`__。
 
     .. math::
         y = \frac{x - \mathrm{E}[x]}{ \sqrt{\mathrm{Var}[x] + \epsilon}} * \gamma + \beta
 
-    The mean and standard-deviation are calculated over the last dimensions size, where `norm_size`
-    is the value  of :attr:`norm_size`. 
+    均值和标准差是在最后一个维度大小上计算的，其中“norm_size” 是 :attr:`norm_size` 的值。
 
-    :param norm_size: `float` - normalize size，equals to last dim
-    :param epsilon: `float` - numerical stability constant, defaults to 1e-5
-    :param name: name of the output layer
-    :return: a LayerNorm1d class
+    :param norm_size: `float` - 归一化大小，应该等于最后一维大小。
+    :param epsilon: `float` - 数值稳定性常数，默认为 1e-5。
+    :param name: 层归一化层命名，默认为""。
+
+    :return: 一维层归一化实例。
 
     Example::
 
@@ -777,16 +759,17 @@ Linear
 
 .. py:class:: pyvqnet.nn.Linear(input_channels, output_channels, weight_initializer=None, bias_initializer=None,use_bias=True, name: str = "")
 
-    Linear module (fully-connected layer).
+    线性模块（全连接层）。
     :math:`y = Ax + b`
 
-    :param input_channels: `int` - number of inputs features
-    :param output_channels: `int` - number of output features
-    :param weight_initializer: `callable` - defaults to normal
-    :param bias_initializer: `callable` - defaults to zeros
-    :param use_bias: `bool` - defaults to True
-    :param name: name of the output layer
-    :return: a Linear class
+    :param input_channels: `int` - 输入数据通道数。
+    :param output_channels: `int` - 输出数据通道数。
+    :param weight_initializer: `callable` - 权重初始化函数，默认为空，使用he_uniform。
+    :param bias_initializer: `callable` - 偏置初始化参数，默认为空，使用he_uniform。
+    :param use_bias: `bool` - 是否使用偏置项, 默认使用。
+    :param name: 线性层的命名，默认为""。
+
+    :return: 线性层实例。
 
     Example::
 
@@ -818,13 +801,13 @@ Dropout
 
 .. py:class:: pyvqnet.nn.dropout.Dropout(dropout_rate = 0.5)
 
-    Dropout module.The dropout module randomly sets the outputs of some units to zero, while upscale others according to the given dropout probability.
+    Dropout 模块。dropout 模块将一些单元的输出随机设置为零，同时根据给定的 dropout_rate 概率升级其他单元。
 
-    :param dropout_rate: `float` - probability that a neuron will be set to zero
-    :return: a Dropout class
+    :param dropout_rate: `float` - 神经元被设置为零的概率。
+
+    :return: Dropout实例。
 
     Example::
-
 
         from pyvqnet._core import Tensor as CoreTensor
         from pyvqnet.nn.dropout import Dropout
@@ -858,45 +841,37 @@ MeanSquaredError
 
 .. py:class:: pyvqnet.nn.MeanSquaredError()
 
-    Creates a criterion that measures the mean squared error (squared L2 norm) between
-    each element in the input :math:`x` and target :math:`y`.
+    计算输入 :math:`x` 和目标值 :math:`y` 之间的均方根误差。
 
-    The unreduced loss can be described as:
+    若平方根误差可由如下函数描述:
 
     .. math::
         \ell(x, y) = L = \{l_1,\dots,l_N\}^\top, \quad
         l_n = \left( x_n - y_n \right)^2,
 
-    where :math:`N` is the batch size. , then:
+    :math:`x` 和 :math:`y` 是任意形状的 QTensor ，总 :math:`n` 个元素的均方根误差由下式计算。
 
     .. math::
         \ell(x, y) =
             \operatorname{mean}(L)
 
+    :return: 一个均方根误差实例。
 
-    :math:`x` and :math:`y` are QTensors of arbitrary shapes with a total
-    of :math:`n` elements each.
+    均方根误差前向计算函数的所需参数:
 
-    The mean operation still operates over all the elements, and divides by :math:`n`.
+    target: :math:`(N, *)`, 目标值， 和输入一样维度的 QTensor 。
 
-    :return: a MeanSquaredError class
-
-    Parameters for loss forward function:
-
-    Target: :math:`(N, *)`, same shape as the input
-
-    Input: :math:`(N, *)` where :math:`*` means, any number of additional dimensions
-    
+    output: :math:`(N, *)` 输入值，其中 :math:`*` 表示任意维度。
 
     Example::
 
         from pyvqnet.tensor import QTensor 
         from pyvqnet.nn import MeanSquaredError
         target = QTensor([[0, 0, 1, 0, 0, 0, 0, 0, 0, 0]], requires_grad=True)
-        input = QTensor([[0.1, 0.05, 0.7, 0, 0.05, 0.1, 0, 0, 0, 0]], requires_grad=True)
+        output = QTensor([[0.1, 0.05, 0.7, 0, 0.05, 0.1, 0, 0, 0, 0]], requires_grad=True)
 
         loss_result = MeanSquaredError()
-        result = loss_result(target, input)
+        result = loss_result(target, output)
         print(result)
 
         # [0.0115000]
@@ -908,26 +883,26 @@ BinaryCrossEntropy
 
 .. py:class:: pyvqnet.nn.BinaryCrossEntropy()
 
-    Measures the Binary Cross Entropy between the target and the output:
+    测量目标和输入之间的平均二元交叉熵损失。
 
-    The unreduced loss can be described as:
+    未做平均运算的二元交叉熵如下式:
 
     .. math::
         \ell(x, y) = L = \{l_1,\dots,l_N\}^\top, \quad
         l_n = - w_n \left[ y_n \cdot \log x_n + (1 - y_n) \cdot \log (1 - x_n) \right],
 
-    where :math:`N` is the batch size.
+    若 :math:`N` 为批的大小，则平均二元交叉熵.
 
     .. math::
         \ell(x, y) = \operatorname{mean}(L)
 
-    :return: a BinaryCrossEntropy class
+    :return: 一个平均二元交叉熵实例。
 
-    Parameters for loss forward function:
+    平均二元交叉熵误差前向计算函数的所需参数:
 
-    Target: :math:`(N, *)`, same shape as the input
+    target: :math:`(N, *)`, 目标值，和输入一样维度的 QTensor 。
 
-    Input: :math:`(N, *)` where :math:`*` means, any number of additional dimensions
+    output: :math:`(N, *)` 输入值，其中 :math:`*` 表示任意维度。
     
     Example::
 
@@ -951,21 +926,21 @@ CategoricalCrossEntropy
 
 .. py:class:: pyvqnet.nn.CategoricalCrossEntropy()
 
-    This criterion combines LogSoftmax and NLLLoss in one single class.
+    该损失函数将 LogSoftmax 和 NLLLoss 同时计算的平均分类交叉熵。
 
-    The loss can be described as:
+    损失函数计算方式如下:
 
     .. math::
         \text{loss}(x, class) = -\log\left(\frac{\exp(x[class])}{\sum_j \exp(x[j])}\right)
                        = -x[class] + \log\left(\sum_j \exp(x[j])\right)
     
-    :return: a CategoricalCrossEntropy class
+    :return: 平均分类交叉熵实例。
 
-    Parameters for loss forward function:
+    误差前向计算函数的所需参数:
 
-    Target: :math:`(N, *)`, same shape as the input
+    target: :math:`(N, *)`, 目标值，和输入一样维度的 QTensor 。
 
-    Input: :math:`(N, *)` where :math:`*` means, any number of additional dimensions
+    output: :math:`(N, *)` 输入值，其中 :math:`*` 表示任意维度。
     
     Example::
 
@@ -988,21 +963,21 @@ SoftmaxCrossEntropy
 
 .. py:class:: pyvqnet.nn.SoftmaxCrossEntropy()
 
-    This criterion combines LogSoftmax and NLLLoss in one single class with more numeral stablity.
+    该损失函数将 LogSoftmax 和 NLLLoss 同时计算的平均分类交叉熵，并具有更高的数值稳定性。
 
-    The loss can be described as:
+    损失函数计算方式如下:
 
     .. math::
         \text{loss}(x, class) = -\log\left(\frac{\exp(x[class])}{\sum_j \exp(x[j])}\right)
                        = -x[class] + \log\left(\sum_j \exp(x[j])\right)
 
-    :return: a SoftmaxCrossEntropy class
+    :return: 一个Softmax交叉熵损失函数实例
 
-    Parameters for loss forward function:
+    误差前向计算函数的所需参数:
 
-    Target: :math:`(N, *)`, same shape as the input
+    target: :math:`(N, *)`, 目标值，和输入一样维度的 QTensor 。
 
-    Input: :math:`(N, *)` where :math:`*` means, any number of additional dimensions
+    output: :math:`(N, *)` 输入值，其中 :math:`*` 表示任意维度。
     
     Example::
 
@@ -1019,7 +994,6 @@ SoftmaxCrossEntropy
 
         # [3.7852478]
         
-            
 
 激活函数
 ----------------------------------
@@ -1029,20 +1003,20 @@ Activation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 .. py:class:: pyvqnet.nn.activation.Activation()
 
-    Base class of activation. Specific activation functions inherit  this functions.
+    激活的基类。 特定的激活函数继承了这个类。
 
 Sigmoid
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 .. py:class:: pyvqnet.nn.Sigmoid(name:str="")
 
-
-    Applies a sigmoid activation function to the given layer.
+    Sigmoid激活函数层。
 
     .. math::
         \text{Sigmoid}(x) = \frac{1}{1 + \exp(-x)}
 
-    :param name: name of the output layer
-    :return: sigmoid Activation layer
+    :param name: 激活函数层的命名，默认为""。
+
+    :return: 一个Sigmoid激活函数层实例。
 
     Examples::
 
@@ -1053,19 +1027,20 @@ Sigmoid
         print(y)
 
         # [0.7310586, 0.8807970, 0.9525741, 0.9820138]
-        
+
 
 Softplus
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 .. py:class:: pyvqnet.nn.Softplus(name:str="")
 
-    Applies the softplus activation function to the given layer.
+    Softplus激活函数层。
 
     .. math::
         \text{Softplus}(x) = \log(1 + \exp(x))
 
-    :param name: name of the output layer
-    :return: softplus Activation layer
+    :param name: 激活函数层的命名，默认为""。
+
+    :return: 一个Softplus激活函数层实例。
 
     Examples::
 
@@ -1082,13 +1057,14 @@ Softsign
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 .. py:class:: pyvqnet.nn.Softsign(name:str="")
 
-    Applies the softsign activation function to the given layer.
+    Softsign 激活函数层。
 
     .. math::
         \text{SoftSign}(x) = \frac{x}{ 1 + |x|}
 
-    :param name: name of the output layer
-    :return: softsign Activation layer
+    :param name: 激活函数层的命名，默认为""。
+
+    :return: 一个Softsign 激活函数层实例。
 
     Examples::
 
@@ -1106,15 +1082,16 @@ Softmax
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 .. py:class:: pyvqnet.nn.Softmax(axis:int = -1,name:str="")
 
-    Applies a softmax activation function to the given layer.
+    Softmax 激活函数层。
 
     .. math::
         \text{Softmax}(x_{i}) = \frac{\exp(x_i)}{\sum_j \exp(x_j)}
 
 
-    :param axis: dimension on which to operate (-1 for last axis),default = -1
-    :param name: name of the output layer
-    :return: softmax Activation layer
+    :param axis: 计算的维度（最后一个轴为-1），默认值 = -1。
+    :param name: 激活函数层的命名，默认为""。
+
+    :return: 一个Softmax 激活函数层实例。
 
     Examples::
 
@@ -1131,17 +1108,18 @@ HardSigmoid
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 .. py:class:: pyvqnet.nn.HardSigmoid(name:str="")
 
-    Applies a hard sigmoid activation function to the given layer.
+    HardSigmoid 激活函数层。
 
     .. math::
         \text{Hardsigmoid}(x) = \begin{cases}
-            0 & \text{ if } x \le -2.5, \\
-            1 & \text{ if } x \ge +2.5, \\
-            x / 5 + 1 / 2 & \text{otherwise}
+            0 & \text{ if } x \le -3, \\
+            1 & \text{ if } x \ge +3, \\
+            x / 6 + 1 / 2 & \text{otherwise}
         \end{cases}
 
-    :param name: name of the output layer
-    :return: hard sigmoid Activation layer
+    :param name: 激活函数层的命名，默认为""。
+
+    :return: 一个HardSigmoid 激活函数层实例。
 
     Examples::
 
@@ -1151,14 +1129,14 @@ HardSigmoid
         y = layer(QTensor([1.0, 2.0, 3.0, 4.0]))
         print(y)
 
-        # [0.7000000, 0.9000000, 1.0000000, 1.0000000]
+        # [0.6666667, 0.8333334, 1.0000000, 1.0000000]
         
 
 ReLu
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 .. py:class:: pyvqnet.nn.ReLu(name:str="")
 
-    Applies a rectified linear unit activation function to the given layer.
+    ReLu 整流线性单元激活函数层。
 
     .. math::
         \text{ReLu}(x) = \begin{cases}
@@ -1167,8 +1145,9 @@ ReLu
         \end{cases}
 
 
-    :param name: name of the output layer
-    :return: ReLu Activation layer
+    :param name: 激活函数层的命名，默认为""。
+
+    :return: 一个ReLu 激活函数层实例。
 
     Examples::
 
@@ -1186,7 +1165,7 @@ LeakyReLu
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 .. py:class:: pyvqnet.nn.LeakyReLu(alpha:float=0.01,name:str="")
 
-    Applies the leaky version of a rectified linear unit activation function to the given layer.
+    LeakyReLu 带泄露的修正线性单元激活函数层。
 
     .. math::
         \text{LeakyRelu}(x) =
@@ -1195,9 +1174,10 @@ LeakyReLu
         \alpha * x, & \text{ otherwise }
         \end{cases}
 
-    :param alpha: LeakyRelu coefficient, default: 0.01
-    :param name: name of the output layer
-    :return: leaky ReLu Activation layer
+    :param alpha: LeakyRelu 系数，默认:0.01。
+    :param name: 激活函数层的命名，默认为""。
+
+    :return: 一个LeakyReLu 激活函数层实例。
 
     Examples::
 
@@ -1215,7 +1195,7 @@ ELU
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 .. py:class:: pyvqnet.nn.ELU(alpha:float=1,name:str="")
 
-    Applies the exponential linear unit activation function to the given layer.
+    ELU 指数线性单位激活函数层。
 
     .. math::
         \text{ELU}(x) = \begin{cases}
@@ -1223,9 +1203,10 @@ ELU
         \alpha * (\exp(x) - 1), & \text{ if } x \leq 0
         \end{cases}
 
-    :param alpha: Elu coefficient, default: 1.0
-    :param name: name of the output layer
-    :return: Elu Activation layer
+    :param alpha: ELU 系数，默认:1。
+    :param name: 激活函数层的命名，默认为""。
+
+    :return: ELU 激活函数层实例。
 
     Examples::
 
@@ -1242,13 +1223,14 @@ Tanh
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 .. py:class:: pyvqnet.nn.Tanh(name:str="")
 
-    Applies the hyperbolic tangent activation function to the given layer.
+    Tanh双曲正切激活函数.
 
     .. math::
         \text{Tanh}(x) = \frac{\exp(x) - \exp(-x)} {\exp(x) + \exp(-x)}
 
-    :param name: name of the output layer
-    :return: hyperbolic tangent Activation layer
+    :param name: 激活函数层的命名，默认为""。
+
+    :return: Tanh 激活函数层实例。
 
     Examples::
 
@@ -1269,16 +1251,18 @@ Optimizer
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 .. py:class:: pyvqnet.optim.optimizer.Optimizer( params, lr=0.01)
 
-    Base class for all optimizers.
+    所有优化器的基类。
 
-    :param params: params of model which need to be optimized
-    :param lr: learning_rate of model (default: 0.01)
+    :param params: 需要优化的模型参数。
+    :param lr: 学习率，默认值：0.01。
 
-adadelta
+Adadelta
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 .. py:class:: pyvqnet.optim.adadelta.Adadelta( params, lr=0.01, beta=0.99, epsilon=1e-8)
 
-    ADADELTA: An Adaptive Learning Rate Method. reference: (https://arxiv.org/abs/1212.5701)
+    ADADELTA: An Adaptive Learning Rate Method。
+    
+    参考:https://arxiv.org/abs/1212.5701。
 
     .. math::
 
@@ -1287,12 +1271,13 @@ adadelta
         E(dx_t^2) &= \beta * E(dx_{t-1}^2) + (1-\beta) * (-g*square\_avg)^2 \\
         param\_new &= param - lr * Square\_avg
 
-    :param params: params of model which need to be optimized
-    :param lr: learning_rate of model (default: 0.01)
-    :param beta: for computing a running average of squared gradients (default: 0.99)
-    :param epsilon: term added to the denominator to improve numerical stability (default: 1e-8)
-    :return: a Adadelta optimizer
-    
+    :param params: 需要优化的模型参数。
+    :param lr: 学习率（默认值：0.01）。
+    :param beta: 用于计算平方梯度的运行平均值（默认值：0.99）。
+    :param epsilon: 添加到分母以提高数值稳定性的常数（默认值：1e-8）。
+
+    :return: 一个 Adadelta 优化器。
+
     Example::
 
         import numpy as np
@@ -1326,11 +1311,13 @@ adadelta
         #  [19.9999809, 20.9999809, 21.9999809, 22.9999809]]]
         # ]
 
-adagrad
+Adagrad
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 .. py:class:: pyvqnet.optim.adagrad.Adagrad( params, lr=0.01, epsilon=1e-8)
 
-    Implements Adagrad algorithm. reference: (https://databricks.com/glossary/adagrad)
+    Adagrad自适应梯度优化器。
+    
+    参考:https://databricks.com/glossary/adagrad。
 
     .. math::
         \begin{align}
@@ -1338,10 +1325,10 @@ adagrad
         &= param - \frac{lr * g}{\sqrt{moment\_new} + \epsilon}
         \end{align}
 
-    :param params: params of model which need to be optimized
-    :param lr: learning_rate of model (default: 0.01)
-    :param epsilon: term added to the denominator to improve numerical stability (default: 1e-8)
-    :return: a Adagrad optimizer
+    :param params: 需要优化的模型参数。
+    :param lr: 学习率（默认值：0.01）。
+    :param epsilon: 添加到分母以提高数值稳定性的常数（默认值：1e-8）。
+    :return: 一个 Adagrad 优化器。
 
     Example::
 
@@ -1381,7 +1368,9 @@ adam
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 .. py:class:: pyvqnet.optim.adam.Adam( params, lr=0.01, beta1=0.9, beta2=0.999, epsilon=1e-8,amsgrad: bool = False)
 
-    Adam: A Method for Stochastic Optimization reference: (https://arxiv.org/abs/1412.6980),it can dynamically adjusts the learning rate of each parameter using the 1st moment estimates and the 2nd moment estimates of the gradient.
+    Adam优化器,它可以使用一阶矩估计动态调整每个参数的学习率和梯度的二阶矩估计。
+    
+    参考:https://arxiv.org/abs/1412.6980。
 
     .. math::
         t = t + 1 
@@ -1392,26 +1381,25 @@ adam
     .. math::
         lr = lr*\frac{\sqrt{1-\beta2^t}}{1-\beta1^t}
 
-    if amsgrad = True
+    如果参数 amsgrad 为 True
 
     .. math::
         moment\_2\_max = max(moment\_2\_max,moment\_2)
     .. math::
         param\_new=param-lr*\frac{moment\_1}{\sqrt{moment\_2\_max}+\epsilon} 
 
-    else
+    否则
 
     .. math::
         param\_new=param-lr*\frac{moment\_1}{\sqrt{moment\_2}+\epsilon} 
 
-
-    :param params: params of model which need to be optimized
-    :param lr: learning_rate of model (default: 0.01)
-    :param beta1: coefficients used for computing running averages of gradient and its square (default: 0.9)
-    :param beta2: coefficients used for computing running averages of gradient and its square (default: 0.999)
-    :param epsilon: term added to the denominator to improve numerical stability (default: 1e-8)
-    :param amsgrad: whether to use the AMSGrad variant of this algorithm (default: False)
-    :return: a Adam optimizer
+    :param params: 需要优化的模型参数。
+    :param lr: 学习率（默认值：0.01）。
+    :param beta1: 用于计算梯度及其平方的运行平均值的系数（默认值：0.9）。
+    :param beta2: 用于计算梯度及其平方的运行平均值的系数（默认值：0.999）。
+    :param epsilon: 添加到分母以提高数值稳定性的常数（默认值：1e-8）。
+    :param amsgrad: 是否使用该算法的 AMSGrad 变体（默认值：False）。
+    :return: 一个 Adam 优化器。
 
     Example::
 
@@ -1450,7 +1438,9 @@ adamax
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 .. py:class:: pyvqnet.optim.adamax.Adamax(params, lr=0.01, beta1=0.9, beta2=0.999, epsilon=1e-8)
 
-    Implements Adamax algorithm (a variant of Adam based on infinity norm).reference: (https://arxiv.org/abs/1412.6980)
+    实现 Adamax 优化器（基于无穷范数的 Adam 变体）。
+    
+    参考:https://arxiv.org/abs/1412.6980。
 
     .. math::
         \\t = t + 1
@@ -1463,12 +1453,13 @@ adamax
     .. math::
         param\_new = param − lr*\frac{moment\_new}{norm\_new}\\
 
-    :param params: params of model which need to be optimized
-    :param lr: learning_rate of model (default: 0.01)
-    :param beta1: coefficients used for computing running averages of gradient and its square (default: 0.9)
-    :param beta2: coefficients used for computing running averages of gradient and its square (default: 0.999)
-    :param epsilon: term added to the denominator to improve numerical stability (default: 1e-8)
-    :return: a Adamax optimizer
+    :param params: 需要优化的模型参数。
+    :param lr: 学习率（默认值：0.01）。
+    :param beta1: 用于计算梯度及其平方的运行平均值的系数（默认值：0.9）。
+    :param beta2: 用于计算梯度及其平方的运行平均值的系数（默认值：0.999）。
+    :param epsilon: 添加到分母以提高数值稳定性的常数（默认值：1e-8）。
+
+    :return: 一个 Adamax 优化器。
 
     Example::
 
@@ -1507,7 +1498,9 @@ rmsprop
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 .. py:class:: pyvqnet.optim.rmsprop.RMSProp( params, lr=0.01, beta=0.99, epsilon=1e-8)
     
-    Implements RMSprop algorithm. reference: (https://arxiv.org/pdf/1308.0850v5.pdf)
+    RMSprop 均方根传播算法优化器。
+    
+    参考:https://arxiv.org/pdf/1308.0850v5.pdf。
 
     .. math::
         s_{t+1} = s_{t} + (1 - \beta)*(g)^2
@@ -1516,11 +1509,12 @@ rmsprop
         param_new = param -  \frac{g}{\sqrt{s_{t+1}} + epsilon}
 
 
-    :param params: params of model which need to be optimized
-    :param lr: learning_rate of model (default: 0.01)
-    :param beta: coefficients used for computing running averages of gradient and its square (default: 0.99)
-    :param epsilon: term added to the denominator to improve numerical stability (default: 1e-8)
-    :return: a RMSProp optimizer
+    :param params: 需要优化的模型参数。
+    :param lr: 学习率（默认值：0.01）。
+    :param beta: 用于计算梯度及其平方的运行平均值的系数（默认值：0.99）。
+    :param epsilon: 添加到分母以提高数值稳定性的常数（默认值：1e-8）。
+
+    :return: 一个 RMSProp 优化器。
 
     Example::
 
@@ -1559,17 +1553,20 @@ sgd
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 .. py:class:: pyvqnet.optim.sgd.SGD(params, lr=0.01,momentum=0, nesterov=False)
 
-    Implements SGD algorithm. reference: (https://en.wikipedia.org/wiki/Stochastic_gradient_descent)
+    随机梯度下降优化器。
+    
+    参考:https://en.wikipedia.org/wiki/Stochastic_gradient_descent。
 
     .. math::
 
         \\param\_new=param-lr*g\\
 
-    :param params: params of model which need to be optimized
-    :param lr: learning_rate of model (default: 0.01)
-    :param momentum: momentum factor (default: 0)
-    :param nesterov: enables Nesterov momentum (default: False)
-    :return: a SGD optimizer
+    :param params: 需要优化的模型参数。
+    :param lr: 学习率（默认值：0.01）。
+    :param momentum: 动量因子（默认值：0）。
+    :param nesterov: 启用 Nesterov 动量 (默认: False)。
+
+    :return: 一个 SGD 优化器。
     
     Example::
 
@@ -1611,13 +1608,15 @@ Rotosolve算法它允许相对于其他参数的固定值直接跳转到单个�
 
 .. py:class:: pyvqnet.optim.rotosolve.Rotosolve(max_iter =50)
 
-    Rotosolve: The rotosolve algorithm can be used to minimize a linear combination
-    of quantum measurement expectation values. See the following paper:
-    https://arxiv.org/abs/1903.12166, Ken M. Nakanishi.
-    https://arxiv.org/abs/1905.09692, Mateusz Ostaszewski.
+    Rotosolve：可以使用 rotosolve 算法来最小化线性组合的量子测量期望值。 请参阅以下论文:
 
-    :param max_iter: max number of iterations of the rotosolve update
-    :return: a Rotosolve optimizer
+    https://arxiv.org/abs/1903.12166, Ken M. Nakanishi。
+
+    https://arxiv.org/abs/1905.09692, Mateusz Ostaszewski。
+
+    :param max_iter: rotosolve 更新的最大迭代次数。
+
+    :return: 一个 Rotosolve 优化器。
     
     Example::
 

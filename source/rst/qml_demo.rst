@@ -1235,17 +1235,38 @@ Quantum circuit structure learning任务的核心目标就是找到最优的带�
 我们将使用 `MNIST datasets <http://yann.lecun.com/exdb/mnist/>`_ 这一神经网络最基础的手写数字数据库作为分类数据 。
 我们首先加载MNIST并过滤包含0和1的数据样本。这些样本分为训练数据 training_data 和测试数据 testing_data，它们每条数据均为1*784的维度大小。
 
-.. code-block:
+.. code-block::
+
+    import time
+    import os
+    import struct
+    import gzip
+    from pyvqnet.nn.module import Module
+    from pyvqnet.nn.linear import Linear
+    from pyvqnet.nn.conv import Conv2D
+
+    from pyvqnet.nn import activation as F
+    from pyvqnet.nn.pooling import MaxPool2D
+    from pyvqnet.nn.loss import CategoricalCrossEntropy
+    from pyvqnet.optim.adam import Adam
+    from pyvqnet.data.data import data_generator
+    from pyvqnet.tensor import tensor
+    from pyvqnet.tensor import QTensor
+    import pyqpanda as pq
 
     import numpy as np
     import matplotlib.pyplot as plt
+    import matplotlib
+    try:
+        matplotlib.use("TkAgg")
+    except:  #pylint:disable=bare-except
+        print("Can not use matplot TkAgg")
+        pass
 
     try:
         import urllib.request
     except ImportError:
-        raise ImportError('You should use Python 3.x')
-    import os.path
-    import gzip
+        raise ImportError("You should use Python 3.x")
 
     url_base = 'http://yann.lecun.com/exdb/mnist/'
     key_file = {
@@ -1496,6 +1517,7 @@ Quantum circuit structure learning任务的核心目标就是找到最优的带�
 
 .. code-block::
 
+    x_train, y_train, x_test, y_test = data_select(1000, 100)
     #实例化
     model = Net() 
     #使用Adam完成此任务就足够了，model.parameters（）是模型需要计算的参数。
@@ -1797,39 +1819,14 @@ Quantum circuit structure learning任务的核心目标就是找到最优的带�
 
         return images, labels
 
-    def data_select(train_num, test_num):
-        x_train, y_train = load_mnist("training_data")  # 下载训练数据
-
-        x_test, y_test = load_mnist("testing_data")
-
-        # Train Leaving only labels 0 and 1
-        idx_train = np.append(np.where(y_train == 0)[0][:train_num],
-                              np.where(y_train == 1)[0][:train_num])
-
-        x_train = x_train[idx_train]
-        y_train = y_train[idx_train]
-
-        x_train = x_train / 255
-        y_train = np.eye(2)[y_train].reshape(-1, 2)
-
-        # Test Leaving only labels 0 and 1
-        idx_test = np.append(np.where(y_test == 0)[0][:test_num],
-                             np.where(y_test == 1)[0][:test_num])
-
-        x_test = x_test[idx_test]
-        y_test = y_test[idx_test]
-        x_test = x_test / 255
-        y_test = np.eye(2)[y_test].reshape(-1, 2)
-
-        return x_train, y_train, x_test, y_test
 
     """
     to get cnn model parameters for transfer learning
     """
 
-    train_size =50
-    eval_size = 50
-    EPOCHES = 10
+    train_size = 10000
+    eval_size = 1000
+    EPOCHES = 100
     def classcal_cnn_model_making():
         # load train data
         x_train, y_train = load_mnist("training_data", digits=np.arange(10))
@@ -2286,7 +2283,7 @@ Quantum circuit structure learning任务的核心目标就是找到最优的带�
         model_hybrid.fc3 = Q_DressedQuantumNet()
         for param in model_hybrid.parameters():
             param.requires_grad = False
-        model_param_quantum = load_parameters("QCNN_TL_ALL.model")
+        model_param_quantum = load_parameters("./result/QCNN_TL_ALL.model")
 
         model_hybrid.load_state_dict(model_param_quantum)
         model_hybrid.eval()
@@ -2371,8 +2368,8 @@ QUnet主要是用于解决图像分割的技术。
 
 数据准备
 """""""""""
-我们将使用VOCdevkit/VOC2012官方库的数据: `VOC2012 <http://host.robots.ox.ac.uk/pascal/VOC/voc2012/VOCtrainval_11-May-2012.tar>`_ , 作为图像分割数据。
-这些样本分为训练数据 training_data 和测试数据 testing_data。 
+我们将使用VOCdevkit/VOC2012官方库的数据: `VOC2012 <http://host.robots.ox.ac.uk/pascal/VOC/voc2012/#devkit>`_ , 作为图像分割数据。
+这些样本分为训练数据 training_data 和测试数据 testing_data,文件夹中包含images 和 labels。 
 
 .. image:: ./images/Unet_data_imshow.png
    :width: 600 px
@@ -2432,16 +2429,16 @@ QUnet主要是用于解决图像分割的技术。
 
 
         def processing(self):
-            list_path = os.listdir((self.path+"/train"))
+            list_path = os.listdir((self.path+"/images"))
             for i in range(len(list_path)):
 
-                temp_data = cv2.imread(self.path+"/train" + '/' + list_path[i], cv2.IMREAD_COLOR)
+                temp_data = cv2.imread(self.path+"/images" + '/' + list_path[i], cv2.IMREAD_COLOR)
                 temp_data = cv2.resize(temp_data, (128, 128))
                 grayimg = cv2.cvtColor(temp_data, cv2.COLOR_BGR2GRAY)
                 temp_data = grayimg.reshape(temp_data.shape[0], temp_data.shape[0], 1)
                 self.x_data.append(temp_data)
 
-                label_data = cv2.imread(self.path+"/label" + '/' +list_path[i].split(".")[0] + ".png", cv2.IMREAD_COLOR)
+                label_data = cv2.imread(self.path+"/labels" + '/' +list_path[i].split(".")[0] + ".png", cv2.IMREAD_COLOR)
                 label_data = cv2.resize(label_data, (128, 128))
 
                 label_data = cv2.cvtColor(label_data, cv2.COLOR_BGR2GRAY)
@@ -2520,6 +2517,13 @@ QUnet主要是用于解决图像分割的技术。
                 for c in range(1):
                     out[j // 2, k // 2, c] = q_results[c]
         return out
+
+    def quantum_data_preprocessing(images):
+        quantum_images = []
+        for _, img in enumerate(images):
+            quantum_images.append(quanconv_(img))
+        quantum_images = np.asarray(quantum_images)
+        return quantum_images
 
 构建混合经典量子神经网络
 """"""""""""""""""""""""""
@@ -2664,6 +2668,7 @@ QUnet主要是用于解决图像分割的技术。
 定义损失函数以及优化器以及定义整个训练测试流程。 对于形如下图的混合神经网络模型，我们通过循环输入数据前向计算损失值，
 并在反向计算中自动计算出各个待训练参数的梯度，并使用优化器进行参数优化，直到迭代次数满足预设值。
 我们这里使用前面下载的VOC2012数据中选取100张作为训练集，10张作为测试集。训练集目录指定为 `path0`,测试集目录指定为 `path1`。
+其中，图像以及其对应的标签图像都经过了量子卷积模块 ``quantum_data_preprocessing`` 进行预处理，我们Unet的训练目标是使得同时经过量子线路预处理的图像和标签尽可能贴近。
 
 .. code-block::
 
@@ -2694,8 +2699,8 @@ QUnet主要是用于解决图像分割的技术。
         pass
 
     # prepare train/test data and label
-    path0 = '../../data/dataset/Unet_data_src'
-    path1 = '../../data/dataset/Unet_data_test'
+    path0 = 'training_data'
+    path1 = 'testing_data'
     train_images, train_labels = PreprocessingData(path0).read()
     test_images, test_labels = PreprocessingData(path1).read()
 
@@ -2706,25 +2711,25 @@ QUnet主要是用于解决图像分割的技术。
 
     # use quantum encoder to preprocess data
     # PREPROCESS = True
-    PREPROCESS = False
+    PREPROCESS = True
     
     if PREPROCESS == True:
         print("Quantum pre-processing of train images:")
-        q_train_images = QuantumDataPreprocessing(train_images)
-        q_test_images = QuantumDataPreprocessing(test_images)
-        q_train_label = QuantumDataPreprocessing(train_labels)
-        q_test_label = QuantumDataPreprocessing(test_labels)
+        q_train_images = quantum_data_preprocessing(train_images)
+        q_test_images = quantum_data_preprocessing(test_images)
+        q_train_label = quantum_data_preprocessing(train_labels)
+        q_test_label = quantum_data_preprocessing(test_labels)
 
         # Save pre-processed images
         print('Quantum Data Saving...')
-        np.save("../../data/dataset/q_train.npy", q_train_images)
-        np.save("../../data/dataset/q_test.npy", q_test_images)
-        np.save("../../data/dataset/q_train_label.npy", q_train_label)
-        np.save("../../data/dataset/q_test_label.npy", q_test_label)
+        np.save("./result/q_train.npy", q_train_images)
+        np.save("./result/q_test.npy", q_test_images)
+        np.save("./result/q_train_label.npy", q_train_label)
+        np.save("./result/q_test_label.npy", q_test_label)
         print('Quantum Data Saving Over!')
 
     # loading quantum data
-    SAVE_PATH = "../../data/dataset/"
+    SAVE_PATH = "./result/"
     train_x = np.load(SAVE_PATH + "q_train.npy")
     train_labels = np.load(SAVE_PATH + "q_train_label.npy")
     test_x = np.load(SAVE_PATH + "q_test.npy")
@@ -2738,7 +2743,7 @@ QUnet主要是用于解决图像分割的技术。
     test_y = test_labels
 
     trainset = MyDataset(train_x, train_y)
-
+    testset = MyDataset(test_x, test_y)
     x_train = []
     y_label = []
     model = UNet()
@@ -2828,9 +2833,10 @@ QUnet主要是用于解决图像分割的技术。
 
     modela = load_parameters("./result/Q-Unet_End.model")
     print("----------------PREDICT-------------")
-    model.train()
+    model.load_state_dict(modela)
+    model.eval()
 
-    for i, (x1, y1) in enumerate(trainset):
+    for i, (x1, y1) in enumerate(testset):
         x_img = QTensor(x1)
         x_img_Qtensor = tensor.unsqueeze(x_img, 0)
         y_img = QTensor(y1)
@@ -2854,7 +2860,7 @@ QUnet主要是用于解决图像分割的技术。
             plt.imshow(np.array(y_img_tensor.data).transpose([1, 2, 0]))
         else:
             plt.imshow(np.array(y_img_tensor.data).transpose([1, 2, 0]).squeeze(2))
-        plt.savefig("./result/" + str(i) + "_1" + ".jpg")
+        plt.savefig("./result/eval_" + str(i) + "_1" + ".jpg")
     print("end!")
 
 训练集上Loss情况
@@ -2939,7 +2945,19 @@ QUnet主要是用于解决图像分割的技术。
 
 .. code-block::
 
-    from scipy import make_blobs
+    import math
+    import numpy as np
+    from pyvqnet.tensor import QTensor, zeros
+    import pyvqnet.tensor as tensor
+    import pyqpanda as pq
+    from sklearn.datasets import make_blobs
+    import matplotlib.pyplot as plt
+    import matplotlib
+    try:
+        matplotlib.use("TkAgg")
+    except:  #pylint:disable=bare-except
+        print("Can not use matplot TkAgg")
+        pass
     # 根据数据的数据量n，聚类中心k和数据标准差std返回对应数据点和聚类中心点
     def get_data(n, k, std):
         data = make_blobs(n_samples=n, n_features=2, centers=k, cluster_std=std, random_state=100)
@@ -3149,6 +3167,23 @@ QUnet主要是用于解决图像分割的技术。
     from pyqpanda import *
     random.seed(1234)
 
+    qvc_train_data = [0,1,0,0,1,
+    0, 1, 0, 1, 0,
+    0, 1, 1, 0, 0,
+    0, 1, 1, 1, 1,
+    1, 0, 0, 0, 1,
+    1, 0, 0, 1, 0,
+    1, 0, 1, 0, 0,
+    1, 0, 1, 1, 1,
+    1, 1, 0, 0, 0,
+    1, 1, 0, 1, 1,
+    1, 1, 1, 0, 1,
+    1, 1, 1, 1, 0]
+    qvc_test_data= [0, 0, 0, 0, 0,
+    0, 0, 0, 1, 1,
+    0, 0, 1, 0, 1,
+    0, 0, 1, 1, 0]
+
     def qvc_circuits(input,weights,qlist,clist,machine):
 
         def get_cnot(nqubits):
@@ -3207,14 +3242,6 @@ QUnet主要是用于解决图像分割的技术。
         def forward(self, x):
             return self.qvc(x)
 
-
-    def get_data(PATH):
-        datasets = np.loadtxt(PATH) 
-        data = datasets[:,:-1]
-        label = datasets[:,-1].astype(int)
-        label = np.eye(2)[label].reshape(-1,2)
-        return data, label
-
     def dataloader(data,label,batch_size, shuffle = True)->np:
         if shuffle:
             for _ in range(len(data)//batch_size):
@@ -3223,6 +3250,19 @@ QUnet主要是用于解决图像分割的技术。
         else:
             for i in range(0,len(data)-batch_size+1,batch_size):
                 yield data[i:i+batch_size], label[i:i+batch_size]
+
+    def get_data(dataset_str):
+        if dataset_str == "train":
+            datasets = np.array(qvc_train_data)
+
+        else:
+            datasets = np.array(qvc_test_data)
+
+        datasets = datasets.reshape([-1,5])
+        data = datasets[:,:-1]
+        label = datasets[:,-1].astype(int)
+        label = np.eye(2)[label].reshape(-1,2)
+        return data, label
 
     def get_accuary(result,label):
         result,label = np.array(result.data), np.array(label.data)
@@ -3239,8 +3279,8 @@ QUnet主要是用于解决图像分割的技术。
         loss = CategoricalCrossEntropy()
         print("start training..............")
         model.train()
-        PATH = os.path.abspath('..//..//data//qvc_data.txt')
-        datas,labels = get_data(PATH)
+
+        datas,labels = get_data("train")
         print(datas)
         print(labels)
         print(datas.shape)
@@ -3267,8 +3307,7 @@ QUnet主要是用于解决图像分割的技术。
         print("start testing..............")
         model.eval()
         count = 0
-        test_PATH = os.path.abspath('../../data/qvc_data_test.txt')
-        test_data, test_label = get_data(test_PATH)
+        test_data, test_label = get_data("test")
         test_batch_size = 1
         accuary = 0
         sum_loss = 0
@@ -3316,7 +3355,7 @@ QUnet主要是用于解决图像分割的技术。
 在VQNet中使用NoiseQuantumLayer进行模型训练
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-在examples中实现了一个使用 ``NoiseQuantumLayer`` 进行可变量子线路的完整实例 hqcnn_noise_test.py
+使用 ``NoiseQuantumLayer`` 可以使用QPanda的噪声虚拟机构建含噪量子线路，并进行训练。
 
 一个完整的含噪模型量子机器学习模型的例子如下：
 
@@ -3658,6 +3697,12 @@ VQNet提供了封装类 ``VQC_wrapper`` ，用户使用普通逻辑门在函数 
     import pyqpanda as pq
 
     random.seed(1234)
+    qvc_train_data = [
+        0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1,
+        1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 0, 1, 1,
+        1, 1, 1, 0, 1, 1, 1, 1, 1, 0
+    ]
+    qvc_test_data = [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 1, 0, 0, 1, 1, 0]
 
     class QVC_demo(VQC_wrapper):
 
@@ -3728,11 +3773,20 @@ VQNet提供了封装类 ``VQC_wrapper`` ，用户使用普通逻辑门在函数 
             return self.qvc(x)
 
 
-    def get_data(PATH):
-        datasets = np.loadtxt(PATH)
-        data = datasets[:,:-1]
-        label = datasets[:,-1].astype(int)
-        label = np.eye(2)[label].reshape(-1,2)
+    def get_data(dataset_str):
+        """
+        Tranform data to valid form
+        """
+        if dataset_str == "train":
+            datasets = np.array(qvc_train_data)
+
+        else:
+            datasets = np.array(qvc_test_data)
+
+        datasets = datasets.reshape([-1, 5])
+        data = datasets[:, :-1]
+        label = datasets[:, -1].astype(int)
+        label = np.eye(2)[label].reshape(-1, 2)
         return data, label
 
     def dataloader(data,label,batch_size, shuffle = True)->np:
@@ -3760,7 +3814,7 @@ VQNet提供了封装类 ``VQC_wrapper`` ，用户使用普通逻辑门在函数 
         loss = CategoricalCrossEntropy()
         print("start training..............")
         model.train()
-        PATH = os.path.abspath('..//..//data//qvc_data.txt')
+        PATH = os.path.abspath('train')
         datas,labels = get_data(PATH)
         for i in range(epoch):
             count=0
@@ -3782,8 +3836,7 @@ VQNet提供了封装类 ``VQC_wrapper`` ，用户使用普通逻辑门在函数 
         print("start testing..............")
         model.eval()
         count = 0
-        test_PATH = os.path.abspath('../../data/qvc_data_test.txt')
-        test_data, test_label = get_data(test_PATH)
+        test_data, test_label = get_data("test")
         test_batch_size = 1
         accuary = 0
         sum_loss = 0
@@ -3826,3 +3879,118 @@ VQNet提供了封装类 ``VQC_wrapper`` ，用户使用普通逻辑门在函数 
     start testing..............
     [0.3132616580]
     test:--------------->loss:QTensor(None, requires_grad=True) #####accuray:1.0
+
+
+QGAN制备任意分布初态
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+基于2019年 Christa Zoufal 的论文 `Quantum Generative Adversarial Networks for learning and loading random distributions <https://www.nature.com/articles/s41534-019-0223-2>`_ , VQNet提供了一个QGAN制备任意分布初态的例子。该算法使用纯量子变分线路制备特定随机分布的生成量子态，可以减少原先生成特定量子态所需的逻辑门，降低量子线路复杂度。
+QGAN使用经典的GAN模型结构，分为Generator生成器与Discriminator鉴别器两个子模型，Generator为量子线路产生特定分布，而Generator生成的分布generated data samples 以及真实的随机分布training data samples 输入Discriminator模型进行鉴别真伪。
+
+.. image:: ./images/qgan-arch.PNG
+   :width: 600 px
+   :align: center
+
+|
+
+
+构建VQNet的量子生成对抗网络接口 ``QGANAPI`` 类，我们可以对真实分布的数据 real_data 使用量子生成器进行初态制备。这里使用量子比特数为3，量子生成器内部含参线路模块重复次数为1。
+使用的评价指标为KL散度。
+
+.. code-block::
+
+    import pickle
+    import os
+    import pyqpanda as pq
+    from pyvqnet.qnn.qgan.qgan_utils import QGANAPI
+    import numpy as np
+
+
+    ##################################
+    num_of_qubits = 3  # paper config
+    rep = 1
+
+    number_of_data = 10000
+    # Load data samples from different distributions
+    mu = 1
+    sigma = 1
+    real_data = np.random.lognormal(mean=mu, sigma=sigma, size=number_of_data)
+
+
+    # intial
+    save_dir = None
+    qgan_model = QGANAPI(
+        real_data,
+        # numpy generated data distribution, 1 - dim.
+        num_of_qubits,
+        batch_size=2000,
+        num_epochs=2000,
+        q_g_cir=None,
+        bounds = [0.0,2**num_of_qubits -1],
+        reps=rep,
+        metric="kl",
+        tol_rel_ent=0.01,
+        if_save_param_dir=save_dir  
+    )
+
+接下来使用其训练接口 ``train`` 训练。
+
+.. code-block::
+
+    # train
+    qgan_model.train()  # train qgan
+
+``eval`` 画出其与真实分布之间的概率分布函数对比:
+
+.. code-block::
+
+    # show probability distribution function of generated distribution and real distribution
+    qgan_model.eval(real_data)  #draw pdf
+
+
+``get_trained_quantum_parameters`` 获取训练参数并输出为一个numpy数组形式。如果 ``save_dir`` 不为空，则该类将保存参数到文件中。可以通过 ``load_param_and_eval`` 函数载入参数，并可以通过
+``get_circuits_with_trained_param`` 获取训练完参数的量子生成器pyQPanda线路。
+
+.. code-block::
+
+    # get trained quantum parameters
+    param = qgan_model.get_trained_quantum_parameters()
+    print(f" trained param {param}")
+
+    #load saved parameters files 
+    if save_dir is not None:
+        path = os.path.join(
+            save_dir, qgan_model._start_time + "trained_qgan_param.pickle")
+        with open(path, "rb") as file:
+            t3 = pickle.load(file)
+        param = t3["quantum_parameters"]
+        print(f" trained param {param}")
+
+    #show probability distribution function of generated distribution and real distribution
+    qgan_model.load_param_and_eval(param)
+
+    #calculate metric
+    print(qgan_model.eval_metric(param, "kl"))
+
+    #get generator quantum circuit
+    m_machine = pq.CPUQVM()
+    m_machine.init_qvm()
+    qubits = m_machine.qAlloc_many(num_of_qubits)
+    qpanda_cir = qgan_model.get_circuits_with_trained_param(qubits)
+    print(qpanda_cir)
+
+生成lognormal分布的损失函数以及概率分布函数图，一般来说需要使用不同的随机种子多次训练该模型可得到较好结果:
+
+.. image:: ./images/qgan-loss.PNG
+   :width: 600 px
+   :align: center
+
+|
+
+.. image:: ./images/qgan-pdf.PNG
+   :width: 600 px
+   :align: center
+
+|
+
+
