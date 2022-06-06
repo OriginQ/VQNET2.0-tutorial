@@ -4196,3 +4196,153 @@ QSVM算法
     # predict： 1 real： 1     
     # predict： 1 real： 1     
     # ---------------errorRate：0.027778-------------------
+
+
+QAOA算法
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+QAOA (Quantum Approximation Optimization Algorithm) 算法是启发式算法，它与变分
+量⼦本征求解器VQE (Variational Quantum Eigensolver) 和 量⼦绝热算法QAA (Quantum
+Adiabatic Algorithm) 有很强的关联。量子近似优化算法（Quantum Approximate Optimization Algorithm，QAOA）是利用量子计算机来近似解决组合优化问题的量子算法，最早由Farhi等人于2014年提出。
+
+组合优化问题可以抽象为对某⼀⽬标函数的最⼤化问题。
+设优化问题的态可以编码为⼀组⼆进制向量 :math:`z=(z_{1},z_{2},...,z_{n}),z_{i} \in \{0,1\}`，使得每⼀个向量唯⼀对应⼀种组合策略。
+优化问题即转化为寻找特定的z使得关于z的⽬标函数取最⼤值。
+对这类组合优化问题，存在⼀般性的量⼦编码⽅法。
+向量z可以⽤n个量⼦⽐特编码为 :math:`|z \rangle`, :math:`z_{i}` 的值即是对应⽐特的⾃旋 :math:`\sigma_{i}^{z}` 。若在计算基下取0-1编码，⼀般性的替换公式为：
+
+.. math::
+            z_{i} \rightarrow\frac{I-Z_{i}}{2}
+
+其中 :math:`I` 是单位矩阵， :math:`Z_{i}` 是泡利矩阵。因为计算基下的0态或1态被泡利矩阵作⽤后得到的分别是⾃旋取值1或-1，所以需要加上单位矩阵对应经典⼆进制编码的取值。⽬标函数对应的哈密顿量可以直接将经典的⽬标函数⾃变量按上述⽅式替换得到：
+
+.. math::
+            H_{C} = C(\frac{I-Z_{1}}{2},\frac{I-Z_{1}}{2},...,\frac{I-Z_{n}}{2})
+
+于是原始的组合优化问题转化为求哈密顿量 :math:`H_{C}`的基态或最⾼激发态对应的量⼦态 :math:`|z \rangle`。
+
+Max-Cut问题是图论中的一个NP-complete问题，它需要将一个图中的顶点分成两部分，并使得两部分被切割的边最多。
+如下图（a），一个图由五个顶点构成，相互连接的边(0, 1), (0, 2), (1, 2), (2, 3), (3, 4), (0, 4)。为了使得被切割的边最多，我们尝试通过（b）图的分割，将1、2、4分为一组，0、3分成另一组，因此可得到被切割的边有5条。
+当图中顶点较少时，我们可以在较短时间内通过穷举法找到最大的切割边数。但当图中顶点增多时，我们很难找到有效的经典算法来解决Max-Cut问题，因为这类NP-complete问题很有可能不存在多项式时间算法。但尽管精确解不容易得到，我们却可以想办法在多项式时间内找到问题的一个近似解，这就是近似优化算法。下面，我们介绍怎么将Max-Cut问题转化为一个哈密顿量的基态能量求解问题。
+
+
+.. image:: ./images/maxcut.png
+   :width: 600 px
+   :align: center
+
+|
+
+我们将图中的每个顶点赋予一个量子比特，当顶点被分到左边时，我们将该顶点上的量子比特设置为 :math:`|0 \rangle` 态，同理，右边为 :math:`|1 \rangle` 态，
+当两个顶点被分到不同的集合中时，这两个顶点上的比特将处于不同的量子态。例如对于第0个顶点和第1个顶点，当其连线被切割时，两个顶点上的比特对应的量子态
+可以表示为 :math:`|01 \rangle` （顶点1：左，顶点0：右）或|10⟩（顶点1：右，顶点0：左）；若它们被分到同一边，则对应量子态为 :math:`|00 \rangle` 或 :math:`|11 \rangle` 。
+因此我们只要找到一个哈密顿量H使得：当有连线的两个顶点处于不同量子态时，哈密顿量的期望值为-1，即 :math:`\langle 01 | H |01 \rangle=-1, \langle 10 | H |10\rangle=-1`。
+而当有连线的顶点处于相同量子态时，哈密顿量的期望值为0，即 :math:`\langle 00 | H |00 \rangle=0, \langle 11 | H |11 \rangle=-0`。
+我们选择哈密顿量 :math:`H=(Z1 Z0−1)/2`，这里Z为泡利Z算符。此时有：
+:math:`Z1 Z0|00\rangle=|00\rangle, Z1 Z0|11\rangle=|11\rangle, Z1 Z0|01\rangle=−|01\rangle, Z1 Z0|10\rangle=−|10\rangle`。
+因此当顶点被分到不同集合时：
+
+.. math::
+
+    \begin{aligned}
+    &\langle 01|H| 01\rangle=\frac{1}{2}\left\langle 01\left|Z_{1} Z_{0}\right| 01\right\rangle-\frac{1}{2}=-1 \\
+    &\langle 10|H| 10\rangle=\frac{1}{2}\left\langle 10\left|Z_{1} Z_{0}\right| 10\right\rangle-\frac{1}{2}=-1
+    \end{aligned}
+
+而当顶点被分到同一集合中时, 不难验证此时:
+
+.. math::
+
+    \begin{aligned}
+    \langle 00|H| 00\rangle &=\frac{1}{2}\left\langle 00\left|Z_{1} Z_{0}\right| 00\right\rangle-\frac{1}{2}=0 \\
+    \langle 11|H| 11\rangle &=\frac{1}{2}\left\langle 11\left|Z_{1} Z_{0}\right| 11\right\rangle-\frac{1}{2}=0
+    \end{aligned}
+
+ 
+因此，我们只要对图中的每条边写出上述哈密顿量，然后将所有边求和，即可写出图对应的哈密顿量H，利用量子计算机求得H的基态能量与基态，我们就可以得到该图的Max-Cut切割方案与最大切割边数。我们记所有边的集合为C，所有边条数为c，则哈密顿量可写为：
+
+.. math::
+
+    H=\sum_{(i,j \in C} (Z_{i}Z_{j}-1)/2
+
+按照之前介绍的QAOA的相关概念，可以将其改写为：
+
+.. math::
+
+    H_{C}=\sum_{<mn>} (I - \sigma_{m}^{z}\sigma_{n}^{z})/2
+
+其中 :math:`<mn>` 表示点m和点n对应的边，求和号表示对所有的边求和。最⼤割问题所求的最优解对应 :math:`H_{C}` 的最⾼激发态。
+以3个⽐特为例，第j层的QAOA电路的形式为：
+
+
+.. image:: ./images/qaoa_demo.png
+   :width: 600 px
+   :align: center
+
+|
+
+共p层这样形式的电路组合变成最终的QAOA电路。
+
+下面为调用networkx 生成一个随机图，并使用VQNet的 ``Hamiltonian_MaxCut`` 生成对应问题的哈密顿量，并使用 ``QAOA`` 的 ``run`` 函数计算的例子。
+
+.. code-block::
+
+    """
+    QAOA demo
+    """
+    import numpy as np
+    from networkx import random_regular_graph
+    from pyvqnet.qnn.qaoa import Hamiltonian_MaxCut,QAOA,write_excel_xls
+    if __name__ == "__main__":
+
+        N = 4  ## 比特数
+        R = 20  ## 前两层初参的随机次数
+        P = 10  ## QAOA算法层数
+
+        # dir_u3r = r'./qaoa'   ## 输出文件所在的文件夹
+        # os.makedirs(dir_u3r, exist_ok=True)
+
+        # exp_file = dir_u3r + r'\exp.xls'
+        exp_file = r'./exp.xls'
+        # params_file = dir_u3r + r'\params.xls'
+        params_file = r'./params.xls'
+
+        for r in range(1):
+            ### MaxCut on unweighted 3-regular graphs (u3R)
+            edge = random_regular_graph(3, N).edges()  ## 生成随机图
+            j_list = [1] * len(edge)  ## 给定每个边的权重，这里是u3R图，所以每个边的权重都是1
+            print('edge: ', edge)
+
+            H_u3r = Hamiltonian_MaxCut(edge_list=edge,
+                                    j_list=j_list)  ## 根据图生成MaxCut问题的哈密顿量
+            qaoa_class = QAOA(N, H_u3r)  ## 定义的关于QAOA算法的类
+            info, params_info, _ = qaoa_class.run(layer=P,
+                                                N_random=20,
+                                                method='L-BFGS-B',
+                                                tol=1e-5,
+                                                period_gamma=0.5 * np.pi)
+
+            write_excel_xls(exp_file, 'exp_r_poss_iter', info)
+            write_excel_xls(params_file, 'beta_gamma', params_info)
+
+    # n_random=0 exp_opt=-3.9999923530971766 exp_inter=-3.999988673288039
+
+    #  exp_opt=-3.999988673288039
+    #  beta_opt=[0.46227748 0.35267186 0.31167185 0.27252209 0.22826549 0.18741367      
+    #  0.15253045 0.10228931 0.05461026 0.02463361]
+    #  gamma_opt=[0.26204671 0.53640213 0.68885431 0.81701332 0.9520552  1.05472162     
+    #  1.13507604 1.2361775  1.36551785 1.50152579]
+    # poss of opt =  0.9999898212017484
+    # value =  [[-3.69751465e+00 -3.99999742e+00 -3.99998625e+00 -3.99999713e+00        
+    #   -3.99999186e+00 -3.99999167e+00 -3.99998775e+00 -3.99998776e+00
+    #   -3.99999235e+00 -3.99998867e+00]
+    #  [ 7.56213364e-02  6.44250338e-07  3.43687980e-06  7.17664328e-07
+    #    2.03462671e-06  2.08305704e-06  3.06359755e-06  3.06018465e-06
+    #    1.91172571e-06  2.83167799e-06]
+    #  [ 0.00000000e+00  0.00000000e+00  0.00000000e+00  0.00000000e+00
+    #    0.00000000e+00  0.00000000e+00  0.00000000e+00  0.00000000e+00
+    #    0.00000000e+00  0.00000000e+00]
+    #  [ 4.98000000e+02  2.21800000e+03  2.28200000e+03  2.35500000e+03
+    #    2.43300000e+03  2.52500000e+03  2.60100000e+03  2.72100000e+03
+    #    2.87400000e+03  3.06400000e+03]]
+
+该问题的目标哈密顿量为-4，QAOA算法最后输出-3.99，优化概率99%。
