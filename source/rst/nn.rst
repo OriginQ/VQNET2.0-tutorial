@@ -190,7 +190,7 @@ load_parameters
 
         model = Net()   
         model1 = Net()  # another Module object
-        pyvqnet.utils.save_parameters( model.state_dict(),"tmp.model")
+        pyvqnet.utils.storage.save_parameters( model.state_dict(),"tmp.model")
         model_para =  pyvqnet.utils.storage.load_parameters("tmp.model")
         model1.load_state_dict(model_para)
 
