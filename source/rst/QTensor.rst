@@ -3104,7 +3104,7 @@ flatten
         # [1.0000000, 2.0000000, 3.0000000]
 
 
-tensor.reshape
+reshape
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:function:: pyvqnet.tensor.reshape(t: pyvqnet.tensor.QTensor,new_shape)
