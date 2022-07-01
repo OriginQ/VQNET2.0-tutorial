@@ -3997,9 +3997,95 @@ QGAN使用经典的GAN模型结构，分为Generator生成器与Discriminator鉴
 其他量子计算算法
 -------------------
 
+
+量子核SVM算法
+^^^^^^^^^^^^^^^^^^^
+
+在机器学习任务中，数据通常不能被原始空间中的超平面分隔。寻找此类超平面的一种常见技术是对数据应用非线性变换函数。
+此函数称为特征映射，通过特征映射，我们可以在这个新的特征空间中计算数据点之间的距离有多近，从而进行机器学习的分类任务。
+
+本例参照 `Supervised learning with quantum enhanced feature spaces <https://arxiv.org/pdf/1804.11326.pdf>`_ 论文的
+第一个方法构建变分线路进行数据分类任务。
+``gen_vqc_qsvm_data`` 为生成该例子所需的数据。 ``vqc_qsvm`` 为变分量子线路类，用来对输入数据进行分类。
+``vqc_qsvm.plot()`` 函数可视化了数据的分布情况。
+
+.. image:: ./images/VQC-SVM.PNG
+   :width: 600 px
+   :align: center
+
+|
+
+    .. code-block::
+
+        """
+        VQC QSVM
+        """
+        from pyvqnet.qnn.svm import vqc_qsvm, gen_vqc_qsvm_data
+        import matplotlib.pyplot as plt
+        import numpy as np
+
+        batch_size = 40
+        maxiter = 40
+        training_size = 20
+        test_size = 10
+        gap = 0.3
+        #线路模块重复次数
+        rep = 3
+
+        #定义接口类
+        VQC_QSVM = vqc_qsvm(batch_size, maxiter, rep)
+        #随机生成数据
+        train_features, test_features, train_labels, test_labels, samples = \
+            gen_vqc_qsvm_data(training_size=training_size, test_size=test_size, gap=gap)
+        VQC_QSVM.plot(train_features, test_features, train_labels, test_labels, samples)
+        #训练
+        VQC_QSVM.train(train_features, train_labels)
+        #测试数据测试
+        rlt, acc_1 = VQC_QSVM.predict(test_features, test_labels)
+        print(f"testing_accuracy {acc_1}")
+
+
+
+除了上述直接用变分量子线路将经典数据特征映射到量子特征空间，在论文 `Supervised learning with quantum enhanced feature spaces <https://arxiv.org/pdf/1804.11326.pdf>`_
+中还介绍了使用量子线路直接估计核函数，并使用经典支持向量机进行分类的方法。类比经典SVM中的各种核函数 :math:`K(i,j)` , 使用量子核函数定义经典数据在量子特征空间 :math:`\phi(\mathbf{x}_i)` 的内积 :
+
+.. math:: 
+    |\langle \phi(\mathbf{x}_j) | \phi(\mathbf{x}_i) \rangle |^2 =  |\langle 0 | U^\dagger(\mathbf{x}_j) U(\mathbf{x}_i) | 0 \rangle |^2
+
+使用VQNet和pyQPanda,我们定义一个 ``QuantumKernel_VQNet`` 产生量子核函数，并使用 ``sklearn`` 的 ``SVC`` 进行分类:
+
+.. image:: ./images/qsvm-kernel.png
+   :width: 600 px
+   :align: center
+
+|
+
+.. code-block::
+
+    import numpy as np
+    import pyqpanda as pq
+    from sklearn.svm import SVC
+    from pyqpanda import *
+    from pyqpanda.Visualization.circuit_draw import *
+    from pyvqnet.qnn.svm import QuantumKernel_VQNet, gen_vqc_qsvm_data
+    import matplotlib
+    try:
+        matplotlib.use('TkAgg')
+    except:
+        pass
+    import matplotlib.pyplot as plt
+
+    train_features, test_features,train_labels, test_labels, samples = gen_vqc_qsvm_data(20,5,0.3)
+    quantum_kernel = QuantumKernel_VQNet(n_qbits=2)
+    quantum_svc = SVC(kernel=quantum_kernel.evaluate)
+    quantum_svc.fit(train_features, train_labels)
+    score = quantum_svc.score(test_features, test_labels)
+    print(f"quantum kernel classification test score: {score}")
+
+
 QSVM算法
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-在2014年论文的 `Quantum Support Vector Machine for Big Data Classification <https://arxiv.org/abs/1307.0471>`_ 这篇文章中，介绍了基于HHL算法的QSVM的实现方法。如下图所示，通过两个量子方法解决了SVM中涉及的两个参数的计算复杂度问题。
+在2014年论文的 `Quantum Support Vector Machine for Big Data Classification <https://arxiv.org/abs/1307.0471>`_ 这篇文章中,介绍了基于HHL算法的QSVM的实现方法。如下图所示,通过两个量子方法解决了SVM中涉及的两个参数的计算复杂度问题。
 问题1是内积的计算问题，通过SWAP-test实现，问题2是一个基于HHL算法的求解线性方程问题。
 
 .. image:: ./images/qsvm-arch.PNG
@@ -4196,6 +4282,7 @@ QSVM算法
     # predict： 1 real： 1     
     # predict： 1 real： 1     
     # ---------------errorRate：0.027778-------------------
+
 
 
 QAOA算法
