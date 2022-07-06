@@ -1,7 +1,7 @@
 经典神经网络模块
 ==================================
 
-以下的经典神经网络模块均支持自动反向传播计算。当您运行前传函数以后，再执行反向函数就可以计算梯度。一个卷积层的简单例子如下：
+以下的经典神经网络模块均支持自动反向传播计算。当您运行前传函数以后,再执行反向函数就可以计算梯度。一个卷积层的简单例子如下:
 
 .. code-block::
 
@@ -60,8 +60,8 @@ Module
 
 .. py:class:: pyvqnet.nn.module.Module
 
-    所有神经网络模块的基类，包括量子模块或经典模块。您的模型也应该是此类的子类，用于 autograd 计算。
-    模块还可以包含其他Module类，允许将它们嵌套在树状结构。 您可以将子模块分配为常规属性::
+    所有神经网络模块的基类,包括量子模块或经典模块。您的模型也应该是此类的子类,用于 autograd 计算。
+    模块还可以包含其他Module类,允许将它们嵌套在树状结构。 您可以将子模块分配为常规属性::
 
         class Model(Module):
             def __init__(self):
@@ -124,7 +124,7 @@ state_dict
     返回包含模块整个状态的字典:包括参数和缓存值。
     键是对应的参数和缓存值名称。
 
-    :param destination: 返回保存模型内部模块，参数的字典。
+    :param destination: 返回保存模型内部模块,参数的字典。
     :param prefix: 使用的参数和缓存值的命名前缀。
 
     :return: 包含模块整个状态的字典。
@@ -212,15 +212,15 @@ Conv1D
     :param stride: `int` - 步长, 默认为1。
     :param padding: `str` - 填充选项, "valid" or "same"。 默认 "valid"。
     :param use_bias: `bool` - 是否使用偏置项, 默认使用。
-    :param kernel_initializer: `callable` - 卷积核初始化方法。默认为空，使用kaiming_uniform。
-    :param bias_initializer: `callable` - 偏置初始化方法。默认为空，使用kaiming_uniform。
+    :param kernel_initializer: `callable` - 卷积核初始化方法。默认为空,使用kaiming_uniform。
+    :param bias_initializer: `callable` - 偏置初始化方法。默认为空,使用kaiming_uniform。
 
     :return: 一维卷积实例。
 
     .. note::
         ``padding='valid'`` 不进行填充。
 
-        ``padding='same'`` 补零填充输入，输出的out_height 为 = ceil(in_height / stride)。
+        ``padding='same'`` 补零填充输入,输出的out_height 为 = ceil(in_height / stride)。
 
     
     Example::
@@ -257,15 +257,15 @@ Conv2D
     :param stride: `tuple|list` - 步长, 默认为 (1, 1)|[1,1]。
     :param padding: `str` - 填充选项, "valid" or "same"。 默认 "valid"。
     :param use_bias: `bool` - 是否使用偏置项, 默认使用。
-    :param kernel_initializer: `callable` - 卷积核初始化方法。默认为空，使用kaiming_uniform。
-    :param bias_initializer: `callable` - 偏置初始化方法。默认为空，使用kaiming_uniform。
+    :param kernel_initializer: `callable` - 卷积核初始化方法。默认为空,使用kaiming_uniform。
+    :param bias_initializer: `callable` - 偏置初始化方法。默认为空,使用kaiming_uniform。
 
     :return: 二维卷积实例。
 
     .. note::
         ``padding='valid'`` 不进行填充。
 
-        ``padding='same'`` 补零填充输入，输出的height 为 = ceil(height / stride)， 输出的width 为 = ceil(width / stride)。
+        ``padding='same'`` 补零填充输入,输出的height 为 = ceil(height / stride), 输出的width 为 = ceil(width / stride)。
 
     Example::
 
@@ -305,19 +305,19 @@ ConvT2D
 
     :param input_channels: `int` - 输入数据的通道数。
     :param output_channels: `int` - 输出数据的通道数。
-    :param kernel_size: `tuple|list` - 卷积核的尺寸，卷积核形状 = [input_channels,output_channels,kernel_size,kernel_size]。 
+    :param kernel_size: `tuple|list` - 卷积核的尺寸,卷积核形状 = [input_channels,output_channels,kernel_size,kernel_size]。 
     :param stride: `tuple|list` - 步长, 默认为 (1, 1)|[1,1]。
     :param padding:  填充选项, "valid" or "same"。 默认 "valid"。
     :param use_bias: `bool` - 是否使用偏置项, 默认使用。
-    :param kernel_initializer: `callable` - 卷积核初始化方法。默认为空，使用kaiming_uniform。
-    :param bias_initializer: `callable` - 偏置项初始化方法。默认为空，使用kaiming_uniform。
+    :param kernel_initializer: `callable` - 卷积核初始化方法。默认为空,使用kaiming_uniform。
+    :param bias_initializer: `callable` - 偏置项初始化方法。默认为空,使用kaiming_uniform。
 
     :return: 二维转置卷积实例。
     
     .. note::
         ``padding='valid'`` 不进行填充。
 
-        ``padding='same'`` 补零填充输入，输出的height 为 = ceil(height / stride)。
+        ``padding='same'`` 补零填充输入,输出的height 为 = ceil(height / stride)。
 
 
     Example::
@@ -358,13 +358,13 @@ AvgPool1D
     :param kernel: 平均池化的窗口大小。
     :param strides: 窗口移动的步长。
     :param padding: 填充选项, "valid" or "same"。 默认 "valid"。
-    :param name: 命名，默认为""。
+    :param name: 命名,默认为""。
     :return: 一维平均池化层实例。
 
     .. note::
         ``padding='valid'`` 不进行填充。
 
-        ``padding='same'`` 补零填充输入，输出的out_height 为 = ceil(in_height / stride)。
+        ``padding='same'`` 补零填充输入,输出的out_height 为 = ceil(in_height / stride)。
 
     Example::
 
@@ -400,14 +400,14 @@ MaxPool1D
     :param kernel: 最大池化的窗口大小。
     :param strides: 窗口移动的步长。
     :param padding: 填充选项, "valid" or "same"。 默认 "valid"。
-    :param name: 命名，默认为""。
+    :param name: 命名,默认为""。
 
     :return: 一维最大池化层实例。
 
     .. note::
         ``padding='valid'`` 不进行填充。
 
-        ``padding='same'`` 补零填充输入，输出的out_height 为 = ceil(in_height / stride)。
+        ``padding='same'`` 补零填充输入,输出的out_height 为 = ceil(in_height / stride)。
 
     Example::
 
@@ -442,14 +442,14 @@ AvgPool2D
     :param kernel: 平均池化的窗口大小。
     :param strides: 窗口移动的步长。
     :param padding: 填充选项, "valid" or "same"。 默认 "valid"。
-    :param name: 命名，默认为""。
+    :param name: 命名,默认为""。
 
     :return: 二维平均池化层实例。
 
     .. note::
         ``padding='valid'`` 不进行填充。
 
-        ``padding='same'`` 补零填充输入，输出的height 为 = ceil(height / stride)， 输出的width 为 = ceil(width / stride)。
+        ``padding='same'`` 补零填充输入,输出的height 为 = ceil(height / stride), 输出的width 为 = ceil(width / stride)。
 
     Example::
 
@@ -482,14 +482,14 @@ MaxPool2D
     :param kernel: 最大池化的窗口大小。
     :param strides: 窗口移动的步长。
     :param padding: 填充选项, "valid" or "same"。 默认 "valid"。
-    :param name: 命名，默认为""。
+    :param name: 命名,默认为""。
 
     :return: 二维最大池化层实例。
 
     .. note::
         ``padding='valid'`` 不进行填充。
 
-        ``padding='same'`` 补零填充输入，输出的height 为 = ceil(height / stride)， 输出的width 为 = ceil(width / stride)。
+        ``padding='same'`` 补零填充输入,输出的height 为 = ceil(height / stride), 输出的width 为 = ceil(width / stride)。
 
 
     Example::
@@ -519,12 +519,12 @@ Embedding
 
 .. py:class:: pyvqnet.nn.embedding.Embedding(num_embeddings, embedding_dim, weight_initializer=xavier_normal, name: str = "")
 
-    该模块通常用于存储词嵌入并使用索引检索它们。模块的输入是索引列表，输出是对应的词嵌入。
+    该模块通常用于存储词嵌入并使用索引检索它们。模块的输入是索引列表,输出是对应的词嵌入。
 
     :param num_embeddings: `int` - 嵌入字典的大小。
     :param embedding_dim: `int` - 每个嵌入向量的大小
-    :param weight_initializer: `callable` - 参数初始化方式，默认正态分布。
-    :param name: 嵌入层的命名，默认为""。
+    :param weight_initializer: `callable` - 参数初始化方式,默认正态分布。
+    :param name: 嵌入层的命名,默认为""。
 
     :return: a Embedding 实例。
 
@@ -572,7 +572,7 @@ BatchNorm2d
 
 .. py:class:: pyvqnet.nn.BatchNorm2d(channel_num:int, momentum:float=0.1, epsilon:float = 1e-5,beta_initializer=zeros, gamma_initializer=ones, name="")
     
-    在 4D 输入（B、C、H、W）上应用批归一化。参照论文
+    在 4D 输入(B、C、H、W)上应用批归一化。参照论文
     `Batch Normalization: Accelerating Deep Network Training by Reducing
     Internal Covariate Shift <https://arxiv.org/abs/1502.03167>`__ 。
     
@@ -580,14 +580,14 @@ BatchNorm2d
 
         y = \frac{x - \mathrm{E}[x]}{\sqrt{\mathrm{Var}[x] + \epsilon}} * \gamma + \beta
 
-    其中 :math:`\gamma` 和 :math:`\beta` 为待训练参数。此外，默认情况下，在训练期间，该层会继续运行估计其计算的均值和方差，然后在评估期间用于归一化。平均方差均值保持默认动量 0.1。
+    其中 :math:`\gamma` 和 :math:`\beta` 为待训练参数。此外,默认情况下,在训练期间,该层会继续运行估计其计算的均值和方差,然后在评估期间用于归一化。平均方差均值保持默认动量 0.1。
 
     :param channel_num: `int` - 输入通道数。
-    :param momentum: `float` - 计算指数加权平均时的动量，默认为 0.1。
-    :param beta_initializer: `callable` - beta的初始化方式，默认全零初始化。
-    :param gamma_initializer: `callable` - gamma的的初始化方式，默认全一初始化。
+    :param momentum: `float` - 计算指数加权平均时的动量,默认为 0.1。
+    :param beta_initializer: `callable` - beta的初始化方式,默认全零初始化。
+    :param gamma_initializer: `callable` - gamma的的初始化方式,默认全一初始化。
     :param epsilon: `float` - 数值稳定参数, 默认 1e-5。
-    :param name: 批归一化层命名，默认为""。
+    :param name: 批归一化层命名,默认为""。
 
     :return: 二维批归一化层实例。
 
@@ -637,15 +637,15 @@ BatchNorm1d
 
         y = \frac{x - \mathrm{E}[x]}{\sqrt{\mathrm{Var}[x] + \epsilon}} * \gamma + \beta
 
-    其中 :math:`\gamma` 和 :math:`\beta` 为待训练参数。此外，默认情况下，在训练期间，该层会继续运行估计其计算的均值和方差，然后在评估期间用于归一化。平均方差均值保持默认动量 0.1。
+    其中 :math:`\gamma` 和 :math:`\beta` 为待训练参数。此外,默认情况下,在训练期间,该层会继续运行估计其计算的均值和方差,然后在评估期间用于归一化。平均方差均值保持默认动量 0.1。
 
 
     :param channel_num: `int` - 输入通道数。
-    :param momentum: `float` - 计算指数加权平均时的动量，默认为 0.1。
-    :param beta_initializer: `callable` - beta的初始化方式，默认全零初始化。
-    :param gamma_initializer: `callable` - gamma的的初始化方式，默认全一初始化。
-    :param epsilon: `float` - 数值稳定性常数，默认为 1e-5。
-    :param name: 批归一化层命名，默认为""。
+    :param momentum: `float` - 计算指数加权平均时的动量,默认为 0.1。
+    :param beta_initializer: `callable` - beta的初始化方式,默认全零初始化。
+    :param gamma_initializer: `callable` - gamma的的初始化方式,默认全一初始化。
+    :param epsilon: `float` - 数值稳定性常数,默认为 1e-5。
+    :param name: 批归一化层命名,默认为""。
 
     :return: 一维批归一化层实例。
 
@@ -679,11 +679,11 @@ LayerNorm2d
     .. math::
         y = \frac{x - \mathrm{E}[x]}{ \sqrt{\mathrm{Var}[x] + \epsilon}} * \gamma + \beta
 
-    平均值和标准差是在除去第一个维度以外的剩余维度数据上计算的。对于像 (B,C,H,W) 这样的输入，:attr:`norm_size` 应该等于 C * H * W。
+    平均值和标准差是在除去第一个维度以外的剩余维度数据上计算的。对于像 (B,C,H,W) 这样的输入,:attr:`norm_size` 应该等于 C * H * W。
 
-    :param norm_size: `float` - 归一化大小，应该等于 C * H * W。
-    :param epsilon: `float` - 数值稳定性常数，默认为 1e-5。
-    :param name: 层归一化层命名，默认为""。
+    :param norm_size: `float` - 归一化大小,应该等于 C * H * W。
+    :param epsilon: `float` - 数值稳定性常数,默认为 1e-5。
+    :param name: 层归一化层命名,默认为""。
     :return: 二维层归一化实例。
 
     Example::
@@ -728,11 +728,11 @@ LayerNorm1d
     .. math::
         y = \frac{x - \mathrm{E}[x]}{ \sqrt{\mathrm{Var}[x] + \epsilon}} * \gamma + \beta
 
-    均值和标准差是在最后一个维度大小上计算的，其中“norm_size” 是 :attr:`norm_size` 的值。
+    均值和标准差是在最后一个维度大小上计算的,其中“norm_size” 是 :attr:`norm_size` 的值。
 
-    :param norm_size: `float` - 归一化大小，应该等于最后一维大小。
-    :param epsilon: `float` - 数值稳定性常数，默认为 1e-5。
-    :param name: 层归一化层命名，默认为""。
+    :param norm_size: `float` - 归一化大小,应该等于最后一维大小。
+    :param epsilon: `float` - 数值稳定性常数,默认为 1e-5。
+    :param name: 层归一化层命名,默认为""。
 
     :return: 一维层归一化实例。
 
@@ -759,15 +759,15 @@ Linear
 
 .. py:class:: pyvqnet.nn.Linear(input_channels, output_channels, weight_initializer=None, bias_initializer=None,use_bias=True, name: str = "")
 
-    线性模块（全连接层）。
+    线性模块(全连接层)。
     :math:`y = Ax + b`
 
     :param input_channels: `int` - 输入数据通道数。
     :param output_channels: `int` - 输出数据通道数。
-    :param weight_initializer: `callable` - 权重初始化函数，默认为空，使用he_uniform。
-    :param bias_initializer: `callable` - 偏置初始化参数，默认为空，使用he_uniform。
+    :param weight_initializer: `callable` - 权重初始化函数,默认为空,使用he_uniform。
+    :param bias_initializer: `callable` - 偏置初始化参数,默认为空,使用he_uniform。
     :param use_bias: `bool` - 是否使用偏置项, 默认使用。
-    :param name: 线性层的命名，默认为""。
+    :param name: 线性层的命名,默认为""。
 
     :return: 线性层实例。
 
@@ -801,7 +801,7 @@ Dropout
 
 .. py:class:: pyvqnet.nn.dropout.Dropout(dropout_rate = 0.5)
 
-    Dropout 模块。dropout 模块将一些单元的输出随机设置为零，同时根据给定的 dropout_rate 概率升级其他单元。
+    Dropout 模块。dropout 模块将一些单元的输出随机设置为零,同时根据给定的 dropout_rate 概率升级其他单元。
 
     :param dropout_rate: `float` - 神经元被设置为零的概率。
 
@@ -838,7 +838,7 @@ GRU
 .. py:class:: pyvqnet.nn.gru.GRU(input_size, hidden_size, num_layers=1, nonlinearity='tanh', batch_first=True, use_bias=True, bidirectional=False)
 
 
-    门控循环单元 (GRU) 模块。支持多层堆叠，双向配置。单层单向GRU的计算公式如下:
+    门控循环单元 (GRU) 模块。支持多层堆叠,双向配置。单层单向GRU的计算公式如下:
 
     .. math::
         \begin{array}{ll}
@@ -852,7 +852,7 @@ GRU
     :param hidden_size:  隐藏特征维度。
     :param num_layers: 堆叠GRU层数. 默认: 1。
     :param batch_first: 如果为 True, 则输入形状为 [batch_size,seq_len,feature_dim],
-     如果为 False, 则输入形状为 [seq_len,batch_size,feature_dim]，默认为 True。
+     如果为 False, 则输入形状为 [seq_len,batch_size,feature_dim],默认为 True。
     :param use_bias: 如果为 False, 该模块不适用偏置项. 默认: True。
     :param bidirectional: 如果为 True, 变为双向GRU. 默认: False。
     :return: GRU 实例
@@ -908,7 +908,7 @@ RNN
 .. py:class:: pyvqnet.nn.rnn.RNN(input_size, hidden_size, num_layers=1, nonlinearity='tanh', batch_first=True, use_bias=True, bidirectional=False)
 
 
-    循环神经网络(RNN)模块，使用 :math:`\tanh` 或 :math:`\text{ReLU}` 作为激活函数。支持双向，多层配置。
+    循环神经网络(RNN)模块,使用 :math:`\tanh` 或 :math:`\text{ReLU}` 作为激活函数。支持双向,多层配置。
     单层单向RNN计算公式如下:
 
     .. math::
@@ -920,7 +920,7 @@ RNN
     :param hidden_size:  隐藏特征维度。
     :param num_layers: 堆叠RNN层数. 默认: 1。
     :param batch_first: 如果为 True, 则输入形状为 [batch_size,seq_len,feature_dim],
-     如果为 False, 则输入形状为 [seq_len,batch_size,feature_dim]，默认为 True。
+     如果为 False, 则输入形状为 [seq_len,batch_size,feature_dim],默认为 True。
     :param use_bias: 如果为 False, 该模块不适用偏置项. 默认: True。
     :param bidirectional: 如果为 True, 变为双向RNN. 默认: False。
     :return: RNN 实例
@@ -990,7 +990,7 @@ LSTM
     :param hidden_size:  隐藏特征维度。
     :param num_layers: 堆叠LSTM层数. 默认: 1。
     :param batch_first: 如果为 True, 则输入形状为 [batch_size,seq_len,feature_dim],
-     如果为 False, 则输入形状为 [seq_len,batch_size,feature_dim]，默认为 True。
+     如果为 False, 则输入形状为 [seq_len,batch_size,feature_dim],默认为 True。
     :param use_bias: 如果为 False, 该模块不适用偏置项. 默认: True。
     :param bidirectional: 如果为 True, 变为双向LSTM. 默认: False。
     :return: LSTM 实例
@@ -1072,7 +1072,7 @@ MeanSquaredError
         \ell(x, y) = L = \{l_1,\dots,l_N\}^\top, \quad
         l_n = \left( x_n - y_n \right)^2,
 
-    :math:`x` 和 :math:`y` 是任意形状的 QTensor ，总 :math:`n` 个元素的均方根误差由下式计算。
+    :math:`x` 和 :math:`y` 是任意形状的 QTensor ,总 :math:`n` 个元素的均方根误差由下式计算。
 
     .. math::
         \ell(x, y) =
@@ -1082,9 +1082,9 @@ MeanSquaredError
 
     均方根误差前向计算函数的所需参数:
 
-    target: :math:`(N, *)`, 目标值， 和输入一样维度的 QTensor 。
+    target: :math:`(N, *)`, 目标值, 和输入一样维度的 QTensor 。
 
-    output: :math:`(N, *)` 输入值，其中 :math:`*` 表示任意维度。
+    output: :math:`(N, *)` 输入值,其中 :math:`*` 表示任意维度。
 
     Example::
 
@@ -1114,7 +1114,7 @@ BinaryCrossEntropy
         \ell(x, y) = L = \{l_1,\dots,l_N\}^\top, \quad
         l_n = - w_n \left[ y_n \cdot \log x_n + (1 - y_n) \cdot \log (1 - x_n) \right],
 
-    若 :math:`N` 为批的大小，则平均二元交叉熵.
+    若 :math:`N` 为批的大小,则平均二元交叉熵.
 
     .. math::
         \ell(x, y) = \operatorname{mean}(L)
@@ -1123,9 +1123,9 @@ BinaryCrossEntropy
 
     平均二元交叉熵误差前向计算函数的所需参数:
 
-    target: :math:`(N, *)`, 目标值，和输入一样维度的 QTensor 。
+    target: :math:`(N, *)`, 目标值,和输入一样维度的 QTensor 。
 
-    output: :math:`(N, *)` 输入值，其中 :math:`*` 表示任意维度。
+    output: :math:`(N, *)` 输入值,其中 :math:`*` 表示任意维度。
     
     Example::
 
@@ -1161,9 +1161,9 @@ CategoricalCrossEntropy
 
     误差前向计算函数的所需参数:
 
-    target: :math:`(N, *)`, 目标值，和输入一样维度的 QTensor 。
+    target: :math:`(N, *)`, 目标值,和输入一样维度的 QTensor 。
 
-    output: :math:`(N, *)` 输入值，其中 :math:`*` 表示任意维度。
+    output: :math:`(N, *)` 输入值,其中 :math:`*` 表示任意维度。
     
     Example::
 
@@ -1186,7 +1186,7 @@ SoftmaxCrossEntropy
 
 .. py:class:: pyvqnet.nn.SoftmaxCrossEntropy()
 
-    该损失函数将 LogSoftmax 和 NLLLoss 同时计算的平均分类交叉熵，并具有更高的数值稳定性。
+    该损失函数将 LogSoftmax 和 NLLLoss 同时计算的平均分类交叉熵,并具有更高的数值稳定性。
 
     损失函数计算方式如下:
 
@@ -1198,9 +1198,9 @@ SoftmaxCrossEntropy
 
     误差前向计算函数的所需参数:
 
-    target: :math:`(N, *)`, 目标值，和输入一样维度的 QTensor 。
+    target: :math:`(N, *)`, 目标值,和输入一样维度的 QTensor 。
 
-    output: :math:`(N, *)` 输入值，其中 :math:`*` 表示任意维度。
+    output: :math:`(N, *)` 输入值,其中 :math:`*` 表示任意维度。
     
     Example::
 
@@ -1237,7 +1237,7 @@ Sigmoid
     .. math::
         \text{Sigmoid}(x) = \frac{1}{1 + \exp(-x)}
 
-    :param name: 激活函数层的命名，默认为""。
+    :param name: 激活函数层的命名,默认为""。
 
     :return: 一个Sigmoid激活函数层实例。
 
@@ -1261,7 +1261,7 @@ Softplus
     .. math::
         \text{Softplus}(x) = \log(1 + \exp(x))
 
-    :param name: 激活函数层的命名，默认为""。
+    :param name: 激活函数层的命名,默认为""。
 
     :return: 一个Softplus激活函数层实例。
 
@@ -1285,7 +1285,7 @@ Softsign
     .. math::
         \text{SoftSign}(x) = \frac{x}{ 1 + |x|}
 
-    :param name: 激活函数层的命名，默认为""。
+    :param name: 激活函数层的命名,默认为""。
 
     :return: 一个Softsign 激活函数层实例。
 
@@ -1311,8 +1311,8 @@ Softmax
         \text{Softmax}(x_{i}) = \frac{\exp(x_i)}{\sum_j \exp(x_j)}
 
 
-    :param axis: 计算的维度（最后一个轴为-1），默认值 = -1。
-    :param name: 激活函数层的命名，默认为""。
+    :param axis: 计算的维度(最后一个轴为-1),默认值 = -1。
+    :param name: 激活函数层的命名,默认为""。
 
     :return: 一个Softmax 激活函数层实例。
 
@@ -1340,7 +1340,7 @@ HardSigmoid
             x / 6 + 1 / 2 & \text{otherwise}
         \end{cases}
 
-    :param name: 激活函数层的命名，默认为""。
+    :param name: 激活函数层的命名,默认为""。
 
     :return: 一个HardSigmoid 激活函数层实例。
 
@@ -1368,7 +1368,7 @@ ReLu
         \end{cases}
 
 
-    :param name: 激活函数层的命名，默认为""。
+    :param name: 激活函数层的命名,默认为""。
 
     :return: 一个ReLu 激活函数层实例。
 
@@ -1397,8 +1397,8 @@ LeakyReLu
         \alpha * x, & \text{ otherwise }
         \end{cases}
 
-    :param alpha: LeakyRelu 系数，默认:0.01。
-    :param name: 激活函数层的命名，默认为""。
+    :param alpha: LeakyRelu 系数,默认:0.01。
+    :param name: 激活函数层的命名,默认为""。
 
     :return: 一个LeakyReLu 激活函数层实例。
 
@@ -1426,8 +1426,8 @@ ELU
         \alpha * (\exp(x) - 1), & \text{ if } x \leq 0
         \end{cases}
 
-    :param alpha: ELU 系数，默认:1。
-    :param name: 激活函数层的命名，默认为""。
+    :param alpha: ELU 系数,默认:1。
+    :param name: 激活函数层的命名,默认为""。
 
     :return: ELU 激活函数层实例。
 
@@ -1451,7 +1451,7 @@ Tanh
     .. math::
         \text{Tanh}(x) = \frac{\exp(x) - \exp(-x)} {\exp(x) + \exp(-x)}
 
-    :param name: 激活函数层的命名，默认为""。
+    :param name: 激活函数层的命名,默认为""。
 
     :return: Tanh 激活函数层实例。
 
@@ -1477,7 +1477,7 @@ Optimizer
     所有优化器的基类。
 
     :param params: 需要优化的模型参数。
-    :param lr: 学习率，默认值：0.01。
+    :param lr: 学习率,默认值:0.01。
 
 Adadelta
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -1495,9 +1495,9 @@ Adadelta
         param\_new &= param - lr * Square\_avg
 
     :param params: 需要优化的模型参数。
-    :param lr: 学习率（默认值：0.01）。
-    :param beta: 用于计算平方梯度的运行平均值（默认值：0.99）。
-    :param epsilon: 添加到分母以提高数值稳定性的常数（默认值：1e-8）。
+    :param lr: 学习率(默认值:0.01)。
+    :param beta: 用于计算平方梯度的运行平均值(默认值:0.99)。
+    :param epsilon: 添加到分母以提高数值稳定性的常数(默认值:1e-8)。
 
     :return: 一个 Adadelta 优化器。
 
@@ -1549,8 +1549,8 @@ Adagrad
         \end{align}
 
     :param params: 需要优化的模型参数。
-    :param lr: 学习率（默认值：0.01）。
-    :param epsilon: 添加到分母以提高数值稳定性的常数（默认值：1e-8）。
+    :param lr: 学习率(默认值:0.01)。
+    :param epsilon: 添加到分母以提高数值稳定性的常数(默认值:1e-8)。
     :return: 一个 Adagrad 优化器。
 
     Example::
@@ -1587,7 +1587,7 @@ Adagrad
         # ]
 
 
-adam
+Adam
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 .. py:class:: pyvqnet.optim.adam.Adam( params, lr=0.01, beta1=0.9, beta2=0.999, epsilon=1e-8,amsgrad: bool = False)
 
@@ -1617,11 +1617,11 @@ adam
         param\_new=param-lr*\frac{moment\_1}{\sqrt{moment\_2}+\epsilon} 
 
     :param params: 需要优化的模型参数。
-    :param lr: 学习率（默认值：0.01）。
-    :param beta1: 用于计算梯度及其平方的运行平均值的系数（默认值：0.9）。
-    :param beta2: 用于计算梯度及其平方的运行平均值的系数（默认值：0.999）。
-    :param epsilon: 添加到分母以提高数值稳定性的常数（默认值：1e-8）。
-    :param amsgrad: 是否使用该算法的 AMSGrad 变体（默认值：False）。
+    :param lr: 学习率(默认值:0.01)。
+    :param beta1: 用于计算梯度及其平方的运行平均值的系数(默认值:0.9)。
+    :param beta2: 用于计算梯度及其平方的运行平均值的系数(默认值:0.999)。
+    :param epsilon: 添加到分母以提高数值稳定性的常数(默认值:1e-8)。
+    :param amsgrad: 是否使用该算法的 AMSGrad 变体(默认值:False)。
     :return: 一个 Adam 优化器。
 
     Example::
@@ -1657,11 +1657,11 @@ adam
         #  [19.9799995, 20.9799995, 21.9799995, 22.9799995]]]
         # ]
 
-adamax
+Adamax
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 .. py:class:: pyvqnet.optim.adamax.Adamax(params, lr=0.01, beta1=0.9, beta2=0.999, epsilon=1e-8)
 
-    实现 Adamax 优化器（基于无穷范数的 Adam 变体）。
+    实现 Adamax 优化器(基于无穷范数的 Adam 变体)。
     
     参考:https://arxiv.org/abs/1412.6980。
 
@@ -1677,10 +1677,10 @@ adamax
         param\_new = param − lr*\frac{moment\_new}{norm\_new}\\
 
     :param params: 需要优化的模型参数。
-    :param lr: 学习率（默认值：0.01）。
-    :param beta1: 用于计算梯度及其平方的运行平均值的系数（默认值：0.9）。
-    :param beta2: 用于计算梯度及其平方的运行平均值的系数（默认值：0.999）。
-    :param epsilon: 添加到分母以提高数值稳定性的常数（默认值：1e-8）。
+    :param lr: 学习率(默认值:0.01)。
+    :param beta1: 用于计算梯度及其平方的运行平均值的系数(默认值:0.9)。
+    :param beta2: 用于计算梯度及其平方的运行平均值的系数(默认值:0.999)。
+    :param epsilon: 添加到分母以提高数值稳定性的常数(默认值:1e-8)。
 
     :return: 一个 Adamax 优化器。
 
@@ -1717,7 +1717,7 @@ adamax
         #  [19.9799995, 20.9799995, 21.9799995, 22.9799995]]]
         # ]
         
-rmsprop
+RMSProp
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 .. py:class:: pyvqnet.optim.rmsprop.RMSProp( params, lr=0.01, beta=0.99, epsilon=1e-8)
     
@@ -1733,9 +1733,9 @@ rmsprop
 
 
     :param params: 需要优化的模型参数。
-    :param lr: 学习率（默认值：0.01）。
-    :param beta: 用于计算梯度及其平方的运行平均值的系数（默认值：0.99）。
-    :param epsilon: 添加到分母以提高数值稳定性的常数（默认值：1e-8）。
+    :param lr: 学习率(默认值:0.01)。
+    :param beta: 用于计算梯度及其平方的运行平均值的系数(默认值:0.99)。
+    :param epsilon: 添加到分母以提高数值稳定性的常数(默认值:1e-8)。
 
     :return: 一个 RMSProp 优化器。
 
@@ -1772,7 +1772,7 @@ rmsprop
         #  [19.8291111, 20.8291111, 21.8291111, 22.8291111]]]
         # ]
 
-sgd
+SGD
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 .. py:class:: pyvqnet.optim.sgd.SGD(params, lr=0.01,momentum=0, nesterov=False)
 
@@ -1785,8 +1785,8 @@ sgd
         \\param\_new=param-lr*g\\
 
     :param params: 需要优化的模型参数。
-    :param lr: 学习率（默认值：0.01）。
-    :param momentum: 动量因子（默认值：0）。
+    :param lr: 学习率(默认值:0.01)。
+    :param momentum: 动量因子(默认值:0)。
     :param nesterov: 启用 Nesterov 动量 (默认: False)。
 
     :return: 一个 SGD 优化器。
@@ -1825,13 +1825,13 @@ sgd
         # ]
 
 
-rotosolve
+Rotosolve
 ^^^^^^^^^^^^^^
-Rotosolve算法它允许相对于其他参数的固定值直接跳转到单个参数的最佳值，直接找到量子线路最佳参数的优化算法。
+Rotosolve算法它允许相对于其他参数的固定值直接跳转到单个参数的最佳值,直接找到量子线路最佳参数的优化算法。
 
 .. py:class:: pyvqnet.optim.rotosolve.Rotosolve(max_iter =50)
 
-    Rotosolve：可以使用 rotosolve 算法来最小化线性组合的量子测量期望值。 请参阅以下论文:
+    Rotosolve:可以使用 rotosolve 算法来最小化线性组合的量子测量期望值。 请参阅以下论文:
 
     https://arxiv.org/abs/1903.12166, Ken M. Nakanishi。
 
@@ -1894,7 +1894,7 @@ Rotosolve算法它允许相对于其他参数的固定值直接跳转到单个�
 .. figure:: ./images/rotosolve.png
 
 
-Metrics模块
+指标模块
 ----------------------------------
 
 
@@ -1905,8 +1905,8 @@ MSE
 
     MSE: Mean squared error regression loss。
 
-    :param y_true_Qtensor: 形状类似(n_samples,)或(n_samples, n_outputs)的输入，真实目标值。
-    :param y_pred_Qtensor: 形状类似(n_samples,)或(n_samples, n_outputs)的输入，估计目标值。
+    :param y_true_Qtensor: 形状类似(n_samples,)或(n_samples, n_outputs)的输入,真实目标值。
+    :param y_pred_Qtensor: 形状类似(n_samples,)或(n_samples, n_outputs)的输入,估计目标值。
 
     :return: 输出float结果。
 
@@ -1936,8 +1936,8 @@ RMSE
 
     RMSE: Root Mean Absolute Error。
 
-    :param y_true_Qtensor: 形状类似(n_samples,)或(n_samples, n_outputs)的输入，真实目标值。
-    :param y_pred_Qtensor: 形状类似(n_samples,)或(n_samples, n_outputs)的输入，估计目标值。
+    :param y_true_Qtensor: 形状类似(n_samples,)或(n_samples, n_outputs)的输入,真实目标值。
+    :param y_pred_Qtensor: 形状类似(n_samples,)或(n_samples, n_outputs)的输入,估计目标值。
 
     :return: 输出float结果。
 
@@ -1968,8 +1968,8 @@ MAE
 
     MAE: Mean absolute error regression loss。
 
-    :param y_true_Qtensor: 形状类似(n_samples,)或(n_samples, n_outputs)的输入，真实目标值。
-    :param y_pred_Qtensor: 形状类似(n_samples,)或(n_samples, n_outputs)的输入，估计目标值。
+    :param y_true_Qtensor: 形状类似(n_samples,)或(n_samples, n_outputs)的输入,真实目标值。
+    :param y_pred_Qtensor: 形状类似(n_samples,)或(n_samples, n_outputs)的输入,估计目标值。
 
     :return: 输出float结果。
 
@@ -1998,10 +1998,10 @@ R_Square
 .. py:class:: pyvqnet.utils.metrics.R_Square(y_true_Qtensor, y_pred_Qtensor, sample_weight=None)
 
     R_Square: R^2 (coefficient of determination) regression score function。
-    可能的最佳分数为1.0，可以为负（因为模型可以任意恶化）。一个始终预测y的预期值，忽略输入特征，将获得0.0的R^2分数。
+    可能的最佳分数为1.0,可以为负(因为模型可以任意恶化)。一个始终预测y的预期值,忽略输入特征,将获得0.0的R^2分数。
 
-    :param y_true_Qtensor: 形状类似(n_samples,)或(n_samples, n_outputs)的输入，真实目标值。
-    :param y_pred_Qtensor: 形状类似(n_samples,)或(n_samples, n_outputs)的输入，估计目标值。
+    :param y_true_Qtensor: 形状类似(n_samples,)或(n_samples, n_outputs)的输入,真实目标值。
+    :param y_pred_Qtensor: 形状类似(n_samples,)或(n_samples, n_outputs)的输入,估计目标值。
     :param sample_weight: 形状类似(n_samples,)的数组,可选样本权重。
 
     :return: 输出float结果。
@@ -2032,8 +2032,8 @@ precision_recall_f1_2_score
 
     Compute the precision, recall and f1 score of the binary classification task。
 
-    :param y_true_Qtensor: 一维阵列状的输入，真实目标值。
-    :param y_pred_Qtensor: 一维阵列状的输入，估计目标值。
+    :param y_true_Qtensor: 一维阵列状的输入,真实目标值。
+    :param y_pred_Qtensor: 一维阵列状的输入,估计目标值。
 
     :return: 输出float结果。Precision, recall, f1 score。
 
@@ -2060,15 +2060,14 @@ precision_recall_f1_N_score
 
     Compute the precision, recall and f1 score of the classification task。
 
-    :param y_true_Qtensor: 一维阵列状的输入，真实目标值。
-    :param y_pred_Qtensor: 一维阵列状的输入，估计目标值。
+    :param y_true_Qtensor: 一维阵列状的输入,真实目标值。
+    :param y_pred_Qtensor: 一维阵列状的输入,估计目标值。
     :param N: N类(类别数)。
     :param average: string, ['micro', 'macro', 'weighted']。
             多类/多标签目标需要此参数。
-            ``'micro'``: 通过计算总真正数来全局计算指标，假阴性和假阳性。
-            ``'macro'``: 计算每个标签的指标，并找到其未加权值。意思是不考虑标签的平衡。
-            ``'weighted'``: 计算每个标签的指标，并找到它们的平均值（每个标签的真实实例数）。
-                            这改变``'macro'``以解释标签不平衡；这可能会导致F-分数不在精度和召回之间。
+            ``'micro'``: 通过计算总真正数来全局计算指标,假阴性和假阳性。
+            ``'macro'``: 计算每个标签的指标,并找到其未加权值。意思是不考虑标签的平衡。
+            ``'weighted'``: 计算每个标签的指标,并找到它们的平均值(每个标签的真实实例数)。这改变 ``'macro'`` 以解释标签不平衡; 这可能会导致F-分数不在精度和召回之间。
 
     :return: 输出float结果。Precision, recall, f1 score。
 
@@ -2122,15 +2121,14 @@ precision_recall_f1_Multi_score
 
     Compute the precision, recall and f1 score of the multi classification task。
 
-    :param y_true_Qtensor: 二维阵列状的输入，真实目标值。
-    :param y_pred_Qtensor: 二维阵列状的输入，估计目标值。
+    :param y_true_Qtensor: 二维阵列状的输入,真实目标值。
+    :param y_pred_Qtensor: 二维阵列状的输入,估计目标值。
     :param N: N类(类别数)。
     :param average: string, ['micro', 'macro', 'weighted']。
             多类/多标签目标需要此参数。
-            ``'micro'``: 通过计算总真正数来全局计算指标，假阴性和假阳性。
-            ``'macro'``: 计算每个标签的指标，并找到其未加权值。意思是不考虑标签的平衡。
-            ``'weighted'``: 计算每个标签的指标，并找到它们的平均值（每个标签的真实实例数）。
-                            这改变``'macro'``以解释标签不平衡；这可能会导致F-分数不在精度和召回之间。
+            ``'micro'``: 通过计算总真正数来全局计算指标,假阴性和假阳性。
+            ``'macro'``: 计算每个标签的指标,并找到其未加权值。意思是不考虑标签的平衡。
+            ``'weighted'``: 计算每个标签的指标,并找到它们的平均值(每个标签的真实实例数)。这改变 ``'macro'`` 以解释标签不平衡; 这可能会导致F-分数不在精度和召回之间。
 
     :return: 输出float结果。Precision, recall, f1 score。
 
@@ -2187,13 +2185,13 @@ auc_calculate
 
     Compute the precision, recall and f1 score of the classification task。
 
-    :param y_true_Qtensor: 一维阵列状的输入，shape = [n_samples]。
-                            真正的二进制标签。如果标签不是{1，1}或{0，1}，则pos_label应明确给出。
-    :param y_pred_Qtensor: 一维阵列状的输入，shape = [n_samples]。
-                            目标分数，可以是正的概率估计类别、置信值或决策的非阈值度量（由某些分类器上的“decision_函数”返回）
+    :param y_true_Qtensor: 一维阵列状的输入,shape = [n_samples]。
+                            真正的二进制标签。如果标签不是{1,1}或{0,1},则pos_label应明确给出。
+    :param y_pred_Qtensor: 一维阵列状的输入,shape = [n_samples]。
+                            目标分数,可以是正的概率估计类别、置信值或决策的非阈值度量(由某些分类器上的“decision_函数”返回)
     :param pos_label: int or str, default=None。
-                    正类的标签。当``pos_label=None``时，如果y_true_Qtensor位于{-1，1}或{0，1}，``pos_label``设置为1，否则将引发错误。
-    :param sample_weight: 形状(n_samples,)的数组，default=None。
+                    正类的标签。当``pos_label=None``时,如果y_true_Qtensor位于{-1,1}或{0,1},``pos_label``设置为1,否则将引发错误。
+    :param sample_weight: 形状(n_samples,)的数组,default=None。
     :param drop_intermediate: boolean, optional (default=True)。
                     是否降低一些在绘制的ROC曲线上不会出现的次优阈值。这对于创建较轻的ROC曲线很有用。
     :return: 输出float结果。
