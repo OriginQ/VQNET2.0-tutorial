@@ -1903,7 +1903,7 @@ MSE
 
 .. py:class:: pyvqnet.utils.metrics.MSE(y_true_Qtensor, y_pred_Qtensor)
 
-    MSE: Mean squared error regression loss。
+    计算均方误差 Mean Squared Error (MSE)。
 
     :param y_true_Qtensor: 形状类似(n_samples,)或(n_samples, n_outputs)的输入,真实目标值。
     :param y_pred_Qtensor: 形状类似(n_samples,)或(n_samples, n_outputs)的输入,估计目标值。
@@ -1921,12 +1921,14 @@ MSE
             y_true_Qtensor = tensor.arange(1, 12)
             y_pred_Qtensor = tensor.arange(4, 15)
             result = vqnet_metrics.MSE(y_true_Qtensor, y_pred_Qtensor)
-            print(result) # 9.0
+            print(result)
+            # 9.0
 
             y_true_Qtensor = tensor.arange(1, 13).reshape([3, 4])
             y_pred_Qtensor = tensor.arange(4, 16).reshape([3, 4])
             result = vqnet_metrics.MSE(y_true_Qtensor, y_pred_Qtensor)
-            print(result) # 9.0
+            print(result)
+            # 9.0
 
 
 RMSE
@@ -1934,7 +1936,7 @@ RMSE
 
 .. py:class:: pyvqnet.utils.metrics.RMSE(y_true_Qtensor, y_pred_Qtensor)
 
-    RMSE: Root Mean Absolute Error。
+    计算均方根误差 Root Mean Square Error (RMSE) 。
 
     :param y_true_Qtensor: 形状类似(n_samples,)或(n_samples, n_outputs)的输入,真实目标值。
     :param y_pred_Qtensor: 形状类似(n_samples,)或(n_samples, n_outputs)的输入,估计目标值。
@@ -1952,12 +1954,14 @@ RMSE
             y_true_Qtensor = tensor.arange(1, 12)
             y_pred_Qtensor = tensor.arange(4, 15)
             result = vqnet_metrics.RMSE(y_true_Qtensor, y_pred_Qtensor)
-            print(result) # 3.0
+            print(result)
+            # 3.0
 
             y_true_Qtensor = tensor.arange(1, 13).reshape([3, 4])
             y_pred_Qtensor = tensor.arange(4, 16).reshape([3, 4])
             result = vqnet_metrics.RMSE(y_true_Qtensor, y_pred_Qtensor)
-            print(result) # 3.0
+            print(result)
+            # 3.0
 
 
 
@@ -1966,7 +1970,7 @@ MAE
 
 .. py:class:: pyvqnet.utils.metrics.MAE(y_true_Qtensor, y_pred_Qtensor)
 
-    MAE: Mean absolute error regression loss。
+    计算预测值和真实值之间绝对平均误差 Mean Absolute Error(MAE)。
 
     :param y_true_Qtensor: 形状类似(n_samples,)或(n_samples, n_outputs)的输入,真实目标值。
     :param y_pred_Qtensor: 形状类似(n_samples,)或(n_samples, n_outputs)的输入,估计目标值。
@@ -1984,12 +1988,14 @@ MAE
             y_true_Qtensor = tensor.arange(1, 12)
             y_pred_Qtensor = tensor.arange(4, 15)
             result = vqnet_metrics.RMSE(y_true_Qtensor, y_pred_Qtensor)
-            print(result) # 3.0
+            print(result)
+            # 3.0
 
             y_true_Qtensor = tensor.arange(1, 13).reshape([3, 4])
             y_pred_Qtensor = tensor.arange(4, 16).reshape([3, 4])
             result = vqnet_metrics.RMSE(y_true_Qtensor, y_pred_Qtensor)
-            print(result) # 3.0
+            print(result)
+            # 3.0
 
 
 R_Square
@@ -1997,7 +2003,7 @@ R_Square
 
 .. py:class:: pyvqnet.utils.metrics.R_Square(y_true_Qtensor, y_pred_Qtensor, sample_weight=None)
 
-    R_Square: R^2 (coefficient of determination) regression score function。
+    计算预测值和真实值之间的R方分数。
     可能的最佳分数为1.0,可以为负(因为模型可以任意恶化)。一个始终预测y的预期值,忽略输入特征,将获得0.0的R^2分数。
 
     :param y_true_Qtensor: 形状类似(n_samples,)或(n_samples, n_outputs)的输入,真实目标值。
@@ -2030,12 +2036,16 @@ precision_recall_f1_2_score
 
 .. py:class:: pyvqnet.utils.metrics.precision_recall_f1_2_score(y_true_Qtensor, y_pred_Qtensor)
 
-    Compute the precision, recall and f1 score of the binary classification task。
+    计算2分类任务下预测值的精确率,召回率和F1分数。其中预测值和真值需要是形状类似(n_samples,)的QTensor,值为0或1,代表两个类的标签。
 
-    :param y_true_Qtensor: 一维阵列状的输入,真实目标值。
-    :param y_pred_Qtensor: 一维阵列状的输入,估计目标值。
+    :param y_true_Qtensor: 一维阵列状的输入,形状类似(n_samples,)，真实目标值。
+    :param y_pred_Qtensor: 一维阵列状的输入,形状类似(n_samples,)，估计目标值。
 
-    :return: 输出float结果。Precision, recall, f1 score。
+    :returns: 
+        - precision - 精确率
+        - recall - 召回率
+        - f1 - F1 分数
+
 
     Example::
 
@@ -2050,7 +2060,8 @@ precision_recall_f1_2_score
 
             precision, recall, f1 = vqnet_metrics.precision_recall_f1_2_score(
                 y_true_Qtensor, y_pred_Qtensor)
-            print(precision, recall, f1) # 0.5 0.6 0.5454545454545454
+            print(precision, recall, f1)
+            # 0.5 0.6 0.5454545454545454
 
 
 precision_recall_f1_N_score
@@ -2058,7 +2069,7 @@ precision_recall_f1_N_score
 
 .. py:class:: pyvqnet.utils.metrics.precision_recall_f1_N_score(y_true_Qtensor, y_pred_Qtensor, N, average=None)
 
-    Compute the precision, recall and f1 score of the classification task。
+    多分类任务的精确率,召回率,F1分数计算。其中预测值和真值是形状类似(n_samples,)的QTensor,值为0到N-1的整数,代表N个类的标签。
 
     :param y_true_Qtensor: 一维阵列状的输入,真实目标值。
     :param y_pred_Qtensor: 一维阵列状的输入,估计目标值。
@@ -2066,10 +2077,15 @@ precision_recall_f1_N_score
     :param average: string, ['micro', 'macro', 'weighted']。
             多类/多标签目标需要此参数。
             ``'micro'``: 通过计算总真正数来全局计算指标,假阴性和假阳性。
-            ``'macro'``: 计算每个标签的指标,并找到其未加权值。意思是不考虑标签的平衡。
-            ``'weighted'``: 计算每个标签的指标,并找到它们的平均值(每个标签的真实实例数)。这改变 ``'macro'`` 以解释标签不平衡; 这可能会导致F-分数不在精度和召回之间。
 
-    :return: 输出float结果。Precision, recall, f1 score。
+            ``'macro'``: 计算每个标签的指标,并找到其未加权值。意思是不考虑标签的平衡。
+
+            ``'weighted'``: 计算每个标签的指标,并找到它们的平均值(每个标签的真实实例数)。这改变 ``'macro'`` 以解释标签不平衡; 这可能会导致F1分数不在精度和召回之间。
+
+    :returns: 
+        - precision - 精确率
+        - recall - 召回率
+        - f1 - F1 分数
 
     Example::
 
@@ -2086,15 +2102,18 @@ precision_recall_f1_N_score
 
                 precision_micro, recall_micro, f1_micro = vqnet_metrics.precision_recall_f1_N_score(
                     y_true_Qtensor, y_pred_Qtensor, 3, average='micro')
-                print(precision_micro, recall_micro, f1_micro) # 0.6 0.6 0.6
+                print(precision_micro, recall_micro, f1_micro)
+                # 0.6 0.6 0.6
 
                 precision_macro, recall_macro, f1_macro = vqnet_metrics.precision_recall_f1_N_score(
                     y_true_Qtensor, y_pred_Qtensor, 3, average='macro')
-                print(precision_macro, recall_macro, f1_macro) # 0.5833333333333334 0.5888888888888889 0.5793650793650794
+                print(precision_macro, recall_macro, f1_macro)
+                # 0.5833333333333334 0.5888888888888889 0.5793650793650794
 
                 precision_weighted, recall_weighted, f1_weighted = vqnet_metrics.precision_recall_f1_N_score(
                     y_true_Qtensor, y_pred_Qtensor, 3, average='weighted')
-                print(precision_weighted, recall_weighted, f1_weighted) # 0.625 0.6 0.6047619047619047
+                print(precision_weighted, recall_weighted, f1_weighted)
+                # 0.625 0.6 0.6047619047619047
 
                 reference_list = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
                 prediciton_list = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
@@ -2103,15 +2122,18 @@ precision_recall_f1_N_score
 
                 precision_micro, recall_micro, f1_micro = vqnet_metrics.precision_recall_f1_N_score(
                     y_true_Qtensor, y_pred_Qtensor, 3, average='micro')
-                print(precision_micro, recall_micro, f1_micro) # 1.0 1.0 1.0
+                print(precision_micro, recall_micro, f1_micro)
+                # 1.0 1.0 1.0
 
                 precision_macro, recall_macro, f1_macro = vqnet_metrics.precision_recall_f1_N_score(
                     y_true_Qtensor, y_pred_Qtensor, 3, average='macro')
-                print(precision_macro, recall_macro, f1_macro) # 1.0 1.0 1.0
+                print(precision_macro, recall_macro, f1_macro)
+                # 1.0 1.0 1.0
 
                 precision_weighted, recall_weighted, f1_weighted = vqnet_metrics.precision_recall_f1_N_score(
                     y_true_Qtensor, y_pred_Qtensor, 3, average='weighted')
-                print(precision_weighted, recall_weighted, f1_weighted) # 1.0 1.0 1.0
+                print(precision_weighted, recall_weighted, f1_weighted)
+                # 1.0 1.0 1.0
 
 
 precision_recall_f1_Multi_score
@@ -2119,7 +2141,7 @@ precision_recall_f1_Multi_score
 
 .. py:class:: pyvqnet.utils.metrics.precision_recall_f1_Multi_score(y_true_Qtensor, y_pred_Qtensor, N, average=None)
 
-    Compute the precision, recall and f1 score of the multi classification task。
+    多分类任务的精确率,召回率,F1分数计算。其中预测值和真值是形状类似(n_samples,N)的QTensor,其中的值为N维独热编码的标签值。
 
     :param y_true_Qtensor: 二维阵列状的输入,真实目标值。
     :param y_pred_Qtensor: 二维阵列状的输入,估计目标值。
@@ -2127,10 +2149,15 @@ precision_recall_f1_Multi_score
     :param average: string, ['micro', 'macro', 'weighted']。
             多类/多标签目标需要此参数。
             ``'micro'``: 通过计算总真正数来全局计算指标,假阴性和假阳性。
+
             ``'macro'``: 计算每个标签的指标,并找到其未加权值。意思是不考虑标签的平衡。
+
             ``'weighted'``: 计算每个标签的指标,并找到它们的平均值(每个标签的真实实例数)。这改变 ``'macro'`` 以解释标签不平衡; 这可能会导致F-分数不在精度和召回之间。
 
-    :return: 输出float结果。Precision, recall, f1 score。
+    :returns: 
+        - precision - 精确率
+        - recall - 召回率
+        - f1 - F1 分数
 
     Example::
 
@@ -2148,15 +2175,18 @@ precision_recall_f1_Multi_score
 
                     micro_precision, micro_recall, micro_f1 = vqnet_metrics.precision_recall_f1_Multi_score(reference_list_Qtensor,
                                 reference_prediciton_list, 2, average='micro')
-                    print(micro_precision, micro_recall, micro_f1) # 0.5 0.2 0.28571428571428575
+                    print(micro_precision, micro_recall, micro_f1)
+                    # 0.5 0.2 0.28571428571428575
 
                     macro_precision, macro_recall, macro_f1 = vqnet_metrics.precision_recall_f1_Multi_score(reference_list_Qtensor,
                                 reference_prediciton_list, 2, average='macro')
-                    print(macro_precision, macro_recall, macro_f1) # 0.25 0.16666666666666666 0.2
+                    print(macro_precision, macro_recall, macro_f1)
+                    # 0.25 0.16666666666666666 0.2
 
                     weighted_precision, weighted_recall, weighted_f1 = vqnet_metrics.precision_recall_f1_Multi_score(reference_list_Qtensor,
                                 reference_prediciton_list, 2, average='weighted')
-                    print(weighted_precision, weighted_recall, weighted_f1) # 0.3 0.19999999999999998 0.24
+                    print(weighted_precision, weighted_recall, weighted_f1)
+                    # 0.3 0.19999999999999998 0.24
 
                     reference_list = [[1, 0, 0], [0, 1, 0], [0, 0, 1], [1, 1, 0], [1, 0, 1]]
                     prediciton_list = [[1, 0, 0], [1, 0, 0], [1, 1, 1], [1, 0, 0], [0, 1, 1]]
@@ -2165,34 +2195,36 @@ precision_recall_f1_Multi_score
 
                     micro_precision, micro_recall, micro_f1 = vqnet_metrics.precision_recall_f1_Multi_score(reference_list_Qtensor,
                                 reference_prediciton_list, 3, average='micro')
-                    print(micro_precision, micro_recall, micro_f1) # 0.5 0.5714285714285714 0.5333333333333333
+                    print(micro_precision, micro_recall, micro_f1)
+                    # 0.5 0.5714285714285714 0.5333333333333333
 
                     macro_precision, macro_recall, macro_f1 = vqnet_metrics.precision_recall_f1_Multi_score(reference_list_Qtensor,
                                 reference_prediciton_list, 3, average='macro')
-                    print(macro_precision, macro_recall, macro_f1) # 0.5 0.5555555555555555 0.5238095238095238
+                    print(macro_precision, macro_recall, macro_f1)
+                    # 0.5 0.5555555555555555 0.5238095238095238
 
                     weighted_precision, weighted_recall, weighted_f1 = vqnet_metrics.precision_recall_f1_Multi_score(reference_list_Qtensor,
                                 reference_prediciton_list, 3, average='weighted')
-                    print(weighted_precision, weighted_recall, weighted_f1) # 0.5 0.5714285714285714 0.5306122448979592
+                    print(weighted_precision, weighted_recall, weighted_f1)
+                    # 0.5 0.5714285714285714 0.5306122448979592
 
 
 
 auc_calculate
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:class:: pyvqnet.utils.metrics.auc_calculate(y_true_Qtensor, y_pred_Qtensor, pos_label=None, sample_weight=None,
-              drop_intermediate=True)
+.. py:class:: pyvqnet.utils.metrics.auc_calculate(y_true_Qtensor, y_pred_Qtensor, pos_label=None, sample_weight=None, drop_intermediate=True)
 
-    Compute the precision, recall and f1 score of the classification task。
+    计算模型对预测值和真值之间进行分类获取的AUC(Area Under Curve)结果。
 
     :param y_true_Qtensor: 一维阵列状的输入,shape = [n_samples]。
                             真正的二进制标签。如果标签不是{1,1}或{0,1},则pos_label应明确给出。
     :param y_pred_Qtensor: 一维阵列状的输入,shape = [n_samples]。
                             目标分数,可以是正的概率估计类别、置信值或决策的非阈值度量(由某些分类器上的“decision_函数”返回)
-    :param pos_label: int or str, default=None。
+    :param pos_label: int or str,默认为None。
                     正类的标签。当``pos_label=None``时,如果y_true_Qtensor位于{-1,1}或{0,1},``pos_label``设置为1,否则将引发错误。
-    :param sample_weight: 形状(n_samples,)的数组,default=None。
-    :param drop_intermediate: boolean, optional (default=True)。
+    :param sample_weight: 形状(n_samples,)的数组,默认为None。
+    :param drop_intermediate: boolean, optional (默认为None)。
                     是否降低一些在绘制的ROC曲线上不会出现的次优阈值。这对于创建较轻的ROC曲线很有用。
     :return: 输出float结果。
 
@@ -2209,19 +2241,22 @@ auc_calculate
                 y_Qtensor = tensor.QTensor(y)
                 pred_Qtensor = tensor.QTensor(pred)
                 result = vqnet_metrics.auc_calculate(y_Qtensor, pred_Qtensor)
-                print("auc:", result) # 0.92
+                print("auc:", result)
+                # 0.92
 
                 y = np.array([1, 1, 1, 1, 1, 0, 0, 1, 1, 1])
                 pred = np.array([1, 0, 1, 1, 1, 1, 0, 1, 1, 0])
                 y_Qtensor = tensor.QTensor(y)
                 pred_Qtensor = tensor.QTensor(pred)
                 result = vqnet_metrics.auc_calculate(y_Qtensor, pred_Qtensor)
-                print("auc:", result) # 0.625
+                print("auc:", result)
+                # 0.625
 
                 y = [1, 2, 1, 1, 1, 0, 0, 1, 1, 1]
                 pred = [1, 0, 2, 1, 1, 1, 0, 1, 1, 0]
                 act_Qtensor = tensor.QTensor(act)
                 pre_Qtensor = tensor.QTensor(pre)
                 result = vqnet_metrics.auc_calculate(act_Qtensor, pre_Qtensor, pos_label=2)
-                print("auc:", result) # 0.1111111111111111
+                print("auc:", result)
+                # 0.1111111111111111
 
