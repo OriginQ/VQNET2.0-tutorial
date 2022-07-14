@@ -2038,8 +2038,8 @@ precision_recall_f1_2_score
 
     计算2分类任务下预测值的精确率，召回率和F1分数。其中预测值和真值需要是形状类似(n_samples,)的QTensor，值为0或1，代表两个类的标签。
 
-    :param y_true_Qtensor: 一维阵列状的输入，形状类似(n_samples,)，真实目标值。
-    :param y_pred_Qtensor: 一维阵列状的输入，形状类似(n_samples,)，估计目标值。
+    :param y_true_Qtensor: 一维QTensor的输入，形状类似(n_samples,)，真实目标值。
+    :param y_pred_Qtensor: 一维QTensor的输入，形状类似(n_samples,)，估计目标值。
 
     :returns: 
         - precision - 精确率
@@ -2071,8 +2071,8 @@ precision_recall_f1_N_score
 
     多分类任务的精确率，召回率，F1分数计算。其中预测值和真值是形状类似(n_samples,)的QTensor，值为0到N-1的整数，代表N个类的标签。
 
-    :param y_true_Qtensor: 一维阵列状的输入，真实目标值。
-    :param y_pred_Qtensor: 一维阵列状的输入，估计目标值。
+    :param y_true_Qtensor: 一维QTensor的输入，真实目标值。
+    :param y_pred_Qtensor: 一维QTensor的输入，估计目标值。
     :param N: N类(类别数)。
     :param average: string, ['micro', 'macro', 'weighted']。
             多类/多标签目标需要此参数。
@@ -2143,8 +2143,8 @@ precision_recall_f1_Multi_score
 
     多分类任务的精确率，召回率，F1分数计算。其中预测值和真值是形状类似(n_samples,N)的QTensor，预测值和真实标签必须为0-1独热编码的形式。
 
-    :param y_true_Qtensor: 二维阵列状的输入，真实目标值。
-    :param y_pred_Qtensor: 二维阵列状的输入，估计目标值。
+    :param y_true_Qtensor: 二维QTensor的输入，真实目标值。
+    :param y_pred_Qtensor: 二维QTensor的输入，估计目标值。
     :param N: N类(类别数)。
     :param average: string, ['micro', 'macro', 'weighted']。
             多类/多标签目标需要此参数。
@@ -2217,9 +2217,9 @@ auc_calculate
 
     计算模型对预测值和真值之间进行分类获取的(Area Under Curve, AUC)结果。
 
-    :param y_true_Qtensor: 一维阵列状的输入,shape = [n_samples]。
+    :param y_true_Qtensor: 一维QTensor的输入,shape = [n_samples]。
                             真正的二进制标签。如果标签不是{1,1}或{0,1}，则pos_label应明确给出。
-    :param y_pred_Qtensor: 一维阵列状的输入,shape = [n_samples]。
+    :param y_pred_Qtensor: 一维QTensor的输入,shape = [n_samples]。
                             目标分数,可以是正的概率估计类别、置信值或决策的非阈值度量(由某些分类器上的“决策函数”返回)
     :param pos_label: int 或 str,默认为None。
                     正类的标签。当 ``pos_label=None`` 时，如果y_true_Qtensor位于{-1,1}或{0,1}， ``pos_label`` 设置为1，否则将引发错误。
