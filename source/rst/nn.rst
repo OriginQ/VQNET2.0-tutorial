@@ -2016,12 +2016,12 @@ R_Square
 
             y_true_Qtensor = tensor.arange(1, 12)
             y_pred_Qtensor = tensor.arange(4, 15)
-            result = vqnet_metrics.R_Square_new(y_true_Qtensor, y_pred_Qtensor)
+            result = vqnet_metrics.R_Square(y_true_Qtensor, y_pred_Qtensor)
             print(result) # 0.09999999999999998
 
             y_true_Qtensor = tensor.arange(1, 13).reshape([3, 4])
             y_pred_Qtensor = tensor.arange(4, 16).reshape([3, 4])
-            result = vqnet_metrics.R_Square_new(y_true_Qtensor, y_pred_Qtensor)
+            result = vqnet_metrics.R_Square(y_true_Qtensor, y_pred_Qtensor)
             print(result) # 0.15625
 
 
@@ -2096,22 +2096,6 @@ precision_recall_f1_N_score
                     y_true_Qtensor, y_pred_Qtensor, 3, average='weighted')
                 print(precision_weighted, recall_weighted, f1_weighted) # 0.625 0.6 0.6047619047619047
 
-                reference_list = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-                prediciton_list = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-                y_true_Qtensor = tensor.QTensor(reference_list)
-                y_pred_Qtensor = tensor.QTensor(prediciton_list)
-
-                precision_micro, recall_micro, f1_micro = vqnet_metrics.precision_recall_f1_N_score(
-                    y_true_Qtensor, y_pred_Qtensor, 3, average='micro')
-                print(precision_micro, recall_micro, f1_micro) # 1.0 1.0 1.0
-
-                precision_macro, recall_macro, f1_macro = vqnet_metrics.precision_recall_f1_N_score(
-                    y_true_Qtensor, y_pred_Qtensor, 3, average='macro')
-                print(precision_macro, recall_macro, f1_macro) # 1.0 1.0 1.0
-
-                precision_weighted, recall_weighted, f1_weighted = vqnet_metrics.precision_recall_f1_N_score(
-                    y_true_Qtensor, y_pred_Qtensor, 3, average='weighted')
-                print(precision_weighted, recall_weighted, f1_weighted) # 1.0 1.0 1.0
 
 
 precision_recall_f1_Multi_score
@@ -2146,16 +2130,16 @@ precision_recall_f1_Multi_score
                     y_true_Qtensor = tensor.QTensor(reference_list)
                     y_pred_Qtensor = tensor.QTensor(prediciton_list)
 
-                    micro_precision, micro_recall, micro_f1 = vqnet_metrics.precision_recall_f1_Multi_score(reference_list_Qtensor,
-                                reference_prediciton_list, 2, average='micro')
+                    micro_precision, micro_recall, micro_f1 = vqnet_metrics.precision_recall_f1_Multi_score(y_true_Qtensor,
+                                y_pred_Qtensor, 2, average='micro')
                     print(micro_precision, micro_recall, micro_f1) # 0.5 0.2 0.28571428571428575
 
-                    macro_precision, macro_recall, macro_f1 = vqnet_metrics.precision_recall_f1_Multi_score(reference_list_Qtensor,
-                                reference_prediciton_list, 2, average='macro')
+                    macro_precision, macro_recall, macro_f1 = vqnet_metrics.precision_recall_f1_Multi_score(y_true_Qtensor,
+                                y_pred_Qtensor, 2, average='macro')
                     print(macro_precision, macro_recall, macro_f1) # 0.25 0.16666666666666666 0.2
 
-                    weighted_precision, weighted_recall, weighted_f1 = vqnet_metrics.precision_recall_f1_Multi_score(reference_list_Qtensor,
-                                reference_prediciton_list, 2, average='weighted')
+                    weighted_precision, weighted_recall, weighted_f1 = vqnet_metrics.precision_recall_f1_Multi_score(y_true_Qtensor,
+                                y_pred_Qtensor, 2, average='weighted')
                     print(weighted_precision, weighted_recall, weighted_f1) # 0.3 0.19999999999999998 0.24
 
                     reference_list = [[1, 0, 0], [0, 1, 0], [0, 0, 1], [1, 1, 0], [1, 0, 1]]
@@ -2163,16 +2147,16 @@ precision_recall_f1_Multi_score
                     y_true_Qtensor = tensor.QTensor(reference_list)
                     y_pred_Qtensor = tensor.QTensor(prediciton_list)
 
-                    micro_precision, micro_recall, micro_f1 = vqnet_metrics.precision_recall_f1_Multi_score(reference_list_Qtensor,
-                                reference_prediciton_list, 3, average='micro')
+                    micro_precision, micro_recall, micro_f1 = vqnet_metrics.precision_recall_f1_Multi_score(y_true_Qtensor,
+                                y_pred_Qtensor, 3, average='micro')
                     print(micro_precision, micro_recall, micro_f1) # 0.5 0.5714285714285714 0.5333333333333333
 
-                    macro_precision, macro_recall, macro_f1 = vqnet_metrics.precision_recall_f1_Multi_score(reference_list_Qtensor,
-                                reference_prediciton_list, 3, average='macro')
+                    macro_precision, macro_recall, macro_f1 = vqnet_metrics.precision_recall_f1_Multi_score(y_true_Qtensor,
+                                y_pred_Qtensor, 3, average='macro')
                     print(macro_precision, macro_recall, macro_f1) # 0.5 0.5555555555555555 0.5238095238095238
 
-                    weighted_precision, weighted_recall, weighted_f1 = vqnet_metrics.precision_recall_f1_Multi_score(reference_list_Qtensor,
-                                reference_prediciton_list, 3, average='weighted')
+                    weighted_precision, weighted_recall, weighted_f1 = vqnet_metrics.precision_recall_f1_Multi_score(y_true_Qtensor,
+                                y_pred_Qtensor, 3, average='weighted')
                     print(weighted_precision, weighted_recall, weighted_f1) # 0.5 0.5714285714285714 0.5306122448979592
 
 
@@ -2220,8 +2204,8 @@ auc_calculate
 
                 y = [1, 2, 1, 1, 1, 0, 0, 1, 1, 1]
                 pred = [1, 0, 2, 1, 1, 1, 0, 1, 1, 0]
-                act_Qtensor = tensor.QTensor(act)
-                pre_Qtensor = tensor.QTensor(pre)
-                result = vqnet_metrics.auc_calculate(act_Qtensor, pre_Qtensor, pos_label=2)
+                y_Qtensor = tensor.QTensor(y)
+                pred_Qtensor = tensor.QTensor(pred)
+                result = vqnet_metrics.auc_calculate(y_Qtensor, pred_Qtensor, pos_label=2)
                 print("auc:", result) # 0.1111111111111111
 
