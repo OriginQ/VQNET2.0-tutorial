@@ -1987,13 +1987,13 @@ MAE
 
         y_true_Qtensor = tensor.arange(1, 12)
         y_pred_Qtensor = tensor.arange(4, 15)
-        result = vqnet_metrics.RMSE(y_true_Qtensor, y_pred_Qtensor)
+        result = vqnet_metrics.MAE(y_true_Qtensor, y_pred_Qtensor)
         print(result)
         # 3.0
 
         y_true_Qtensor = tensor.arange(1, 13).reshape([3, 4])
         y_pred_Qtensor = tensor.arange(4, 16).reshape([3, 4])
-        result = vqnet_metrics.RMSE(y_true_Qtensor, y_pred_Qtensor)
+        result = vqnet_metrics.MAE(y_true_Qtensor, y_pred_Qtensor)
         print(result)
         # 3.0
 
