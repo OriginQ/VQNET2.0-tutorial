@@ -2022,12 +2022,12 @@ R_Square
 
         y_true_Qtensor = tensor.arange(1, 12)
         y_pred_Qtensor = tensor.arange(4, 15)
-        result = vqnet_metrics.R_Square_new(y_true_Qtensor, y_pred_Qtensor)
+        result = vqnet_metrics.R_Square(y_true_Qtensor, y_pred_Qtensor)
         print(result) # 0.09999999999999998
 
         y_true_Qtensor = tensor.arange(1, 13).reshape([3, 4])
         y_pred_Qtensor = tensor.arange(4, 16).reshape([3, 4])
-        result = vqnet_metrics.R_Square_new(y_true_Qtensor, y_pred_Qtensor)
+        result = vqnet_metrics.R_Square(y_true_Qtensor, y_pred_Qtensor)
         print(result) # 0.15625
 
 
@@ -2221,8 +2221,8 @@ auc_calculate
                             真正的二进制标签。如果标签不是{1,1}或{0,1}，则pos_label应明确给出。
     :param y_pred_Qtensor: 一维QTensor的输入,shape = [n_samples]。
                             目标分数,可以是正的概率估计类别、置信值或决策的非阈值度量(由某些分类器上的“决策函数”返回)
-    :param pos_label: int 或 str,默认为None。
-                    正类的标签。当 ``pos_label=None`` 时，如果y_true_Qtensor位于{-1,1}或{0,1}， ``pos_label`` 设置为1，否则将引发错误。
+    :param pos_label: int 或 str,正类的标签。默认为None。
+                    当 ``pos_label`` 是 None 时，如果 ``y_true_Qtensor`` 位于{-1,1}或{0,1}， ``pos_label`` 设置为1，否则将引发错误。
     :param sample_weight: 形状(n_samples,)的数组，默认为None。
     :param drop_intermediate: boolean，是否降低一些在绘制的ROC曲线上不会出现的次优阈值。(默认为None)。
 
