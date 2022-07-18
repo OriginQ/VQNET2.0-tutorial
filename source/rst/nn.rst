@@ -2080,7 +2080,7 @@ precision_recall_f1_N_score
 
             ``'macro'``: 计算每个标签的指标，并找到其未加权值。意思是不考虑标签的平衡。
 
-            ``'weighted'``: 计算每个标签的指标，并找到它们的平均值(每个标签的真实实例数)。这改变 ``'macro'`` 以解释标签不平衡; 这可能会导致F1分数不在精度和召回之间。
+            ``'weighted'``: 计算每个标签的指标，并找到它们的平均值(每个标签的真实实例数)。这改变 ``'macro'`` 以解释标签不平衡; 这可能会导致F分数不在精度和召回之间。
 
     :returns: 
         - precision - 精确率
@@ -2152,7 +2152,7 @@ precision_recall_f1_Multi_score
 
             ``'macro'``: 计算每个标签的指标，并找到其未加权值。意思是不考虑标签的平衡。
 
-            ``'weighted'``: 计算每个标签的指标，并找到它们的平均值(每个标签的真实实例数)。这改变 ``'macro'`` 以解释标签不平衡; 这可能会导致F-分数不在精度和召回之间。
+            ``'weighted'``: 计算每个标签的指标，并找到它们的平均值(每个标签的真实实例数)。这改变 ``'macro'`` 以解释标签不平衡; 这可能会导致F分数不在精度和召回之间。
 
     :returns: 
         - precision - 精确率
@@ -2254,8 +2254,8 @@ auc_calculate
 
         y = [1, 2, 1, 1, 1, 0, 0, 1, 1, 1]
         pred = [1, 0, 2, 1, 1, 1, 0, 1, 1, 0]
-        act_Qtensor = tensor.QTensor(act)
-        pre_Qtensor = tensor.QTensor(pre)
+        act_Qtensor = tensor.QTensor(y)
+        pre_Qtensor = tensor.QTensor(pred)
         result = vqnet_metrics.auc_calculate(act_Qtensor, pre_Qtensor, pos_label=2)
         print("auc:", result)
         # 0.1111111111111111

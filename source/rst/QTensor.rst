@@ -185,7 +185,7 @@ item
 
 .. py:method:: QTensor.item()
 
-    从 只包含当个元素的 QTensor 返回唯一的元素。
+    从只包含单个元素的 QTensor 返回唯一的元素。
 
     :return: 元素值
 
