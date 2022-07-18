@@ -914,7 +914,7 @@ RNN
     .. math::
         h_t = \tanh(W_{ih} x_t + b_{ih} + W_{hh} h_{(t-1)} + b_{hh})
 
-    如果 :attr:`nonlinearity` 是 ``'relu'``, 则 :math:`\text{ReLU}` 将替代 :math:`\tanh`.
+    如果 :attr:`nonlinearity` 是 ``'relu'``, 则 :math:`\text{ReLU}` 将替代 :math:`\tanh`。
 
     :param input_size: 输入特征维度。
     :param hidden_size:  隐藏特征维度。
@@ -990,7 +990,7 @@ LSTM
     :param hidden_size:  隐藏特征维度。
     :param num_layers: 堆叠LSTM层数，默认: 1。
     :param batch_first: 如果为 True，则输入形状为 [batch_size,seq_len,feature_dim]，
-     如果为 False, 则输入形状为 [seq_len,batch_size,feature_dim],默认为 True。
+     如果为 False, 则输入形状为 [seq_len,batch_size,feature_dim]，默认为 True。
     :param use_bias: 如果为 False，该模块不适用偏置项， 默认: True。
     :param bidirectional: 如果为 True，变为双向LSTM， 默认: False。
     :return: LSTM 实例
