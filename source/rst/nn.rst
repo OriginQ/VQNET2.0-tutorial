@@ -667,11 +667,36 @@ BatchNorm1d
         # [1.3416405, 1.3416405, 1.3416405, 1.3416405]
         # ]
 
+LayerNormNd
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:class:: pyvqnet.nn.layer_norm.LayerNormNd(normalized_shape: list, epsilon: float = 1e-5, affine: bool = True, name="")
+
+    在任意输入的后D维度上进行层归一化。具体方式如论文所述:
+    `Layer Normalization <https://arxiv.org/abs/1607.06450>`__。
+
+    .. math::
+        y = \frac{x - \mathrm{E}[x]}{ \sqrt{\mathrm{Var}[x] + \epsilon}} * \gamma + \beta
+
+    对于像 (B,C,H,W,D) 这样的输入，:attr:`norm_shape` 可以是 [C,H,W,D],[H,W,D],[W,D] 或 [D] .
+
+    :param norm_shape: `float` - 标准化形状。
+    :param epsilon: `float` - 数值稳定性常数，默认为 1e-5。
+    :param affine: `bool` - 是否使用应用仿射变换，默认为 True。
+    :param name: 这个模块的名字， 默认为""。
+    :return: 一个 LayerNormNd 类
+
+    Example::
+
+        ic = 4
+        test_conv = LayerNormNd([2,2])
+        x = QTensor(np.arange(1,17).reshape([2,2,2,2]),requires_grad=True)
+        y = test_conv.forward(x)
 
 LayerNorm2d
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:class:: pyvqnet.nn.layer_norm.LayerNorm2d(norm_size:int, epsilon:float = 1e-5, name="")
+.. py:class:: pyvqnet.nn.layer_norm.LayerNorm2d(norm_size:int, epsilon:float = 1e-5,  affine: bool = True, name="")
 
     在 4D 输入上进行层归一化。具体方式如论文所述:
     `Layer Normalization <https://arxiv.org/abs/1607.06450>`__。
@@ -683,7 +708,8 @@ LayerNorm2d
 
     :param norm_size: `float` - 归一化大小,应该等于 C * H * W。
     :param epsilon: `float` - 数值稳定性常数,默认为 1e-5。
-    :param name: 层归一化层命名,默认为""。
+    :param affine: `bool` - 是否使用应用仿射变换，默认为 True。
+    :param name: 这个模块的名字， 默认为""。
     :return: 二维层归一化实例。
 
     Example::
@@ -720,7 +746,7 @@ LayerNorm2d
 LayerNorm1d
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:class:: pyvqnet.nn.layer_norm.LayerNorm1d(norm_size:int, epsilon:float = 1e-5, name="")
+.. py:class:: pyvqnet.nn.layer_norm.LayerNorm1d(norm_size:int, epsilon:float = 1e-5, affine: bool = True, name="")
     
     在 2D 输入上进行层归一化。具体方式如论文所述:
     `Layer Normalization <https://arxiv.org/abs/1607.06450>`__。
@@ -732,7 +758,8 @@ LayerNorm1d
 
     :param norm_size: `float` - 归一化大小,应该等于最后一维大小。
     :param epsilon: `float` - 数值稳定性常数,默认为 1e-5。
-    :param name: 层归一化层命名,默认为""。
+    :param affine: `bool` - 是否使用应用仿射变换，默认为 True。
+    :param name: 这个模块的名字， 默认为""。
 
     :return: 一维层归一化实例。
 
