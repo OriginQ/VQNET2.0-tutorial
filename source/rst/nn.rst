@@ -688,10 +688,23 @@ LayerNormNd
 
     Example::
 
+        import numpy as np
+        from pyvqnet.tensor import QTensor
+        from pyvqnet.nn.layer_norm import LayerNormNd
         ic = 4
         test_conv = LayerNormNd([2,2])
         x = QTensor(np.arange(1,17).reshape([2,2,2,2]),requires_grad=True)
         y = test_conv.forward(x)
+        # [
+        # [[[-1.3416355, -0.4472118],
+        #  [0.4472118, 1.3416355]],
+        # [[-1.3416355, -0.4472118],
+        #  [0.4472118, 1.3416355]]],
+        # [[[-1.3416355, -0.4472118],
+        #  [0.4472118, 1.3416355]],
+        # [[-1.3416355, -0.4472118],
+        #  [0.4472118, 1.3416355]]]
+        # ]
 
 LayerNorm2d
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
