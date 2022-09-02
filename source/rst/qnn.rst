@@ -1015,6 +1015,85 @@ ProbsMeasure
         print(rlt_prob)
         #[0.2499999999999947, 0.2499999999999947, 0.2499999999999947, 0.2499999999999947]
 
+DensityMatrixFromQstate
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. py:function:: pyvqnet.qnn.measure.DensityMatrixFromQstate(state, indices)
+
+    计算密度矩阵
+
+    :param state: 一维列表状态向量。 这个列表的大小应该是 ``(2**N,)`` 对于一些整数值 ``N``.qstate 应该从 000 ->111 开始。
+    :param indices: 所考虑子系统中的量子比特索引列表。
+    :return: 大小为“(2**len(indices), 2**len(indices))”的密度矩阵。
+
+    Example::
+        
+        from pyvqnet.qnn.measure import DensityMatrixFromQstate
+        qstate = [(0.9306699299765968+0j), (0.18865613455240968+0j), (0.1886561345524097+0j), (0.03824249173404786+0j), -0.048171819846746615j, -0.00976491131165138j, -0.23763904794287155j, -0.048171819846746615j]
+        print(DensityMatrixFromQstate(qstate,[0,1]))
+        # [[0.86846704+0.j 0.1870241 +0.j 0.17604699+0.j 0.03791166+0.j]
+        #  [0.1870241 +0.j 0.09206345+0.j 0.03791166+0.j 0.01866219+0.j]
+        #  [0.17604699+0.j 0.03791166+0.j 0.03568649+0.j 0.00768507+0.j]
+        #  [0.03791166+0.j 0.01866219+0.j 0.00768507+0.j 0.00378301+0.j]]
+
+VN_Entropy
+^^^^^^^^^^^^^^^
+.. py:function:: pyvqnet.qnn.measure.VN_Entropy(state, indices, base=None)
+
+    根据给定 qubits 列表上的状态向量计算Von Neumann熵 。
+
+    .. math::
+        S( \rho ) = -\text{Tr}( \rho \log ( \rho ))
+
+    :param state: 一维列表状态向量。 这个列表的大小应该是 ``(2**N,)`` 对于一些整数值 ``N``.qstate 应该从 000 ->111 开始
+    :param indices: - 所考虑子系统中的量子比特索引列表。
+    :param base: 对数的底。 如果没有，则使用自然对数。
+
+    :return: 冯诺依曼熵的浮点值.
+
+    Example::
+
+        from pyvqnet.qnn.measure import VN_Entropy
+        qstate = [(0.9022961387408862 + 0j), -0.06676534788028633j,
+                (0.18290448232350312 + 0j), -0.3293638014158896j,
+                (0.03707657410649268 + 0j), -0.06676534788028635j,
+                (0.18290448232350312 + 0j), -0.013534006039561714j]
+        print(VN_Entropy(qstate, [0, 1]))
+        #0.14592917648464448
+
+Mutal_Info
+^^^^^^^^^^^^^^^
+.. py:function:: pyvqnet.qnn.measure.Mutal_Info(state, indices0, indices1, base=None)
+
+    根据给定两个子 qubits 列表上的状态向量的互信息 。
+
+    .. math::
+
+        I(A, B) = S(\rho^A) + S(\rho^B) - S(\rho^{AB})
+
+    其中 :math:`S` 是冯诺依曼熵。
+
+    互信息是衡量两个子系统之间相关性的指标。更具体地说，它量化了一个系统通过测量另一个系统获得的信息量。
+
+    每个状态都可以作为计算基础中的状态向量给出。
+
+    :param state: 一维列表状态向量。 这个列表的大小应该是 ``(2**N,)`` 对于一些整数值 ``N``.qstate 应该从 000 ->111 开始
+    :param indices0: 第一个子系统中的量子比特索引列表。
+    :param indices1: 第二个子系统中的量子比特索引列表。
+    :param base: 对数的底。 如果没有，则使用自然对数。
+
+    :return: 子系统之间的相互信息
+
+    Example::
+
+        from pyvqnet.qnn.measure import Mutal_Info
+        qstate = [(0.9022961387408862 + 0j), -0.06676534788028633j,
+                (0.18290448232350312 + 0j), -0.3293638014158896j,
+                (0.03707657410649268 + 0j), -0.06676534788028635j,
+                (0.18290448232350312 + 0j), -0.013534006039561714j]
+        print(Mutal_Info(qstate, [0], [2], 2))
+        #0.13763425302805887
+
+
 量子机器学习算法接口
 ----------------------------------
 
