@@ -887,6 +887,156 @@ CSWAPcircuit
         #           │
         # q_2:  |0>─X─
 
+常用量子线路
+----------------------------------
+VQNet提供了量子机器学习研究中常用的一些量子线路
+
+
+HardwareEfficientAnsatz
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:class:: pyvqnet.qnn.ansatz.HardwareEfficientAnsatz(n_qubits,single_rot_gate_list,qubits,entangle_gate="CNOT",entangle_rules='linear',depth=1)
+
+    论文介绍的Hardware Efficient Ansatz的实现： `Hardware-efficient Variational Quantum Eigensolver for Small Molecules <https://arxiv.org/pdf/1704.05018.pdf>`__ 。
+
+    :param n_qubits: 量子比特数。
+    :param single_rot_gate_list: 单个量子位旋转门列表由一个或多个作用于每个量子位的旋转门构成。目前支持 Rx、Ry、Rz。
+    :param qubits: 由 pyqpanda 分配的量子位。
+    :param entangle_gate: 非参数化纠缠门。支持CNOT、CZ。默认: CNOT。
+    :param entangle_rules: 电路中如何使用纠缠门。 ``linear`` 意味着纠缠门将作用于每个相邻的量子位。 ``full`` 意味着纠缠门将作用于任何两个 qbuits。 默认值：``linear``。
+    :param depth: ansatz 的深度，默认：1。
+
+    Example::
+
+        import pyqpanda as pq
+        from pyvqnet.tensor import QTensor,tensor
+        from pyvqnet.qnn import HardwareEfficientAnsatz
+        machine = pq.CPUQVM()
+        machine.init_qvm()
+        qlist = machine.qAlloc_many(4)
+        c = HardwareEfficientAnsatz(4, ["rx", "RY", "rz"],
+                                    qlist,
+                                    entangle_gate="cnot",
+                                    entangle_rules="linear",
+                                    depth=1)
+        w = tensor.ones([c.get_para_num()])
+
+        cir = c.create_ansatz(w)
+        print(cir)
+        #           ┌────────────┐ ┌────────────┐ ┌────────────┐        ┌────────────┐ ┌────────────┐ ┌────────────┐
+        # q_0:  |0>─┤RX(1.000000)├ ┤RY(1.000000)├ ┤RZ(1.000000)├ ───■── ┤RX(1.000000)├ ┤RY(1.000000)├ ┤RZ(1.000000)├ ────────────── ────────────── 
+        #           ├────────────┤ ├────────────┤ ├────────────┤ ┌──┴─┐ └────────────┘ ├────────────┤ ├────────────┤ ┌────────────┐
+        # q_1:  |0>─┤RX(1.000000)├ ┤RY(1.000000)├ ┤RZ(1.000000)├ ┤CNOT├ ───■────────── ┤RX(1.000000)├ ┤RY(1.000000)├ ┤RZ(1.000000)├ ──────────────     
+        #           ├────────────┤ ├────────────┤ ├────────────┤ └────┘ ┌──┴─┐         └────────────┘ ├────────────┤ ├────────────┤ ┌────────────┐     
+        # q_2:  |0>─┤RX(1.000000)├ ┤RY(1.000000)├ ┤RZ(1.000000)├ ────── ┤CNOT├──────── ───■────────── ┤RX(1.000000)├ ┤RY(1.000000)├ ┤RZ(1.000000)├     
+        #           ├────────────┤ ├────────────┤ ├────────────┤        └────┘         ┌──┴─┐         ├────────────┤ ├────────────┤ ├────────────┤     
+        # q_3:  |0>─┤RX(1.000000)├ ┤RY(1.000000)├ ┤RZ(1.000000)├ ────── ────────────── ┤CNOT├──────── ┤RX(1.000000)├ ┤RY(1.000000)├ ┤RZ(1.000000)├     
+        #           └────────────┘ └────────────┘ └────────────┘                       └────┘         └────────────┘ └────────────┘ └────────────┘     
+
+BasicEntanglerLayers
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:class:: pyvqnet.qnn.template.BasicEntanglerLayers(weights=None, num_qubits=1, rotation=pyqpanda.RX)
+
+    由每个量子位上的单参数单量子位旋转组成的层，后跟一个闭合链或环组合的多个CNOT 门。
+
+    CNOT 门环将每个量子位与其邻居连接起来，最后一个量子位被认为是第一个量子位的邻居。
+
+    层数 :math:`L` 由参数 ``weights`` 的第一个维度决定。
+
+    :param weights: 形状的权重张量 `(L, len(qubits))`。 每个权重都用作量子含参门中的参数。默认值为： ``None`` ，则使用 `(1,1)` 正态分布随机数作为权重。
+    :param num_qubits: 量子比特数,默认为1。
+    :param rotation: 使用单参数单量子比特门，``pyqpanda.RX`` 被用作默认值。
+
+    Example::
+
+        import pyqpanda as pq
+        import numpy as np
+        from pyvqnet.qnn.template import BasicEntanglerLayers
+        np.random.seed(42)
+        num_qubits = 5
+        shape = [1, num_qubits]
+        weights = np.random.random(size=shape)
+
+        machine = pq.CPUQVM()
+        machine.init_qvm()
+        qubits = machine.qAlloc_many(num_qubits)
+
+        circuit = BasicEntanglerLayers(weights=weights, num_qubits=num_qubits, rotation=pq.RZ)
+        result = circuit.create_circuit(qubits)
+        circuit.print_circuit(qubits)
+
+        prob = machine.prob_run_dict(result, qubits[0], -1)
+        prob = list(prob.values())
+        print(prob)
+        #           ┌────────────┐                             ┌────┐
+        # q_0:  |0>─┤RZ(0.374540)├ ───■── ────── ────── ────── ┤CNOT├
+        #           ├────────────┤ ┌──┴─┐                      └──┬─┘
+        # q_1:  |0>─┤RZ(0.950714)├ ┤CNOT├ ───■── ────── ────── ───┼──
+        #           ├────────────┤ └────┘ ┌──┴─┐                  │
+        # q_2:  |0>─┤RZ(0.731994)├ ────── ┤CNOT├ ───■── ────── ───┼──
+        #           ├────────────┤        └────┘ ┌──┴─┐           │
+        # q_3:  |0>─┤RZ(0.598658)├ ────── ────── ┤CNOT├ ───■── ───┼──
+        #           ├────────────┤               └────┘ ┌──┴─┐    │
+        # q_4:  |0>─┤RZ(0.156019)├ ────── ────── ────── ┤CNOT├ ───■──
+        #           └────────────┘                      └────┘
+
+        # [1.0, 0.0]
+
+
+StronglyEntanglingLayers
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:class:: pyvqnet.qnn.template.StronglyEntanglingLayers(weights=None, num_qubits=1, ranges=None)
+
+    由单个量子比特旋转和纠缠器组成的层,参考 `circuit-centric classifier design <https://arxiv.org/abs/1804.00633>`__ .
+
+    参数 ``weights`` 包含每一层的权重。 因此得出层数:math:`L` 等于 ``weights`` 的第一个维度。
+
+    其包含2-qubit CNOT 门，作用于 :math:`M` 个量子比特上，:math:`i = 1,...,M`。 每个门的第二个量子位由下式给出 :math:`(i+r)\mod M` ，其中 :math:`r` 是一个称为 ``range``  的超参数，并且 :math:`0 < r < M`。
+
+    :param weights: 形状为 ``(L, M, 3)`` 的权重张量，默认值：None，使用形状为 ``(1,1,3)`` 的随机张量。
+    :param num_qubits: 量子比特数，默认值：1。
+    :param ranges: 确定每个后续层的范围超参数的序列； 默认值：None，使用 :math:`r=l \ mod M` 表示第 :math:`l` 层和 :math:`M` 量子比特。
+
+    Example::
+
+        import pyqpanda as pq
+        import numpy as np
+        from pyvqnet.qnn.template import StronglyEntanglingLayers
+        np.random.seed(42)
+        num_qubits = 3
+        shape = [2, num_qubits, 3]
+        weights = np.random.random(size=shape)
+
+        machine = pq.CPUQVM()  # outside
+        machine.init_qvm()  # outside
+        qubits = machine.qAlloc_many(num_qubits)
+
+        circuit = StronglyEntanglingLayers(weights, num_qubits=num_qubits)
+        result = circuit.create_circuit(qubits)
+        circuit.print_circuit(qubits)
+
+        prob = machine.prob_run_dict(result, qubits[0], -1)
+        prob = list(prob.values())
+        print(prob)
+        # q_0:  |0>─┤RZ(0.374540)├ ┤RY(0.950714)├ ┤RZ(0.731994)├ ───■── ────── ┤CNOT├──────────── ┤RZ(0.708073)├ >
+        #           ├────────────┤ ├────────────┤ ├────────────┤ ┌──┴─┐        └──┬┬┴───────────┐ ├────────────┤ >
+        # q_1:  |0>─┤RZ(0.598658)├ ┤RY(0.156019)├ ┤RZ(0.155995)├ ┤CNOT├ ───■── ───┼┤RZ(0.832443)├ ┤RY(0.212339)├ >
+        #           ├────────────┤ ├────────────┤ ├────────────┤ └────┘ ┌──┴─┐    │└────────────┘ ├────────────┤ >
+        # q_2:  |0>─┤RZ(0.058084)├ ┤RY(0.866176)├ ┤RZ(0.601115)├ ────── ┤CNOT├ ───■────────────── ┤RZ(0.183405)├ >
+        #           └────────────┘ └────────────┘ └────────────┘        └────┘                    └────────────┘ >
+
+        #          ┌────────────┐ ┌────────────┐        ┌────┐
+        # q_0:  |0>┤RY(0.020584)├ ┤RZ(0.969910)├ ───■── ┤CNOT├ ──────
+        #          ├────────────┤ └────────────┘    │   └──┬─┘ ┌────┐
+        # q_1:  |0>┤RZ(0.181825)├ ────────────── ───┼── ───■── ┤CNOT├
+        #          ├────────────┤ ┌────────────┐ ┌──┴─┐        └──┬─┘
+        # q_2:  |0>┤RY(0.304242)├ ┤RZ(0.524756)├ ┤CNOT├ ────── ───■──
+        #          └────────────┘ └────────────┘ └────┘
+        #[0.6881335561525671, 0.31186644384743273]
+
+
 对量子线路进行测量
 ----------------------------------
 
