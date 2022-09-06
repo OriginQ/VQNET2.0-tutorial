@@ -1265,7 +1265,7 @@ NLL_Loss
 
     平均负对数似然损失。 对C个类别的分类问题很有用。
 
-    `output` 是模型给出的概率形式的似然量.其尺寸可以是 :math:`(minibatch, C)` or :math:`(minibatch, C, d_1, d_2, ..., d_K)` 。The ``target`` 是损失函数期望的真值，包含 :math:`[0, C-1]` 的类别索引。
+    `output` 是模型给出的概率形式的似然量.其尺寸可以是 :math:`(N, C)` or :math:`(N, C, d_1, d_2, ..., d_K)` 。The ``target`` 是损失函数期望的真值，包含 :math:`[0, C-1]` 的类别索引。
 
     .. math::
 
@@ -1305,7 +1305,7 @@ CrossEntropyLoss
 
     该函数计算LogSoftmax以及NLL_Loss在一起计算的损失。
 
-    `output` is 是包含未做归一化的输出.它的尺寸可以为 :math:`(C)` , :math:`(minibatch, C)` 二维或 :math:`(minibatch, C, d_1, d_2, ..., d_K)` 多维。
+    `output` is 是包含未做归一化的输出.它的尺寸可以为 :math:`(C)` , :math:`(N, C)` 二维或 :math:`(N, C, d_1, d_2, ..., d_K)` 多维。
 
     损失函数的公式如下：
 
