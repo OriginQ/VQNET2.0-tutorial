@@ -1257,7 +1257,85 @@ SoftmaxCrossEntropy
         print(result)
 
         # [3.7852478]
-        
+
+NLL_Loss
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:class:: pyvqnet.nn.NLL_Loss()
+
+    平均负对数似然损失。 对C个类别的分类问题很有用。
+
+    `output` 是模型给出的概率形式的似然量.其尺寸可以是 :math:`(minibatch, C)` or :math:`(minibatch, C, d_1, d_2, ..., d_K)` 。The ``target`` 是损失函数期望的真值，包含 :math:`[0, C-1]` 的类别索引。
+
+    .. math::
+
+        \ell(output, target) = L = \{l_1,\dots,l_N\}^\top, \quad
+        l_n = -  
+            \sum_{n=1}^N \frac{1}{N}output_{n,target_n}, \quad
+
+    :param target: :math:`(N, *)`,损失函数期望的真值。
+    :param output: :math:`(N, *)`,损失函数的输出，可以为多维变量。
+    :return: 一个NLL_Loss 实例
+
+    Example::
+
+        import numpy as np
+        from pyvqnet.nn import NLL_Loss
+        from pyvqnet.tensor import QTensor
+        output = QTensor([
+            0.9476322568516703, 0.226547421131723, 0.5944201443911326,
+            0.42830868492969476, 0.76414068655387, 0.00286059168094277,
+            0.3574236812873617, 0.9096948856639084, 0.4560809854582528,
+            0.9818027091583286, 0.8673569904602182, 0.9860275114020933,
+            0.9232667066664217, 0.303693313961628, 0.8461034903175555
+        ])
+        output.reshape_([1, 3, 1, 5])
+        output.requires_grad = True
+        y_test = np.array([[[2, 1, 0, 0, 2]]])
+
+        loss_result = NLL_Loss()
+        result = loss_result(y_test, output)
+        print(result)
+        #[-0.6187226]
+
+CrossEntropyLoss
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:class:: pyvqnet.nn.CrossEntropyLoss()
+
+    该函数计算LogSoftmax以及NLL_Loss在一起计算的损失。
+
+    `output` is 是包含未做归一化的输出.它的尺寸可以为 :math:`(C)` , :math:`(minibatch, C)` 二维或 :math:`(minibatch, C, d_1, d_2, ..., d_K)` 多维。
+
+    损失函数的公式如下：
+
+    .. math::
+        \text{loss}(x, class) = -\log\left(\frac{\exp(x[class])}{\sum_j \exp(x[j])}\right)
+                       = -x[class] + \log\left(\sum_j \exp(x[j])\right)
+
+    :param target: :math:`(N, *)`,损失函数期望的真值。
+    :param output: :math:`(N, *)`,损失函数的输出，可以为多维变量。
+    :return: CrossEntropyLoss 实例
+
+    Example::
+
+        import numpy as np
+        from pyvqnet.nn import CrossEntropyLoss
+        from pyvqnet.tensor import QTensor
+        output = QTensor([
+            0.9476322568516703, 0.226547421131723, 0.5944201443911326, 0.42830868492969476, 0.76414068655387,
+            0.00286059168094277, 0.3574236812873617, 0.9096948856639084, 0.4560809854582528, 0.9818027091583286,
+            0.8673569904602182, 0.9860275114020933, 0.9232667066664217, 0.303693313961628, 0.8461034903175555
+        ])
+        output.reshape_([1, 3, 1, 5])
+        output.requires_grad = True
+        y_test = np.array([[[2, 1, 0, 0, 2]]])
+
+        loss_result = CrossEntropyLoss()
+        result = loss_result(y_test, output)
+        print(result)
+        #[1.1508200]
+
 
 激活函数
 ----------------------------------
