@@ -933,10 +933,10 @@ HardwareEfficientAnsatz
         # q_3:  |0>─┤RX(1.000000)├ ┤RY(1.000000)├ ┤RZ(1.000000)├ ────── ────────────── ┤CNOT├──────── ┤RX(1.000000)├ ┤RY(1.000000)├ ┤RZ(1.000000)├     
         #           └────────────┘ └────────────┘ └────────────┘                       └────┘         └────────────┘ └────────────┘ └────────────┘     
 
-BasicEntanglerLayers
+BasicEntanglerTemplate
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:class:: pyvqnet.qnn.template.BasicEntanglerLayers(weights=None, num_qubits=1, rotation=pyqpanda.RX)
+.. py:class:: pyvqnet.qnn.template.BasicEntanglerTemplate(weights=None, num_qubits=1, rotation=pyqpanda.RX)
 
     由每个量子位上的单参数单量子位旋转组成的层，后跟一个闭合链或环组合的多个CNOT 门。
 
@@ -952,7 +952,7 @@ BasicEntanglerLayers
 
         import pyqpanda as pq
         import numpy as np
-        from pyvqnet.qnn.template import BasicEntanglerLayers
+        from pyvqnet.qnn.template import BasicEntanglerTemplate
         np.random.seed(42)
         num_qubits = 5
         shape = [1, num_qubits]
@@ -962,7 +962,7 @@ BasicEntanglerLayers
         machine.init_qvm()
         qubits = machine.qAlloc_many(num_qubits)
 
-        circuit = BasicEntanglerLayers(weights=weights, num_qubits=num_qubits, rotation=pq.RZ)
+        circuit = BasicEntanglerTemplate(weights=weights, num_qubits=num_qubits, rotation=pq.RZ)
         result = circuit.create_circuit(qubits)
         circuit.print_circuit(qubits)
 
@@ -984,10 +984,10 @@ BasicEntanglerLayers
         # [1.0, 0.0]
 
 
-StronglyEntanglingLayers
+StronglyEntanglingTemplate
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:class:: pyvqnet.qnn.template.StronglyEntanglingLayers(weights=None, num_qubits=1, ranges=None)
+.. py:class:: pyvqnet.qnn.template.StronglyEntanglingTemplate(weights=None, num_qubits=1, ranges=None)
 
     由单个量子比特旋转和纠缠器组成的层,参考 `circuit-centric classifier design <https://arxiv.org/abs/1804.00633>`__ .
 
@@ -1003,7 +1003,7 @@ StronglyEntanglingLayers
 
         import pyqpanda as pq
         import numpy as np
-        from pyvqnet.qnn.template import StronglyEntanglingLayers
+        from pyvqnet.qnn.template import StronglyEntanglingTemplate
         np.random.seed(42)
         num_qubits = 3
         shape = [2, num_qubits, 3]
@@ -1013,20 +1013,21 @@ StronglyEntanglingLayers
         machine.init_qvm()  # outside
         qubits = machine.qAlloc_many(num_qubits)
 
-        circuit = StronglyEntanglingLayers(weights, num_qubits=num_qubits)
+        circuit = StronglyEntanglingTemplate(weights, num_qubits=num_qubits)
         result = circuit.create_circuit(qubits)
         circuit.print_circuit(qubits)
 
         prob = machine.prob_run_dict(result, qubits[0], -1)
         prob = list(prob.values())
         print(prob)
+        #           ┌────────────┐ ┌────────────┐ ┌────────────┐               ┌────┐             ┌────────────┐ >
         # q_0:  |0>─┤RZ(0.374540)├ ┤RY(0.950714)├ ┤RZ(0.731994)├ ───■── ────── ┤CNOT├──────────── ┤RZ(0.708073)├ >
         #           ├────────────┤ ├────────────┤ ├────────────┤ ┌──┴─┐        └──┬┬┴───────────┐ ├────────────┤ >
         # q_1:  |0>─┤RZ(0.598658)├ ┤RY(0.156019)├ ┤RZ(0.155995)├ ┤CNOT├ ───■── ───┼┤RZ(0.832443)├ ┤RY(0.212339)├ >
         #           ├────────────┤ ├────────────┤ ├────────────┤ └────┘ ┌──┴─┐    │└────────────┘ ├────────────┤ >
         # q_2:  |0>─┤RZ(0.058084)├ ┤RY(0.866176)├ ┤RZ(0.601115)├ ────── ┤CNOT├ ───■────────────── ┤RZ(0.183405)├ >
         #           └────────────┘ └────────────┘ └────────────┘        └────┘                    └────────────┘ >
-
+        #
         #          ┌────────────┐ ┌────────────┐        ┌────┐
         # q_0:  |0>┤RY(0.020584)├ ┤RZ(0.969910)├ ───■── ┤CNOT├ ──────
         #          ├────────────┤ └────────────┘    │   └──┬─┘ ┌────┐
@@ -1195,7 +1196,7 @@ VN_Entropy
         S( \rho ) = -\text{Tr}( \rho \log ( \rho ))
 
     :param state: 一维列表状态向量。 这个列表的大小应该是 ``(2**N,)`` 对于一些整数值 ``N``.qstate 应该从 000 ->111 开始
-    :param indices: - 所考虑子系统中的量子比特索引列表。
+    :param indices: 所考虑子系统中的量子比特索引列表。
     :param base: 对数的底。 如果没有，则使用自然对数。
 
     :return: 冯诺依曼熵的浮点值.
