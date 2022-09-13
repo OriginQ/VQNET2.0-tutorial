@@ -210,12 +210,12 @@ Conv1D
     :param output_channels: `int` - 输出数据的通道数。
     :param kernel_size: `int` - 卷积核的尺寸. 卷积核形状 = [output_channels,input_channels/group,kernel_size,1]。
     :param stride: `int` - 步长, 默认为1。
-    :param padding: `str|tuple` - 填充选项, 它可以是一个字符串 {'valid', 'same'} 或一个整数元组，给出在两边应用的隐式填充量。 默认 "valid"。
+    :param padding: `str|int` - 填充选项, 它可以是一个字符串 {'valid', 'same'} 或一个整数，给出应用在输入上的填充量。 默认 "valid"。
     :param use_bias: `bool` - 是否使用偏置项, 默认使用。
     :param kernel_initializer: `callable` - 卷积核初始化方法。默认为空,使用kaiming_uniform。
     :param bias_initializer: `callable` - 偏置初始化方法。默认为空,使用kaiming_uniform。
-    :param dilation_rate: `int` - 空洞大小,defaults: 1
-    :param group: `int` -  分组卷积的分组数. Default: 1
+    :param dilation_rate: `int` - 空洞大小,defaults: 1。
+    :param group: `int` -  分组卷积的分组数. Default: 1。
     :return: 一维卷积实例。
 
     .. note::
@@ -259,8 +259,8 @@ Conv2D
     :param use_bias: `bool` - 是否使用偏置项, 默认使用。
     :param kernel_initializer: `callable` - 卷积核初始化方法。默认为空,使用kaiming_uniform。
     :param bias_initializer: `callable` - 偏置初始化方法。默认为空,使用kaiming_uniform。
-    :param dilation_rate: `int` - 空洞大小,defaults: 1
-    :param group: `int` -  分组卷积的分组数. Default: 1
+    :param dilation_rate: `int` - 空洞大小,defaults: 1。
+    :param group: `int` -  分组卷积的分组数. Default: 1。
     :return: 二维卷积实例。
 
     .. note::
@@ -312,8 +312,8 @@ ConvT2D
     :param use_bias: `bool` - 是否使用偏置项, 默认使用。
     :param kernel_initializer: `callable` - 卷积核初始化方法。默认为空,使用kaiming_uniform。
     :param bias_initializer: `callable` - 偏置项初始化方法。默认为空,使用kaiming_uniform。
-    :param dilation_rate: `int` - 空洞大小,defaults: 1
-    :param group: `int` -  分组卷积的分组数. Default: 1
+    :param dilation_rate: `int` - 空洞大小,defaults: 1。
+    :param group: `int` -  分组卷积的分组数. Default: 1。
     :return: 二维转置卷积实例。
     
     .. note::
@@ -673,7 +673,7 @@ LayerNormNd
 
 .. py:class:: pyvqnet.nn.layer_norm.LayerNormNd(normalized_shape: list, epsilon: float = 1e-5, affine: bool = True, name="")
 
-    在任意输入的后D维度上进行层归一化。具体方式如论文所述:
+    在任意输入的后D个维度上进行层归一化。具体方式如论文所述:
     `Layer Normalization <https://arxiv.org/abs/1607.06450>`__。
 
     .. math::
@@ -1306,7 +1306,7 @@ CrossEntropyLoss
 
     该函数计算LogSoftmax以及NLL_Loss在一起计算的损失。
 
-    `output` is 是包含未做归一化的输出.它的尺寸可以为 :math:`(C)` , :math:`(N, C)` 二维或 :math:`(N, C, d_1, d_2, ..., d_K)` 多维。
+    `output` 是包含未做归一化的输出.它的尺寸可以为 :math:`(C)` , :math:`(N, C)` 二维或 :math:`(N, C, d_1, d_2, ..., d_K)` 多维。
 
     损失函数的公式如下：
 
