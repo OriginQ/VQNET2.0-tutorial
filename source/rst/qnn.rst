@@ -211,6 +211,100 @@ QuantumLayerV2
         
 
 
+
+QuantumLayerMultiProcess
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+如您更加熟悉pyQPanda语法，可以使用QuantumLayerMultiProcess，自定义量子比特 ``qubits`` ,经典比特 ``cbits`` ,后端模拟器 ``machine`` 加入QuantumLayerMultiProcess的参数 ``qprog_with_measure`` 函数中。
+
+.. py:class:: pyvqnet.qnn.quantumlayer.QuantumLayerMultiProcess(qprog_with_measure,para_num,machine_type_or_cloud_token,num_of_qubits: int,num_of_cbits: int = 1,diff_method:str = "parameter_shift",delta:float = 0.01)
+
+	变分量子层的抽象计算模块。对一个参数化的量子线路进行仿真，得到测量结果。该变分量子层继承了VQNet框架的梯度计算模块，可以计算线路参数的梯度，训练变分量子线路模型或将变分量子线路嵌入混合量子和经典模型。
+
+    :param qprog_with_measure: 用pyQPand构建的量子线路运行和测量函数。
+    :param para_num: `int` - 参数个数。
+    :param machine_type_or_cloud_token: qpanda量子虚拟机类型或pyQPANDA 量子云令牌 : https://pyqpanda-toturial.readthedocs.io/zh/latest/Realchip.html。
+    :param num_of_qubits: 量子比特数。
+    :param num_of_cbits: 经典比特数，默认为1。
+    :param diff_method: 求解量子线路参数梯度的方法，“参数位移”或“有限差分”，默认参数偏移。
+    :param delta: 有限差分计算梯度时的 \delta。
+    :return: 一个可以计算量子线路的模块。
+
+    .. note::
+        qprog_with_measure是pyQPanda中定义的量子线路函数 :https://pyqpanda-toturial.readthedocs.io/zh/latest/QCircuit.html。
+
+        此函数应包含以下参数，否则无法在QuantumLayerMultiProcess中正常运行。
+
+        与QuantumLayer相比。应该分配量子比特和模拟器: https://pyqpanda-toturial.readthedocs.io/zh/latest/QuantumMachine.html,
+
+        如果qprog_with_measure需要quantum measure，您可能还需要分配cbits: https://pyqpanda-toturial.readthedocs.io/zh/latest/Measure.html
+
+        qprog_with_measure (input,param)
+
+        `input`: 输入一维经典数据。
+
+        `param`: 输入一维量子线路的参数。
+
+
+    Example::
+
+        import pyqpanda as pq
+        from pyvqnet.qnn.measure import ProbsMeasure
+        from pyvqnet.qnn.quantumlayer import QuantumLayerMultiProcess
+        import numpy as np
+        from pyvqnet.tensor import QTensor
+        def pqctest (input,param,nqubits,ncubits):
+            machine = pq.CPUQVM()
+            machine.init_qvm()
+            qubits = machine.qAlloc_many(nqubits)
+            circuit = pq.QCircuit()
+            circuit.insert(pq.H(qubits[0]))
+            circuit.insert(pq.H(qubits[1]))
+            circuit.insert(pq.H(qubits[2]))
+            circuit.insert(pq.H(qubits[3]))
+
+            circuit.insert(pq.RZ(qubits[0],input[0]))
+            circuit.insert(pq.RZ(qubits[1],input[1]))
+            circuit.insert(pq.RZ(qubits[2],input[2]))
+            circuit.insert(pq.RZ(qubits[3],input[3]))
+
+            circuit.insert(pq.CNOT(qubits[0],qubits[1]))
+            circuit.insert(pq.RZ(qubits[1],param[0]))
+            circuit.insert(pq.CNOT(qubits[0],qubits[1]))
+
+            circuit.insert(pq.CNOT(qubits[1],qubits[2]))
+            circuit.insert(pq.RZ(qubits[2],param[1]))
+            circuit.insert(pq.CNOT(qubits[1],qubits[2]))
+
+            circuit.insert(pq.CNOT(qubits[2],qubits[3]))
+            circuit.insert(pq.RZ(qubits[3],param[2]))
+            circuit.insert(pq.CNOT(qubits[2],qubits[3]))
+            #print(circuit)
+
+            prog = pq.QProg()
+            prog.insert(circuit)
+
+            rlt_prob = ProbsMeasure([0,2],prog,machine,qubits)
+            return rlt_prob
+
+
+        pqc = QuantumLayerMultiProcess(pqctest,3,"cpu",4,1)
+        #classic data as input
+        input = QTensor([[1,2,3,4],[4,2,2,3],[3,3,2,2]] )
+        #forward circuits
+        rlt = pqc(input)
+        grad = QTensor(np.ones(rlt.data.shape)*1000)
+        #backward circuits
+        rlt.backward(grad)
+        print(rlt)
+
+        # [
+        # [0.2500000, 0.2500000, 0.2500000, 0.2500000],
+        # [0.2500000, 0.2500000, 0.2500000, 0.2500000],
+        # [0.2500000, 0.2500000, 0.2500000, 0.2500000]
+        # ]
+
+
 NoiseQuantumLayer
 ^^^^^^^^^^^^^^^^^^^
 
