@@ -1264,7 +1264,7 @@ DensityMatrixFromQstate
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 .. py:function:: pyvqnet.qnn.measure.DensityMatrixFromQstate(state, indices)
 
-    计算密度矩阵
+    计算量子态在一组特定量子比特上的密度矩阵。
 
     :param state: 一维列表状态向量。 这个列表的大小应该是 ``(2**N,)`` 对于一些整数值 ``N``.qstate 应该从 000 ->111 开始。
     :param indices: 所考虑子系统中的量子比特索引列表。
@@ -1309,7 +1309,7 @@ Mutal_Info
 ^^^^^^^^^^^^^^^
 .. py:function:: pyvqnet.qnn.measure.Mutal_Info(state, indices0, indices1, base=None)
 
-    根据给定两个子 qubits 列表上的状态向量的互信息 。
+    根据给定两个子 qubits 列表上的状态向量计算互信息 。
 
     .. math::
 
@@ -1347,7 +1347,7 @@ Mutal_Info
 
 人工神经网络是机器学习算法和人工智能的一种经典方法。从历史上看，人工神经元的最简单实现可以追溯到经典Rosenblatt 的“感知器”，但其长期实际应用可能会受到计算复杂度快速扩展的阻碍，尤其是与多层感知器的训练相关网络。这里我们参照论文 `An Artificial Neuron Implemented on an Actual Quantum Processor <https://arxiv.org/abs/1811.02266>`__ 一种基于量子信息的算法实现量子计算机版本的感知器，在编码资源方面显示出相比经典模型指数优势。
 
-对于该量子感知机，处理的数据是 0 1 二进制比特字符串。其目标是想识别形如下图w十字形状的模式。
+对于该量子感知机，处理的数据是 0 1 二进制比特字符串。其目标是想识别形如下图 :math:`w` 十字形状的模式。
 
 .. image:: ./images/QP-data.PNG
    :width: 600 px
@@ -1355,7 +1355,7 @@ Mutal_Info
 
 |
 
-使用二进制比特字符串对其进行编码，其中黑为0，白为1，可知w编码为（1，1，1，1，1，1，0，1，1，0，0，0，1，1，0，1）。共16位的字符串正好可以编码进4bit的量子态的振幅的符号上，符号为负数编码为0，符号为正数编码为1。通过以上编码方式，我们算法输入input转化为16位的二进制串。这样的不重复的二进制串可以分别对应特定的输入线路Ui。
+使用二进制比特字符串对其进行编码，其中黑为0，白为1，可知 :math:`w` 编码为（1，1，1，1，1，1，0，1，1，0，0，0，1，1，0，1）。共16位的字符串正好可以编码进4bit的量子态的振幅的符号上，符号为负数编码为0，符号为正数编码为1。通过以上编码方式，我们算法输入input转化为16位的二进制串。这样的不重复的二进制串可以分别对应特定的输入线路 :math:`U_i` 。
  
 该论文提出的量子感知机线路结构如下：
 
@@ -1365,22 +1365,22 @@ Mutal_Info
 
 |
 
-在比特0~3上构建编码线路Ui，包含多受控的CZ,CNOT门，H门；在Ui后面紧接着构建权重变换线路Uw，同样由受控门以及H门构成。使用Ui可以进行酉矩阵变化，将数据编码到量子态上：
+在比特0~3上构建编码线路 :math:`U_i` ，包含多受控的 :math:`CZ` 门， :math:`CNOT` 门， :math:`H` 门；在 :math:`U_i` 后面紧接着构建权重变换线路 :math:`U_w` ，同样由受控门以及 :math:`H` 门构成。使用 :math:`U_i` 可以进行酉矩阵变化，将数据编码到量子态上：
 
 .. math::
     U_i|0\rangle^{\otimes N}=\left|\psi_i\right\rangle
 
-使用酉矩阵变换Uw来计算输入和权重之间的内积：
+使用酉矩阵变换 :math:`U_w` 来计算输入和权重之间的内积：
 
 .. math::
     U_w\left|\psi_i\right\rangle=\sum_{j=0}^{m-1} c_j|j\rangle \equiv\left|\phi_{i, w}\right\rangle
 
-使用一个目标比特在辅助比特上的CNX门，并使用一些后续的H门，X门，CX门作为激活函数可以获取Ui和Uw的归一化激活概率值：
+使用一个目标比特在辅助比特上的多受控 :math:`NOT` 门，并使用一些后续的 :math:`H` 门， :math:`X` 门，:math:`CX` 门作为激活函数可以获取 :math:`U_i` 和 :math:`U_w` 的归一化激活概率值：
 
 .. math::
     \left|\phi_{i, w}\right\rangle|0\rangle_a \rightarrow \sum_{j=0}^{m-2} c_j|j\rangle|0\rangle_a+c_{m-1}|m-1\rangle|1\rangle_a
 
-当输入i的2进制串和w完全一致时，该归一化概率值应为最大。
+当输入 :math:`i` 的2进制串和 :math:`w` 完全一致时，该归一化概率值应为最大。
 
 VQNet提供了 ``QuantumNeuron`` 模块实现该算法。首先初始化一个量子感知机 ``QuantumNeuron``。
 
