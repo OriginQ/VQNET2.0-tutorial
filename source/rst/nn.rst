@@ -679,7 +679,7 @@ LayerNormNd
     .. math::
         y = \frac{x - \mathrm{E}[x]}{ \sqrt{\mathrm{Var}[x] + \epsilon}} * \gamma + \beta
 
-    对于像 (B,C,H,W,D) 这样的输入，:attr:`norm_shape` 可以是 [C,H,W,D],[H,W,D],[W,D] 或 [D] .
+    对于像 (B,C,H,W,D) 这样的输入， ``norm_shape`` 可以是 [C,H,W,D],[H,W,D],[W,D] 或 [D] .
 
     :param norm_shape: `float` - 标准化形状。
     :param epsilon: `float` - 数值稳定性常数，默认为 1e-5。
@@ -696,6 +696,7 @@ LayerNormNd
         test_conv = LayerNormNd([2,2])
         x = QTensor(np.arange(1,17).reshape([2,2,2,2]),requires_grad=True)
         y = test_conv.forward(x)
+        print(y)
         # [
         # [[[-1.3416355, -0.4472118],
         #  [0.4472118, 1.3416355]],
@@ -718,7 +719,7 @@ LayerNorm2d
     .. math::
         y = \frac{x - \mathrm{E}[x]}{ \sqrt{\mathrm{Var}[x] + \epsilon}} * \gamma + \beta
 
-    平均值和标准差是在除去第一个维度以外的剩余维度数据上计算的。对于像 (B,C,H,W) 这样的输入,:attr:`norm_size` 应该等于 C * H * W。
+    平均值和标准差是在除去第一个维度以外的剩余维度数据上计算的。对于像 (B,C,H,W) 这样的输入, ``norm_size`` 应该等于 C * H * W。
 
     :param norm_size: `float` - 归一化大小,应该等于 C * H * W。
     :param epsilon: `float` - 数值稳定性常数,默认为 1e-5。
@@ -768,7 +769,7 @@ LayerNorm1d
     .. math::
         y = \frac{x - \mathrm{E}[x]}{ \sqrt{\mathrm{Var}[x] + \epsilon}} * \gamma + \beta
 
-    均值和标准差是在最后一个维度大小上计算的,其中“norm_size” 是 :attr:`norm_size` 的值。
+    均值和标准差是在最后一个维度大小上计算的,其中“norm_size” 是 ``norm_size`` 的值。
 
     :param norm_size: `float` - 归一化大小,应该等于最后一维大小。
     :param epsilon: `float` - 数值稳定性常数,默认为 1e-5。
@@ -1124,19 +1125,19 @@ MeanSquaredError
 
     均方根误差前向计算函数的所需参数:
 
-    target: :math:`(N, *)`, 目标值, 和输入一样维度的 QTensor 。
+        x: :math:`(N, *)` 输入值,其中 :math:`*` 表示任意维度。
 
-    output: :math:`(N, *)` 输入值,其中 :math:`*` 表示任意维度。
+        y: :math:`(N, *)`, 目标值, 和输入一样维度的 QTensor 。
 
     Example::
 
         from pyvqnet.tensor import QTensor 
         from pyvqnet.nn import MeanSquaredError
-        target = QTensor([[0, 0, 1, 0, 0, 0, 0, 0, 0, 0]], requires_grad=True)
-        output = QTensor([[0.1, 0.05, 0.7, 0, 0.05, 0.1, 0, 0, 0, 0]], requires_grad=True)
+        y = QTensor([[0, 0, 1, 0, 0, 0, 0, 0, 0, 0]], requires_grad=True)
+        x = QTensor([[0.1, 0.05, 0.7, 0, 0.05, 0.1, 0, 0, 0, 0]], requires_grad=True)
 
         loss_result = MeanSquaredError()
-        result = loss_result(target, output)
+        result = loss_result(y, x)
         print(result)
 
         # [0.0115000]
@@ -1165,26 +1166,24 @@ BinaryCrossEntropy
 
     平均二元交叉熵误差前向计算函数的所需参数:
 
-    target: :math:`(N, *)`, 目标值,和输入一样维度的 QTensor 。
+        x: :math:`(N, *)` 输入值,其中 :math:`*` 表示任意维度。
 
-    output: :math:`(N, *)` 输入值,其中 :math:`*` 表示任意维度。
-    
+        y: :math:`(N, *)`, 目标值,和输入一样维度的 QTensor 。
+
     Example::
 
         from pyvqnet.tensor import QTensor
         from pyvqnet.nn import BinaryCrossEntropy
-        output = QTensor([[0.3, 0.7, 0.2], [0.2, 0.3, 0.1]], requires_grad=True)
-        target = QTensor([[0, 1, 0], [0, 0, 1]], requires_grad=True)
+        x = QTensor([[0.3, 0.7, 0.2], [0.2, 0.3, 0.1]], requires_grad=True)
+        y = QTensor([[0, 1, 0], [0, 0, 1]], requires_grad=True)
 
         loss_result = BinaryCrossEntropy()
-        result = loss_result(target, output)
+        result = loss_result(y, x)
         result.backward()
         print(result)
 
         # [0.6364825]
         
-
-
 
 CategoricalCrossEntropy
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -1193,35 +1192,34 @@ CategoricalCrossEntropy
 
     该损失函数将 LogSoftmax 和 NLLLoss 同时计算的平均分类交叉熵。
 
-    损失函数计算方式如下:
+    损失函数计算方式如下,其中 class 为目标值的对应分类标签:
 
     .. math::
-        \text{loss}(x, class) = -\log\left(\frac{\exp(x[class])}{\sum_j \exp(x[j])}\right)
+        \text{loss}(x, y) = -\log\left(\frac{\exp(x[class])}{\sum_j \exp(x[j])}\right)
                        = -x[class] + \log\left(\sum_j \exp(x[j])\right)
     
     :return: 平均分类交叉熵实例。
 
     误差前向计算函数的所需参数:
 
-    target: :math:`(N, *)`, 目标值,和输入一样维度的 QTensor 。
+        x: :math:`(N, *)` 输入值,其中 :math:`*` 表示任意维度。
 
-    output: :math:`(N, *)` 输入值,其中 :math:`*` 表示任意维度。
-    
+        y: :math:`(N, *)`, 目标值,和输入一样维度的 QTensor 。
+
+
     Example::
 
         from pyvqnet.tensor import QTensor
         from pyvqnet.nn import CategoricalCrossEntropy
-        output = QTensor([[1, 2, 3, 4, 5],
+        x = QTensor([[1, 2, 3, 4, 5],
         [1, 2, 3, 4, 5],
         [1, 2, 3, 4, 5]], requires_grad=True)
-        target = QTensor([[0, 1, 0, 0, 0], [0, 1, 0, 0, 0], [1, 0, 0, 0, 0]], requires_grad=True)
+        y = QTensor([[0, 1, 0, 0, 0], [0, 1, 0, 0, 0], [1, 0, 0, 0, 0]], requires_grad=True)
         loss_result = CategoricalCrossEntropy()
-        result = loss_result(target, output)
+        result = loss_result(y, x)
         print(result)
 
         # [3.7852428]
-        
-
 
 SoftmaxCrossEntropy
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -1230,30 +1228,30 @@ SoftmaxCrossEntropy
 
     该损失函数将 LogSoftmax 和 NLLLoss 同时计算的平均分类交叉熵,并具有更高的数值稳定性。
 
-    损失函数计算方式如下:
+    损失函数计算方式如下,其中 class 为目标值的对应分类标签:
 
     .. math::
-        \text{loss}(x, class) = -\log\left(\frac{\exp(x[class])}{\sum_j \exp(x[j])}\right)
+        \text{loss}(x, y) = -\log\left(\frac{\exp(x[class])}{\sum_j \exp(x[j])}\right)
                        = -x[class] + \log\left(\sum_j \exp(x[j])\right)
 
     :return: 一个Softmax交叉熵损失函数实例
 
     误差前向计算函数的所需参数:
 
-    target: :math:`(N, *)`, 目标值,和输入一样维度的 QTensor 。
+        x: :math:`(N, *)` 输入值,其中 :math:`*` 表示任意维度。
 
-    output: :math:`(N, *)` 输入值,其中 :math:`*` 表示任意维度。
-    
+        y: :math:`(N, *)`, 目标值,和输入一样维度的 QTensor 。
+
     Example::
 
         from pyvqnet.tensor import QTensor
         from pyvqnet.nn import SoftmaxCrossEntropy
-        output = QTensor([[1, 2, 3, 4, 5],
+        x = QTensor([[1, 2, 3, 4, 5],
         [1, 2, 3, 4, 5],
         [1, 2, 3, 4, 5]], requires_grad=True)
-        target = QTensor([[0, 1, 0, 0, 0], [0, 1, 0, 0, 0], [1, 0, 0, 0, 0]], requires_grad=True)
+        y = QTensor([[0, 1, 0, 0, 0], [0, 1, 0, 0, 0], [1, 0, 0, 0, 0]], requires_grad=True)
         loss_result = SoftmaxCrossEntropy()
-        result = loss_result(target, output)
+        result = loss_result(y, x)
         result.backward()
         print(result)
 
@@ -1266,36 +1264,40 @@ NLL_Loss
 
     平均负对数似然损失。 对C个类别的分类问题很有用。
 
-    `output` 是模型给出的概率形式的似然量.其尺寸可以是 :math:`(N, C)` or :math:`(N, C, d_1, d_2, ..., d_K)` 。The ``target`` 是损失函数期望的真值，包含 :math:`[0, C-1]` 的类别索引。
+    `x` 是模型给出的概率形式的似然量。其尺寸可以是 :math:`(N, C)` or :math:`(N, C, d_1, d_2, ..., d_K)` 。 `y` 是损失函数期望的真值，包含 :math:`[0, C-1]` 的类别索引。
 
     .. math::
 
-        \ell(output, target) = L = \{l_1,\dots,l_N\}^\top, \quad
+        \ell(x, y) = L = \{l_1,\dots,l_N\}^\top, \quad
         l_n = -  
-            \sum_{n=1}^N \frac{1}{N}output_{n,target_n}, \quad
+            \sum_{n=1}^N \frac{1}{N}x_{n,y_n} \quad
 
-    :param target: :math:`(N, *)`,损失函数期望的真值。
-    :param output: :math:`(N, *)`,损失函数的输出，可以为多维变量。
-    :return: 一个NLL_Loss 实例
+    :return: 一个NLL_Loss损失函数实例
+
+    误差前向计算函数的所需参数:
+
+        x: :math:`(N, *)`,损失函数的输出，可以为多维变量。
+
+        y: :math:`(N, *)`,损失函数期望的真值。
 
     Example::
 
         import numpy as np
         from pyvqnet.nn import NLL_Loss
         from pyvqnet.tensor import QTensor
-        output = QTensor([
+        x = QTensor([
             0.9476322568516703, 0.226547421131723, 0.5944201443911326,
             0.42830868492969476, 0.76414068655387, 0.00286059168094277,
             0.3574236812873617, 0.9096948856639084, 0.4560809854582528,
             0.9818027091583286, 0.8673569904602182, 0.9860275114020933,
             0.9232667066664217, 0.303693313961628, 0.8461034903175555
         ])
-        output.reshape_([1, 3, 1, 5])
-        output.requires_grad = True
-        y_test = np.array([[[2, 1, 0, 0, 2]]])
+        x.reshape_([1, 3, 1, 5])
+        x.requires_grad = True
+        y = np.array([[[2, 1, 0, 0, 2]]])
 
         loss_result = NLL_Loss()
-        result = loss_result(y_test, output)
+        result = loss_result(y, x)
         print(result)
         #[-0.6187226]
 
@@ -1304,36 +1306,40 @@ CrossEntropyLoss
 
 .. py:class:: pyvqnet.nn.CrossEntropyLoss()
 
-    该函数计算LogSoftmax以及NLL_Loss在一起计算的损失。
+    该函数计算LogSoftmax以及NLL_Loss在一起的损失。
 
-    `output` 是包含未做归一化的输出.它的尺寸可以为 :math:`(C)` , :math:`(N, C)` 二维或 :math:`(N, C, d_1, d_2, ..., d_K)` 多维。
+    `x` 是包含未做归一化的输出.它的尺寸可以为 :math:`(C)` , :math:`(N, C)` 二维或 :math:`(N, C, d_1, d_2, ..., d_K)` 多维。
 
-    损失函数的公式如下：
+    损失函数的公式如下,其中 class 为目标值的对应分类标签:
 
     .. math::
-        \text{loss}(x, class) = -\log\left(\frac{\exp(x[class])}{\sum_j \exp(x[j])}\right)
+        \text{loss}(x, y) = -\log\left(\frac{\exp(x[class])}{\sum_j \exp(x[j])}\right)
                        = -x[class] + \log\left(\sum_j \exp(x[j])\right)
 
-    :param target: :math:`(N, *)`,损失函数期望的真值。
-    :param output: :math:`(N, *)`,损失函数的输出，可以为多维变量。
-    :return: CrossEntropyLoss 实例
+    :return: 一个CrossEntropyLoss损失函数实例
+
+    误差前向计算函数的所需参数:
+
+        x: :math:`(N, *)`,损失函数的输出，可以为多维变量。
+
+        y: :math:`(N, *)`,损失函数期望的真值。
 
     Example::
 
         import numpy as np
         from pyvqnet.nn import CrossEntropyLoss
         from pyvqnet.tensor import QTensor
-        output = QTensor([
+        x = QTensor([
             0.9476322568516703, 0.226547421131723, 0.5944201443911326, 0.42830868492969476, 0.76414068655387,
             0.00286059168094277, 0.3574236812873617, 0.9096948856639084, 0.4560809854582528, 0.9818027091583286,
             0.8673569904602182, 0.9860275114020933, 0.9232667066664217, 0.303693313961628, 0.8461034903175555
         ])
-        output.reshape_([1, 3, 1, 5])
-        output.requires_grad = True
-        y_test = np.array([[[2, 1, 0, 0, 2]]])
+        x.reshape_([1, 3, 1, 5])
+        x.requires_grad = True
+        y = np.array([[[2, 1, 0, 0, 2]]])
 
         loss_result = CrossEntropyLoss()
-        result = loss_result(y_test, output)
+        result = loss_result(y, x)
         print(result)
         #[1.1508200]
 

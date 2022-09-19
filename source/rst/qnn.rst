@@ -219,7 +219,7 @@ QuantumLayerMultiProcess
 
 .. py:class:: pyvqnet.qnn.quantumlayer.QuantumLayerMultiProcess(qprog_with_measure,para_num,machine_type_or_cloud_token,num_of_qubits: int,num_of_cbits: int = 1,diff_method:str = "parameter_shift",delta:float = 0.01)
 
-	变分量子层的抽象计算模块.使用多进程技术对量子线路进行加速。
+	变分量子层的抽象计算模块。使用多进程技术对量子线路进行加速。
     
     该层对一个参数化的量子线路进行仿真，得到测量结果。该变分量子层继承了VQNet框架的梯度计算模块，可以计算线路参数的梯度，训练变分量子线路模型或将变分量子线路嵌入混合量子和经典模型。
 
@@ -999,7 +999,7 @@ HardwareEfficientAnsatz
     :param single_rot_gate_list: 单个量子位旋转门列表由一个或多个作用于每个量子位的旋转门构成。目前支持 Rx、Ry、Rz。
     :param qubits: 由 pyqpanda 分配的量子位。
     :param entangle_gate: 非参数化纠缠门。支持CNOT、CZ。默认: CNOT。
-    :param entangle_rules: 电路中如何使用纠缠门。 ``linear`` 意味着纠缠门将作用于每个相邻的量子位。 ``full`` 意味着纠缠门将作用于任何两个 qbuits。 默认值：``linear``。
+    :param entangle_rules: 电路中如何使用纠缠门。 ``linear`` 意味着纠缠门将作用于每个相邻的量子位。 ``all`` 意味着纠缠门将作用于任何两个 qbuits。 默认值：``linear``。
     :param depth: ansatz 的深度，默认：1。
 
     Example::
@@ -1087,13 +1087,13 @@ StronglyEntanglingTemplate
 
     由单个量子比特旋转和纠缠器组成的层,参考 `circuit-centric classifier design <https://arxiv.org/abs/1804.00633>`__ .
 
-    参数 ``weights`` 包含每一层的权重。 因此得出层数:math:`L` 等于 ``weights`` 的第一个维度。
+    参数 ``weights`` 包含每一层的权重。 因此得出层数 :math:`L` 等于 ``weights`` 的第一个维度。
 
-    其包含2-qubit CNOT 门，作用于 :math:`M` 个量子比特上，:math:`i = 1,...,M`。 每个门的第二个量子位由下式给出 :math:`(i+r)\mod M` ，其中 :math:`r` 是一个称为 ``range``  的超参数，并且 :math:`0 < r < M`。
+    其包含2-qubit CNOT 门，作用于 :math:`M` 个量子比特上，:math:`i = 1,...,M`。 每个门的第二个量子位标号由公式 :math:`(i+r)\mod M` 给出，其中 :math:`r` 是一个称为 ``range``  的超参数，并且 :math:`0 < r < M`。
 
     :param weights: 形状为 ``(L, M, 3)`` 的权重张量，默认值：None，使用形状为 ``(1,1,3)`` 的随机张量。
     :param num_qubits: 量子比特数，默认值：1。
-    :param ranges: 确定每个后续层的范围超参数的序列； 默认值：None，使用 :math:`r=l \ mod M` 表示第 :math:`l` 层和 :math:`M` 量子比特。
+    :param ranges: 确定每个后续层的范围超参数的序列； 默认值：None，使用 :math:`r=l \ mod M` 作为ranges 的值。
 
     Example::
 
@@ -1268,7 +1268,7 @@ DensityMatrixFromQstate
 
     计算量子态在一组特定量子比特上的密度矩阵。
 
-    :param state: 一维列表状态向量。 这个列表的大小应该是 ``(2**N,)`` 对于一些整数值 ``N``.qstate 应该从 000 ->111 开始。
+    :param state: 一维列表状态向量。 这个列表的大小应该是 ``(2**N,)`` 对于量子比特个数 ``N`` ,qstate 应该从 000 ->111 开始。
     :param indices: 所考虑子系统中的量子比特索引列表。
     :return: 大小为“(2**len(indices), 2**len(indices))”的密度矩阵。
 
@@ -1291,7 +1291,7 @@ VN_Entropy
     .. math::
         S( \rho ) = -\text{Tr}( \rho \log ( \rho ))
 
-    :param state: 一维列表状态向量。 这个列表的大小应该是 ``(2**N,)`` 对于一些整数值 ``N``.qstate 应该从 000 ->111 开始
+    :param state: 一维列表状态向量。 这个列表的大小应该是 ``(2**N,)`` 对于量子比特个数 ``N`` ,qstate 应该从 000 ->111 开始。
     :param indices: 所考虑子系统中的量子比特索引列表。
     :param base: 对数的底。 如果没有，则使用自然对数。
 
@@ -1323,10 +1323,10 @@ Mutal_Info
 
     每个状态都可以作为计算基础中的状态向量给出。
 
-    :param state: 一维列表状态向量。 这个列表的大小应该是 ``(2**N,)`` 对于一些整数值 ``N``.qstate 应该从 000 ->111 开始
+    :param state: 一维列表状态向量。 这个列表的大小应该是 ``(2**N,)`` 对于量子比特个数 ``N`` , qstate 应该从 000 ->111 开始。
     :param indices0: 第一个子系统中的量子比特索引列表。
     :param indices1: 第二个子系统中的量子比特索引列表。
-    :param base: 对数的底。 如果没有，则使用自然对数。
+    :param base: 对数的底。 如果为None，则使用自然对数，默认为None。
 
     :return: 子系统之间的相互信息
 
