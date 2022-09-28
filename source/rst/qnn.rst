@@ -211,6 +211,102 @@ QuantumLayerV2
         
 
 
+
+QuantumLayerMultiProcess
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+如您更加熟悉pyQPanda语法，可以使用QuantumLayerMultiProcess，自定义量子比特 ``qubits`` ,经典比特 ``cbits`` ,后端模拟器 ``machine`` 加入QuantumLayerMultiProcess的参数 ``qprog_with_measure`` 函数中。
+
+.. py:class:: pyvqnet.qnn.quantumlayer.QuantumLayerMultiProcess(qprog_with_measure,para_num,machine_type_or_cloud_token,num_of_qubits: int,num_of_cbits: int = 1,diff_method:str = "parameter_shift",delta:float = 0.01)
+
+	变分量子层的抽象计算模块。使用多进程技术对量子线路进行加速。
+    
+    该层对一个参数化的量子线路进行仿真，得到测量结果。该变分量子层继承了VQNet框架的梯度计算模块，可以计算线路参数的梯度，训练变分量子线路模型或将变分量子线路嵌入混合量子和经典模型。
+
+    :param qprog_with_measure: 用pyQPand构建的量子线路运行和测量函数。
+    :param para_num: `int` - 参数个数。
+    :param machine_type_or_cloud_token: qpanda量子虚拟机类型或pyQPANDA 量子云令牌 : https://pyqpanda-toturial.readthedocs.io/zh/latest/Realchip.html。
+    :param num_of_qubits: 量子比特数。
+    :param num_of_cbits: 经典比特数，默认为1。
+    :param diff_method: 求解量子线路参数梯度的方法，“参数位移”或“有限差分”，默认参数偏移。
+    :param delta: 有限差分计算梯度时的 \delta。
+    :return: 一个可以计算量子线路的模块。
+
+    .. note::
+        qprog_with_measure是pyQPanda中定义的量子线路函数 :https://pyqpanda-toturial.readthedocs.io/zh/latest/QCircuit.html。
+
+        此函数应包含以下参数，否则无法在QuantumLayerMultiProcess中正常运行。
+
+        与QuantumLayer相比。应该分配量子比特和模拟器: https://pyqpanda-toturial.readthedocs.io/zh/latest/QuantumMachine.html,
+
+        如果qprog_with_measure需要quantum measure，您可能还需要分配cbits: https://pyqpanda-toturial.readthedocs.io/zh/latest/Measure.html
+
+        qprog_with_measure (input,param)
+
+        `input`: 输入一维经典数据。
+
+        `param`: 输入一维量子线路的参数。
+
+
+    Example::
+
+        import pyqpanda as pq
+        from pyvqnet.qnn.measure import ProbsMeasure
+        from pyvqnet.qnn.quantumlayer import QuantumLayerMultiProcess
+        import numpy as np
+        from pyvqnet.tensor import QTensor
+        def pqctest (input,param,nqubits,ncubits):
+            machine = pq.CPUQVM()
+            machine.init_qvm()
+            qubits = machine.qAlloc_many(nqubits)
+            circuit = pq.QCircuit()
+            circuit.insert(pq.H(qubits[0]))
+            circuit.insert(pq.H(qubits[1]))
+            circuit.insert(pq.H(qubits[2]))
+            circuit.insert(pq.H(qubits[3]))
+
+            circuit.insert(pq.RZ(qubits[0],input[0]))
+            circuit.insert(pq.RZ(qubits[1],input[1]))
+            circuit.insert(pq.RZ(qubits[2],input[2]))
+            circuit.insert(pq.RZ(qubits[3],input[3]))
+
+            circuit.insert(pq.CNOT(qubits[0],qubits[1]))
+            circuit.insert(pq.RZ(qubits[1],param[0]))
+            circuit.insert(pq.CNOT(qubits[0],qubits[1]))
+
+            circuit.insert(pq.CNOT(qubits[1],qubits[2]))
+            circuit.insert(pq.RZ(qubits[2],param[1]))
+            circuit.insert(pq.CNOT(qubits[1],qubits[2]))
+
+            circuit.insert(pq.CNOT(qubits[2],qubits[3]))
+            circuit.insert(pq.RZ(qubits[3],param[2]))
+            circuit.insert(pq.CNOT(qubits[2],qubits[3]))
+            #print(circuit)
+
+            prog = pq.QProg()
+            prog.insert(circuit)
+
+            rlt_prob = ProbsMeasure([0,2],prog,machine,qubits)
+            return rlt_prob
+
+
+        pqc = QuantumLayerMultiProcess(pqctest,3,"cpu",4,1)
+        #classic data as input
+        input = QTensor([[1,2,3,4],[4,2,2,3],[3,3,2,2]] )
+        #forward circuits
+        rlt = pqc(input)
+        grad = QTensor(np.ones(rlt.data.shape)*1000)
+        #backward circuits
+        rlt.backward(grad)
+        print(rlt)
+
+        # [
+        # [0.2500000, 0.2500000, 0.2500000, 0.2500000],
+        # [0.2500000, 0.2500000, 0.2500000, 0.2500000],
+        # [0.2500000, 0.2500000, 0.2500000, 0.2500000]
+        # ]
+
+
 NoiseQuantumLayer
 ^^^^^^^^^^^^^^^^^^^
 
@@ -887,6 +983,157 @@ CSWAPcircuit
         #           │
         # q_2:  |0>─X─
 
+常用量子线路
+----------------------------------
+VQNet提供了量子机器学习研究中常用的一些量子线路
+
+
+HardwareEfficientAnsatz
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:class:: pyvqnet.qnn.ansatz.HardwareEfficientAnsatz(n_qubits,single_rot_gate_list,qubits,entangle_gate="CNOT",entangle_rules='linear',depth=1)
+
+    论文介绍的Hardware Efficient Ansatz的实现： `Hardware-efficient Variational Quantum Eigensolver for Small Molecules <https://arxiv.org/pdf/1704.05018.pdf>`__ 。
+
+    :param n_qubits: 量子比特数。
+    :param single_rot_gate_list: 单个量子位旋转门列表由一个或多个作用于每个量子位的旋转门构成。目前支持 Rx、Ry、Rz。
+    :param qubits: 由 pyqpanda 分配的量子位。
+    :param entangle_gate: 非参数化纠缠门。支持CNOT、CZ。默认: CNOT。
+    :param entangle_rules: 电路中如何使用纠缠门。 ``linear`` 意味着纠缠门将作用于每个相邻的量子位。 ``all`` 意味着纠缠门将作用于任何两个 qbuits。 默认值：``linear``。
+    :param depth: ansatz 的深度，默认：1。
+
+    Example::
+
+        import pyqpanda as pq
+        from pyvqnet.tensor import QTensor,tensor
+        from pyvqnet.qnn import HardwareEfficientAnsatz
+        machine = pq.CPUQVM()
+        machine.init_qvm()
+        qlist = machine.qAlloc_many(4)
+        c = HardwareEfficientAnsatz(4, ["rx", "RY", "rz"],
+                                    qlist,
+                                    entangle_gate="cnot",
+                                    entangle_rules="linear",
+                                    depth=1)
+        w = tensor.ones([c.get_para_num()])
+
+        cir = c.create_ansatz(w)
+        print(cir)
+        #           ┌────────────┐ ┌────────────┐ ┌────────────┐        ┌────────────┐ ┌────────────┐ ┌────────────┐
+        # q_0:  |0>─┤RX(1.000000)├ ┤RY(1.000000)├ ┤RZ(1.000000)├ ───■── ┤RX(1.000000)├ ┤RY(1.000000)├ ┤RZ(1.000000)├ ────────────── ────────────── 
+        #           ├────────────┤ ├────────────┤ ├────────────┤ ┌──┴─┐ └────────────┘ ├────────────┤ ├────────────┤ ┌────────────┐
+        # q_1:  |0>─┤RX(1.000000)├ ┤RY(1.000000)├ ┤RZ(1.000000)├ ┤CNOT├ ───■────────── ┤RX(1.000000)├ ┤RY(1.000000)├ ┤RZ(1.000000)├ ──────────────     
+        #           ├────────────┤ ├────────────┤ ├────────────┤ └────┘ ┌──┴─┐         └────────────┘ ├────────────┤ ├────────────┤ ┌────────────┐     
+        # q_2:  |0>─┤RX(1.000000)├ ┤RY(1.000000)├ ┤RZ(1.000000)├ ────── ┤CNOT├──────── ───■────────── ┤RX(1.000000)├ ┤RY(1.000000)├ ┤RZ(1.000000)├     
+        #           ├────────────┤ ├────────────┤ ├────────────┤        └────┘         ┌──┴─┐         ├────────────┤ ├────────────┤ ├────────────┤     
+        # q_3:  |0>─┤RX(1.000000)├ ┤RY(1.000000)├ ┤RZ(1.000000)├ ────── ────────────── ┤CNOT├──────── ┤RX(1.000000)├ ┤RY(1.000000)├ ┤RZ(1.000000)├     
+        #           └────────────┘ └────────────┘ └────────────┘                       └────┘         └────────────┘ └────────────┘ └────────────┘     
+
+BasicEntanglerTemplate
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:class:: pyvqnet.qnn.template.BasicEntanglerTemplate(weights=None, num_qubits=1, rotation=pyqpanda.RX)
+
+    由每个量子位上的单参数单量子位旋转组成的层，后跟一个闭合链或环组合的多个CNOT 门。
+
+    CNOT 门环将每个量子位与其邻居连接起来，最后一个量子位被认为是第一个量子位的邻居。
+
+    层数 :math:`L` 由参数 ``weights`` 的第一个维度决定。
+
+    :param weights: 形状的权重张量 `(L, len(qubits))`。 每个权重都用作量子含参门中的参数。默认值为： ``None`` ，则使用 `(1,1)` 正态分布随机数作为权重。
+    :param num_qubits: 量子比特数,默认为1。
+    :param rotation: 使用单参数单量子比特门，``pyqpanda.RX`` 被用作默认值。
+
+    Example::
+
+        import pyqpanda as pq
+        import numpy as np
+        from pyvqnet.qnn.template import BasicEntanglerTemplate
+        np.random.seed(42)
+        num_qubits = 5
+        shape = [1, num_qubits]
+        weights = np.random.random(size=shape)
+
+        machine = pq.CPUQVM()
+        machine.init_qvm()
+        qubits = machine.qAlloc_many(num_qubits)
+
+        circuit = BasicEntanglerTemplate(weights=weights, num_qubits=num_qubits, rotation=pq.RZ)
+        result = circuit.create_circuit(qubits)
+        circuit.print_circuit(qubits)
+
+        prob = machine.prob_run_dict(result, qubits[0], -1)
+        prob = list(prob.values())
+        print(prob)
+        #           ┌────────────┐                             ┌────┐
+        # q_0:  |0>─┤RZ(0.374540)├ ───■── ────── ────── ────── ┤CNOT├
+        #           ├────────────┤ ┌──┴─┐                      └──┬─┘
+        # q_1:  |0>─┤RZ(0.950714)├ ┤CNOT├ ───■── ────── ────── ───┼──
+        #           ├────────────┤ └────┘ ┌──┴─┐                  │
+        # q_2:  |0>─┤RZ(0.731994)├ ────── ┤CNOT├ ───■── ────── ───┼──
+        #           ├────────────┤        └────┘ ┌──┴─┐           │
+        # q_3:  |0>─┤RZ(0.598658)├ ────── ────── ┤CNOT├ ───■── ───┼──
+        #           ├────────────┤               └────┘ ┌──┴─┐    │
+        # q_4:  |0>─┤RZ(0.156019)├ ────── ────── ────── ┤CNOT├ ───■──
+        #           └────────────┘                      └────┘
+
+        # [1.0, 0.0]
+
+
+StronglyEntanglingTemplate
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:class:: pyvqnet.qnn.template.StronglyEntanglingTemplate(weights=None, num_qubits=1, ranges=None)
+
+    由单个量子比特旋转和纠缠器组成的层,参考 `circuit-centric classifier design <https://arxiv.org/abs/1804.00633>`__ .
+
+    参数 ``weights`` 包含每一层的权重。 因此得出层数 :math:`L` 等于 ``weights`` 的第一个维度。
+
+    其包含2-qubit CNOT 门，作用于 :math:`M` 个量子比特上，:math:`i = 1,...,M`。 每个门的第二个量子位标号由公式 :math:`(i+r)\mod M` 给出，其中 :math:`r` 是一个称为 ``range``  的超参数，并且 :math:`0 < r < M`。
+
+    :param weights: 形状为 ``(L, M, 3)`` 的权重张量，默认值：None，使用形状为 ``(1,1,3)`` 的随机张量。
+    :param num_qubits: 量子比特数，默认值：1。
+    :param ranges: 确定每个后续层的范围超参数的序列； 默认值：None，使用 :math:`r=l \ mod M` 作为ranges 的值。
+
+    Example::
+
+        import pyqpanda as pq
+        import numpy as np
+        from pyvqnet.qnn.template import StronglyEntanglingTemplate
+        np.random.seed(42)
+        num_qubits = 3
+        shape = [2, num_qubits, 3]
+        weights = np.random.random(size=shape)
+
+        machine = pq.CPUQVM()  # outside
+        machine.init_qvm()  # outside
+        qubits = machine.qAlloc_many(num_qubits)
+
+        circuit = StronglyEntanglingTemplate(weights, num_qubits=num_qubits)
+        result = circuit.create_circuit(qubits)
+        circuit.print_circuit(qubits)
+
+        prob = machine.prob_run_dict(result, qubits[0], -1)
+        prob = list(prob.values())
+        print(prob)
+        #           ┌────────────┐ ┌────────────┐ ┌────────────┐               ┌────┐             ┌────────────┐ >
+        # q_0:  |0>─┤RZ(0.374540)├ ┤RY(0.950714)├ ┤RZ(0.731994)├ ───■── ────── ┤CNOT├──────────── ┤RZ(0.708073)├ >
+        #           ├────────────┤ ├────────────┤ ├────────────┤ ┌──┴─┐        └──┬┬┴───────────┐ ├────────────┤ >
+        # q_1:  |0>─┤RZ(0.598658)├ ┤RY(0.156019)├ ┤RZ(0.155995)├ ┤CNOT├ ───■── ───┼┤RZ(0.832443)├ ┤RY(0.212339)├ >
+        #           ├────────────┤ ├────────────┤ ├────────────┤ └────┘ ┌──┴─┐    │└────────────┘ ├────────────┤ >
+        # q_2:  |0>─┤RZ(0.058084)├ ┤RY(0.866176)├ ┤RZ(0.601115)├ ────── ┤CNOT├ ───■────────────── ┤RZ(0.183405)├ >
+        #           └────────────┘ └────────────┘ └────────────┘        └────┘                    └────────────┘ >
+        #
+        #          ┌────────────┐ ┌────────────┐        ┌────┐
+        # q_0:  |0>┤RY(0.020584)├ ┤RZ(0.969910)├ ───■── ┤CNOT├ ──────
+        #          ├────────────┤ └────────────┘    │   └──┬─┘ ┌────┐
+        # q_1:  |0>┤RZ(0.181825)├ ────────────── ───┼── ───■── ┤CNOT├
+        #          ├────────────┤ ┌────────────┐ ┌──┴─┐        └──┬─┘
+        # q_2:  |0>┤RY(0.304242)├ ┤RZ(0.524756)├ ┤CNOT├ ────── ───■──
+        #          └────────────┘ └────────────┘ └────┘
+        #[0.6881335561525671, 0.31186644384743273]
+
+
 对量子线路进行测量
 ----------------------------------
 
@@ -1015,6 +1262,354 @@ ProbsMeasure
         print(rlt_prob)
         #[0.2499999999999947, 0.2499999999999947, 0.2499999999999947, 0.2499999999999947]
 
+DensityMatrixFromQstate
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. py:function:: pyvqnet.qnn.measure.DensityMatrixFromQstate(state, indices)
+
+    计算量子态在一组特定量子比特上的密度矩阵。
+
+    :param state: 一维列表状态向量。 这个列表的大小应该是 ``(2**N,)`` 对于量子比特个数 ``N`` ,qstate 应该从 000 ->111 开始。
+    :param indices: 所考虑子系统中的量子比特索引列表。
+    :return: 大小为“(2**len(indices), 2**len(indices))”的密度矩阵。
+
+    Example::
+        
+        from pyvqnet.qnn.measure import DensityMatrixFromQstate
+        qstate = [(0.9306699299765968+0j), (0.18865613455240968+0j), (0.1886561345524097+0j), (0.03824249173404786+0j), -0.048171819846746615j, -0.00976491131165138j, -0.23763904794287155j, -0.048171819846746615j]
+        print(DensityMatrixFromQstate(qstate,[0,1]))
+        # [[0.86846704+0.j 0.1870241 +0.j 0.17604699+0.j 0.03791166+0.j]
+        #  [0.1870241 +0.j 0.09206345+0.j 0.03791166+0.j 0.01866219+0.j]
+        #  [0.17604699+0.j 0.03791166+0.j 0.03568649+0.j 0.00768507+0.j]
+        #  [0.03791166+0.j 0.01866219+0.j 0.00768507+0.j 0.00378301+0.j]]
+
+VN_Entropy
+^^^^^^^^^^^^^^^
+.. py:function:: pyvqnet.qnn.measure.VN_Entropy(state, indices, base=None)
+
+    根据给定 qubits 列表上的状态向量计算Von Neumann熵 。
+
+    .. math::
+        S( \rho ) = -\text{Tr}( \rho \log ( \rho ))
+
+    :param state: 一维列表状态向量。 这个列表的大小应该是 ``(2**N,)`` 对于量子比特个数 ``N`` ,qstate 应该从 000 ->111 开始。
+    :param indices: 所考虑子系统中的量子比特索引列表。
+    :param base: 对数的底。 如果没有，则使用自然对数。
+
+    :return: 冯诺依曼熵的浮点值.
+
+    Example::
+
+        from pyvqnet.qnn.measure import VN_Entropy
+        qstate = [(0.9022961387408862 + 0j), -0.06676534788028633j,
+                (0.18290448232350312 + 0j), -0.3293638014158896j,
+                (0.03707657410649268 + 0j), -0.06676534788028635j,
+                (0.18290448232350312 + 0j), -0.013534006039561714j]
+        print(VN_Entropy(qstate, [0, 1]))
+        #0.14592917648464448
+
+Mutal_Info
+^^^^^^^^^^^^^^^
+.. py:function:: pyvqnet.qnn.measure.Mutal_Info(state, indices0, indices1, base=None)
+
+    根据给定两个子 qubits 列表上的状态向量计算互信息 。
+
+    .. math::
+
+        I(A, B) = S(\rho^A) + S(\rho^B) - S(\rho^{AB})
+
+    其中 :math:`S` 是冯诺依曼熵。
+
+    互信息是衡量两个子系统之间相关性的指标。更具体地说，它量化了一个系统通过测量另一个系统获得的信息量。
+
+    每个状态都可以作为计算基础中的状态向量给出。
+
+    :param state: 一维列表状态向量。 这个列表的大小应该是 ``(2**N,)`` 对于量子比特个数 ``N`` , qstate 应该从 000 ->111 开始。
+    :param indices0: 第一个子系统中的量子比特索引列表。
+    :param indices1: 第二个子系统中的量子比特索引列表。
+    :param base: 对数的底。 如果为None，则使用自然对数，默认为None。
+
+    :return: 子系统之间的相互信息
+
+    Example::
+
+        from pyvqnet.qnn.measure import Mutal_Info
+        qstate = [(0.9022961387408862 + 0j), -0.06676534788028633j,
+                (0.18290448232350312 + 0j), -0.3293638014158896j,
+                (0.03707657410649268 + 0j), -0.06676534788028635j,
+                (0.18290448232350312 + 0j), -0.013534006039561714j]
+        print(Mutal_Info(qstate, [0], [2], 2))
+        #0.13763425302805887
 
 
+量子机器学习算法接口
+----------------------------------
+
+量子感知机
+^^^^^^^^^^^^^^^^
+
+人工神经网络是机器学习算法和人工智能的一种经典方法。从历史上看，人工神经元的最简单实现可以追溯到经典Rosenblatt 的“感知器”，但其长期实际应用可能会受到计算复杂度快速扩展的阻碍，尤其是与多层感知器的训练相关网络。这里我们参照论文 `An Artificial Neuron Implemented on an Actual Quantum Processor <https://arxiv.org/abs/1811.02266>`__ 一种基于量子信息的算法实现量子计算机版本的感知器，在编码资源方面显示出相比经典模型指数优势。
+
+对于该量子感知机，处理的数据是 0 1 二进制比特字符串。其目标是想识别形如下图 :math:`w` 十字形状的模式。
+
+.. image:: ./images/QP-data.PNG
+   :width: 600 px
+   :align: center
+
+|
+
+使用二进制比特字符串对其进行编码，其中黑为0，白为1，可知 :math:`w` 编码为（1，1，1，1，1，1，0，1，1，0，0，0，1，1，0，1）。共16位的字符串正好可以编码进4bit的量子态的振幅的符号上，符号为负数编码为0，符号为正数编码为1。通过以上编码方式，我们算法输入input转化为16位的二进制串。这样的不重复的二进制串可以分别对应特定的输入线路 :math:`U_i` 。
+ 
+该论文提出的量子感知机线路结构如下：
+
+.. image:: ./images/QP-cir.PNG
+   :width: 600 px
+   :align: center
+
+|
+
+在比特0~3上构建编码线路 :math:`U_i` ，包含多受控的 :math:`CZ` 门， :math:`CNOT` 门， :math:`H` 门；在 :math:`U_i` 后面紧接着构建权重变换线路 :math:`U_w` ，同样由受控门以及 :math:`H` 门构成。使用 :math:`U_i` 可以进行酉矩阵变化，将数据编码到量子态上：
+
+.. math::
+    U_i|0\rangle^{\otimes N}=\left|\psi_i\right\rangle
+
+使用酉矩阵变换 :math:`U_w` 来计算输入和权重之间的内积：
+
+.. math::
+    U_w\left|\psi_i\right\rangle=\sum_{j=0}^{m-1} c_j|j\rangle \equiv\left|\phi_{i, w}\right\rangle
+
+使用一个目标比特在辅助比特上的多受控 :math:`NOT` 门，并使用一些后续的 :math:`H` 门， :math:`X` 门，:math:`CX` 门作为激活函数可以获取 :math:`U_i` 和 :math:`U_w` 的归一化激活概率值：
+
+.. math::
+    \left|\phi_{i, w}\right\rangle|0\rangle_a \rightarrow \sum_{j=0}^{m-2} c_j|j\rangle|0\rangle_a+c_{m-1}|m-1\rangle|1\rangle_a
+
+当输入 :math:`i` 的2进制串和 :math:`w` 完全一致时，该归一化概率值应为最大。
+
+VQNet提供了 ``QuantumNeuron`` 模块实现该算法。首先初始化一个量子感知机 ``QuantumNeuron``。
+
+.. code-block::
+
+    perceptron = QuantumNeuron()
+
+使用 ``gen_4bitstring_data`` 接口生成论文中的各种数据以及其类别标签。
+
+.. code-block::
+
+    training_label, test_label = perceptron.gen_4bitstring_data()
+
+使用 ``train`` 接口遍历所有数据，可以获取最后训练好的量子感知器线路Uw。
+
+.. code-block::
+
+    trained_para = perceptron.train(training_label, test_label)
+
+.. image:: ./images/QP-pic.PNG
+   :width: 600 px
+   :align: center
+
+|
+
+在测试数据上，可以获取测试数据上的准确率结果
+
+.. image:: ./images/QP-acc.PNG
+   :width: 600 px
+   :align: center
+
+|
+
+
+
+QGAN制备任意分布初态
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+基于2019年 Christa Zoufal 的论文 `Quantum Generative Adversarial Networks for learning and loading random distributions <https://www.nature.com/articles/s41534-019-0223-2>`_ , VQNet提供了一个QGAN制备任意分布初态的例子。该算法使用纯量子变分线路制备特定随机分布的生成量子态，可以减少原先生成特定量子态所需的逻辑门，降低量子线路复杂度。
+QGAN使用经典的GAN模型结构，分为Generator生成器与Discriminator鉴别器两个子模型，Generator为量子线路产生特定分布，而Generator生成的分布generated data samples 以及真实的随机分布training data samples 输入Discriminator模型进行鉴别真伪。
+
+.. image:: ./images/qgan-arch.PNG
+   :width: 600 px
+   :align: center
+
+|
+
+
+构建VQNet的量子生成对抗网络接口 ``QGANAPI`` 类，我们可以对真实分布的数据 real_data 使用量子生成器进行初态制备。这里使用量子比特数为3，量子生成器内部含参线路模块重复次数为1。
+使用的评价指标为KL散度。
+
+.. code-block::
+
+    import pickle
+    import os
+    import pyqpanda as pq
+    from pyvqnet.qnn.qgan.qgan_utils import QGANAPI
+    import numpy as np
+
+
+    ##################################
+    num_of_qubits = 3  # paper config
+    rep = 1
+
+    number_of_data = 10000
+    # Load data samples from different distributions
+    mu = 1
+    sigma = 1
+    real_data = np.random.lognormal(mean=mu, sigma=sigma, size=number_of_data)
+
+
+    # intial
+    save_dir = None
+    qgan_model = QGANAPI(
+        real_data,
+        # numpy generated data distribution, 1 - dim.
+        num_of_qubits,
+        batch_size=2000,
+        num_epochs=2000,
+        q_g_cir=None,
+        bounds = [0.0,2**num_of_qubits -1],
+        reps=rep,
+        metric="kl",
+        tol_rel_ent=0.01,
+        if_save_param_dir=save_dir  
+    )
+
+接下来使用其训练接口 ``train`` 训练。
+
+.. code-block::
+
+    # train
+    qgan_model.train()  # train qgan
+
+``eval`` 画出其与真实分布之间的概率分布函数对比:
+
+.. code-block::
+
+    # show probability distribution function of generated distribution and real distribution
+    qgan_model.eval(real_data)  #draw pdf
+
+
+``get_trained_quantum_parameters`` 获取训练参数并输出为一个numpy数组形式。如果 ``save_dir`` 不为空，则该类将保存参数到文件中。可以通过 ``load_param_and_eval`` 函数载入参数，并可以通过
+``get_circuits_with_trained_param`` 获取训练完参数的量子生成器pyQPanda线路。
+
+.. code-block::
+
+    # get trained quantum parameters
+    param = qgan_model.get_trained_quantum_parameters()
+    print(f" trained param {param}")
+
+    #load saved parameters files 
+    if save_dir is not None:
+        path = os.path.join(
+            save_dir, qgan_model._start_time + "trained_qgan_param.pickle")
+        with open(path, "rb") as file:
+            t3 = pickle.load(file)
+        param = t3["quantum_parameters"]
+        print(f" trained param {param}")
+
+    #show probability distribution function of generated distribution and real distribution
+    qgan_model.load_param_and_eval(param)
+
+    #calculate metric
+    print(qgan_model.eval_metric(param, "kl"))
+
+    #get generator quantum circuit
+    m_machine = pq.CPUQVM()
+    m_machine.init_qvm()
+    qubits = m_machine.qAlloc_many(num_of_qubits)
+    qpanda_cir = qgan_model.get_circuits_with_trained_param(qubits)
+    print(qpanda_cir)
+
+生成lognormal分布的损失函数以及概率分布函数图，一般来说需要使用不同的随机种子多次训练该模型可得到较好结果:
+
+.. image:: ./images/qgan-loss.PNG
+   :width: 600 px
+   :align: center
+
+|
+
+.. image:: ./images/qgan-pdf.PNG
+   :width: 600 px
+   :align: center
+
+|
+
+量子核SVM算法
+^^^^^^^^^^^^^^^^^^^
+
+在机器学习任务中，数据通常不能被原始空间中的超平面分隔。寻找此类超平面的一种常见技术是对数据应用非线性变换函数。
+此函数称为特征映射，通过特征映射，我们可以在这个新的特征空间中计算数据点之间的距离有多近，从而进行机器学习的分类任务。
+
+本例参照 `Supervised learning with quantum enhanced feature spaces <https://arxiv.org/pdf/1804.11326.pdf>`_ 论文的第一个方法构建变分线路进行数据分类任务。
+``gen_vqc_qsvm_data`` 为生成该例子所需的数据。 ``vqc_qsvm`` 为变分量子线路类，用来对输入数据进行分类。
+``vqc_qsvm.plot()`` 函数可视化了数据的分布情况。
+
+.. image:: ./images/VQC-SVM.PNG
+   :width: 600 px
+   :align: center
+
+|
+
+    .. code-block::
+
+        """
+        VQC QSVM
+        """
+        from pyvqnet.qnn.svm import vqc_qsvm, gen_vqc_qsvm_data
+        import matplotlib.pyplot as plt
+        import numpy as np
+
+        batch_size = 40
+        maxiter = 40
+        training_size = 20
+        test_size = 10
+        gap = 0.3
+        #线路模块重复次数
+        rep = 3
+
+        #定义接口类
+        VQC_QSVM = vqc_qsvm(batch_size, maxiter, rep)
+        #随机生成数据
+        train_features, test_features, train_labels, test_labels, samples = \
+            gen_vqc_qsvm_data(training_size=training_size, test_size=test_size, gap=gap)
+        VQC_QSVM.plot(train_features, test_features, train_labels, test_labels, samples)
+        #训练
+        VQC_QSVM.train(train_features, train_labels)
+        #测试数据测试
+        rlt, acc_1 = VQC_QSVM.predict(test_features, test_labels)
+        print(f"testing_accuracy {acc_1}")
+
+
+
+除了上述直接用变分量子线路将经典数据特征映射到量子特征空间，在论文 `Supervised learning with quantum enhanced feature spaces <https://arxiv.org/pdf/1804.11326.pdf>`_
+中还介绍了使用量子线路直接估计核函数，并使用经典支持向量机进行分类的方法。类比经典SVM中的各种核函数 :math:`K(i,j)` , 使用量子核函数定义经典数据在量子特征空间 :math:`\phi(\mathbf{x}_i)` 的内积 :
+
+.. math:: 
+    |\langle \phi(\mathbf{x}_j) | \phi(\mathbf{x}_i) \rangle |^2 =  |\langle 0 | U^\dagger(\mathbf{x}_j) U(\mathbf{x}_i) | 0 \rangle |^2
+
+使用VQNet和pyQPanda,我们定义一个 ``QuantumKernel_VQNet`` 产生量子核函数，并使用 ``sklearn`` 的 ``SVC`` 进行分类:
+
+.. image:: ./images/qsvm-kernel.png
+   :width: 600 px
+   :align: center
+
+|
+
+.. code-block::
+
+    import numpy as np
+    import pyqpanda as pq
+    from sklearn.svm import SVC
+    from pyqpanda import *
+    from pyqpanda.Visualization.circuit_draw import *
+    from pyvqnet.qnn.svm import QuantumKernel_VQNet, gen_vqc_qsvm_data
+    import matplotlib
+    try:
+        matplotlib.use('TkAgg')
+    except:
+        pass
+    import matplotlib.pyplot as plt
+
+    train_features, test_features,train_labels, test_labels, samples = gen_vqc_qsvm_data(20,5,0.3)
+    quantum_kernel = QuantumKernel_VQNet(n_qbits=2)
+    quantum_svc = SVC(kernel=quantum_kernel.evaluate)
+    quantum_svc.fit(train_features, train_labels)
+    score = quantum_svc.score(test_features, test_labels)
+    print(f"quantum kernel classification test score: {score}")
 

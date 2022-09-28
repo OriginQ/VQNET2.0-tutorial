@@ -202,19 +202,20 @@ load_parameters
 Conv1D
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:class:: pyvqnet.nn.Conv1D(input_channels:int,output_channels:int,kernel_size:int ,stride:int= 1,padding:str="valid",use_bias:bool = True,kernel_initializer = None,bias_initializer =None)
+.. py:class:: pyvqnet.nn.Conv1D(input_channels:int,output_channels:int,kernel_size:int ,stride:int= 1,padding = "valid",use_bias:bool = True,kernel_initializer = None,bias_initializer =None, dilation_rate: int = 1, group: int = 1)
 
     在输入上进行一维卷积运算。 Conv1D模块的输入具有形状(batch_size、input_channels、in_height)。
 
     :param input_channels: `int` - 输入数据的通道数。
     :param output_channels: `int` - 输出数据的通道数。
-    :param kernel_size: `int` - 卷积核的尺寸. 卷积核形状 = [input_channels,output_channels,kernel_size,1]。
+    :param kernel_size: `int` - 卷积核的尺寸. 卷积核形状 = [output_channels,input_channels/group,kernel_size,1]。
     :param stride: `int` - 步长, 默认为1。
-    :param padding: `str` - 填充选项, "valid" or "same"。 默认 "valid"。
+    :param padding: `str|int` - 填充选项, 它可以是一个字符串 {'valid', 'same'} 或一个整数，给出应用在输入上的填充量。 默认 "valid"。
     :param use_bias: `bool` - 是否使用偏置项, 默认使用。
     :param kernel_initializer: `callable` - 卷积核初始化方法。默认为空,使用kaiming_uniform。
     :param bias_initializer: `callable` - 偏置初始化方法。默认为空,使用kaiming_uniform。
-
+    :param dilation_rate: `int` - 空洞大小,defaults: 1。
+    :param group: `int` -  分组卷积的分组数. Default: 1。
     :return: 一维卷积实例。
 
     .. note::
@@ -222,7 +223,6 @@ Conv1D
 
         ``padding='same'`` 补零填充输入,输出的out_height 为 = ceil(in_height / stride)。
 
-    
     Example::
 
         import numpy as np
@@ -247,19 +247,20 @@ Conv1D
 Conv2D
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:class:: pyvqnet.nn.Conv2D(input_channels:int,output_channels:int,kernel_size:tuple,stride:tuple=(1, 1),padding="valid",use_bias = True,kernel_initializer=None,bias_initializer=None)
+.. py:class:: pyvqnet.nn.Conv2D(input_channels:int,output_channels:int,kernel_size:tuple,stride:tuple=(1, 1),padding="valid",use_bias = True,kernel_initializer=None,bias_initializer=None, dilation_rate: int = 1, group: int = 1)
 
     在输入上进行二维卷积运算。 Conv2D模块的输入具有形状(batch_size, input_channels, height, width)。
 
     :param input_channels: `int` - 输入数据的通道数。
     :param output_channels: `int` - 输出数据的通道数。
-    :param kernel_size: `tuple|list` - 卷积核的尺寸. 卷积核形状 = [input_channels,output_channels,kernel_size,kernel_size]。
+    :param kernel_size: `tuple|list` - 卷积核的尺寸. 卷积核形状 = [output_channels,input_channels/group,kernel_size,kernel_size]。
     :param stride: `tuple|list` - 步长, 默认为 (1, 1)|[1,1]。
-    :param padding: `str` - 填充选项, "valid" or "same"。 默认 "valid"。
+    :param padding: `str|tuple` - 填充选项, 它可以是一个字符串 {'valid', 'same'} 或一个整数元组，给出在两边应用的隐式填充量。 默认 "valid"。
     :param use_bias: `bool` - 是否使用偏置项, 默认使用。
     :param kernel_initializer: `callable` - 卷积核初始化方法。默认为空,使用kaiming_uniform。
     :param bias_initializer: `callable` - 偏置初始化方法。默认为空,使用kaiming_uniform。
-
+    :param dilation_rate: `int` - 空洞大小,defaults: 1。
+    :param group: `int` -  分组卷积的分组数. Default: 1。
     :return: 二维卷积实例。
 
     .. note::
@@ -299,26 +300,26 @@ Conv2D
 ConvT2D
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:class:: pyvqnet.nn.ConvT2D(input_channels,output_channels,kernel_size,stride=[1, 1],padding="valid",use_bias="True", kernel_initializer=None,bias_initializer=None)
+.. py:class:: pyvqnet.nn.ConvT2D(input_channels,output_channels,kernel_size,stride=[1, 1],padding="valid",use_bias="True", kernel_initializer=None,bias_initializer=None, dilation_rate: int = 1, group: int = 1)
 
     在输入上进行二维转置卷积运算。 Conv2D模块的输入具有形状(batch_size, input_channels, height, width)。
 
     :param input_channels: `int` - 输入数据的通道数。
     :param output_channels: `int` - 输出数据的通道数。
-    :param kernel_size: `tuple|list` - 卷积核的尺寸,卷积核形状 = [input_channels,output_channels,kernel_size,kernel_size]。 
+    :param kernel_size: `tuple|list` - 卷积核的尺寸,卷积核形状 = [input_channels,output_channels/group,kernel_size,kernel_size]。 
     :param stride: `tuple|list` - 步长, 默认为 (1, 1)|[1,1]。
-    :param padding:  填充选项, "valid" or "same"。 默认 "valid"。
+    :param padding: `str|tuple` - 填充选项, 它可以是一个字符串 {'valid', 'same'} 或一个整数元组，给出在两边应用的隐式填充量。 默认 "valid"。
     :param use_bias: `bool` - 是否使用偏置项, 默认使用。
     :param kernel_initializer: `callable` - 卷积核初始化方法。默认为空,使用kaiming_uniform。
     :param bias_initializer: `callable` - 偏置项初始化方法。默认为空,使用kaiming_uniform。
-
+    :param dilation_rate: `int` - 空洞大小,defaults: 1。
+    :param group: `int` -  分组卷积的分组数. Default: 1。
     :return: 二维转置卷积实例。
     
     .. note::
         ``padding='valid'`` 不进行填充。
 
         ``padding='same'`` 补零填充输入,输出的height 为 = ceil(height / stride)。
-
 
     Example::
 
@@ -667,11 +668,50 @@ BatchNorm1d
         # [1.3416405, 1.3416405, 1.3416405, 1.3416405]
         # ]
 
+LayerNormNd
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:class:: pyvqnet.nn.layer_norm.LayerNormNd(normalized_shape: list, epsilon: float = 1e-5, affine: bool = True, name="")
+
+    在任意输入的后D个维度上进行层归一化。具体方式如论文所述:
+    `Layer Normalization <https://arxiv.org/abs/1607.06450>`__。
+
+    .. math::
+        y = \frac{x - \mathrm{E}[x]}{ \sqrt{\mathrm{Var}[x] + \epsilon}} * \gamma + \beta
+
+    对于像 (B,C,H,W,D) 这样的输入， ``norm_shape`` 可以是 [C,H,W,D],[H,W,D],[W,D] 或 [D] .
+
+    :param norm_shape: `float` - 标准化形状。
+    :param epsilon: `float` - 数值稳定性常数，默认为 1e-5。
+    :param affine: `bool` - 是否使用应用仿射变换，默认为 True。
+    :param name: 这个模块的名字， 默认为""。
+    :return: 一个 LayerNormNd 类
+
+    Example::
+
+        import numpy as np
+        from pyvqnet.tensor import QTensor
+        from pyvqnet.nn.layer_norm import LayerNormNd
+        ic = 4
+        test_conv = LayerNormNd([2,2])
+        x = QTensor(np.arange(1,17).reshape([2,2,2,2]),requires_grad=True)
+        y = test_conv.forward(x)
+        print(y)
+        # [
+        # [[[-1.3416355, -0.4472118],
+        #  [0.4472118, 1.3416355]],
+        # [[-1.3416355, -0.4472118],
+        #  [0.4472118, 1.3416355]]],
+        # [[[-1.3416355, -0.4472118],
+        #  [0.4472118, 1.3416355]],
+        # [[-1.3416355, -0.4472118],
+        #  [0.4472118, 1.3416355]]]
+        # ]
 
 LayerNorm2d
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:class:: pyvqnet.nn.layer_norm.LayerNorm2d(norm_size:int, epsilon:float = 1e-5, name="")
+.. py:class:: pyvqnet.nn.layer_norm.LayerNorm2d(norm_size:int, epsilon:float = 1e-5,  affine: bool = True, name="")
 
     在 4D 输入上进行层归一化。具体方式如论文所述:
     `Layer Normalization <https://arxiv.org/abs/1607.06450>`__。
@@ -679,11 +719,12 @@ LayerNorm2d
     .. math::
         y = \frac{x - \mathrm{E}[x]}{ \sqrt{\mathrm{Var}[x] + \epsilon}} * \gamma + \beta
 
-    平均值和标准差是在除去第一个维度以外的剩余维度数据上计算的。对于像 (B,C,H,W) 这样的输入,:attr:`norm_size` 应该等于 C * H * W。
+    平均值和标准差是在除去第一个维度以外的剩余维度数据上计算的。对于像 (B,C,H,W) 这样的输入, ``norm_size`` 应该等于 C * H * W。
 
     :param norm_size: `float` - 归一化大小,应该等于 C * H * W。
     :param epsilon: `float` - 数值稳定性常数,默认为 1e-5。
-    :param name: 层归一化层命名,默认为""。
+    :param affine: `bool` - 是否使用应用仿射变换，默认为 True。
+    :param name: 这个模块的名字， 默认为""。
     :return: 二维层归一化实例。
 
     Example::
@@ -720,7 +761,7 @@ LayerNorm2d
 LayerNorm1d
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:class:: pyvqnet.nn.layer_norm.LayerNorm1d(norm_size:int, epsilon:float = 1e-5, name="")
+.. py:class:: pyvqnet.nn.layer_norm.LayerNorm1d(norm_size:int, epsilon:float = 1e-5, affine: bool = True, name="")
     
     在 2D 输入上进行层归一化。具体方式如论文所述:
     `Layer Normalization <https://arxiv.org/abs/1607.06450>`__。
@@ -728,11 +769,12 @@ LayerNorm1d
     .. math::
         y = \frac{x - \mathrm{E}[x]}{ \sqrt{\mathrm{Var}[x] + \epsilon}} * \gamma + \beta
 
-    均值和标准差是在最后一个维度大小上计算的,其中“norm_size” 是 :attr:`norm_size` 的值。
+    均值和标准差是在最后一个维度大小上计算的,其中“norm_size” 是 ``norm_size`` 的值。
 
     :param norm_size: `float` - 归一化大小,应该等于最后一维大小。
     :param epsilon: `float` - 数值稳定性常数,默认为 1e-5。
-    :param name: 层归一化层命名,默认为""。
+    :param affine: `bool` - 是否使用应用仿射变换，默认为 True。
+    :param name: 这个模块的名字， 默认为""。
 
     :return: 一维层归一化实例。
 
@@ -919,6 +961,7 @@ RNN
     :param input_size: 输入特征维度。
     :param hidden_size:  隐藏特征维度。
     :param num_layers: 堆叠RNN层数， 默认: 1。
+    :param nonlinearity: 非线性激活函数，默认为 ``'tanh'``。
     :param batch_first: 如果为 True， 则输入形状为 [batch_size,seq_len,feature_dim]，
      如果为 False， 则输入形状为 [seq_len,batch_size,feature_dim]，默认为 True。
     :param use_bias: 如果为 False， 该模块不适用偏置项，默认: True。
@@ -1082,19 +1125,19 @@ MeanSquaredError
 
     均方根误差前向计算函数的所需参数:
 
-    target: :math:`(N, *)`, 目标值, 和输入一样维度的 QTensor 。
+        x: :math:`(N, *)` 输入值,其中 :math:`*` 表示任意维度。
 
-    output: :math:`(N, *)` 输入值,其中 :math:`*` 表示任意维度。
+        y: :math:`(N, *)`, 目标值, 和输入一样维度的 QTensor 。
 
     Example::
 
         from pyvqnet.tensor import QTensor 
         from pyvqnet.nn import MeanSquaredError
-        target = QTensor([[0, 0, 1, 0, 0, 0, 0, 0, 0, 0]], requires_grad=True)
-        output = QTensor([[0.1, 0.05, 0.7, 0, 0.05, 0.1, 0, 0, 0, 0]], requires_grad=True)
+        y = QTensor([[0, 0, 1, 0, 0, 0, 0, 0, 0, 0]], requires_grad=True)
+        x = QTensor([[0.1, 0.05, 0.7, 0, 0.05, 0.1, 0, 0, 0, 0]], requires_grad=True)
 
         loss_result = MeanSquaredError()
-        result = loss_result(target, output)
+        result = loss_result(y, x)
         print(result)
 
         # [0.0115000]
@@ -1123,26 +1166,24 @@ BinaryCrossEntropy
 
     平均二元交叉熵误差前向计算函数的所需参数:
 
-    target: :math:`(N, *)`, 目标值,和输入一样维度的 QTensor 。
+        x: :math:`(N, *)` 输入值,其中 :math:`*` 表示任意维度。
 
-    output: :math:`(N, *)` 输入值,其中 :math:`*` 表示任意维度。
-    
+        y: :math:`(N, *)`, 目标值,和输入一样维度的 QTensor 。
+
     Example::
 
         from pyvqnet.tensor import QTensor
         from pyvqnet.nn import BinaryCrossEntropy
-        output = QTensor([[0.3, 0.7, 0.2], [0.2, 0.3, 0.1]], requires_grad=True)
-        target = QTensor([[0, 1, 0], [0, 0, 1]], requires_grad=True)
+        x = QTensor([[0.3, 0.7, 0.2], [0.2, 0.3, 0.1]], requires_grad=True)
+        y = QTensor([[0, 1, 0], [0, 0, 1]], requires_grad=True)
 
         loss_result = BinaryCrossEntropy()
-        result = loss_result(target, output)
+        result = loss_result(y, x)
         result.backward()
         print(result)
 
         # [0.6364825]
         
-
-
 
 CategoricalCrossEntropy
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -1151,35 +1192,34 @@ CategoricalCrossEntropy
 
     该损失函数将 LogSoftmax 和 NLLLoss 同时计算的平均分类交叉熵。
 
-    损失函数计算方式如下:
+    损失函数计算方式如下,其中 class 为目标值的对应分类标签:
 
     .. math::
-        \text{loss}(x, class) = -\log\left(\frac{\exp(x[class])}{\sum_j \exp(x[j])}\right)
+        \text{loss}(x, y) = -\log\left(\frac{\exp(x[class])}{\sum_j \exp(x[j])}\right)
                        = -x[class] + \log\left(\sum_j \exp(x[j])\right)
     
     :return: 平均分类交叉熵实例。
 
     误差前向计算函数的所需参数:
 
-    target: :math:`(N, *)`, 目标值,和输入一样维度的 QTensor 。
+        x: :math:`(N, *)` 输入值,其中 :math:`*` 表示任意维度。
 
-    output: :math:`(N, *)` 输入值,其中 :math:`*` 表示任意维度。
-    
+        y: :math:`(N, *)`, 目标值,和输入一样维度的 QTensor 。
+
+
     Example::
 
         from pyvqnet.tensor import QTensor
         from pyvqnet.nn import CategoricalCrossEntropy
-        output = QTensor([[1, 2, 3, 4, 5],
+        x = QTensor([[1, 2, 3, 4, 5],
         [1, 2, 3, 4, 5],
         [1, 2, 3, 4, 5]], requires_grad=True)
-        target = QTensor([[0, 1, 0, 0, 0], [0, 1, 0, 0, 0], [1, 0, 0, 0, 0]], requires_grad=True)
+        y = QTensor([[0, 1, 0, 0, 0], [0, 1, 0, 0, 0], [1, 0, 0, 0, 0]], requires_grad=True)
         loss_result = CategoricalCrossEntropy()
-        result = loss_result(target, output)
+        result = loss_result(y, x)
         print(result)
 
         # [3.7852428]
-        
-
 
 SoftmaxCrossEntropy
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -1188,39 +1228,123 @@ SoftmaxCrossEntropy
 
     该损失函数将 LogSoftmax 和 NLLLoss 同时计算的平均分类交叉熵,并具有更高的数值稳定性。
 
-    损失函数计算方式如下:
+    损失函数计算方式如下,其中 class 为目标值的对应分类标签:
 
     .. math::
-        \text{loss}(x, class) = -\log\left(\frac{\exp(x[class])}{\sum_j \exp(x[j])}\right)
+        \text{loss}(x, y) = -\log\left(\frac{\exp(x[class])}{\sum_j \exp(x[j])}\right)
                        = -x[class] + \log\left(\sum_j \exp(x[j])\right)
 
     :return: 一个Softmax交叉熵损失函数实例
 
     误差前向计算函数的所需参数:
 
-    target: :math:`(N, *)`, 目标值,和输入一样维度的 QTensor 。
+        x: :math:`(N, *)` 输入值,其中 :math:`*` 表示任意维度。
 
-    output: :math:`(N, *)` 输入值,其中 :math:`*` 表示任意维度。
-    
+        y: :math:`(N, *)`, 目标值,和输入一样维度的 QTensor 。
+
     Example::
 
         from pyvqnet.tensor import QTensor
         from pyvqnet.nn import SoftmaxCrossEntropy
-        output = QTensor([[1, 2, 3, 4, 5],
+        x = QTensor([[1, 2, 3, 4, 5],
         [1, 2, 3, 4, 5],
         [1, 2, 3, 4, 5]], requires_grad=True)
-        target = QTensor([[0, 1, 0, 0, 0], [0, 1, 0, 0, 0], [1, 0, 0, 0, 0]], requires_grad=True)
+        y = QTensor([[0, 1, 0, 0, 0], [0, 1, 0, 0, 0], [1, 0, 0, 0, 0]], requires_grad=True)
         loss_result = SoftmaxCrossEntropy()
-        result = loss_result(target, output)
+        result = loss_result(y, x)
         result.backward()
         print(result)
 
         # [3.7852478]
-        
+
+NLL_Loss
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:class:: pyvqnet.nn.NLL_Loss()
+
+    平均负对数似然损失。 对C个类别的分类问题很有用。
+
+    `x` 是模型给出的概率形式的似然量。其尺寸可以是 :math:`(N, C)` or :math:`(N, C, d_1, d_2, ..., d_K)` 。 `y` 是损失函数期望的真值，包含 :math:`[0, C-1]` 的类别索引。
+
+    .. math::
+
+        \ell(x, y) = L = \{l_1,\dots,l_N\}^\top, \quad
+        l_n = -  
+            \sum_{n=1}^N \frac{1}{N}x_{n,y_n} \quad
+
+    :return: 一个NLL_Loss损失函数实例
+
+    误差前向计算函数的所需参数:
+
+        x: :math:`(N, *)`,损失函数的输出，可以为多维变量。
+
+        y: :math:`(N, *)`,损失函数期望的真值。
+
+    Example::
+
+        import numpy as np
+        from pyvqnet.nn import NLL_Loss
+        from pyvqnet.tensor import QTensor
+        x = QTensor([
+            0.9476322568516703, 0.226547421131723, 0.5944201443911326,
+            0.42830868492969476, 0.76414068655387, 0.00286059168094277,
+            0.3574236812873617, 0.9096948856639084, 0.4560809854582528,
+            0.9818027091583286, 0.8673569904602182, 0.9860275114020933,
+            0.9232667066664217, 0.303693313961628, 0.8461034903175555
+        ])
+        x.reshape_([1, 3, 1, 5])
+        x.requires_grad = True
+        y = np.array([[[2, 1, 0, 0, 2]]])
+
+        loss_result = NLL_Loss()
+        result = loss_result(y, x)
+        print(result)
+        #[-0.6187226]
+
+CrossEntropyLoss
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:class:: pyvqnet.nn.CrossEntropyLoss()
+
+    该函数计算LogSoftmax以及NLL_Loss在一起的损失。
+
+    `x` 是包含未做归一化的输出.它的尺寸可以为 :math:`(C)` , :math:`(N, C)` 二维或 :math:`(N, C, d_1, d_2, ..., d_K)` 多维。
+
+    损失函数的公式如下,其中 class 为目标值的对应分类标签:
+
+    .. math::
+        \text{loss}(x, y) = -\log\left(\frac{\exp(x[class])}{\sum_j \exp(x[j])}\right)
+                       = -x[class] + \log\left(\sum_j \exp(x[j])\right)
+
+    :return: 一个CrossEntropyLoss损失函数实例
+
+    误差前向计算函数的所需参数:
+
+        x: :math:`(N, *)`,损失函数的输出，可以为多维变量。
+
+        y: :math:`(N, *)`,损失函数期望的真值。
+
+    Example::
+
+        import numpy as np
+        from pyvqnet.nn import CrossEntropyLoss
+        from pyvqnet.tensor import QTensor
+        x = QTensor([
+            0.9476322568516703, 0.226547421131723, 0.5944201443911326, 0.42830868492969476, 0.76414068655387,
+            0.00286059168094277, 0.3574236812873617, 0.9096948856639084, 0.4560809854582528, 0.9818027091583286,
+            0.8673569904602182, 0.9860275114020933, 0.9232667066664217, 0.303693313961628, 0.8461034903175555
+        ])
+        x.reshape_([1, 3, 1, 5])
+        x.requires_grad = True
+        y = np.array([[[2, 1, 0, 0, 2]]])
+
+        loss_result = CrossEntropyLoss()
+        result = loss_result(y, x)
+        print(result)
+        #[1.1508200]
 
 激活函数
 ----------------------------------
-
 
 Activation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
