@@ -3897,7 +3897,7 @@ VQNet提供了封装类 ``VQC_wrapper`` ，用户使用普通逻辑门在函数 
 
 首先我们展示使用Pauli旋转作为数据编码门的量子模型如何只能在一定程度上拟合傅里叶级数。为简单起见，我们将只看单量子比特电路：
 
-.. image:: ./images/single_qubit_model.PNG
+.. image:: ./images/single_qubit_model.png
    :width: 600 px
    :align: center
 
@@ -3998,7 +3998,7 @@ VQNet提供了封装类 ``VQC_wrapper`` ，用户使用普通逻辑门在函数 
 
 不训练的量子线路运行结果为：
 
-.. image:: ./images/single_qubit_model_result_no_train.PNG
+.. image:: ./images/single_qubit_model_result_no_train.png
    :width: 600 px
    :align: center
 
@@ -4150,7 +4150,7 @@ VQNet提供了封装类 ``VQC_wrapper`` ，用户使用普通逻辑门在函数 
 
 其中量子模型为：
 
-.. image:: ./images/single_qubit_model_circuit.PNG
+.. image:: ./images/single_qubit_model_circuit.png
    :width: 600 px
    :align: center
 
@@ -4158,7 +4158,7 @@ VQNet提供了封装类 ``VQC_wrapper`` ，用户使用普通逻辑门在函数 
 
 网络训练结果为：
 
-.. image:: ./images/single_qubit_model_result.PNG
+.. image:: ./images/single_qubit_model_result.png
    :width: 600 px
    :align: center
 
@@ -4300,7 +4300,7 @@ VQNet提供了封装类 ``VQC_wrapper`` ，用户使用普通逻辑门在函数 
 
 不训练的量子线路运行结果为：
 
-.. image:: ./images/parallel_model_result_no_train.PNG
+.. image:: ./images/parallel_model_result_no_train.png
    :width: 600 px
    :align: center
 
@@ -4476,7 +4476,7 @@ VQNet提供了封装类 ``VQC_wrapper`` ，用户使用普通逻辑门在函数 
 
 其中量子模型为：
 
-.. image:: ./images/parallel_model_circuit.PNG
+.. image:: ./images/parallel_model_circuit.png
    :width: 600 px
    :align: center
 
@@ -4484,7 +4484,7 @@ VQNet提供了封装类 ``VQC_wrapper`` ，用户使用普通逻辑门在函数 
 
 网络训练结果为：
 
-.. image:: ./images/parallel_model_result.PNG
+.. image:: ./images/parallel_model_result.png
    :width: 600 px
    :align: center
 

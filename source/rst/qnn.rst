@@ -1351,7 +1351,7 @@ Mutal_Info
 
 对于该量子感知机，处理的数据是 0 1 二进制比特字符串。其目标是想识别形如下图 :math:`w` 十字形状的模式。
 
-.. image:: ./images/QP-data.PNG
+.. image:: ./images/QP-data.png
    :width: 600 px
    :align: center
 
@@ -1361,7 +1361,7 @@ Mutal_Info
  
 该论文提出的量子感知机线路结构如下：
 
-.. image:: ./images/QP-cir.PNG
+.. image:: ./images/QP-cir.png
    :width: 600 px
    :align: center
 
@@ -1402,7 +1402,7 @@ VQNet提供了 ``QuantumNeuron`` 模块实现该算法。首先初始化一个�
 
     trained_para = perceptron.train(training_label, test_label)
 
-.. image:: ./images/QP-pic.PNG
+.. image:: ./images/QP-pic.png
    :width: 600 px
    :align: center
 
@@ -1410,7 +1410,7 @@ VQNet提供了 ``QuantumNeuron`` 模块实现该算法。首先初始化一个�
 
 在测试数据上，可以获取测试数据上的准确率结果
 
-.. image:: ./images/QP-acc.PNG
+.. image:: ./images/QP-acc.png
    :width: 600 px
    :align: center
 
@@ -1518,13 +1518,13 @@ QGAN使用经典的GAN模型结构，分为Generator生成器与Discriminator鉴
 
 生成lognormal分布的损失函数以及概率分布函数图，一般来说需要使用不同的随机种子多次训练该模型可得到较好结果:
 
-.. image:: ./images/qgan-loss.PNG
+.. image:: ./images/qgan-loss.png
    :width: 600 px
    :align: center
 
 |
 
-.. image:: ./images/qgan-pdf.PNG
+.. image:: ./images/qgan-pdf.png
    :width: 600 px
    :align: center
 
@@ -1540,7 +1540,7 @@ QGAN使用经典的GAN模型结构，分为Generator生成器与Discriminator鉴
 ``gen_vqc_qsvm_data`` 为生成该例子所需的数据。 ``vqc_qsvm`` 为变分量子线路类，用来对输入数据进行分类。
 ``vqc_qsvm.plot()`` 函数可视化了数据的分布情况。
 
-.. image:: ./images/VQC-SVM.PNG
+.. image:: ./images/VQC-SVM.png
    :width: 600 px
    :align: center
 
