@@ -905,13 +905,13 @@ ones_like
 full
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:function:: pyvqnet.tensor.full(shape, value, dev: int = 0)
+.. py:function:: pyvqnet.tensor.full(shape, value, device: int = 0)
 
     创建一个指定形状的 QTensor 并用特定值填充它。
 
     :param shape: 要创建的张量形状。
     :param value: 填充的值。
-    :param dev: 储存在哪个设备上，默认0，在CPU上。
+    :param device: 储存在哪个设备上，默认0，在CPU上。
 
     :return: 输出新 QTensor 。 
 
@@ -1058,7 +1058,7 @@ linspace
 logspace
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:function:: pyvqnet.tensor.logspace(start, end, num, base, dev: int = 0, requires_grad)
+.. py:function:: pyvqnet.tensor.logspace(start, end, num, base, device: int = 0, requires_grad)
 
     在对数刻度上创建具有均匀间隔值的一维 QTensor。
 
@@ -1066,7 +1066,7 @@ logspace
     :param end: ``base ** end`` 是序列的最终值
     :param num: 要生成的样本数
     :param base: 对数刻度的基数
-    :param dev: 要使用的设备，默认 = 0 ，使用 CPU 设备。
+    :param device: 要使用的设备，默认 = 0 ，使用 CPU 设备。
     :param requires_grad: 是否计算梯度，默认为False。
     :return: 输出 QTensor 。
 
@@ -1084,13 +1084,13 @@ logspace
 eye
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:function:: pyvqnet.tensor.eye(size, offset: int = 0, dev: int = 0)
+.. py:function:: pyvqnet.tensor.eye(size, offset: int = 0, device: int = 0)
 
     创建一个 size x size 的 QTensor，对角线上为 1，其他地方为 0。
 
     :param size: 要创建的（正方形）QTensor 的大小。
     :param offset: 对角线的索引：0（默认）表示主对角线，正值表示上对角线，负值表示下对角线。
-    :param dev: 要使用的设备，默认 = 0 ，使用 CPU 设备。
+    :param device: 要使用的设备，默认 = 0 ，使用 CPU 设备。
 
     :return: 输出 QTensor 。
 
@@ -1187,12 +1187,12 @@ diag
 randu
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:function:: pyvqnet.tensor.randu(shape, dev: int = 0)
+.. py:function:: pyvqnet.tensor.randu(shape, device: int = 0)
 
     创建一个具有均匀分布随机值的 QTensor 。
 
     :param shape: 要创建的 QTensor 的形状。
-    :param dev: 要使用的设备，默认 = 0 ，使用 CPU 设备。
+    :param device: 要使用的设备，默认 = 0 ，使用 CPU 设备。
     :return: 输出 QTensor 。
 
     Example::
@@ -1212,12 +1212,12 @@ randu
 randn
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:function:: pyvqnet.tensor.randn(shape, dev: int = 0)
+.. py:function:: pyvqnet.tensor.randn(shape, device: int = 0)
 
     创建一个具有正态分布随机值的 QTensor 。
 
     :param shape: 要创建的 QTensor 的形状。
-    :param dev: 要使用的设备，默认 = 0 ，使用 CPU 设备。
+    :param device: 要使用的设备，默认 = 0 ，使用 CPU 设备。
     :return: 输出 QTensor 。
 
     Example::
