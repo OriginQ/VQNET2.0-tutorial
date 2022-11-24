@@ -2167,6 +2167,33 @@ log
 
         # [0.0000000, 0.6931471, 1.0986123]
 
+log_softmax
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:function:: pyvqnet.tensor.log_softmax(t, axis=-1)
+
+    顺序计算在轴axis上的softmax函数以及log函数的结果。
+
+    :param t: 输入 QTensor 。
+    :param axis: 用于求softmax的轴，默认为-1。
+
+    :return: 输出 QTensor。
+
+    Example::
+
+        from pyvqnet import tensor
+        output = tensor.arange(1,13).reshape([3,2,2])
+        t = tensor.log_softmax(output,1)
+        print(t)
+        # [
+        # [[-2.1269281, -2.1269281],
+        #  [-0.1269280, -0.1269280]],
+        # [[-2.1269281, -2.1269281],
+        #  [-0.1269280, -0.1269280]],
+        # [[-2.1269281, -2.1269281],
+        #  [-0.1269280, -0.1269280]]
+        # ]
+
 sqrt
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

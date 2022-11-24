@@ -32,11 +32,11 @@ minimum,sinh,BatchNorm2d
 min,cosh,BatchNorm1d
 max,power,Dropout
 clip,abs,Embedding
-where,logspace,LayerNormNd
+where,log,LayerNormNd
 ,sqrt,LayerNorm1d
 ,square,LayerNorm2d
 ,frobenius_norm,MaxPool1D
-,,MaxPool2D
+,log_softmax,MaxPool2D
 ,,AvgPool2D
 ,,AvgPool1D
 ,,GRU
