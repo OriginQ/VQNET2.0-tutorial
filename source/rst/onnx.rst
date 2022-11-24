@@ -1,7 +1,7 @@
 VQNet2ONNX模块
 ==================================
 
-VQNet2ONNX模块 支持将 VQNet 模型格式转化到 ONNX 模型格式。通过 ONNX 可以完成将 VQNet 模型到多种推理引擎的部署，包括 TensorRT/OpenVINO/MNN/TNN/NCNN，以及其它对 ONNX 开源格式进行支持的推理引擎或硬件。
+VQNet2ONNX模块 支持将 VQNet 模型以及参数转化到 ONNX 模型格式。通过 ONNX 可以完成将 VQNet 模型到多种推理引擎的部署，包括 TensorRT/OpenVINO/MNN/TNN/NCNN，以及其它对 ONNX 开源格式进行支持的推理引擎或硬件。
 
 环境依赖:onnx>=1.12.0
 
@@ -18,11 +18,9 @@ VQNet2ONNX模块 支持将 VQNet 模型格式转化到 ONNX 模型格式。通�
 .. code-block::
 
     import numpy as np
-
     from pyvqnet.tensor import *
     from pyvqnet.nn import Module, BatchNorm2d, Conv2D, ReLu, AvgPool2D, Linear
     from pyvqnet.onnx.export import export_model
-
     from onnx import __version__, IR_VERSION
     from onnx.defs import onnx_opset_version
     print(
@@ -39,8 +37,6 @@ VQNet2ONNX模块 支持将 VQNet 模型格式转化到 ONNX 模型格式。通�
 
         def __init__(self, in_chals, out_chals, stride=1):
             super().__init__()
-
-            #residual function
             self.conv2d1 = Conv2D(in_chals,
                                 out_chals,
                                 kernel_size=(3, 3),
@@ -48,13 +44,11 @@ VQNet2ONNX模块 支持将 VQNet 模型格式转化到 ONNX 模型格式。通�
                                 padding=(1, 1),
                                 use_bias=False)
             self.BatchNorm2d1 = BatchNorm2d(out_chals)
-
             self.conv2d2 = Conv2D(out_chals,
                                 out_chals * BasicBlock.expansion,
                                 kernel_size=(3, 3),
                                 padding=(1, 1),
                                 use_bias=False)
-
             self.BatchNorm2d2 = BatchNorm2d(out_chals * BasicBlock.expansion)
             self.Relu = ReLu(name="relu")
             #shortcut
@@ -64,7 +58,6 @@ VQNet2ONNX模块 支持将 VQNet 模型格式转化到 ONNX 模型格式。通�
                                         stride=(stride, stride),
                                         use_bias=False)
             self.shortcut_bn2d = BatchNorm2d(out_chals * BasicBlock.expansion)
-
             self.need_match_dim = False
             if stride != 1 or in_chals != BasicBlock.expansion * out_chals:
                 self.need_match_dim = True
@@ -80,7 +73,6 @@ VQNet2ONNX模块 支持将 VQNet 模型格式转化到 ONNX 模型格式。通�
             else:
                 y1 = self.shortcut_conv2d(x)
                 y1 = self.shortcut_bn2d(y1)
-
                 return y + y1
 
     resize = 32
@@ -90,7 +82,6 @@ VQNet2ONNX模块 支持将 VQNet 模型格式转化到 ONNX 模型格式。通�
             super().__init__()
 
             self.in_chals = 64 // resize
-
             self.conv1 = Conv2D(1,
                                 64 // resize,
                                 kernel_size=(3, 3),
@@ -98,21 +89,14 @@ VQNet2ONNX模块 支持将 VQNet 模型格式转化到 ONNX 模型格式。通�
                                 use_bias=False)
             self.bn1 = BatchNorm2d(64 // resize)
             self.relu = ReLu()
-            #we use a different inputsize than the original paper
-            #so conv2_x's stride is 1
-
             self.conv2_x_1 = BasicBlock(64 // resize, 64 // resize, 1)
             self.conv2_x_2 = BasicBlock(64 // resize, 64 // resize, 1)
-
             self.conv3_x_1 = BasicBlock(64 // resize, 128 // resize, 2)
             self.conv3_x_2 = BasicBlock(128 // resize, 128 // resize, 1)
-
             self.conv4_x_1 = BasicBlock(128 // resize, 256 // resize, 2)
             self.conv4_x_2 = BasicBlock(256 // resize, 256 // resize, 1)
-
             self.conv5_x_1 = BasicBlock(256 // resize, 512 // resize, 2)
             self.conv5_x_2 = BasicBlock(512 // resize, 512 // resize, 1)
-
             self.avg_pool = AvgPool2D([4, 4], [1, 1], "valid")
             self.fc = Linear(512 // resize, num_classes)
 
@@ -157,33 +141,28 @@ VQNet2ONNX模块 支持将 VQNet 模型格式转化到 ONNX 模型格式。通�
         #onnxruntime 对比运行结果
         import onnxruntime
         session = onnxruntime.InferenceSession('demo.onnx', None)
-
         input_name = session.get_inputs()[0].name
 
         v = np.ones([4,1,32,32])
         v = v.astype(np.float32)
-
         inputs = [v]
         test_data_num = len(inputs)
         outputs = [
             session.run([], {input_name: inputs[i]})[0]
             for i in range(test_data_num)
         ]
-
         onnx_y = outputs[0]
-
         assert np.allclose(onnx_y, vqnet_y)
 
 
     if __name__ == "__main__":
-
         test_resnet()
 
 
 使用 https://netron.app/ 可以可视化VQNet导出的ONNX模型 demo.onnx
 
 .. image:: ./images/resnet_onnx.png
-   :width: 200 px
+   :width: 100 px
    :align: center
 
 |
@@ -191,142 +170,6 @@ VQNet2ONNX模块 支持将 VQNet 模型格式转化到 ONNX 模型格式。通�
 
 以下是支持的VQNet模块
 
+.. csv-table:: 已支持VQNet接口列表
+   :file: ./images/onnxsupport.csv
 
-=============== =================================
- 张量创建模块     备注
-=============== =================================
-ones
-ons_like
-full
-full_like
-zeros
-zeros_like
-arange
-linspace
-logspace
-eye
-randu
-randn
-tiru
-tril 
-=============== =================================
-
-=============== =================================
-数学模块         备注
-=============== =================================
-floor
-ceil
-round
-sort
-argosrt
-topK
-argtopK
-add
-sub
-mul
-divide
-sums
-cumsum
-mean
-median
-std
-var
-matmul
-reciprocal
-sign
-neg
-exp
-acos
-asin
-atan
-sin
-cos
-tan
-tanh
-sinh
-cosh
-power
-abs
-sqrt
-square
-frobenius_norm
-=============== =================================
-
-=============== =================================
-数学模块         备注
-=============== =================================
-maximum
-minimum
-min
-max
-clip
-where
-nonzero
-isfinite
-isinf
-isnan
-isneginf
-isposinf
-logical_and
-logical_or
-logical_not
-logical_xor
-greater
-greater_equal
-less
-less_equal
-equal
-not_equal
-=============== =================================
-
-=============== =================================
-张量操作模块     备注
-=============== =================================
-__getitem__
-__setitem__      not support multiple tensor 
-                 indices that are not consecutive
-concatenate
-stack
-permute
-transpose
-tile
-squeeze
-unsqueeze
-swapaxis
-masked_fill
-flatten
-reshape
-flip
-=============== =================================
-
-=============== =================================
-神经网络模块      备注
-=============== =================================
-Conv2D
-Conv1D
-ConvT2D
-Linear
-Sigmoid
-Softplus
-Softsign
-Softmax
-HardSigmoid
-ReLu
-LeakyReLu
-ELU
-Tanh
-BatchNorm2d
-BatchNorm1d
-Dropout
-Embedding
-LayerNormNd
-LayerNorm1d
-LayerNorm2d
-MaxPool1D
-MaxPool2D
-AvgPool2D
-AvgPool1D
-GRU
-LSTM
-RNN
-=============== =================================
