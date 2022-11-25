@@ -1137,8 +1137,7 @@ StronglyEntanglingTemplate
 Quantum_Embedding
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:class:: pyvqnet.qnn.Quantum_Embedding(qubits, machine, num_repetitions_input, depth_input,
-                 num_unitary_layers, num_repetitions)
+.. py:class:: pyvqnet.qnn.Quantum_Embedding(qubits, machine, num_repetitions_input, depth_input, num_unitary_layers, num_repetitions)
 
     使用 RZ,RY,RZ 创建变分量子电路，将经典数据编码为量子态。
     参考 `Quantum embeddings for machine learning <https://arxiv.org/abs/2001.03622>`_。
