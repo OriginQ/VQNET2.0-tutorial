@@ -1613,3 +1613,653 @@ QGAN使用经典的GAN模型结构，分为Generator生成器与Discriminator鉴
     score = quantum_svc.score(test_features, test_labels)
     print(f"quantum kernel classification test score: {score}")
 
+
+
+同时扰动随机近似优化器。
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+.. py:function:: pyvqnet.qnn.SPSA(maxiter: int = 1000, save_steps: int = 1, last_avg: int = 1, c0: float = _C0, c1: float = 0.2, c2: float = 0.602, c3: float = 0.101, c4: float = 0, init_para=None, model=None, calibrate_flag=False)
+    
+    同时扰动随机近似 (SPSA) 优化器。
+
+    SPSA 提供了一种用于逼近多元可微成本函数梯度的随机方法。
+    为实现这一点，使用扰动参数向量对成本函数进行两次评估：原始参数向量的每个分量同时随随机生成的值移动。
+    `SPSA 网站 <http://www.jhuapl.edu/SPSA>`__ 上提供了进一步的介绍。
+
+    :param maxiter: 要执行的最大迭代次数。默认值：1000。
+    :param save_steps: 保存每个 save_steps 步骤的中间信息。默认值：1。
+    :param last_avg: last_avg 迭代的平均参数。
+        如果 last_avg = 1，则只考虑最后一次迭代。默认值：1。
+    :param c0: 初始a。更新参数的步长。默认值：0.2*pi
+    :param c1: 初始的c。用于近似梯度的步长。默认值：0.1。
+    :param c2: 论文中的alpha，用于在每次迭代时调整a(c0)。默认值：0.602。
+    :param c3: 论文中的gamma，每次迭代时用来调整c(c1)。默认值：0.101。
+    :param c4: 同样用来控制a的参数。默认值：0。
+    :param init_para: 初始化参数。默认值：无。
+    :param model: 参数模型：模型。默认值：无。
+    :param calibrate_flag: 是否校准 hpyer 参数 a 和 c，默认值：False。
+
+    :return: 一个SPSA优化器实例
+
+    Example::
+
+        from pyvqnet.qnn import AngleEmbeddingCircuit, expval, QuantumLayerV2, SPSA
+        from pyvqnet.qnn.template import BasicEntanglerTemplate
+        import pyqpanda as pq
+        
+        #定义一个量子变分线路模型
+        class Model_spsa(Module):
+            def __init__(self):
+                super(Model_spsa, self).__init__()
+                self.qvc = QuantumLayerV2(layer_fn_spsa_pq, 3)
+
+            def forward(self, x):
+                y = self.qvc(x)
+                return y
+
+        #本例线路是最小化该VQC的期望值
+        def layer_fn_spsa_pq(input, weights):
+            num_of_qubits = 1
+
+            m_machine = pq.CPUQVM()
+            m_machine.init_qvm()
+            qubits = m_machine.qAlloc_many(num_of_qubits)
+            c1 = AngleEmbeddingCircuit(input, qubits)
+            weights =weights.reshape([4,1])
+            bc_class = BasicEntanglerTemplate(weights, 1)
+            c2 = bc_class.create_circuit(qubits)
+            m_prog = pq.QProg()
+            m_prog.insert(c1)
+            m_prog.insert(c2)
+            pauli_dict = {'Z0': 1}
+            exp2 = expval(m_machine, m_prog, pauli_dict, qubits)
+
+            return exp2
+
+        model = Model_spsa()
+        #定义一个SPSA优化器
+        optimizer = SPSA(maxiter=20,
+            init_para=model.parameters(),
+            model=model,
+        )
+
+
+.. py:function:: pyvqnet.qnn.SPSA._step(input_data)
+
+    优化 sapa 优化器
+
+    :param input_data: 输入训练数据QTensor
+    :return:
+
+        train_para：最终参数。
+
+        theta_best：最后 `last_avg` 次优化后的平均参数。
+
+    Example::
+
+        from pyvqnet.qnn import AngleEmbeddingCircuit, expval, QuantumLayerV2, SPSA
+        from pyvqnet.qnn.template import BasicEntanglerTemplate
+        import pyqpanda as pq
+        
+        #定义一个量子变分线路模型
+        class Model_spsa(Module):
+            def __init__(self):
+                super(Model_spsa, self).__init__()
+                self.qvc = QuantumLayerV2(layer_fn_spsa_pq, 3)
+
+            def forward(self, x):
+                y = self.qvc(x)
+                return y
+
+        #本例线路是最小化该VQC的期望值
+        def layer_fn_spsa_pq(input, weights):
+            num_of_qubits = 1
+
+            m_machine = pq.CPUQVM()
+            m_machine.init_qvm()
+            qubits = m_machine.qAlloc_many(num_of_qubits)
+            c1 = AngleEmbeddingCircuit(input, qubits)
+            weights =weights.reshape([4,1])
+            bc_class = BasicEntanglerTemplate(weights, 1)
+            c2 = bc_class.create_circuit(qubits)
+            m_prog = pq.QProg()
+            m_prog.insert(c1)
+            m_prog.insert(c2)
+            pauli_dict = {'Z0': 1}
+            exp2 = expval(m_machine, m_prog, pauli_dict, qubits)
+
+            return exp2
+
+        model = Model_spsa()
+        #定义一个SPSA优化器
+        optimizer = SPSA(maxiter=20,
+            init_para=model.parameters(),
+            model=model,
+        )
+        #初始化参数
+        data = QTensor(np.array([[0.27507603]]))
+        p = model.parameters()
+        p[0].data = pyvqnet._core.Tensor( np.array([3.97507603, 3.12950603, 1.00854038,
+                        1.25907603]))
+        #调用SPSA进行迭代优化
+        optimizer._step(input_data=data)
+        
+        #计算优化后的VQC期望值
+        y = model(data)
+        print(y)
+
+量子自然梯度
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+量子机器学习模型一般使用梯度下降法对可变量子逻辑线路中参数进行优化。经典梯度下降法公式如下：
+
+.. math:: \theta_{t+1} = \theta_t -\eta \nabla \mathcal{L}(\theta),
+
+本质上，每次迭代时候，我们将计算参数空间下，梯度下降最陡的方向作为参数变化的方向。
+在空间中任何一个方向，在局部范围内下降的速度都不如负梯度方向快。
+不同空间上，最速下降方向的推导是依赖于参数微分的范数——距离度量。距离度量在这里起着核心作用，
+不同的度量会得到不同的最速下降方向。对于经典优化问题中参数所处的欧几里得空间，最速下降方向就是负梯度方向。
+即使如此，在参数优化的每一步，由于损失函数随着参数的变化，其参数空间发生变换。使得找到另一个更优的距离范数成为可能。
+
+`量子自然梯度法 <https://arxiv.org/abs/1909.02108>`_ 借鉴经典自然梯度法的概念 `Amari (1998) <https://www.mitpressjournals.org/doi/abs/10.1162/089976698300017746>`__ ，
+我们改为将优化问题视为给定输入的可能输出值的概率分布（即，最大似然估计），则更好的方法是在分布
+空间中执行梯度下降，它相对于参数化是无量纲和不变的. 因此，无论参数化如何，每个优化步骤总是会为每个参数选择最佳步长。
+在量子机器学习任务中，量子态空间拥有一个独特的不变度量张量，称为 Fubini-Study 度量张量 :math:`g_{ij}`。
+该张量将量子线路参数空间中的最速下降转换为分布空间中的最速下降。
+量子自然梯度的公式如下：
+
+.. math:: \theta_{t+1} = \theta_t - \eta g^{+}(\theta_t)\nabla \mathcal{L}(\theta),
+
+其中 :math:`g^{+}` 是伪逆。
+
+以下我们基于VQNet实现对一个量子变分线路参数进行量子自然梯度优化的例子，可见使用量子自然梯度(Quantum Nature Gradient)使得某些损失函数下降更快。
+
+我们的目标是使如下的量子变分线路的期望最小，可见其中含有两层共3个量子含参逻辑门，第一层由0和1比特上的 RZ, RY 逻辑门构成，第二层由2比特上的RX 逻辑门构成。
+
+.. image:: ./images/qng_all_cir.png
+   :width: 600 px
+   :align: center
+
+|
+
+.. code-block::
+
+    import pyqpanda as pq
+    import numpy as np
+    from pyvqnet.tensor import QTensor
+    from pyvqnet.qnn.measure import expval, ProbsMeasure
+    from pyvqnet.qnn import insert_pauli_for_mt, get_metric_tensor, QNG,QuantumLayer
+    import matplotlib.pyplot as plt
+    from pyvqnet.optim import SGD
+    from pyvqnet import _core
+    ###################################################
+    # Quantum Nature Gradients Examples
+    ###################################################
+    class pyqpanda_config_wrapper:
+        """
+        A wrapper for pyqpanda config,including QVM machine, allocated qubits, classic bits.
+        """
+        def __init__(self, qubits_num) -> None:
+            self._machine = pq.CPUQVM()
+            self._machine.init_qvm()
+            self._qubits = self._machine.qAlloc_many(qubits_num)
+            self._cubits = self._machine.cAlloc_many(qubits_num)
+            self._qcir = pq.QCircuit()
+
+        def __del__(self):
+            self._machine.finalize()
+
+
+    # use quantum nature gradient optimzer to optimize circuit quantum_net
+    steps = 200
+
+    def quantum_net(
+            q_input_features,
+            params,
+            qubits,
+            cubits,
+            machine):
+        qcir = pq.QCircuit()
+        qcir.insert(pq.RY(qubits[0], np.pi / 4))
+        qcir.insert(pq.RY(qubits[1], np.pi / 3))
+        qcir.insert(pq.RY(qubits[2], np.pi / 7))
+
+        qcir.insert(pq.RZ(qubits[0], params[0]))
+        qcir.insert(pq.RY(qubits[1], params[1]))
+
+        qcir.insert(pq.CNOT(qubits[0], qubits[1]))
+        qcir.insert(pq.CNOT(qubits[1], qubits[2]))
+        qcir.insert(pq.RX(qubits[2], params[2]))
+
+        qcir.insert(pq.CNOT(qubits[0], qubits[1]))
+        qcir.insert(pq.CNOT(qubits[1], qubits[2]))
+        m_prog = pq.QProg()
+        m_prog.insert(qcir)
+
+        return expval(machine, m_prog, {'Y0': 1}, qubits)
+
+
+要使用量子自然梯度算法，我们首先需要计算出度量张量。
+按照算法定义，我们人工定义了如下两个子线路，分别计算两层含参线路的Fubini-Study 张量。
+第一个参数层计算度量张量的子线路如下：
+
+.. image:: ./images/qng_subcir1.png
+   :width: 600 px
+   :align: center
+
+|
+
+.. code-block::
+
+    def layer0_subcircuit(config: pyqpanda_config_wrapper, params):
+        qcir = pq.QCircuit()
+        qcir.insert(pq.RY(config._qubits[0], np.pi / 4))
+        qcir.insert(pq.RY(config._qubits[1], np.pi / 3))
+        return qcir
+
+    def get_p01_diagonal_(config, params, target_gate_type, target_gate_bits,
+                            wires):
+        qcir = layer0_subcircuit(config, params)
+        qcir2 = insert_pauli_for_mt(config._qubits, target_gate_type,
+                                    target_gate_bits)
+        qcir3 = pq.QCircuit()
+        qcir3.insert(qcir)
+        qcir3.insert(qcir2)
+        m_prog = pq.QProg()
+        m_prog.insert(qcir3)
+
+        return ProbsMeasure(wires, m_prog, config._machine, config._qubits)
+
+第二个参数层计算度量张量的子线路如下：
+
+.. image:: ./images/qng_subcir2.png
+   :width: 600 px
+   :align: center
+
+|
+
+.. code-block::
+
+
+    def layer1_subcircuit(config: pyqpanda_config_wrapper, params):
+        qcir = pq.QCircuit()
+        qcir.insert(pq.RY(config._qubits[0], np.pi / 4))
+        qcir.insert(pq.RY(config._qubits[1], np.pi / 3))
+        qcir.insert(pq.RY(config._qubits[2], np.pi / 7))
+
+        qcir.insert(pq.RZ(config._qubits[0], params[0]))
+        qcir.insert(pq.RY(config._qubits[1], params[1]))
+
+        qcir.insert(pq.CNOT(config._qubits[0], config._qubits[1]))
+        qcir.insert(pq.CNOT(config._qubits[1], config._qubits[2]))
+
+        return qcir
+    def get_p1_diagonal_(config, params, target_gate_type, target_gate_bits,
+                            wires):
+        qcir = layer1_subcircuit(config, params)
+        qcir2 = insert_pauli_for_mt(config._qubits, target_gate_type,
+                                    target_gate_bits)
+        qcir3 = pq.QCircuit()
+        qcir3.insert(qcir)
+        qcir3.insert(qcir2)
+        m_prog = pq.QProg()
+        m_prog.insert(qcir3)
+        
+        return ProbsMeasure(wires, m_prog, config._machine, config._qubits)
+
+使用 `QNG` 类定义的量子自然梯度类，其中[['RZ', 'RY'], ['RX']]为3个含参逻辑门的门类型，
+[[0, 1], [2]]为作用的比特，qcir为计算张量的线路函数列表，[0,1,2]为整个线路的量子比特索引。
+
+.. code-block::
+
+    config = pyqpanda_config_wrapper(3)
+    qcir = []
+    qcir.append(get_p01_diagonal_)
+    qcir.append(get_p1_diagonal_)
+
+
+    # define QNG optimzer
+    opt = QNG(config, quantum_net, 0.02, [['RZ', 'RY'], ['RX']], [[0, 1], [2]],
+                qcir, [0, 1, 2])
+
+进行迭代优化，使用 `opt` 函数进行单步优化，其中第一个入参为输入数据，
+此处线路没有输入，故为None，第二个入参为待优化参数theta。
+
+.. code-block::
+
+    qng_cost = []
+    theta2 = QTensor([0.432, 0.543, 0.233])
+
+    # iteration
+    for _ in range(steps):
+        theta2 = opt.step(None, theta2)
+
+        qng_cost.append(
+            quantum_net(None, theta2, config._qubits, config._cubits,
+                        config._machine))
+
+使用SGD经典梯度下降法作为基线比较两者在相同迭代次数下的损失值变化情况，可见使用量子自然梯度，该损失函数下降更快。
+
+.. code-block::
+
+    # use gradient descent as the baseline
+    sgd_cost = []
+    qlayer = QuantumLayer(quantum_net, 3, 'cpu', 3)
+
+    temp = _core.Tensor([0.432, 0.543, 0.233])
+    _core.vqnet.copyTensor(temp, qlayer.m_para.data)
+    opti = SGD(qlayer.parameters())
+
+    for i in range(steps):
+        opti.zero_grad()
+        loss = qlayer(QTensor([[1]]))
+        print(f'step {i}')
+        print(f'q param before {qlayer.m_para}')
+        loss.backward()
+        sgd_cost.append(loss.item())
+        opti._step()
+        print(f'q param after{qlayer.m_para}')
+        
+    plt.style.use("seaborn")
+    plt.plot(qng_cost, "b", label="Quantum natural gradient descent")
+    plt.plot(sgd_cost, "g", label="Vanilla gradient descent")
+
+    plt.ylabel("Cost function value")
+    plt.xlabel("Optimization steps")
+    plt.legend()
+    plt.show()
+
+.. image:: ./images/qng_vs_sgd.png
+   :width: 600 px
+   :align: center
+
+|
+
+随机参数偏移算法
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+在量子变分线路中，使用参数偏移法 `parameter-shift` 计算量子参数的梯度是一种常用的方法。
+参数偏移法并不普遍适用所有的量子含参逻辑门。
+在它不成立（或不知道成立）的情况下，我们要么必须将门分解为兼容的门，要么使用梯度的替代估计器，例如有限差分近似。
+但是，由于增加了电路复杂性或梯度值中的潜在误差，这两种替代方案都可能存在缺陷。
+Banchi 和 Crooks 1 发现一种可以适用在任一酉矩阵量子逻辑门上的 `随机参数偏移算法(Stochastic Parameter-Shift Rule) <https://arxiv.org/abs/2005.10299>`_ 。
+
+下面展示适用VQNet对一个量子变分线路使用随机参数偏移法计算梯度的示例。示例线路定义如下：
+
+.. code-block::
+
+    import pyqpanda as pq
+    import numpy as np
+    from pyvqnet.qnn.measure import expval
+    from scipy.linalg import expm
+    import matplotlib
+    try:
+        matplotlib.use('TkAgg')
+    except:
+        pass
+    import matplotlib.pyplot as plt
+
+
+    machine = pq.init_quantum_machine(pq.QMachineType.CPU)
+    q = machine.qAlloc_many(2)
+    c = machine.cAlloc_many(2)
+
+    # some basic Pauli matrices
+    I = np.eye(2)
+    X = np.array([[0, 1], [1, 0]])
+    Z = np.array([[1, 0], [0, -1]])
+
+    def Generator(theta1, theta2, theta3):
+        G = theta1.item() * np.kron(X, I) - \
+            theta2 * np.kron(Z, X) + \
+            theta3 * np.kron(I, X)
+        return G
+
+    def pq_demo_circuit(gate_pars):
+        G = Generator(*gate_pars)
+        G = expm(-1j * G)
+        x = G.flatten().tolist()
+
+        cir = pq.matrix_decompose(q, x)
+        m_prog = pq.QProg()
+        m_prog.insert(cir)
+        pauli_dict = {'Z0': 1}
+        exp2 = expval(machine, m_prog, pauli_dict, q)
+        return exp2
+
+随机参数偏移法首先随机从[0,1]的均匀分布中采样一个变量s，接着对线路分别进行如下的酉矩阵变换：
+
+     a) :math:`e^{i(1-s)(\hat{H} + \theta\hat{V})}`
+     b) :math:`e^{+i\tfrac{\pi}{4}\hat{V}}`
+     c) :math:`e^{is(\hat{H} + \theta\hat{V})}`
+
+其中 :math:`\hat{V}` 是一个泡利算符的张量积， :math:`\hat{H}` 是任意泡利算符张量积的线性组合。
+此时获取的观测量的期望值我们定义为 :math:`\langle r_+ \rangle` 。
+
+.. code-block::
+
+    def pq_SPSRgates(gate_pars, s, sign):
+        G = Generator(*gate_pars)
+        # step a)
+        G1 = expm(1j * (1 - s) * G)
+        x = G1.flatten().tolist()
+
+        cir = pq.matrix_decompose(q, x)
+        m_prog = pq.QProg()
+        m_prog.insert(cir)
+
+        # step b)
+        G2 = expm(1j * sign * np.pi / 4 * X)
+        x = G2.flatten().tolist()
+        cir = pq.matrix_decompose(q[0], x)
+        m_prog.insert(cir)
+
+        # step c)
+        G3 = expm(1j * s * G)
+        x = G3.flatten().tolist()
+        cir = pq.matrix_decompose(q, x)
+        m_prog.insert(cir)
+        pauli_dict = {'Z0': 1}
+        exp2 = expval(machine, m_prog, pauli_dict, q)
+        return exp2
+
+将上一步骤中 :math:`\tfrac{\pi}{4}` 变成  :math:`-\tfrac{\pi}{4}`，
+重复进行 a, b, c 操作，获取观测量的期望 :math:`\langle r_- \rangle` 。
+
+随机参数偏移算法计算的梯度公式如下：
+
+ .. math::
+
+     \mathbb{E}_{s\in\mathcal{U}[0,1]}[\langle r_+ \rangle - \langle r_-\rangle]
+
+我们画出使用随机参数偏移法计算的参数 :math:`\theta_1` 梯度与观测量期望的之间的关系。
+通过观察可见，观测量期望符合 :math:`\cos(2\theta_1)` 的函数形式；而使用随机参数偏移法计算梯度
+符合 :math:`-2\sin(2\theta_1)` , 正好是 :math:`\cos(2\theta_1)` 的微分。
+
+.. code-block::
+
+    angles = np.linspace(0, 2 * np.pi, 50)
+    pos_vals = np.array([[
+        pq_SPSRgates([theta1, theta2, theta3], s=s, sign=+1)
+        for s in np.random.uniform(size=10)
+    ] for theta1 in angles])
+    neg_vals = np.array([[
+        pq_SPSRgates([theta1, theta2, theta3], s=s, sign=-1)
+        for s in np.random.uniform(size=10)
+    ] for theta1 in angles])
+
+    # Plot the results
+    evals = [pq_demo_circuit([theta1, theta2, theta3]) for theta1 in angles]
+    spsr_vals = (pos_vals - neg_vals).mean(axis=1)
+    plt.plot(angles, evals, 'b', label="Expectation Value")
+    plt.plot(angles, spsr_vals, 'r', label="Stochastic parameter-shift rule")
+    plt.xlabel("theta1")
+    plt.legend()
+    plt.title("VQNet")
+    plt.show()
+
+.. image:: ./images/stochastic_parameter-shift.png
+   :width: 600 px
+   :align: center
+
+|
+
+
+双随机梯度下降
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+在变分量子算法中，参数化量子电路通过经典梯度下降法进行优化，以最小化期望函数值。
+虽然可以在经典模拟中分析计算期望值，在量子硬件上，程序仅限于从期望值中采样；随着样本数量以及shots次数的增加，这种方式获得的期望值会收敛于理论期望值，但可能永远得到准确值。
+Sweke 等人 在 `论文 <https://arxiv.org/abs/1910.01155>`_ 中发现了一种双随机梯度下降法。
+在本文中，他们证明了使用有限数量的测量样本（或shots）来估计梯度的量子梯度下降是随机梯度下降的一种形式。
+此外，如果优化涉及期望值的线性组合（例如 VQE），从该线性组合中的项中抽样可以进一步减少所需的时间复杂度。
+
+VQNet实现了该算法的一个示例：使用VQE 求解目标Hamiltonian的基态能量。注意此处我们设置量子线路观测的次数shots仅为1次。
+
+.. math::
+
+    H = \begin{bmatrix}
+          8 & 4 & 0 & -6\\
+          4 & 0 & 4 & 0\\
+          0 & 4 & 8 & 0\\
+          -6 & 0 & 0 & 0
+        \end{bmatrix}.
+
+.. code-block::
+
+    import numpy as np
+    import pyqpanda as pq
+    from pyvqnet.qnn.template import StronglyEntanglingTemplate
+    from pyvqnet.qnn.measure import Hermitian_expval
+    from pyvqnet.qnn import QuantumLayerV2
+    from pyvqnet.optim import SGD
+    import pyvqnet._core as _core
+    from pyvqnet.tensor import QTensor
+    from matplotlib import pyplot as plt
+
+    num_layers = 2
+    num_wires = 2
+    eta = 0.01
+    steps = 200
+    n = 1
+    param_shape = [2, 2, 3]
+    shots = 1
+
+    H = np.array([[8, 4, 0, -6], [4, 0, 4, 0], [0, 4, 8, 0], [-6, 0, 0, 0]])
+
+    init_params = np.random.uniform(low=0,
+                                    high=2 * np.pi,
+                                    size=param_shape)
+
+    def pq_circuit(params):
+        params = params.reshape(param_shape)
+        num_qubits = 2
+
+        machine = pq.CPUQVM()
+        machine.init_qvm()
+        qubits = machine.qAlloc_many(num_qubits)
+        circuit = StronglyEntanglingTemplate(params, num_qubits=num_qubits)
+        qcir = circuit.create_circuit(qubits)
+        prog = pq.QProg()
+        prog.insert(qcir)
+        machine.directly_run(prog)
+        result = machine.get_qstate()
+        return result
+
+
+该示例中的哈密顿量是厄密特矩阵，我们总是可以将其表示为泡利矩阵的总和。
+
+.. math::
+
+    H = \sum_{i,j=0,1,2,3} a_{i,j} (\sigma_i\otimes \sigma_j),
+
+其中
+
+.. math::
+
+    a_{i,j} = \frac{1}{4}\text{tr}[(\sigma_i\otimes \sigma_j )H], ~~ \sigma = \{I, X, Y, Z\}.
+
+代入以上公式，可见
+
+.. math::
+
+    H = 4  + 2I\otimes X + 4I \otimes Z - X\otimes X + 5 Y\otimes Y + 2Z\otimes X.
+
+为了执行“双随机”梯度下降，我们简单地应用随机梯度下降方法，但另外也均匀采样每个优化步骤的哈密顿期望项的子集。
+vqe_func_analytic()函数是使用参数偏移计算理论梯度，vqe_func_shots()则是使用随机采样值以及随机采样哈密顿期望子集的“双随机”梯度计算。
+
+.. code-block::
+
+    terms = np.array([
+        2 * np.kron(I, X),
+        4 * np.kron(I, Z),
+        -np.kron(X, X),
+        5 * np.kron(Y, Y),
+        2 * np.kron(Z, X),
+    ])
+
+
+    def vqe_func_analytic(input, init_params):
+        qstate = pq_circuit(init_params)
+        expval = Hermitian_expval(H, qstate, [0, 1], 2)
+        return  expval
+
+    def vqe_func_shots(input, init_params):
+        qstate = pq_circuit(init_params)
+        idx = np.random.choice(np.arange(5), size=n, replace=False)
+        A = np.sum(terms[idx], axis=0)
+        expval = Hermitian_expval(A, qstate, [0, 1], 2, shots)
+        return 4 + (5 / 1) * expval
+
+
+使用VQNet进行参数优化，对比损失函数的曲线，由于双随机梯度下降法每次仅计算H的部分泡利算符和，
+故使用其平均值才能代表最终观测量的期望结果，这里使用滑动平均moving_average()进行计算。
+
+.. code-block::
+
+    for i in range(steps):
+        opti_ana.zero_grad()
+        loss = qlayer_ana(QTensor([[1]]))
+
+        loss.backward()
+        cost_sgd.append(loss.item())
+        opti_ana._step()
+
+    for i in range(steps+50):
+        opti_shots.zero_grad()
+        loss = qlayer_shots(QTensor([[1]]))
+
+        loss.backward()
+        cost_dsgd.append(loss.item())
+        opti_shots._step()
+
+    def moving_average(data, n=3):
+        ret = np.cumsum(data, dtype=np.float64)
+        ret[n:] = ret[n:] - ret[:-n]
+        return ret[n - 1:] / n
+    ta = moving_average(np.array(cost_dsgd), n=50)
+    ta = ta[:-26]
+    average = np.vstack([np.arange(25, 200),ta ])
+    final_param = qlayer_shots.parameters()[0].to_numpy()
+    print("Doubly stochastic gradient descent min energy = ", vqe_func_analytic(QTensor([1]),final_param))
+    final_param  = qlayer_ana.parameters()[0].to_numpy()
+    print("stochastic gradient descent min energy = ", vqe_func_analytic(QTensor([1]),final_param))
+
+    plt.plot(cost_sgd, label="Vanilla gradient descent")
+    plt.plot(cost_dsgd, ".", label="Doubly QSGD")
+    plt.plot(average[0], average[1], "--", label="Doubly QSGD (moving average)")
+
+    plt.ylabel("Cost function value")
+    plt.xlabel("Optimization steps")
+    plt.xlim(-2, 200)
+    plt.legend()
+    plt.show()
+
+    #Doubly stochastic gradient descent min energy =  -4.337801834749975
+    #stochastic gradient descent min energy =  -4.531484333030544
+
+.. image:: ./images/dsgd.png
+   :width: 600 px
+   :align: center
+
+|
