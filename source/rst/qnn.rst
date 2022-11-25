@@ -1134,6 +1134,65 @@ StronglyEntanglingTemplate
         #[0.6881335561525671, 0.31186644384743273]
 
 
+Quantum_Embedding
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:class:: pyvqnet.qnn.Quantum_Embedding(qubits, machine, num_repetitions_input, depth_input,
+                 num_unitary_layers, num_repetitions)
+
+    使用 RZ,RY,RZ 创建变分量子电路，将经典数据编码为量子态。
+    参考 `Quantum embeddings for machine learning <https://arxiv.org/abs/2001.03622>`_。
+    在初始化该类后，其成员函数 ``compute_circuit`` 为运行函数，可作为参数输入 ``QuantumLayerV2`` 类构成量子机器学习模型的一层。
+
+    :param qubits: 使用pyqpanda 申请的量子比特。
+    :param machine: 使用pyqpanda 申请的量子虚拟机。
+    :param num_repetitions_input: 在子模块中对输入进行编码的重复次数。
+    :param depth_input: 输入数据的特征维度。
+    :param num_unitary_layers: 每个子模块中变分量子门的重复字数。
+    :param num_repetitions: 子模块的重复次数。
+
+    Example::
+
+
+        from pyvqnet.qnn import QuantumLayerV2,Quantum_Embedding
+        from pyvqnet.tensor import tensor
+        depth_input = 2
+        num_repetitions = 2
+        num_repetitions_input = 2
+        num_unitary_layers = 2
+
+        loacl_machine = pq.CPUQVM()
+        loacl_machine.init_qvm()
+        nq = depth_input * num_repetitions_input
+        qubits = loacl_machine.qAlloc_many(nq)
+        cubits = loacl_machine.cAlloc_many(nq)
+
+        data_in = tensor.ones([12, depth_input])
+
+        qe = Quantum_Embedding(qubits, loacl_machine, num_repetitions_input,
+                            depth_input, num_unitary_layers, num_repetitions)
+        qlayer = QuantumLayerV2(qe.compute_circuit,
+                                qe.param_num)
+
+        data_in.requires_grad = True
+        y = qlayer.forward(data_in)
+        # [
+        # [0.2302894],
+        #  [0.2302894],
+        #  [0.2302894],
+        #  [0.2302894],
+        #  [0.2302894],
+        #  [0.2302894],
+        #  [0.2302894],
+        #  [0.2302894],
+        #  [0.2302894],
+        #  [0.2302894],
+        #  [0.2302894],
+        #  [0.2302894]
+        # ]
+
+
+
 对量子线路进行测量
 ----------------------------------
 
