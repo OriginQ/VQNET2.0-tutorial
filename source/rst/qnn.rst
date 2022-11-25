@@ -1615,11 +1615,10 @@ QGAN使用经典的GAN模型结构，分为Generator生成器与Discriminator鉴
 
 
 
-同时扰动随机近似优化器。
+同时扰动随机近似优化器
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-
-.. py:function:: pyvqnet.qnn.SPSA(maxiter: int = 1000, save_steps: int = 1, last_avg: int = 1, c0: float = _C0, c1: float = 0.2, c2: float = 0.602, c3: float = 0.101, c4: float = 0, init_para=None, model=None, calibrate_flag=False)
+.. py:class:: pyvqnet.qnn.SPSA(maxiter: int = 1000, last_avg: int = 1, c0: float = _C0, c1: float = 0.2, c2: float = 0.602, c3: float = 0.101, c4: float = 0, init_para=None, model=None, calibrate_flag=False)
     
     同时扰动随机近似 (SPSA) 优化器。
 
@@ -1628,7 +1627,6 @@ QGAN使用经典的GAN模型结构，分为Generator生成器与Discriminator鉴
     `SPSA 网站 <http://www.jhuapl.edu/SPSA>`__ 上提供了进一步的介绍。
 
     :param maxiter: 要执行的最大迭代次数。默认值：1000。
-    :param save_steps: 保存每个 save_steps 步骤的中间信息。默认值：1。
     :param last_avg: last_avg 迭代的平均参数。
         如果 last_avg = 1，则只考虑最后一次迭代。默认值：1。
     :param c0: 初始a。更新参数的步长。默认值：0.2*pi
@@ -1685,7 +1683,7 @@ QGAN使用经典的GAN模型结构，分为Generator生成器与Discriminator鉴
         )
 
 
-.. py:function:: pyvqnet.qnn.SPSA._step(input_data)
+.. py:method:: pyvqnet.qnn.SPSA._step(input_data)
 
     优化 sapa 优化器
 
