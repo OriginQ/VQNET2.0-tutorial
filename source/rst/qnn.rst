@@ -1147,7 +1147,7 @@ Quantum_Embedding
     :param machine: 使用pyqpanda 申请的量子虚拟机。
     :param num_repetitions_input: 在子模块中对输入进行编码的重复次数。
     :param depth_input: 输入数据的特征维度。
-    :param num_unitary_layers: 每个子模块中变分量子门的重复字数。
+    :param num_unitary_layers: 每个子模块中变分量子门的重复次数。
     :param num_repetitions: 子模块的重复次数。
 
     Example::

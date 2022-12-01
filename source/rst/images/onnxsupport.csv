@@ -1,4 +1,4 @@
-算子,算子,算子
+operator,operator,operator
 ones,floor,nonzero
 ons_like,ceil,isfinite
 full,round,isinf
