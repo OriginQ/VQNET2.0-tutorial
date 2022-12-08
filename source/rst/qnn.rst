@@ -47,9 +47,9 @@ QuantumLayer是一个支持量子含参线路作为参数的自动求导模块�
     .. note::
         qprog_with_measure是pyQPanda中定义的量子线路函数 :https://pyqpanda-toturial.readthedocs.io/zh/latest/QCircuit.html。
         
-        此函数应包含以下参数，否则无法在QuantumLayer中正常运行。
+        此函数必须包含以下参数作为函数入参（即使某个参数未实际使用），否则无法在QuantumLayer中正常运行。
 
-        qprog_with_measure (input,param,qubits,cbits,m_machine)
+        qprog_with_measure (input,param,qubits,cbits,machine)
         
             `input`: 输入一维经典数据。
             
@@ -59,7 +59,7 @@ QuantumLayer是一个支持量子含参线路作为参数的自动求导模块�
             
             `cbits`: cbits由QuantumLayer分配。如果线路不使用cbits，也应保留此参数。
             
-            `m_machine`: QuantumLayer创建的模拟器。
+            `machine`: QuantumLayer创建的模拟器。
 
     Example::
 
@@ -68,7 +68,7 @@ QuantumLayer是一个支持量子含参线路作为参数的自动求导模块�
         from pyvqnet.qnn.quantumlayer import QuantumLayer
         import numpy as np 
         from pyvqnet.tensor import QTensor
-        def pqctest (input,param,qubits,cbits,m_machine):
+        def pqctest (input,param,qubits,cbits,machine):
             circuit = pq.QCircuit()
             circuit.insert(pq.H(qubits[0]))
             circuit.insert(pq.H(qubits[1])) 
@@ -96,7 +96,7 @@ QuantumLayer是一个支持量子含参线路作为参数的自动求导模块�
             prog = pq.QProg()    
             prog.insert(circuit)    
             # pauli_dict  = {'Z0 X1':10,'Y2':-0.543}
-            rlt_prob = ProbsMeasure([0,2],prog,m_machine,qubits)
+            rlt_prob = ProbsMeasure([0,2],prog,machine,qubits)
             return rlt_prob
 
         pqc = QuantumLayer(pqctest,3,"CPU",4,1)
@@ -133,7 +133,7 @@ QuantumLayerV2
     .. note::
         qprog_with_measure是pyQPanda中定义的量子线路函数 :https://pyqpanda-toturial.readthedocs.io/zh/latest/QCircuit.html。
         
-        此函数应包含以下参数，否则无法在QuantumLayerV2中正常运行。
+        此函数必须包含以下参数作为函数入参（即使某个参数未实际使用），否则无法在QuantumLayerV2中正常运行。
 
         与QuantumLayer相比。应该分配量子比特和模拟器: https://pyqpanda-toturial.readthedocs.io/zh/latest/QuantumMachine.html,
 
@@ -156,9 +156,9 @@ QuantumLayerV2
         def pqctest (input,param):
             num_of_qubits = 4
 
-            m_machine = pq.CPUQVM()# outside
-            m_machine.init_qvm()# outside
-            qubits = m_machine.qAlloc_many(num_of_qubits)
+            machine = pq.CPUQVM()
+            machine.init_qvm()
+            qubits = machine.qAlloc_many(num_of_qubits)
 
             circuit = pq.QCircuit()
             circuit.insert(pq.H(qubits[0]))
@@ -186,7 +186,7 @@ QuantumLayerV2
 
             prog = pq.QProg()    
             prog.insert(circuit)    
-            rlt_prob = ProbsMeasure([0,2],prog,m_machine,qubits)
+            rlt_prob = ProbsMeasure([0,2],prog,machine,qubits)
             return rlt_prob
 
 
@@ -337,7 +337,7 @@ NoiseQuantumLayer
         
         此函数应包含以下参数，否则无法在NoiseQuantumLayer中正常运行。
         
-        qprog_with_measure (input,param,qubits,cbits,m_machine)
+        qprog_with_measure (input,param,qubits,cbits,machine)
         
             `input`: 输入一维经典数据。
             
@@ -347,7 +347,7 @@ NoiseQuantumLayer
             
             `cbits`: cbits由QuantumLayer分配。如果线路不使用cbits，也应保留此参数。
             
-            `m_machine`: QuantumLayer创建的模拟器。
+            `machine`: QuantumLayer创建的模拟器。
 
 
     Example::
@@ -720,9 +720,9 @@ BasicEmbeddingCircuit
         import pyqpanda as pq
         from pyvqnet.qnn.template import BasicEmbeddingCircuit
         input_feat = np.array([0,1,1]).reshape([3])
-        m_machine = pq.init_quantum_machine(pq.QMachineType.CPU)
+        machine = pq.init_quantumachine(pq.QMachineType.CPU)
 
-        qlist = m_machine.qAlloc_many(3)
+        qlist = machine.qAlloc_many(3)
         circuit = BasicEmbeddingCircuit(input_feat,qlist)
         print(circuit)
 
@@ -759,9 +759,9 @@ AngleEmbeddingCircuit
         import numpy as np
         import pyqpanda as pq
         from pyvqnet.qnn.template import AngleEmbeddingCircuit
-        m_machine = pq.init_quantum_machine(pq.QMachineType.CPU)
-        m_qlist = m_machine.qAlloc_many(2)
-        m_clist = m_machine.cAlloc_many(2)
+        machine = pq.init_quantumachine(pq.QMachineType.CPU)
+        m_qlist = machine.qAlloc_many(2)
+        m_clist = machine.cAlloc_many(2)
         m_prog = pq.QProg()
 
         input_feat = np.array([2.2, 1])
@@ -771,7 +771,7 @@ AngleEmbeddingCircuit
         print(C)
         C = AngleEmbeddingCircuit(input_feat,m_qlist,'Z')
         print(C)
-        pq.destroy_quantum_machine(m_machine)
+        pq.destroy_quantumachine(machine)
 
         #           ┌────────────┐
         # q_0:  |0>─┤RX(2.200000)├
@@ -812,13 +812,13 @@ AmplitudeEmbeddingCircuit
         import pyqpanda as pq
         from pyvqnet.qnn.template import AmplitudeEmbeddingCircuit
         input_feat = np.array([2.2, 1, 4.5, 3.7])
-        m_machine = pq.init_quantum_machine(pq.QMachineType.CPU)
-        m_qlist = m_machine.qAlloc_many(2)
-        m_clist = m_machine.cAlloc_many(2)
+        machine = pq.init_quantumachine(pq.QMachineType.CPU)
+        m_qlist = machine.qAlloc_many(2)
+        m_clist = machine.cAlloc_many(2)
         m_prog = pq.QProg()
         cir = AmplitudeEmbeddingCircuit(input_feat,m_qlist)
         print(cir)
-        pq.destroy_quantum_machine(m_machine)
+        pq.destroy_quantumachine(machine)
 
         #                              ┌────────────┐     ┌────────────┐
         # q_0:  |0>─────────────── ─── ┤RY(0.853255)├ ─── ┤RY(1.376290)├
@@ -847,9 +847,9 @@ IQPEmbeddingCircuits
         import numpy as np
         import pyqpanda as pq
         from pyvqnet.qnn.template import IQPEmbeddingCircuits
-        m_machine = pq.init_quantum_machine(pq.QMachineType.CPU)
+        machine = pq.init_quantumachine(pq.QMachineType.CPU)
         input_feat = np.arange(1,100)
-        qlist = m_machine.qAlloc_many(3)
+        qlist = machine.qAlloc_many(3)
         circuit = IQPEmbeddingCircuits(input_feat,qlist,rep = 1)
         print(circuit)
 
@@ -887,14 +887,14 @@ RotCircuit
         import pyqpanda as pq
         from pyvqnet.tensor import QTensor
         from pyvqnet.qnn.template import RotCircuit
-        m_machine = pq.init_quantum_machine(pq.QMachineType.CPU)
-        m_clist = m_machine.cAlloc_many(2)
+        machine = pq.init_quantumachine(pq.QMachineType.CPU)
+        m_clist = machine.cAlloc_many(2)
         m_prog = pq.QProg()
-        m_qlist = m_machine.qAlloc_many(1)
+        m_qlist = machine.qAlloc_many(1)
         param = np.array([3,4,5])
         c = RotCircuit(QTensor(param),m_qlist)
         print(c)
-        pq.destroy_quantum_machine(m_machine)
+        pq.destroy_quantumachine(machine)
 
         #           ┌────────────┐ ┌────────────┐ ┌────────────┐
         # q_0:  |0>─┤RZ(5.000000)├ ┤RY(4.000000)├ ┤RZ(3.000000)├
@@ -926,15 +926,15 @@ CRotCircuit
         import pyqpanda as pq
         from pyvqnet.tensor import QTensor
         from pyvqnet.qnn.template import CRotCircuit
-        m_machine = pq.init_quantum_machine(pq.QMachineType.CPU)
-        m_clist = m_machine.cAlloc_many(2)
+        machine = pq.init_quantumachine(pq.QMachineType.CPU)
+        m_clist = machine.cAlloc_many(2)
         m_prog = pq.QProg()
-        m_qlist = m_machine.qAlloc_many(1)
+        m_qlist = machine.qAlloc_many(1)
         param = np.array([3,4,5])
-        control_qlist = m_machine.qAlloc_many(1)
+        control_qlist = machine.qAlloc_many(1)
         c = CRotCircuit(QTensor(param),control_qlist,m_qlist)
         print(c)
-        pq.destroy_quantum_machine(m_machine)
+        pq.destroy_quantumachine(machine)
 
         #           ┌────────────┐ ┌────────────┐ ┌────────────┐
         # q_0:  |0>─┤RZ(5.000000)├ ┤RY(4.000000)├ ┤RZ(3.000000)├
@@ -969,13 +969,13 @@ CSWAPcircuit
 
         from pyvqnet.qnn.template import CSWAPcircuit
         import pyqpanda as pq
-        m_machine = pq.init_quantum_machine(pq.QMachineType.CPU)
+        machine = pq.init_quantumachine(pq.QMachineType.CPU)
 
-        m_qlist = m_machine.qAlloc_many(3)
+        m_qlist = machine.qAlloc_many(3)
 
         c = CSWAPcircuit([m_qlist[1],m_qlist[2],m_qlist[0]])
         print(c)
-        pq.destroy_quantum_machine(m_machine)
+        pq.destroy_quantumachine(machine)
 
         # q_0:  |0>─X─
         #           │
@@ -1105,8 +1105,8 @@ StronglyEntanglingTemplate
         shape = [2, num_qubits, 3]
         weights = np.random.random(size=shape)
 
-        machine = pq.CPUQVM()  # outside
-        machine.init_qvm()  # outside
+        machine = pq.CPUQVM()  
+        machine.init_qvm()  
         qubits = machine.qAlloc_many(num_qubits)
 
         circuit = StronglyEntanglingTemplate(weights, num_qubits=num_qubits)
@@ -1219,9 +1219,9 @@ expval
         import pyqpanda as pq
         from pyvqnet.qnn.measure import expval
         input = [0.56, 0.1]
-        m_machine = pq.init_quantum_machine(pq.QMachineType.CPU)
+        machine = pq.init_quantumachine(pq.QMachineType.CPU)
         m_prog = pq.QProg()
-        m_qlist = m_machine.qAlloc_many(3)
+        m_qlist = machine.qAlloc_many(3)
         cir = pq.QCircuit()
         cir.insert(pq.RZ(m_qlist[0],input[0]))
         cir.insert(pq.CNOT(m_qlist[0],m_qlist[1]))
@@ -1229,9 +1229,9 @@ expval
         cir.insert(pq.CNOT(m_qlist[0],m_qlist[2]))
         m_prog.insert(cir)    
         pauli_dict  = {'Z0 X1':10,'Y2':-0.543}
-        exp2 = expval(m_machine,m_prog,pauli_dict,m_qlist)
+        exp2 = expval(machine,m_prog,pauli_dict,m_qlist)
         print(exp2)
-        pq.destroy_quantum_machine(m_machine)
+        pq.destroy_quantumachine(machine)
         #0.9983341664682731
 
 QuantumMeasure
@@ -1258,9 +1258,9 @@ QuantumMeasure
         import pyqpanda as pq
         input = [0.56,0.1]
         measure_qubits = [0,2]
-        m_machine = pq.init_quantum_machine(pq.QMachineType.CPU)
+        machine = pq.init_quantumachine(pq.QMachineType.CPU)
         m_prog = pq.QProg()
-        m_qlist = m_machine.qAlloc_many(3)
+        m_qlist = machine.qAlloc_many(3)
 
         cir = pq.QCircuit()
         cir.insert(pq.RZ(m_qlist[0],input[0]))
@@ -1272,7 +1272,7 @@ QuantumMeasure
         cir.insert(pq.H(m_qlist[2]))
 
         m_prog.insert(cir)    
-        rlt_quant = QuantumMeasure(measure_qubits,m_prog,m_machine,m_qlist)
+        rlt_quant = QuantumMeasure(measure_qubits,m_prog,machine,m_qlist)
         print(rlt_quant)
         #[0.25, 0.264, 0.257, 0.229]
 
@@ -1301,9 +1301,9 @@ ProbsMeasure
 
         input = [0.56,0.1]
         measure_qubits = [0,2]
-        m_machine = pq.init_quantum_machine(pq.QMachineType.CPU)
+        machine = pq.init_quantumachine(pq.QMachineType.CPU)
         m_prog = pq.QProg()
-        m_qlist = m_machine.qAlloc_many(3)
+        m_qlist = machine.qAlloc_many(3)
 
         cir = pq.QCircuit()
         cir.insert(pq.RZ(m_qlist[0],input[0]))
@@ -1316,7 +1316,7 @@ ProbsMeasure
 
         m_prog.insert(cir)    
 
-        rlt_prob = ProbsMeasure([0,2],m_prog,m_machine,m_qlist)
+        rlt_prob = ProbsMeasure([0,2],m_prog,machine,m_qlist)
         print(rlt_prob)
         #[0.2499999999999947, 0.2499999999999947, 0.2499999999999947, 0.2499999999999947]
 
@@ -1568,9 +1568,9 @@ QGAN使用经典的GAN模型结构，分为Generator生成器与Discriminator鉴
     print(qgan_model.eval_metric(param, "kl"))
 
     #get generator quantum circuit
-    m_machine = pq.CPUQVM()
-    m_machine.init_qvm()
-    qubits = m_machine.qAlloc_many(num_of_qubits)
+    machine = pq.CPUQVM()
+    machine.init_qvm()
+    qubits = machine.qAlloc_many(num_of_qubits)
     qpanda_cir = qgan_model.get_circuits_with_trained_param(qubits)
     print(qpanda_cir)
 
@@ -1718,9 +1718,9 @@ QGAN使用经典的GAN模型结构，分为Generator生成器与Discriminator鉴
         def layer_fn_spsa_pq(input, weights):
             num_of_qubits = 1
 
-            m_machine = pq.CPUQVM()
-            m_machine.init_qvm()
-            qubits = m_machine.qAlloc_many(num_of_qubits)
+            machine = pq.CPUQVM()
+            machine.init_qvm()
+            qubits = machine.qAlloc_many(num_of_qubits)
             c1 = AngleEmbeddingCircuit(input, qubits)
             weights =weights.reshape([4,1])
             bc_class = BasicEntanglerTemplate(weights, 1)
@@ -1729,7 +1729,7 @@ QGAN使用经典的GAN模型结构，分为Generator生成器与Discriminator鉴
             m_prog.insert(c1)
             m_prog.insert(c2)
             pauli_dict = {'Z0': 1}
-            exp2 = expval(m_machine, m_prog, pauli_dict, qubits)
+            exp2 = expval(machine, m_prog, pauli_dict, qubits)
 
             return exp2
 
@@ -1772,9 +1772,9 @@ QGAN使用经典的GAN模型结构，分为Generator生成器与Discriminator鉴
         def layer_fn_spsa_pq(input, weights):
             num_of_qubits = 1
 
-            m_machine = pq.CPUQVM()
-            m_machine.init_qvm()
-            qubits = m_machine.qAlloc_many(num_of_qubits)
+            machine = pq.CPUQVM()
+            machine.init_qvm()
+            qubits = machine.qAlloc_many(num_of_qubits)
             c1 = AngleEmbeddingCircuit(input, qubits)
             weights =weights.reshape([4,1])
             bc_class = BasicEntanglerTemplate(weights, 1)
@@ -1783,7 +1783,7 @@ QGAN使用经典的GAN模型结构，分为Generator生成器与Discriminator鉴
             m_prog.insert(c1)
             m_prog.insert(c2)
             pauli_dict = {'Z0': 1}
-            exp2 = expval(m_machine, m_prog, pauli_dict, qubits)
+            exp2 = expval(machine, m_prog, pauli_dict, qubits)
 
             return exp2
 
@@ -2056,7 +2056,7 @@ Banchi 和 Crooks 1 发现一种可以适用在任一酉矩阵量子逻辑门上
     import matplotlib.pyplot as plt
 
 
-    machine = pq.init_quantum_machine(pq.QMachineType.CPU)
+    machine = pq.init_quantumachine(pq.QMachineType.CPU)
     q = machine.qAlloc_many(2)
     c = machine.cAlloc_many(2)
 
@@ -2134,6 +2134,7 @@ Banchi 和 Crooks 1 发现一种可以适用在任一酉矩阵量子逻辑门上
 
 .. code-block::
 
+    theta2, theta3 = -0.15, 1.6
     angles = np.linspace(0, 2 * np.pi, 50)
     pos_vals = np.array([[
         pq_SPSRgates([theta1, theta2, theta3], s=s, sign=+1)
@@ -2202,6 +2203,11 @@ VQNet实现了该算法的一个示例：使用VQE 求解目标Hamiltonian的基
     shots = 1
 
     H = np.array([[8, 4, 0, -6], [4, 0, 4, 0], [0, 4, 8, 0], [-6, 0, 0, 0]])
+
+    # some basic Pauli matrices
+    I = np.eye(2)
+    X = np.array([[0, 1], [1, 0]])
+    Z = np.array([[1, 0], [0, -1]])
 
     init_params = np.random.uniform(low=0,
                                     high=2 * np.pi,
@@ -2272,6 +2278,21 @@ vqe_func_analytic()函数是使用参数偏移计算理论梯度，vqe_func_shot
 故使用其平均值才能代表最终观测量的期望结果，这里使用滑动平均moving_average()进行计算。
 
 .. code-block::
+
+    from pyqpanda import *
+
+    ##############################################################################
+    # Optimizing the circuit using gradient descent via the parameter-shift rule:
+    qlayer_ana = QuantumLayerV2(vqe_func_analytic, 2*2*3 )
+    qlayer_shots = QuantumLayerV2(vqe_func_shots, 2*2*3 )
+    cost_sgd = []
+    cost_dsgd = []
+    temp = _core.Tensor(init_params)
+    _core.vqnet.copyTensor(temp, qlayer_ana.m_para.data)
+    opti_ana = SGD(qlayer_ana.parameters())
+
+    _core.vqnet.copyTensor(temp, qlayer_shots.m_para.data)
+    opti_shots = SGD(qlayer_shots.parameters())
 
     for i in range(steps):
         opti_ana.zero_grad()

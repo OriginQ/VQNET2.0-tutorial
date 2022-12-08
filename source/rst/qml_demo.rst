@@ -10,7 +10,7 @@
 ^^^^^^^^^^^^^^^^^^
 
 这个例子使用VQNet实现了论文 `Circuit-centric quantum classifiers <https://arxiv.org/pdf/1804.00633.pdf>`_ 中可变量子线路进行二分类任务。
-该例子用来判断一个二进制数是奇数还是偶数。通过将二进制数编码到量子比特上，通过优化线路中的可变参数，使得该线路z方向观测量可以指示该输入为奇数还是偶数。
+该例子用来判断一个二进制数是奇数还是偶数。通过将二进制数编码到量子比特上，通过优化线路中的可变参数，使得该线路z方向测量值可以指示该输入为奇数还是偶数。
 
 量子线路
 """""""""""""""""
@@ -1397,6 +1397,7 @@ Quantum circuit structure learning任务的核心目标就是找到最优的带�
 
     from pyqpanda import *
     import pyqpanda as pq
+    import numpy as np
     def circuit(weights):
         num_qubits = 1
         #pyQPanda 创建模拟器
@@ -3961,8 +3962,8 @@ VQNet提供了封装类 ``VQC_wrapper`` ，用户使用普通逻辑门在函数 
 
     def serial_quantum_model(weights, x, num_qubits, scaling):
         cir = pq.QCircuit()
-        machine = pq.CPUQVM()  # outside
-        machine.init_qvm()  # outside
+        machine = pq.CPUQVM()  
+        machine.init_qvm()  
         qubits = machine.qAlloc_many(num_qubits)
 
         for theta in weights[:-1]:
@@ -4264,8 +4265,8 @@ VQNet提供了封装类 ``VQC_wrapper`` ，用户使用普通逻辑门在函数 
 
     def parallel_quantum_model(weights, x, num_qubits):
         cir = pq.QCircuit()
-        machine = pq.CPUQVM()  # outside
-        machine.init_qvm()  # outside
+        machine = pq.CPUQVM()  
+        machine.init_qvm()  
         qubits = machine.qAlloc_many(num_qubits)
 
         cir.insert(W1(weights[0], qubits))

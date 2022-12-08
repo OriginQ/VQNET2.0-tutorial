@@ -45,6 +45,7 @@ VQNet支持将量子计算模块与经典计算模块（例如：卷积，池化
 
 .. code-block::
 
+    import pyqpanda as pq
     def qdrl_circuit(input,weights,qlist,clist,machine):
 
             x1 = input.squeeze()
