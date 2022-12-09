@@ -35,9 +35,9 @@ QuantumLayer是一个支持量子含参线路作为参数的自动求导模块�
 
     变分量子层的抽象计算模块。对一个参数化的量子线路进行仿真，得到测量结果。该变分量子层继承了VQNet框架的梯度计算模块，可以计算线路参数的梯度，训练变分量子线路模型或将变分量子线路嵌入混合量子和经典模型。
 
-    :param qprog_with_measure: 用pyQPand构建的量子线路运行和测量函数。
+    :param qprog_with_measure: 用pyQPanda构建的量子线路运行和测量函数。
     :param para_num: `int` - 参数个数。
-    :param machine_type_or_cloud_token: qpanda量子虚拟机类型或pyQPANDA 量子云令牌 : https://pyqpanda-toturial.readthedocs.io/zh/latest/Realchip.html。
+    :param machine_type_or_cloud_token: qpanda量子虚拟机类型或pyQPanda 量子云令牌 : https://pyqpanda-toturial.readthedocs.io/zh/latest/Realchip.html。
     :param num_of_qubits: 量子比特数。
     :param num_of_cbits: 经典比特数，默认为1。
     :param diff_method: 求解量子线路参数梯度的方法，“参数位移”或“有限差分”，默认参数偏移。
@@ -223,9 +223,9 @@ QuantumLayerMultiProcess
     
     该层对一个参数化的量子线路进行仿真，得到测量结果。该变分量子层继承了VQNet框架的梯度计算模块，可以计算线路参数的梯度，训练变分量子线路模型或将变分量子线路嵌入混合量子和经典模型。
 
-    :param qprog_with_measure: 用pyQPand构建的量子线路运行和测量函数。
+    :param qprog_with_measure: 用pyQPanda构建的量子线路运行和测量函数。
     :param para_num: `int` - 参数个数。
-    :param machine_type_or_cloud_token: qpanda量子虚拟机类型或pyQPANDA 量子云令牌 : https://pyqpanda-toturial.readthedocs.io/zh/latest/Realchip.html。
+    :param machine_type_or_cloud_token: qpanda量子虚拟机类型或pyQPanda 量子云令牌 : https://pyqpanda-toturial.readthedocs.io/zh/latest/Realchip.html。
     :param num_of_qubits: 量子比特数。
     :param num_of_cbits: 经典比特数，默认为1。
     :param diff_method: 求解量子线路参数梯度的方法，“参数位移”或“有限差分”，默认参数偏移。
@@ -321,7 +321,7 @@ NoiseQuantumLayer
 
     这一层可以在量子线路中使用噪声模型。
 
-    :param qprog_with_measure: 用pyQPand构建的量子线路运行和测量函数。
+    :param qprog_with_measure: 用pyQPanda构建的量子线路运行和测量函数。
     :param para_num: `int` - 参数个数。
     :param machine_type: qpanda机器类型。
     :param num_of_qubits: 量子比特数。
