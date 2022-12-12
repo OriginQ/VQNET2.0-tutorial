@@ -1373,7 +1373,7 @@ Quantum circuit structure learning任务的核心目标就是找到最优的带�
             break
         
         if targets[0] == 0:
-            axes[n_samples_show - 1].set_title("Labeled: 0")
+            axes[n_samples_show - 1].set_title("Labeled: 1")
             axes[n_samples_show - 1].imshow(img.squeeze(), cmap='gray')
             axes[n_samples_show - 1].set_xticks([])
             axes[n_samples_show - 1].set_yticks([])
