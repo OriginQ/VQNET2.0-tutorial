@@ -1399,6 +1399,81 @@ Mutal_Info
         #0.13763425302805887
 
 
+MeasurePauliSum
+^^^^^^^^^^^^^^^^^^^^
+.. py:function:: pyvqnet.qnn.measure.MeasurePauliSum(machine, prog, obs_list, qlists)
+
+    根据提供的哈密顿观量的期望值。
+
+    :param machine: pyQPanda分配的量子虚拟机。
+    :param prog: qpanda创建的量子工程。
+    :param pauli_str_dict: 需要观测的哈密顿量。
+    :param qlists: pyQPanda分配的量子比特。
+
+    :return: 期望值
+
+    Example::
+
+        from pyvqnet.qnn.measure import MeasurePauliSum
+        import pyqpanda as pq
+        x = [0.56, 0.1]
+        obs_list = [{'wires': [0, 2, 3], 'observables': ['X', 'Y', 'Z'], 'coefficient': [1, 0.5, 0.4]},
+                    {'wires': [0, 1, 2], 'observables': ['X', 'Y', 'Z'], 'coefficient': [1, 0.5, 0.4]}]
+
+        m_machine = pq.CPUQVM()
+        m_machine.init_qvm()
+
+        m_prog = pq.QProg()
+        m_qlist = m_machine.qAlloc_many(4)
+
+        cir = pq.QCircuit()
+        cir.insert(pq.RZ(m_qlist[0], x[0]))
+        cir.insert(pq.RZ(m_qlist[1], x[0]))
+        cir.insert(pq.CNOT(m_qlist[0], m_qlist[1]))
+        cir.insert(pq.RY(m_qlist[2], x[1]))
+        cir.insert(pq.CNOT(m_qlist[0], m_qlist[2]))
+        cir.insert(pq.RZ(m_qlist[3], x[1]))
+
+        m_prog.insert(cir)
+        result = MeasurePauliSum(m_machine, m_prog, obs_list, m_qlist)
+        print(result)
+        m_machine.finalize()
+        # [0.40000000000000013, 0.3980016661112104]
+
+
+VarMeasure
+^^^^^^^^^^^^^^^^^^^^
+.. py:function:: pyvqnet.qnn.measure.VarMeasure(machine, prog, actual_qlist)
+
+    提供的可观察量的方差。
+
+    :param machine: pyQPanda分配的量子虚拟机。
+    :param prog: qpanda创建的量子工程。
+    :param actual_qlist: 由 pyQpanda.qAlloc_many() 分配的量子位。
+
+    :return: 方差值
+
+    Example::
+
+        import pyqpanda as pq
+        from pyvqnet.qnn.measure import VarMeasure
+        cir = pq.QCircuit()
+        machine = pq.CPUQVM()  # outside
+        machine.init_qvm()  # outside
+        qubits = machine.qAlloc_many(2)
+
+        cir.insert(pq.RX(qubits[0], 0.5))
+        cir.insert(pq.H(qubits[1]))
+        cir.insert(pq.CNOT(qubits[0], qubits[1]))
+
+        prog1 = pq.QProg()
+        prog1.insert(cir)
+        var_result = VarMeasure(machine, prog1, qubits[0])
+        print(var_result)
+        # 0.2298488470659339
+
+
+
 量子机器学习算法接口
 ----------------------------------
 
