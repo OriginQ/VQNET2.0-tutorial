@@ -1639,7 +1639,7 @@ Quantum circuit structure learning任务的核心目标就是找到最优的带�
         axes[count].set_yticks([])
         axes[count].set_title('Predicted {}'.format(np.array(pred.data)))
         count += 1
-        plt.show()
+    plt.show()
 
 .. image:: ./images/eval_test.png
    :width: 600 px
