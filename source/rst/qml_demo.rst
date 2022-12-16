@@ -4504,4 +4504,165 @@ VQNet提供了封装类 ``VQC_wrapper`` ，用户使用普通逻辑门在函数 
 
 
 
+量子线路表达能力
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+
+在论文 `Expressibility and entangling capability of parameterized quantum circuits for hybrid quantum-classical algorithms <https://arxiv.org/abs/1905.10876>`_ 中，
+作者提出了基于神经网络输出态之间的保真度概率分布的表达能力量化方法。
+对任意量子神经网络 :math:`U(\vec{\theta})` ，采样两次神经网络参数（设为 :math:`\vec{\phi}` 和 :math:`\vec{\psi}` ），
+则两个量子电路输出态之间的保真度 :math:`F=|\langle0|U(\vec{\phi})^\dagger U(\vec{\psi})|0\rangle|^2` 服从某个概率分布：
+
+.. math::
+
+    F\sim{P}(f)
+
+文献指出，量子神经网络 $U$ 能够均匀地分布在所有酉矩阵上时（此时称 :math:`U` 服从哈尔分布），保真度的概率分布 :math:`P_\text{Haar}(f)` 满足
+
+.. math::
+
+    P_\text{Haar}(f)=(2^{n}-1)(1-f)^{2^n-2}
+
+统计数学中的 K-L 散度（也称相对熵）可以衡量两个概率分布之间的差异。两个离散概率分布 :math:`P,Q` 之间的 K-L 散度定义为
+
+.. math::
+
+    D_{KL}(P||Q)=\sum_jP(j)\ln\frac{P(j)}{Q(j)}
+
+如果将量子神经网络输出的保真度分布记为 :math:`P_\text{QNN}(f)` ，则量子神经网络的表达能力定义为 :math:`P_\text{QNN}(f)` 和 :math:`P_\text{Haar}(f)` 之间的 K-L 散度 ：
+
+.. math::
+
+    \text{Expr}_\text{QNN}=D_{KL}(P_\text{QNN}(f)||P_\text{Haar}(f))
+
+
+因此，当 :math:`P_\text{QNN}(f)` 越接近 :math:`P_\text{Haar}(f)` 时， :math:`\text{Expr}` 将越小（越趋近于 0），
+量子神经网络的表达能力也就越强；反之， :math:`\text{Expr}` 越大，量子神经网络的表达能力也就越弱。
+
+我们可以根据该定义直接计算单比特量子神经网络 :math:`R_Y(\theta)` ， :math:`R_Y(\theta_1)R_Z(\theta_2)` 和
+ :math:`R_Y(\theta_1)R_Z(\theta_2)R_Y(\theta_3)` 的表达能力：
+
+以下用VQNet展示了HardwareEfficientAnsatz 在不同深度下（1，2，3）的量子线路表达能力。
+
+
+.. code-block::
+
+    import numpy as np
+    import matplotlib.pyplot as plt
+    from matplotlib.ticker import FuncFormatter
+    from scipy import integrate
+    from scipy.linalg import sqrtm
+    from scipy.stats import entropy
+
+    import pyqpanda as pq
+    import numpy as np
+    from pyvqnet.qnn.ansatz import HardwareEfficientAnsatz
+    from pyvqnet.tensor import tensor
+    from pyvqnet.qnn.quantum_expressibility import fidelity_of_cir, fidelity_harr_sample
+    num_qubit = 1  # the number of qubit
+    num_sample = 2000  # the number of sample
+    outputs_y = list()  # save QNN outputs
+
+
+    # plot histgram
+    def plot_hist(data, num_bin, title_str):
+        def to_percent(y, position):
+            return str(np.around(y * 100, decimals=2)) + '%'
+
+        plt.hist(data,
+                weights=[1. / len(data)] * len(data),
+                bins=np.linspace(0, 1, num=num_bin),
+                facecolor="blue",
+                edgecolor="black",
+                alpha=0.7)
+        plt.xlabel("Fidelity")
+        plt.ylabel("frequency")
+        plt.title(title_str)
+        formatter = FuncFormatter(to_percent)
+        plt.gca().yaxis.set_major_formatter(formatter)
+        plt.show()
+
+
+
+    def cir(num_qubits, depth):
+
+        machine = pq.CPUQVM()
+        machine.init_qvm()
+        qlist = machine.qAlloc_many(num_qubits)
+        az = HardwareEfficientAnsatz(num_qubits, ["rx", "RY", "rz"],
+                                    qlist,
+                                    entangle_gate="cnot",
+                                    entangle_rules="linear",
+                                    depth=depth)
+        w = tensor.QTensor(
+            np.random.uniform(size=[az.get_para_num()], low=0, high=2 * np.pi))
+
+        cir1 = az.create_ansatz(w)
+        return cir1, machine, qlist
+
+.. image:: ./images/haar-fidelity.png
+   :width: 600 px
+   :align: center
+
+|
+
+.. code-block::
+
+
+    # 设置电路宽度和最大深度
+    num_qubit = 4
+    max_depth = 3
+    # 计算哈尔采样对应的保真度分布
+    print("哈尔采样输出的保真度服从分布：")
+    flist, p_haar, theory_haar = fidelity_harr_sample(num_qubit, num_sample)
+    title_str = "haar, %d qubit(s)" % num_qubit
+    plot_hist(flist, 50, title_str)
+
+
+
+    Expr_cel = list()
+    # 计算不同深度的神经网络的表达能力
+    for DEPTH in range(1, max_depth + 1):
+        print("正在采样深度为 %d 的电路..." % DEPTH)
+
+        f_list, p_cel = fidelity_of_cir(HardwareEfficientAnsatz, num_qubit, DEPTH,
+                                        num_sample)
+        title_str = f"HardwareEfficientAnsatz, {num_qubit} qubit(s) {DEPTH} layer(s)"
+        plot_hist(f_list, 50, title_str)
+        expr = entropy(p_cel, theory_haar)
+        Expr_cel.append(expr)
+    # 比较不同深度的神经网络的表达能力
+    print(
+        f"深度为 1,2,3 的神经网络的表达能力分别为 { np.around(Expr_cel, decimals=4)} 越小越好。", )
+    plt.plot(range(1, max_depth + 1), Expr_cel, marker='>')
+    plt.xlabel("depth")
+    plt.yscale('log')
+    plt.ylabel("Expr.")
+    plt.xticks(range(1, max_depth + 1))
+    plt.title("Expressibility vs Circuit Depth")
+    plt.show()
+
+
+.. image:: ./images/f1.png
+   :width: 600 px
+   :align: center
+
+|
+
+.. image:: ./images/f2.png
+   :width: 600 px
+   :align: center
+
+|
+
+.. image:: ./images/f3.png
+   :width: 600 px
+   :align: center
+
+|
+
+.. image:: ./images/express.png
+   :width: 600 px
+   :align: center
+
+|
