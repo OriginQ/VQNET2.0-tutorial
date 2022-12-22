@@ -4542,7 +4542,7 @@ VQNet提供了封装类 ``VQC_wrapper`` ，用户使用普通逻辑门在函数 
 我们可以根据该定义直接计算单比特量子神经网络 :math:`R_Y(\theta)` ， :math:`R_Y(\theta_1)R_Z(\theta_2)` 和
  :math:`R_Y(\theta_1)R_Z(\theta_2)R_Y(\theta_3)` 的表达能力：
 
-以下用VQNet展示了HardwareEfficientAnsatz 在不同深度下（1，2，3）的量子线路表达能力。
+以下用VQNet展示了`HardwareEfficientAnsatz <https://arxiv.org/abs/1704.05018>`_ 在不同深度下（1，2，3）的量子线路表达能力。
 
 
 .. code-block::
@@ -4600,6 +4600,8 @@ VQNet提供了封装类 ``VQC_wrapper`` ，用户使用普通逻辑门在函数 
         cir1 = az.create_ansatz(w)
         return cir1, machine, qlist
 
+哈尔采样输出的保真度服从分布：
+
 .. image:: ./images/haar-fidelity.png
    :width: 600 px
    :align: center
@@ -4613,7 +4615,7 @@ VQNet提供了封装类 ``VQC_wrapper`` ，用户使用普通逻辑门在函数 
     num_qubit = 4
     max_depth = 3
     # 计算哈尔采样对应的保真度分布
-    print("哈尔采样输出的保真度服从分布：")
+
     flist, p_haar, theory_haar = fidelity_harr_sample(num_qubit, num_sample)
     title_str = "haar, %d qubit(s)" % num_qubit
     plot_hist(flist, 50, title_str)
@@ -4623,7 +4625,6 @@ VQNet提供了封装类 ``VQC_wrapper`` ，用户使用普通逻辑门在函数 
     Expr_cel = list()
     # 计算不同深度的神经网络的表达能力
     for DEPTH in range(1, max_depth + 1):
-        print("正在采样深度为 %d 的电路..." % DEPTH)
 
         f_list, p_cel = fidelity_of_cir(HardwareEfficientAnsatz, num_qubit, DEPTH,
                                         num_sample)
@@ -4643,11 +4644,15 @@ VQNet提供了封装类 ``VQC_wrapper`` ，用户使用普通逻辑门在函数 
     plt.show()
 
 
+采样深度为 1 的电路的保真度分布
+
 .. image:: ./images/f1.png
    :width: 600 px
    :align: center
 
 |
+
+采样深度为 2 的电路的保真度分布
 
 .. image:: ./images/f2.png
    :width: 600 px
@@ -4655,11 +4660,15 @@ VQNet提供了封装类 ``VQC_wrapper`` ，用户使用普通逻辑门在函数 
 
 |
 
+采样深度为 3 的电路的保真度分布
+
 .. image:: ./images/f3.png
    :width: 600 px
    :align: center
 
 |
+
+可见，随着量子线路深度提升，保真度KL散度越小，表达力越强。
 
 .. image:: ./images/express.png
    :width: 600 px
