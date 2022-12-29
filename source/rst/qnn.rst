@@ -2364,8 +2364,6 @@ vqe_func_analytic()函数是使用参数偏移计算理论梯度，vqe_func_shot
 
 .. code-block::
 
-    from pyqpanda import *
-
     ##############################################################################
     # Optimizing the circuit using gradient descent via the parameter-shift rule:
     qlayer_ana = QuantumLayerV2(vqe_func_analytic, 2*2*3 )
