@@ -4773,7 +4773,7 @@ QUnet主要是用于解决图像分割的技术。
 
 在经典神经网络的训练中，基于梯度的优化方法不仅会遇到局部极小值的问题，
 而且还会遇到梯度接近于零的鞍点等几何结构。
-相应的，量子神经网络中也存在**贫瘠高原效应** (plataus)。
+相应的，量子神经网络中也存在 "贫瘠高原效应" 。
 这一奇特现象最早由McClean等人在2018年发现 `Barren plateaus in quantum neural network training landscapes <https://arxiv.org/abs/1803.11173>`_。
 简单地说，当你选择的随机电路结构满足一定程度的复杂性时，优化景观会变得非常平坦，
 这使得基于梯度下降的优化方法很难找到全局最小值
@@ -4892,7 +4892,7 @@ QUnet主要是用于解决图像分割的技术。
 
 
         plt.figure()
-        # Plot the straight line fit to the semilog
+
         plt.plot(qubits, means, "v-")
 
         plt.xlabel(r"N Qubits")
