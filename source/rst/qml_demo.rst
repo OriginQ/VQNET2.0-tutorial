@@ -5529,7 +5529,7 @@ vqe_func_analytic()函数是使用参数偏移计算理论梯度，vqe_func_shot
 基于梯度的剪枝
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-下例子实现了论文 `Towards Efficient On-Chip Training of Quantum Neural Networks <https://openreview.net/forum?id=vKefw-zKOft>`_ 中的算法。
+下面的例子实现了论文 `Towards Efficient On-Chip Training of Quantum Neural Networks <https://openreview.net/forum?id=vKefw-zKOft>`_ 中的算法。
 通过仔细研究量子变分线路中参数的过程，作者观察到小梯度在量子噪声下往往具有较大的相对变化甚至错误的方向。
 此外，并非所有梯度计算对于训练过程都是必需的，尤其是对于小幅度梯度。
 受此启发，作者提出了一种概率梯度修剪方法来预测并仅计算高可靠性的梯度。
@@ -5537,9 +5537,9 @@ vqe_func_analytic()函数是使用参数偏移计算理论梯度，vqe_func_shot
 
 在gradient based pruning算法中，对于参数的优化过程，划分了积累窗口和修剪窗口两个阶段，所有训练时期分成一个重复的累积窗口，然后是一个修剪窗口。 概率梯度修剪方法中有三个重要的超参数：
 
-    * 累积窗口宽度𝑤𝑎，
-    * 修剪比例𝑟，
-    * 修剪窗口宽度 𝑤𝑝 .
+    * 累积窗口宽度 :math:`\omega_a` ，
+    * 修剪比例 :math:`r` ，
+    * 修剪窗口宽度 :math:`\omega_p` .
 
 在累积窗口中，算法收集每个训练步骤中的梯度信息。 在修剪窗口的每一步中，算法根据从累积窗口和修剪比率收集的信息，
 概率地免除一些梯度的计算。
@@ -5550,7 +5550,7 @@ vqe_func_analytic()函数是使用参数偏移计算理论梯度，vqe_func_shot
 
 |
 
-剪枝比例r,累积窗口宽度Wa和剪枝窗口宽度Wp分别决定了梯度趋势评估的可靠性。
+剪枝比例 :math:`r` ,累积窗口宽度 :math:`\omega_a` 和剪枝窗口宽度 :math:`\omega_p` 分别决定了梯度趋势评估的可靠性。
 因此，我们的概率梯度修剪方法节省的时间百分比是 :math:`r\tfrac{\omega_p}{\omega_a +\omega_p}\times 100\%`。
 以下是使用梯度剪枝接口 ``Gradient_Prune_Instance`` 对QVC 分类示例的运用。
 
