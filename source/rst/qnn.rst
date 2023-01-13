@@ -1778,7 +1778,7 @@ QGAN使用经典的GAN模型结构，分为Generator生成器与Discriminator鉴
         from pyvqnet.qnn import AngleEmbeddingCircuit, expval, QuantumLayerV2, SPSA
         from pyvqnet.qnn.template import BasicEntanglerTemplate
         import pyqpanda as pq
-        
+        from pyvqnet.nn.module import Module
         #定义一个量子变分线路模型
         class Model_spsa(Module):
             def __init__(self):
@@ -1829,10 +1829,19 @@ QGAN使用经典的GAN模型结构，分为Generator生成器与Discriminator鉴
 
     Example::
 
-        from pyvqnet.qnn import AngleEmbeddingCircuit, expval, QuantumLayerV2, SPSA
-        from pyvqnet.qnn.template import BasicEntanglerTemplate
+        import numpy as np
         import pyqpanda as pq
-        
+
+        import sys
+        sys.path.insert(0, "../")
+        import pyvqnet
+
+        from pyvqnet.nn.module import Module
+        from pyvqnet.qnn import SPSA
+        from pyvqnet.tensor.tensor import QTensor
+        from pyvqnet.qnn import AngleEmbeddingCircuit, expval, QuantumLayerV2, expval
+        from pyvqnet.qnn.template import BasicEntanglerTemplate
+
         #定义一个量子变分线路模型
         class Model_spsa(Module):
             def __init__(self):
@@ -1875,7 +1884,7 @@ QGAN使用经典的GAN模型结构，分为Generator生成器与Discriminator鉴
                         1.25907603]))
         #调用SPSA进行迭代优化
         optimizer._step(input_data=data)
-        
+
         #计算优化后的VQC期望值
         y = model(data)
         print(y)
@@ -2115,7 +2124,7 @@ QGAN使用经典的GAN模型结构，分为Generator生成器与Discriminator鉴
 但是，由于增加了电路复杂性或梯度值中的潜在误差，这两种替代方案都可能存在缺陷。
 Banchi 和 Crooks 1 发现一种可以适用在任一酉矩阵量子逻辑门上的 `随机参数偏移算法(Stochastic Parameter-Shift Rule) <https://arxiv.org/abs/2005.10299>`_ 。
 
-下面展示适用VQNet对一个量子变分线路使用随机参数偏移法计算梯度的示例。示例线路定义如下：
+下面展示适用VQNet对一个量子变分线路使用随机参数偏移法计算梯度的示例。其中，pyqpanda建议版本为3.7.12。示例线路定义如下：
 
 .. code-block::
 
@@ -2131,7 +2140,7 @@ Banchi 和 Crooks 1 发现一种可以适用在任一酉矩阵量子逻辑门上
     import matplotlib.pyplot as plt
 
 
-    machine = pq.init_quantumachine(pq.QMachineType.CPU)
+    machine = pq.init_quantum_machine(pq.QMachineType.CPU)
     q = machine.qAlloc_many(2)
     c = machine.cAlloc_many(2)
 
@@ -2282,6 +2291,7 @@ VQNet实现了该算法的一个示例：使用VQE 求解目标Hamiltonian的基
     # some basic Pauli matrices
     I = np.eye(2)
     X = np.array([[0, 1], [1, 0]])
+    Y = np.array([[0, -1j], [1j, 0]])
     Z = np.array([[1, 0], [0, -1]])
 
     init_params = np.random.uniform(low=0,
@@ -2353,8 +2363,6 @@ vqe_func_analytic()函数是使用参数偏移计算理论梯度，vqe_func_shot
 故使用其平均值才能代表最终观测量的期望结果，这里使用滑动平均moving_average()进行计算。
 
 .. code-block::
-
-    from pyqpanda import *
 
     ##############################################################################
     # Optimizing the circuit using gradient descent via the parameter-shift rule:
