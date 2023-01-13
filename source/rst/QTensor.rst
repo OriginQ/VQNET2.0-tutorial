@@ -120,6 +120,25 @@ size
 
         # 4
 
+numel
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:method:: QTensor.numel
+
+    返回张量的元素个数。
+    
+    :return: 张量的元素个数。
+
+    Example::
+
+        from pyvqnet.tensor import tensor
+        from pyvqnet.tensor import QTensor
+
+        a = QTensor([2, 3, 4, 5], requires_grad=True)
+        print(a.numel())
+
+        # 4
+
 zero_grad
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
