@@ -15,7 +15,7 @@
     hw = 4      # input width and heights
 
     # two dimension convolution layer
-    test_conv = Conv2D(ic,oc,(3,3),(2,2),"same")
+    test_conv = Conv2D(ic,oc,(2,2),(2,2),"same")
 
     # input of shape [b,ic,hw,hw]
     x0 = QTensor(CoreTensor.range(1,b*ic*hw*hw).reshape([b,ic,hw,hw]),requires_grad=True)
@@ -28,22 +28,22 @@
     print(x0.grad)
 
     # [
-    # [[[0.3051388, 0.3040530, 0.3051388, 0.1224213],
-    #  [0.1118232, 0.1448178, 0.1118232, 0.2228756],
-    #  [0.3051388, 0.3040530, 0.3051388, 0.1224213],
-    #  [0.0281369, 0.2619222, 0.0281369, 0.0893420]],
-    # [[-0.2651831, 0.4174044, -0.2651831, 0.2255079],
-    #  [-0.3505684, 0.0706428, -0.3505684, 0.1537349],
-    #  [-0.2651831, 0.4174044, -0.2651831, 0.2255079],
-    #  [-0.0199047, -0.1207576, -0.0199047, 0.0083465]]],
-    # [[[0.3051388, 0.3040530, 0.3051388, 0.1224213],
-    #  [0.1118232, 0.1448178, 0.1118232, 0.2228756],
-    #  [0.3051388, 0.3040530, 0.3051388, 0.1224213],
-    #  [0.0281369, 0.2619222, 0.0281369, 0.0893420]],
-    # [[-0.2651831, 0.4174044, -0.2651831, 0.2255079],
-    #  [-0.3505684, 0.0706428, -0.3505684, 0.1537349],
-    #  [-0.2651831, 0.4174044, -0.2651831, 0.2255079],
-    #  [-0.0199047, -0.1207576, -0.0199047, 0.0083465]]]
+    # [[[0.0958736, 0.3032238, 0.0958736, 0.3032238],
+    #  [-0.2665333, 0.1081382, -0.2665333, 0.1081382],
+    #  [0.0958736, 0.3032238, 0.0958736, 0.3032238],
+    #  [-0.2665333, 0.1081382, -0.2665333, 0.1081382]],
+    # [[-0.0068994, 0.0914679, -0.0068994, 0.0914679],
+    #  [-0.2820665, 0.3160213, -0.2820665, 0.3160213],
+    #  [-0.0068994, 0.0914679, -0.0068994, 0.0914679],
+    #  [-0.2820665, 0.3160213, -0.2820665, 0.3160213]]],
+    # [[[0.0958736, 0.3032238, 0.0958736, 0.3032238],
+    #  [-0.2665333, 0.1081382, -0.2665333, 0.1081382],
+    #  [0.0958736, 0.3032238, 0.0958736, 0.3032238],
+    #  [-0.2665333, 0.1081382, -0.2665333, 0.1081382]],
+    # [[-0.0068994, 0.0914679, -0.0068994, 0.0914679],
+    #  [-0.2820665, 0.3160213, -0.2820665, 0.3160213],
+    #  [-0.0068994, 0.0914679, -0.0068994, 0.0914679],
+    #  [-0.2820665, 0.3160213, -0.2820665, 0.3160213]]]
     # ]
 
 .. currentmodule:: pyvqnet.nn
@@ -358,7 +358,7 @@ AvgPool1D
 
     :param kernel: 平均池化的窗口大小。
     :param strides: 窗口移动的步长。
-    :param padding: 填充选项, "valid" or "same"。 默认 "valid"。
+    :param padding: 填充选项, "valid" or "same" 或者整数指定填充长度。 默认 "valid"。
     :param name: 命名,默认为""。
     :return: 一维平均池化层实例。
 
@@ -372,7 +372,7 @@ AvgPool1D
         import numpy as np
         from pyvqnet.tensor import QTensor
         from pyvqnet.nn import AvgPool1D
-        test_mp = AvgPool1D([2],[2],"same")
+        test_mp = AvgPool1D([3],[2],"same")
         x= QTensor(np.array([0, 1, 0, 4, 5,
                                     2, 3, 2, 1, 3,
                                     4, 4, 0, 4, 3,
@@ -381,13 +381,12 @@ AvgPool1D
 
         y= test_mp.forward(x)
         print(y)
-
         # [
-        # [[0.0000000, 0.5000000, 4.5000000],
-        #  [1.0000000, 2.5000000, 2.0000000],
-        #  [2.0000000, 2.0000000, 3.5000000],
-        #  [1.0000000, 3.5000000, 5.0000000],
-        #  [0.5000000, 0.0000000, 6.0000000]]
+        # [[0.3333333, 1.6666666, 3.0000000],
+        #  [1.6666666, 2.0000000, 1.3333334],
+        #  [2.6666667, 2.6666667, 2.3333333],
+        #  [2.3333333, 4.3333335, 3.3333333],
+        #  [0.3333333, 1.6666666, 4.0000000]]
         # ]
         
 
@@ -400,7 +399,7 @@ MaxPool1D
 
     :param kernel: 最大池化的窗口大小。
     :param strides: 窗口移动的步长。
-    :param padding: 填充选项, "valid" or "same"。 默认 "valid"。
+    :param padding: 填充选项, "valid" or "same" 或者整数指定填充长度。 默认 "valid"。
     :param name: 命名,默认为""。
 
     :return: 一维最大池化层实例。
@@ -415,7 +414,7 @@ MaxPool1D
         import numpy as np
         from pyvqnet.tensor import QTensor
         from pyvqnet.nn import MaxPool1D
-        test_mp = MaxPool1D([2],[2],"same")
+        test_mp = MaxPool1D([3],[2],"same")
         x= QTensor(np.array([0, 1, 0, 4, 5,
                                     2, 3, 2, 1, 3,
                                     4, 4, 0, 4, 3,
@@ -425,11 +424,11 @@ MaxPool1D
         y= test_mp.forward(x)
         print(y)
         # [
-        # [[0.0000000, 1.0000000, 5.0000000],
-        #  [2.0000000, 3.0000000, 3.0000000],
+        # [[1.0000000, 4.0000000, 5.0000000],
+        #  [3.0000000, 3.0000000, 3.0000000],
         #  [4.0000000, 4.0000000, 4.0000000],
-        #  [2.0000000, 5.0000000, 6.0000000],
-        #  [1.0000000, 0.0000000, 7.0000000]]
+        #  [5.0000000, 6.0000000, 6.0000000],
+        #  [1.0000000, 5.0000000, 7.0000000]]
         # ]
         
 
@@ -442,7 +441,7 @@ AvgPool2D
 
     :param kernel: 平均池化的窗口大小。
     :param strides: 窗口移动的步长。
-    :param padding: 填充选项, "valid" or "same"。 默认 "valid"。
+    :param padding: 填充选项, "valid" or "same" 或包含2个整数的元组，整数为两个维度上的填充长度。 默认 "valid"。
     :param name: 命名,默认为""。
 
     :return: 二维平均池化层实例。
@@ -457,7 +456,7 @@ AvgPool2D
         import numpy as np
         from pyvqnet.tensor import QTensor
         from pyvqnet.nn import AvgPool2D
-        test_mp = AvgPool2D([2,2],[2,2],"same")
+        test_mp = AvgPool2D([2,2],[2,2],"valid")
         x= QTensor(np.array([0, 1, 0, 4, 5,
                                     2, 3, 2, 1, 3,
                                     4, 4, 0, 4, 3,
@@ -467,9 +466,8 @@ AvgPool2D
         y= test_mp.forward(x)
         print(y)
         # [
-        # [[[0.0000000, 0.2500000, 2.2500000],
-        #  [1.5000000, 2.2500000, 2.7500000],
-        #  [0.7500000, 1.7500000, 5.5000000]]]
+        # [[[1.5000000, 1.7500000],
+        #  [3.7500000, 3.0000000]]]
         # ]
         
 
@@ -482,7 +480,7 @@ MaxPool2D
 
     :param kernel: 最大池化的窗口大小。
     :param strides: 窗口移动的步长。
-    :param padding: 填充选项, "valid" or "same"。 默认 "valid"。
+    :param padding: 填充选项, "valid" or "same" 或包含2个整数的元组，整数为两个维度上的填充长度。 默认 "valid"。
     :param name: 命名,默认为""。
 
     :return: 二维最大池化层实例。
@@ -498,7 +496,7 @@ MaxPool2D
         import numpy as np
         from pyvqnet.tensor import QTensor
         from pyvqnet.nn import MaxPool2D
-        test_mp = MaxPool2D([2,2],[2,2],"same")
+        test_mp = MaxPool2D([2,2],[2,2],"valid")
         x= QTensor(np.array([0, 1, 0, 4, 5,
                                     2, 3, 2, 1, 3,
                                     4, 4, 0, 4, 3,
@@ -509,9 +507,8 @@ MaxPool2D
         print(y)
 
         # [
-        # [[[0.0000000, 1.0000000, 5.0000000],
-        #  [4.0000000, 4.0000000, 4.0000000],
-        #  [2.0000000, 5.0000000, 7.0000000]]]
+        # [[[3.0000000, 4.0000000],
+        #  [5.0000000, 6.0000000]]]
         # ]
         
 
@@ -733,7 +730,7 @@ LayerNorm2d
         from pyvqnet.tensor import QTensor
         from pyvqnet.nn.layer_norm import LayerNorm2d
         ic = 4
-        test_conv = LayerNorm2d([8])
+        test_conv = LayerNorm2d(8)
         x = QTensor(np.arange(1,17).reshape([2,2,4,1]),requires_grad=True)
         y = test_conv.forward(x)
         print(y)
@@ -783,7 +780,7 @@ LayerNorm1d
         import numpy as np
         from pyvqnet.tensor import QTensor
         from pyvqnet.nn.layer_norm import LayerNorm1d
-        test_conv = LayerNorm1d([4])
+        test_conv = LayerNorm1d(4)
         x = QTensor(np.arange(1,17).reshape([4,4]),requires_grad=True)
         y = test_conv.forward(x)
         print(y)

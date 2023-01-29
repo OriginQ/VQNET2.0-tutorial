@@ -10,7 +10,7 @@
 ^^^^^^^^^^^^^^^^^^
 
 这个例子使用VQNet实现了论文 `Circuit-centric quantum classifiers <https://arxiv.org/pdf/1804.00633.pdf>`_ 中可变量子线路进行二分类任务。
-该例子用来判断一个二进制数是奇数还是偶数。通过将二进制数编码到量子比特上，通过优化线路中的可变参数，使得该线路z方向观测量可以指示该输入为奇数还是偶数。
+该例子用来判断一个二进制数是奇数还是偶数。通过将二进制数编码到量子比特上，通过优化线路中的可变参数，使得该线路z方向测量值可以指示该输入为奇数还是偶数。
 
 量子线路
 """""""""""""""""
@@ -1373,7 +1373,7 @@ Quantum circuit structure learning任务的核心目标就是找到最优的带�
             break
         
         if targets[0] == 0:
-            axes[n_samples_show - 1].set_title("Labeled: 0")
+            axes[n_samples_show - 1].set_title("Labeled: 1")
             axes[n_samples_show - 1].imshow(img.squeeze(), cmap='gray')
             axes[n_samples_show - 1].set_xticks([])
             axes[n_samples_show - 1].set_yticks([])
@@ -1397,6 +1397,7 @@ Quantum circuit structure learning任务的核心目标就是找到最优的带�
 
     from pyqpanda import *
     import pyqpanda as pq
+    import numpy as np
     def circuit(weights):
         num_qubits = 1
         #pyQPanda 创建模拟器
@@ -1630,15 +1631,15 @@ Quantum circuit structure learning任务的核心目标就是找到最优的带�
     for x, y in data_generator(x_test, y_test, batch_size=1, shuffle=True):
         if count == n_samples_show:
             break
-            x = x.reshape(-1, 1, 28, 28)
-            output = model(x)
-            pred = QTensor.argmax(output, [1])
-            axes[count].imshow(x[0].squeeze(), cmap='gray')
-            axes[count].set_xticks([])
-            axes[count].set_yticks([])
-            axes[count].set_title('Predicted {}'.format(np.array(pred.data)))
-            count += 1
-            plt.show()
+        x = x.reshape(-1, 1, 28, 28)
+        output = model(x)
+        pred = QTensor.argmax(output, [1])
+        axes[count].imshow(x[0].squeeze(), cmap='gray')
+        axes[count].set_xticks([])
+        axes[count].set_yticks([])
+        axes[count].set_title('Predicted {}'.format(np.array(pred.data)))
+        count += 1
+    plt.show()
 
 .. image:: ./images/eval_test.png
    :width: 600 px
@@ -2887,6 +2888,834 @@ QUnet主要是用于解决图像分割的技术。
 
 |
 
+
+4.混合量子经典的QCNN网络模型
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+我们介绍并分析了一种由卷积神经网络驱动的新型量子机器学习模型。`Quantum Convolutional Neural Networks <https://arxiv.org/pdf/1810.03787.pdf>`_ 是一种用于解决经典图像分类的算法。
+我们将编写一个将 `pyQPanda <https://pyqpanda-toturial.readthedocs.io/zh/latest/>`_ 与 `VQNet` 集成的简单示例。
+
+
+
+构建混合经典量子神经网络
+""""""""""""""""""""""""""
+
+.. code-block::
+
+    import random
+    import numpy as np
+    import pyqpanda as pq
+    from qiskit.utils import algorithm_globals
+    from pyvqnet.qnn.measure import expval
+    from scipy.optimize import minimize
+    from abc import abstractmethod
+    from sklearn.model_selection import train_test_split
+    from sklearn.base import ClassifierMixin
+    import matplotlib.pyplot as plt
+    import matplotlib
+    try:
+        matplotlib.use("TkAgg")
+    except:  #pylint:disable=bare-except
+        print("Can not use matplot TkAgg")
+
+    def network(input_data, weights):
+        datasets = np.array(input_data)
+        number_of_qubits = 8
+        circuit_data = []
+        for x in datasets:
+            machine = pq.CPUQVM()
+            machine.init_qvm()
+            qlist = machine.qAlloc_many(number_of_qubits)
+            clist = machine.cAlloc_many(number_of_qubits)
+
+            circuit = pq.QCircuit()
+            circuit.insert(build_VQNet_cir(qlist, number_of_qubits, x, weights))
+
+            prog = pq.QProg()
+            prog.insert(circuit)
+
+            pauli_dict = {'Z7': 1}
+            exp2 = expval(machine, prog, pauli_dict, qlist)
+            circuit_data.append([exp2])
+
+        output = np.array(circuit_data).reshape([-1, 1])
+
+        return output
+
+    class ObjectiveFunction:
+        # pylint: disable=invalid-name
+        def __init__(
+            self, X: np.ndarray, y: np.ndarray, neural_network
+        ) -> None:
+            """
+            Args:
+                X: The input data.
+                y: The target values.
+                neural_network: An instance of an quantum neural network to be used by this
+                    objective function.
+            """
+            super().__init__()
+            self._X = X
+            self._num_samples = X.shape[0]
+            self._y = y
+            self._neural_network = neural_network
+            self._last_forward_weights = None
+            self._last_forward = None
+            self._loss_result = []
+
+        @abstractmethod
+        def objective(self, weights: np.ndarray) -> float:
+            """Computes the value of this objective function given weights.
+
+            Args:
+                weights: an array of weights to be used in the objective function.
+
+            Returns:
+                Value of the function.
+            """
+            raise NotImplementedError
+
+        @abstractmethod
+        def gradient(self, weights: np.ndarray) -> np.ndarray:
+            """Computes gradients of this objective function given weights.
+
+            Args:
+                weights: an array of weights to be used in the objective function.
+
+            Returns:
+                Gradients of the function.
+            """
+            raise NotImplementedError
+
+        def _neural_network_forward(self, weights: np.ndarray):
+            """
+            Computes and caches the results of the forward pass. Cached values may be re-used in
+            gradient computation.
+
+            Args:
+                weights: an array of weights to be used in the forward pass.
+
+            Returns:
+                The result of the neural network.
+            """
+            # if we get the same weights, we don't compute the forward pass again.
+            if self._last_forward_weights is None or (
+                not np.all(np.isclose(weights, self._last_forward_weights))
+            ):
+                # compute forward and cache the results for re-use in backward
+                self._last_forward = self._neural_network(self._X, weights)
+                # a copy avoids keeping a reference to the same array, so we are sure we have
+                # different arrays on the next iteration.
+                self._last_forward_weights = np.copy(weights)
+            return self._last_forward
+
+        def _neural_network_backward(self, weights: np.ndarray):
+
+            datasetsy = np.array(self._y)
+            datasetsy = datasetsy.reshape([-1, 1])
+
+            weights1 = weights + np.pi / 2
+            weights2 = weights - np.pi / 2
+            exp1 = self._neural_network_forward(weights1)
+            exp2 = self._neural_network_forward(weights2)
+
+            circuit_grad = (exp1 - exp2) / 2
+            output = self._neural_network_forward(weights)
+            result = 2 * (output - datasetsy)
+            grad = result[:, 0] @ circuit_grad
+            grad = grad.reshape(1, -1) / self._X.shape[0]
+            return grad
+
+    class BinaryObjectiveFunction(ObjectiveFunction):
+        """An objective function for binary representation of the output,
+        e.g. classes of ``-1`` and ``+1``."""
+
+        def objective(self, weights: np.ndarray) -> float:
+            # predict is of shape (N, 1), where N is a number of samples
+            output = self._neural_network_forward(weights)
+            datasetsy = np.array(self._y).reshape([-1, 1])
+            if len(output.shape) <= 1:
+                loss_data = (output - datasetsy) ** 2
+            else:
+                loss_data = np.linalg.norm(output - datasetsy, axis=tuple(range(1, len(output.shape)))) ** 2
+
+            result = float(np.sum(loss_data) / self._X.shape[0])
+            self._loss_result.append(result)
+            return np.average(np.array(result))
+
+        def gradient(self, weights: np.ndarray) -> np.ndarray:
+            # weight grad is of shape (N, 1, num_weights)
+            weight_grad = self._neural_network_backward(weights)
+            return weight_grad
+
+        def loss_value(self):
+            # get loss curve data
+            return self._loss_result
+
+    class VQNet_QCNN(ClassifierMixin):
+        def __init__(self, forward_func=None, init_weight=None, optimizer=None):
+            """
+            forward_func: An instance of an quantum neural network.
+            init_weight: Initial weight for the optimizer to start from.
+            optimizer: An instance of an optimizer to be used in training. When `None` defaults to L-BFGS-B.
+            """
+            self.init_weight = init_weight
+            self._fit_result = None
+            self._forward_func = forward_func
+            self._optimizer = optimizer
+            self._loss_result = []
+
+
+        def fit(self, X: np.ndarray, y: np.ndarray): # pylint: disable=invalid-name
+            """
+            Function operation to solve the optimal solution.
+            """
+            function = BinaryObjectiveFunction(X, y, self._forward_func)
+            self._fit_result = minimize(fun=function.objective, x0=self.init_weight,
+                                        method=self._optimizer, jac=function.gradient)
+            self._loss_result.append(function.loss_value())
+            return self._fit_result.x
+
+        def predict(self, X:np.ndarray):
+            """
+            Predict
+            """
+            if self._fit_result is None:
+                raise Exception("Model needs to be fit to some training data first!")
+
+            return np.sign(self._forward_func(X, self._fit_result.x))
+
+        # pylint: disable=invalid-name
+        def score(
+            self, X: np.ndarray, y: np.ndarray, sample_weight=None
+        ) -> float:
+            """
+            Calculate the score.
+            """
+            result_score = ClassifierMixin.score(self, X, y, sample_weight)
+            return result_score
+
+        def get_loss_value(self):
+            """
+            Get loss curve data.
+            """
+            result = self._loss_result
+            return result
+
+    def ZFeatureMap_VQNet(qlist, n_qbits, weights):
+        r"""The first order Pauli Z-evolution circuit.
+        On 3 qubits and with 2 repetitions the circuit is represented by:
+
+        .. parsed-literal::
+            ┌───┐┌──────────────┐┌───┐┌──────────────┐
+            ┤ H ├┤ U1(2.0*x[0]) ├┤ H ├┤ U1(2.0*x[0]) ├
+            ├───┤├──────────────┤├───┤├──────────────┤
+            ┤ H ├┤ U1(2.0*x[1]) ├┤ H ├┤ U1(2.0*x[1]) ├
+            ├───┤├──────────────┤├───┤├──────────────┤
+            ┤ H ├┤ U1(2.0*x[2]) ├┤ H ├┤ U1(2.0*x[2]) ├
+            └───┘└──────────────┘└───┘└──────────────┘
+
+        """
+        circuit = pq.QCircuit()
+        for i in range(n_qbits):
+            circuit.insert(pq.H(qlist[i]))
+            circuit.insert(pq.U1(qlist[i], 2.0*weights[i]))
+            circuit.insert(pq.H(qlist[i]))
+            circuit.insert(pq.U1(qlist[i], 2.0*weights[i]))
+        return circuit
+
+    def conv_circuit_VQNet(qlist, n_qbits, weights):
+        """
+        Quantum Convolutional
+        """
+        circuit = pq.QCircuit()
+        circuit.insert(pq.RZ(qlist[1], -np.pi))
+        circuit.insert(pq.CNOT(qlist[1], qlist[0]))
+        circuit.insert(pq.RZ(qlist[0], weights[0]))
+        circuit.insert(pq.RY(qlist[1], weights[1]))
+        circuit.insert(pq.CNOT(qlist[0], qlist[1]))
+        circuit.insert(pq.RY(qlist[1], weights[2]))
+        circuit.insert(pq.CNOT(qlist[1], qlist[0]))
+        circuit.insert(pq.RZ(qlist[0], np.pi))
+        return circuit
+
+    def conv_layer_VQNet(qlist, n_qbits, weights):
+        """
+         Define the Convolutional Layers of our QCNN
+        """
+        qubits = list(range(n_qbits))
+        param_index = 0
+        cir = pq.QCircuit()
+
+        for q1, q2 in zip(qubits[0::2], qubits[1::2]):
+            qlist_q = [qlist[q1], qlist[q2]]
+            cir.insert(conv_circuit_VQNet(qlist_q, n_qbits, weights[param_index:(param_index + 3)]))
+            cir.insert(pq.BARRIER(qlist))
+            param_index += 3
+
+        for q1, q2 in zip(qubits[1::2], qubits[2::2] + [0]):
+            qlist_q = [qlist[q1], qlist[q2]]
+            cir.insert(conv_circuit_VQNet(qlist_q, n_qbits, weights[param_index:(param_index + 3)]))
+            cir.insert(pq.BARRIER(qlist))
+            param_index += 3
+
+        return cir
+
+    def pool_circuit_VQNet(qlist, n_qbits, weights):
+        """
+        Quantum Pool
+        """
+        cir = pq.QCircuit()
+        cir.insert(pq.RZ(qlist[1], -np.pi))
+        cir.insert(pq.CNOT(qlist[1], qlist[0]))
+        cir.insert(pq.RZ(qlist[0], weights[0]))
+        cir.insert(pq.RY(qlist[1], weights[1]))
+        cir.insert(pq.CNOT(qlist[0], qlist[1]))
+        cir.insert(pq.RY(qlist[1], weights[2]))
+
+        return cir
+
+    def pool_layer_VQNet(sources, sinks, qlist, n_qbits, weights):
+        """
+        Create a QCNN Pooling Layer
+        """
+        num_qubits = len(sources) + len(sinks)
+        if num_qubits != n_qbits:
+            raise ValueError("the number of qubits is error!")
+        param_index = 0
+        cir = pq.QCircuit()
+        for source, sink in zip(sources, sinks):
+            qlist_q = [qlist[source], qlist[sink]]
+            cir.insert(pool_circuit_VQNet(qlist_q, n_qbits, weights[param_index:(param_index + 3)]))
+            cir.insert(pq.BARRIER(qlist))
+            param_index += 3
+
+        return cir
+
+    def build_VQNet_cir(qubits, n_qbits, input_data, weights):
+        """
+        Create a VQNet Quantum Convolutional Neural Network.
+        """
+        circuit = pq.QCircuit()
+        circuit.insert(ZFeatureMap_VQNet(qubits, n_qbits, input_data))
+        circuit.insert(conv_layer_VQNet(qubits, n_qbits, weights))
+        sources = [0, 1, 2, 3]
+        sinks = [4, 5, 6, 7]
+        circuit.insert(pool_layer_VQNet(sources, sinks, qubits, n_qbits, weights))
+
+        qubits_select_4_8 = qubits[4:8]
+        n_qbits_len_4_8 = len(qubits_select_4_8)
+        circuit.insert(conv_layer_VQNet(qubits_select_4_8, n_qbits_len_4_8, weights))
+        sources = [0, 1]
+        sinks = [2, 3]
+        circuit.insert(pool_layer_VQNet(sources, sinks, qubits_select_4_8, n_qbits_len_4_8, weights))
+
+        qubits_select_6_8 = qubits[6:8]
+        n_qbits_len_6_8 = len(qubits_select_6_8)
+        circuit.insert(conv_layer_VQNet(qubits_select_6_8, n_qbits_len_6_8, weights))
+        sources = [0]
+        sinks = [1]
+        circuit.insert(pool_layer_VQNet(sources, sinks, qubits_select_6_8, n_qbits_len_6_8, weights))
+
+        return circuit
+
+    def generate_dataset(num_images):
+        images = []
+        labels = []
+        hor_array = np.zeros((6, 8))
+        ver_array = np.zeros((4, 8))
+
+        j = 0
+        for i in range(0, 7):
+            if i != 3:
+                hor_array[j][i] = np.pi / 2
+                hor_array[j][i + 1] = np.pi / 2
+                j += 1
+
+        j = 0
+        for i in range(0, 4):
+            ver_array[j][i] = np.pi / 2
+            ver_array[j][i + 4] = np.pi / 2
+            j += 1
+
+        for n in range(num_images):
+            rng = algorithm_globals.random.integers(0, 2)
+            if rng == 0:
+                labels.append(-1)
+                random_image = algorithm_globals.random.integers(0, 6)
+                images.append(np.array(hor_array[random_image]))
+            elif rng == 1:
+                labels.append(1)
+                random_image = algorithm_globals.random.integers(0, 4)
+                images.append(np.array(ver_array[random_image]))
+
+            # Create noise
+            for i in range(8):
+                if images[-1][i] == 0:
+                    images[-1][i] = algorithm_globals.random.uniform(0, np.pi / 4)
+        return images, labels
+
+    def vqnet_qcnn_test():
+        algorithm_globals.random_seed = 12345
+        random.seed(24)
+
+        images, labels = generate_dataset(50)
+
+        train_images, test_images, train_labels, test_labels = train_test_split(
+            images, labels, test_size=0.3
+        )
+
+        fig, ax = plt.subplots(2, 2, figsize=(10, 6), subplot_kw={"xticks": [], "yticks": []})
+        for i in range(4):
+            ax[i // 2, i % 2].imshow(
+                train_images[i].reshape(2, 4),  # Change back to 2 by 4
+                aspect="equal",
+            )
+        plt.subplots_adjust(wspace=0.1, hspace=0.025)
+        # plt.show()
+
+        _initial_point = algorithm_globals.random.random(63)
+        qcnn_compute = VQNet_QCNN(forward_func=network, init_weight=_initial_point, optimizer="COBYLA")
+        x = np.asarray(train_images)
+        y = np.asarray(train_labels)
+        result = qcnn_compute.fit(x, y)
+        print(len(result))
+
+        # score classifier
+        print(f"Accuracy from the train data : {np.round(100 * qcnn_compute.score(x, y), 2)}%")
+
+        # show the loss
+        plt.figure()
+        loss_value = qcnn_compute.get_loss_value()[0]
+        loss_len = len(loss_value)
+        x = np.arange(1, loss_len+1)
+        plt.plot(x, loss_value, "b")
+        plt.show()
+
+
+    if __name__ == "__main__":
+        vqnet_qcnn_test()
+
+
+数据结果
+"""""""""""""""
+
+训练数据的损失函数曲线显示保存，以及测试数据结果保存。
+训练集上Loss情况
+
+.. image:: ./images/qcnn_vqnet.png
+   :width: 600 px
+   :align: center
+
+|
+
+可视化运行情况
+
+.. image:: ./images/qcnn_vqnet_result.png
+   :width: 600 px
+   :align: center
+
+
+|
+
+
+5.混合量子经典的QMLP网络模型
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+我们介绍并分析了提出了一种量子多层感知器 (QMLP) 架构，其特点是具有容错输入嵌入、丰富的非线性和带有参数化双量子比特纠缠门的增强变分电路模拟。`QMLP: An Error-Tolerant Nonlinear Quantum MLP Architecture using Parameterized Two-Qubit Gates <https://arxiv.org/pdf/2206.01345.pdf>`_ 。
+我们将编写一个将 `pyQPanda <https://pyqpanda-toturial.readthedocs.io/zh/latest/>`_ 与 `VQNet` 集成的简单示例。
+
+
+
+构建混合经典量子神经网络
+""""""""""""""""""""""""""
+
+.. code-block::
+
+    import os
+    import gzip
+    import struct
+    import numpy as np
+    import pyqpanda as pq
+    from pyvqnet.nn.module import Module
+    from pyvqnet.nn.loss import MeanSquaredError, CrossEntropyLoss
+    from pyvqnet.optim.adam import Adam
+    from pyvqnet.tensor.tensor import QTensor
+    from pyvqnet.qnn.measure import expval
+    from pyvqnet.qnn.quantumlayer import QuantumLayer, QuantumLayerMultiProcess
+    from pyvqnet.nn.pooling import AvgPool2D
+    from pyvqnet.nn.linear import Linear
+    from pyvqnet.data.data import data_generator
+    from pyvqnet.tensor import tensor
+    import matplotlib
+    from matplotlib import pyplot as plt
+    try:
+        matplotlib.use("TkAgg")
+    except:  # pylint:disable=bare-except
+        print("Can not use matplot TkAgg")
+
+    try:
+        import urllib.request
+    except ImportError:
+        raise ImportError("You should use Python 3.x")
+
+    url_base = "http://yann.lecun.com/exdb/mnist/"
+    key_file = {
+        "train_img": "train-images-idx3-ubyte.gz",
+        "train_label": "train-labels-idx1-ubyte.gz",
+        "test_img": "t10k-images-idx3-ubyte.gz",
+        "test_label": "t10k-labels-idx1-ubyte.gz"
+    }
+
+
+    def _download(dataset_dir, file_name):
+        """
+        Download mnist data if needed.
+        """
+        file_path = dataset_dir + "/" + file_name
+
+        if os.path.exists(file_path):
+            with gzip.GzipFile(file_path) as file:
+                file_path_ungz = file_path[:-3].replace("\\", "/")
+                if not os.path.exists(file_path_ungz):
+                    open(file_path_ungz, "wb").write(file.read())
+            return
+
+        print("Downloading " + file_name + " ... ")
+        urllib.request.urlretrieve(url_base + file_name, file_path)
+        if os.path.exists(file_path):
+            with gzip.GzipFile(file_path) as file:
+                file_path_ungz = file_path[:-3].replace("\\", "/")
+                file_path_ungz = file_path_ungz.replace("-idx", ".idx")
+                if not os.path.exists(file_path_ungz):
+                    open(file_path_ungz, "wb").write(file.read())
+        print("Done")
+
+    def download_mnist(dataset_dir):
+        for v in key_file.values():
+            _download(dataset_dir, v)
+
+    def load_mnist(dataset="training_data", digits=np.arange(2), path="./"):
+        """
+        load mnist data
+        """
+        from array import array as pyarray
+        download_mnist(path)
+        if dataset == "training_data":
+            fname_image = os.path.join(path, "train-images.idx3-ubyte").replace(
+                "\\", "/")
+            fname_label = os.path.join(path, "train-labels.idx1-ubyte").replace(
+                "\\", "/")
+        elif dataset == "testing_data":
+            fname_image = os.path.join(path, "t10k-images.idx3-ubyte").replace(
+                "\\", "/")
+            fname_label = os.path.join(path, "t10k-labels.idx1-ubyte").replace(
+                "\\", "/")
+        else:
+            raise ValueError("dataset must be 'training_data' or 'testing_data'")
+
+        flbl = open(fname_label, "rb")
+        _, size = struct.unpack(">II", flbl.read(8))
+        lbl = pyarray("b", flbl.read())
+        flbl.close()
+
+        fimg = open(fname_image, "rb")
+        _, size, rows, cols = struct.unpack(">IIII", fimg.read(16))
+        img = pyarray("B", fimg.read())
+        fimg.close()
+
+        ind = [k for k in range(size) if lbl[k] in digits]
+        num = len(ind)
+        images = np.zeros((num, rows, cols))
+        labels = np.zeros((num, 1), dtype=int)
+        for i in range(len(ind)):
+            images[i] = np.array(img[ind[i] * rows * cols:(ind[i] + 1) * rows *
+                                     cols]).reshape((rows, cols))
+            labels[i] = lbl[ind[i]]
+
+        return images, labels
+
+    def data_select(train_num, test_num):
+        """
+        Select data from mnist dataset.
+        """
+        x_train, y_train = load_mnist("training_data")  #pylint:disable=redefined-outer-name
+        x_test, y_test = load_mnist("testing_data")  #pylint:disable=redefined-outer-name
+        idx_train = np.append(
+            np.where(y_train == 0)[0][:train_num],
+            np.where(y_train == 1)[0][:train_num])
+
+        x_train = x_train[idx_train]
+        y_train = y_train[idx_train]
+
+        x_train = x_train / 255
+        y_train = np.eye(2)[y_train].reshape(-1, 2)
+
+        # Test Leaving only labels 0 and 1
+        idx_test = np.append(
+            np.where(y_test == 0)[0][:test_num],
+            np.where(y_test == 1)[0][:test_num])
+
+        x_test = x_test[idx_test]
+        y_test = y_test[idx_test]
+        x_test = x_test / 255
+        y_test = np.eye(2)[y_test].reshape(-1, 2)
+
+        return x_train, y_train, x_test, y_test
+
+    def RotCircuit(para, qlist):
+        r"""
+
+        Arbitrary single qubit rotation.Number of qlist should be 1,and number of parameters should
+        be 3
+
+        .. math::
+
+            R(\phi,\theta,\omega) = RZ(\omega)RY(\theta)RZ(\phi)= \begin{bmatrix}
+            e^{-i(\phi+\omega)/2}\cos(\theta/2) & -e^{i(\phi-\omega)/2}\sin(\theta/2) \\
+            e^{-i(\phi-\omega)/2}\sin(\theta/2) & e^{i(\phi+\omega)/2}\cos(\theta/2)
+            \end{bmatrix}.
+
+
+        :param para: numpy array which represents paramters [\phi, \theta, \omega]
+        :param qlist: qubits allocated by pyQpanda.qAlloc_many()
+        :return: quantum circuits
+
+        Example::
+
+            m_machine = pq.init_quantum_machine(pq.QMachineType.CPU)
+            m_clist = m_machine.cAlloc_many(2)
+            m_prog = pq.QProg()
+            m_qlist = m_machine.qAlloc_many(1)
+            param = np.array([3,4,5])
+            c = RotCircuit(param,m_qlist)
+            print(c)
+            pq.destroy_quantum_machine(m_machine)
+
+        """
+        if isinstance(para, QTensor):
+            para = QTensor._to_numpy(para)
+        if para.ndim > 1:
+            raise ValueError(" dim of paramters in Rot should be 1")
+        if para.shape[0] != 3:
+            raise ValueError(" numbers of paramters in Rot should be 3")
+
+        cir = pq.QCircuit()
+        cir.insert(pq.RZ(qlist, para[2]))
+        cir.insert(pq.RY(qlist, para[1]))
+        cir.insert(pq.RZ(qlist, para[0]))
+
+        return cir
+
+    def build_RotCircuit(qubits, weights):
+        cir = pq.QCircuit()
+        cir.insert(RotCircuit(weights[0:3], qubits[0]))
+        cir.insert(RotCircuit(weights[3:6], qubits[1]))
+        cir.insert(RotCircuit(weights[6:9], qubits[2]))
+        cir.insert(RotCircuit(weights[9:12], qubits[3]))
+        cir.insert(RotCircuit(weights[12:15], qubits[4]))
+        cir.insert(RotCircuit(weights[15:18], qubits[5]))
+        cir.insert(RotCircuit(weights[18:21], qubits[6]))
+        cir.insert(RotCircuit(weights[21:24], qubits[7]))
+        cir.insert(RotCircuit(weights[24:27], qubits[8]))
+        cir.insert(RotCircuit(weights[27:30], qubits[9]))
+        cir.insert(RotCircuit(weights[30:33], qubits[10]))
+        cir.insert(RotCircuit(weights[33:36], qubits[11]))
+        cir.insert(RotCircuit(weights[36:39], qubits[12]))
+        cir.insert(RotCircuit(weights[39:42], qubits[13]))
+        cir.insert(RotCircuit(weights[42:45], qubits[14]))
+        cir.insert(RotCircuit(weights[45:48], qubits[15]))
+
+        return cir
+
+    def CRXCircuit(para, control_qlists, rot_qlists):
+        cir = pq.QCircuit()
+        cir.insert(pq.RX(rot_qlists, para))
+        cir.set_control(control_qlists)
+        return cir
+
+    def build_CRotCircuit(qubits, weights):
+        cir = pq.QCircuit()
+        cir.insert(CRXCircuit(weights[0], qubits[0], qubits[1]))
+        cir.insert(CRXCircuit(weights[1], qubits[1], qubits[2]))
+        cir.insert(CRXCircuit(weights[2], qubits[2], qubits[3]))
+        cir.insert(CRXCircuit(weights[3], qubits[3], qubits[4]))
+        cir.insert(CRXCircuit(weights[4], qubits[4], qubits[5]))
+        cir.insert(CRXCircuit(weights[5], qubits[5], qubits[6]))
+        cir.insert(CRXCircuit(weights[6], qubits[6], qubits[7]))
+        cir.insert(CRXCircuit(weights[7], qubits[7], qubits[8]))
+        cir.insert(CRXCircuit(weights[8], qubits[8], qubits[9]))
+        cir.insert(CRXCircuit(weights[9], qubits[9], qubits[10]))
+        cir.insert(CRXCircuit(weights[10], qubits[10], qubits[11]))
+        cir.insert(CRXCircuit(weights[11], qubits[11], qubits[12]))
+        cir.insert(CRXCircuit(weights[12], qubits[12], qubits[13]))
+        cir.insert(CRXCircuit(weights[13], qubits[13], qubits[14]))
+        cir.insert(CRXCircuit(weights[14], qubits[14], qubits[15]))
+        cir.insert(CRXCircuit(weights[15], qubits[15], qubits[0]))
+
+        return cir
+
+
+    def build_qmlp_circuit(x, weights, qubits, clist, machine):
+        cir = pq.QCircuit()
+        num_qubits = len(qubits)
+        for i in range(num_qubits):
+            cir.insert(pq.RX(qubits[i], x[i]))
+
+        cir.insert(build_RotCircuit(qubits, weights[0:48]))
+        cir.insert(build_CRotCircuit(qubits, weights[48:64]))
+
+        for i in range(num_qubits):
+            cir.insert(pq.RX(qubits[i], x[i]))
+
+        cir.insert(build_RotCircuit(qubits, weights[64:112]))
+        cir.insert(build_CRotCircuit(qubits, weights[112:128]))
+
+        prog = pq.QProg()
+        prog.insert(cir)
+        # print(prog)
+        # exit()
+
+        exp_vals = []
+        for position in range(num_qubits):
+            pauli_str = {"Z" + str(position): 1.0}
+            exp2 = expval(machine, prog, pauli_str, qubits)
+            exp_vals.append(exp2)
+
+        return exp_vals
+
+    def build_multiprocess_qmlp_circuit(x, weights, num_qubits, num_clist):
+        machine = pq.CPUQVM()
+        machine.init_qvm()
+        qubits = machine.qAlloc_many(num_qubits)
+        cir = pq.QCircuit()
+        for i in range(num_qubits):
+            cir.insert(pq.RX(qubits[i], x[i]))
+
+        cir.insert(build_RotCircuit(qubits, weights[0:48]))
+        cir.insert(build_CRotCircuit(qubits, weights[48:64]))
+
+        for i in range(num_qubits):
+            cir.insert(pq.RX(qubits[i], x[i]))
+
+        cir.insert(build_RotCircuit(qubits, weights[64:112]))
+        cir.insert(build_CRotCircuit(qubits, weights[112:128]))
+
+        prog = pq.QProg()
+        prog.insert(cir)
+        # print(prog)
+        # exit()
+
+        exp_vals = []
+        for position in range(num_qubits):
+            pauli_str = {"Z" + str(position): 1.0}
+            exp2 = expval(machine, prog, pauli_str, qubits)
+            exp_vals.append(exp2)
+
+        return exp_vals
+
+    class QMLPModel(Module):
+        def __init__(self):
+            super(QMLPModel, self).__init__()
+            self.ave_pool2d = AvgPool2D([7, 7], [7, 7], "valid")
+            # self.quantum_circuit = QuantumLayer(build_qmlp_circuit, 128, "CPU", 16, diff_method="finite_diff")
+            self.quantum_circuit = QuantumLayerMultiProcess(build_multiprocess_qmlp_circuit, 128, "CPU",
+                                                            16, 1, diff_method="finite_diff")
+            self.linear = Linear(16, 10)
+
+        def forward(self, x):
+            bsz = x.shape[0]
+            x = self.ave_pool2d(x)
+            input_data = x.reshape([bsz, 16])
+            quanutum_result = self.quantum_circuit(input_data)
+            result = self.linear(quanutum_result)
+            return result
+
+    def vqnet_test_QMLPModel():
+        # train num=1000, test_num=100
+        # x_train, y_train, x_test, y_test = data_select(1000, 100)
+
+        train_size = 1000
+        eval_size = 100
+        x_train, y_train = load_mnist("training_data", digits=np.arange(10))
+        x_test, y_test = load_mnist("testing_data", digits=np.arange(10))
+
+        x_train = x_train[:train_size]
+        y_train = y_train[:train_size]
+        x_test = x_test[:eval_size]
+        y_test = y_test[:eval_size]
+
+        x_train = x_train / 255
+        x_test = x_test / 255
+        y_train = np.eye(10)[y_train].reshape(-1, 10)
+        y_test = np.eye(10)[y_test].reshape(-1, 10)
+
+        model = QMLPModel()
+        optimizer = Adam(model.parameters(), lr=0.005)
+        loss_func = CrossEntropyLoss()
+        loss_list = []
+        epochs = 30
+        for epoch in range(1, epochs):
+            total_loss = []
+
+            correct = 0
+            n_train = 0
+            for x, y in data_generator(x_train,
+                                       y_train,
+                                       batch_size=16,
+                                       shuffle=True):
+
+                x = x.reshape(-1, 1, 28, 28)
+                optimizer.zero_grad()
+                # Forward pass
+                output = model(x)
+                # Calculating loss
+                loss = loss_func(y, output)
+                loss_np = np.array(loss.data)
+                print("loss: ", loss_np)
+                np_output = np.array(output.data, copy=False)
+
+                temp_out = np_output.argmax(axis=1)
+                temp_output = np.zeros((temp_out.size, 10))
+                temp_output[np.arange(temp_out.size), temp_out] = 1
+                temp_maks = (temp_output == y)
+
+                correct += np.sum(np.array(temp_maks))
+                n_train += 160
+
+                # Backward pass
+                loss.backward()
+                # Optimize the weights
+                optimizer._step()
+                total_loss.append(loss_np)
+            print("##########################")
+            print(f"Train Accuracy: {correct / n_train}")
+            loss_list.append(np.sum(total_loss) / len(total_loss))
+            # train_acc_list.append(correct / n_train)
+            print("epoch: ", epoch)
+            # print(100. * (epoch + 1) / epochs)
+            print("{:.0f} loss is : {:.10f}".format(epoch, loss_list[-1]))
+
+    if __name__ == "__main__":
+
+        vqnet_test_QMLPModel()
+
+
+
+数据结果
+"""""""""""""""
+
+训练数据的损失函数曲线显示保存，以及测试数据结果保存。
+训练集上Loss情况
+
+.. image:: ./images/QMLP.png
+   :width: 600 px
+   :align: center
+
+|
+
+
+
 无监督学习
 -------------------
 
@@ -3961,8 +4790,8 @@ VQNet提供了封装类 ``VQC_wrapper`` ，用户使用普通逻辑门在函数 
 
     def serial_quantum_model(weights, x, num_qubits, scaling):
         cir = pq.QCircuit()
-        machine = pq.CPUQVM()  # outside
-        machine.init_qvm()  # outside
+        machine = pq.CPUQVM()  
+        machine.init_qvm()  
         qubits = machine.qAlloc_many(num_qubits)
 
         for theta in weights[:-1]:
@@ -4264,8 +5093,8 @@ VQNet提供了封装类 ``VQC_wrapper`` ，用户使用普通逻辑门在函数 
 
     def parallel_quantum_model(weights, x, num_qubits):
         cir = pq.QCircuit()
-        machine = pq.CPUQVM()  # outside
-        machine.init_qvm()  # outside
+        machine = pq.CPUQVM()  
+        machine.init_qvm()  
         qubits = machine.qAlloc_many(num_qubits)
 
         cir.insert(W1(weights[0], qubits))
