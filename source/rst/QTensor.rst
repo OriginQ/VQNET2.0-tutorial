@@ -3295,3 +3295,173 @@ to_tensor
 
         # [10.0000000]
         
+
+pad_sequence
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:function:: pyvqnet.tensor.pad_sequence(qtensor_list, batch_first=False, padding_value=0)
+
+    用 ``padding_value`` 填充可变长度张量列表。 ``pad_sequence`` 沿新维度堆叠张量列表，并将它们填充到相等的长度。
+    输入是列表大小为 ``L x *`` 的序列。 L 是可变长度。
+
+    :param qtensor_list: `list[QTensor]`- 可变长度序列列表。
+    :param batch_first: 'bool' - 如果为真，输出将是 ``批大小 x 最长序列长度 x *`` ，否则为 ``最长序列长度 x 批大小 x *`` 。 默认值: False。
+    :param padding_value: 'float' - 填充值。 默认值：0。
+
+    :return:
+        如果 batch_first 为 ``False``，则张量大小为 ``批大小 x 最长序列长度 x *``。
+        否则张量的大小为 ``最长序列长度 x 批大小 x *`` 。
+
+    Examples::
+
+        from pyvqnet.tensor import tensor
+        a = tensor.ones([4, 2,3])
+        b = tensor.ones([1, 2,3])
+        c = tensor.ones([2, 2,3])
+        a.requires_grad = True
+        b.requires_grad = True
+        c.requires_grad = True
+        y = tensor.pad_sequence([a, b, c], True)
+
+        print(y)
+        # [
+        # [[[1.0000000, 1.0000000, 1.0000000],
+        #  [1.0000000, 1.0000000, 1.0000000]],
+        # [[1.0000000, 1.0000000, 1.0000000],
+        #  [1.0000000, 1.0000000, 1.0000000]],
+        # [[1.0000000, 1.0000000, 1.0000000],
+        #  [1.0000000, 1.0000000, 1.0000000]],
+        # [[1.0000000, 1.0000000, 1.0000000],
+        #  [1.0000000, 1.0000000, 1.0000000]]],
+        # [[[1.0000000, 1.0000000, 1.0000000],
+        #  [1.0000000, 1.0000000, 1.0000000]],
+        # [[0.0000000, 0.0000000, 0.0000000],
+        #  [0.0000000, 0.0000000, 0.0000000]],
+        # [[0.0000000, 0.0000000, 0.0000000],
+        #  [0.0000000, 0.0000000, 0.0000000]],
+        # [[0.0000000, 0.0000000, 0.0000000],
+        #  [0.0000000, 0.0000000, 0.0000000]]],
+        # [[[1.0000000, 1.0000000, 1.0000000],
+        #  [1.0000000, 1.0000000, 1.0000000]],
+        # [[1.0000000, 1.0000000, 1.0000000],
+        #  [1.0000000, 1.0000000, 1.0000000]],
+        # [[0.0000000, 0.0000000, 0.0000000],
+        #  [0.0000000, 0.0000000, 0.0000000]],
+        # [[0.0000000, 0.0000000, 0.0000000],
+        #  [0.0000000, 0.0000000, 0.0000000]]]
+        # ]
+
+
+pad_packed_sequence
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:function:: pyvqnet.tensor.pad_packed_sequence(sequence, batch_first=False, padding_value=0, total_length=None)
+
+    填充一批打包的可变长度序列。它是 `pack_pad_sequence` 的逆操作。
+    当  ``batch_first`` 是 True，它将返回  ``B x T x *`` 形状的张量，否则返回  ``T x B x *``。
+    其中 `T` 为序列最长长度, `B` 为批处理大小。
+
+
+
+    :param sequence: 'QTensor' - 待处理数据。
+    :param batch_first: 'bool' - 如果为 ``True`` ，批处理将是输入的第一维。 默认值：False。
+    :param padding_value: 'bool' - 填充值。默认:0。
+    :param total_length: 'bool' - 如果不是 ``None`` ，输出将被填充到长度 :attr:`total_length`。 默认值：None。
+    :return:
+        包含填充序列的张量元组，以及批次中每个序列的长度列表。批次元素将按照最初的顺序重新排序。
+
+    Examples::
+
+        from pyvqnet.tensor import tensor
+        a = tensor.ones([4, 2,3])
+        b = tensor.ones([2, 2,3])
+        c = tensor.ones([1, 2,3])
+        a.requires_grad = True
+        b.requires_grad = True
+        c.requires_grad = True
+        y = tensor.pad_sequence([a, b, c], True)
+        seq_len = [4, 2, 1]
+        data = tensor.pack_pad_sequence(y,
+                                seq_len,
+                                batch_first=True,
+                                enforce_sorted=True)
+
+        seq_unpacked, lens_unpacked = tensor.pad_packed_sequence(data, batch_first=True)
+        print(seq_unpacked)
+        # [
+        # [[1.0000000, 1.0000000],
+        #  [1.0000000, 1.0000000],
+        #  [1.0000000, 1.0000000]],
+        # [[1.0000000, 1.0000000],
+        #  [0.0000000, 0.0000000],
+        #  [1.0000000, 1.0000000]],
+        # [[1.0000000, 1.0000000],
+        #  [0.0000000, 0.0000000],
+        #  [0.0000000, 0.0000000]],
+        # [[1.0000000, 1.0000000],
+        #  [0.0000000, 0.0000000],
+        #  [0.0000000, 0.0000000]]
+        # ]
+        print(lens_unpacked)
+        # [4 1 2]
+
+
+pad_packed_sequence
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:function:: pyvqnet.tensor.pad_packed_sequence(nput, lengths, batch_first=False, enforce_sorted=True)
+
+    打包一个包含可变长度填充序列的张量。
+    如果 batch_first 是 True, `input` 的形状应该为 [批大小,长度,*]，否则形状 [长度，批大小,*]。
+
+    对于未排序的序列，使用 ``enforce_sorted`` 是 False。 如果 :attr:`enforce_sorted` 是 ``True``，序列应该按长度降序排列。
+
+    :param input: 'QTensor' - 填充的可变长度序列批次。
+    :parma lengths: 'list' - 每个批次的序列长度列表
+        元素。
+    :param batch_first: 'bool' - 如果 ``True``，则输入预期为 ``B x T x *``
+        格式，默认：False。
+    :param enforce_sorted: 'bool' - 如果 ``True``，输入应该是
+        包含按长度降序排列的序列。 如果 ``False``，输入将无条件排序。 默认值：True。
+
+    :return: 一个 :class:`PackedSequence` 对象。
+
+    Examples::
+
+        from pyvqnet.tensor import tensor
+        a = tensor.ones([4, 2,3])
+        b = tensor.ones([2, 2,3])
+        c = tensor.ones([1, 2,3])
+        a.requires_grad = True
+        b.requires_grad = True
+        c.requires_grad = True
+        y = tensor.pad_sequence([a, b, c], True)
+        seq_len = [4, 2, 1]
+        data = tensor.pack_pad_sequence(y,
+                                seq_len,
+                                batch_first=True,
+                                enforce_sorted=True)
+        print(data.data)
+        print(data.batch_sizes)
+        print(data.sort_indice)
+        print(data.unsorted_indice)
+
+        # [
+        # [[1.0000000, 1.0000000, 1.0000000],
+        #  [1.0000000, 1.0000000, 1.0000000]],
+        # [[1.0000000, 1.0000000, 1.0000000],
+        #  [1.0000000, 1.0000000, 1.0000000]],
+        # [[1.0000000, 1.0000000, 1.0000000],
+        #  [1.0000000, 1.0000000, 1.0000000]],
+        # [[1.0000000, 1.0000000, 1.0000000],
+        #  [1.0000000, 1.0000000, 1.0000000]],
+        # [[1.0000000, 1.0000000, 1.0000000],
+        #  [1.0000000, 1.0000000, 1.0000000]],
+        # [[1.0000000, 1.0000000, 1.0000000],
+        #  [1.0000000, 1.0000000, 1.0000000]],
+        # [[1.0000000, 1.0000000, 1.0000000],
+        #  [1.0000000, 1.0000000, 1.0000000]]
+        # ]
+        # [3, 2, 1, 1]
+        # [0, 2, 1]
+        # [0, 2, 1]
