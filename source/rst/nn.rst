@@ -871,7 +871,53 @@ Dropout
         #  [0.0000000, 14.0000000]]]
         # ]
 
-GRU 
+Pixel_Shuffle 
+^^^^^^^^^^^^^^^^^^^^^^^^^
+.. py:class:: pyvqnet.nn.pixel_shuffle.Pixel_Shuffle(upscale_factors)
+
+    重新排列形状为：(*, C * r^2, H, W)  的张量
+    到形状为 (*, C, H * r, W * r) 的张量，其中 r 是尺度变换因子。
+
+    :param upscale_factors: 增加尺度变换的因子
+
+    :return:
+            Pixel_Shuffle 模块
+
+    Example::
+
+        from pyvqnet.nn import Pixel_Shuffle
+        from pyvqnet.tensor import tensor
+        ps = Pixel_Shuffle(3)
+        inx = tensor.ones([5,2,3,18,4,4])
+        inx.requires_grad=  True
+        y = ps(inx)
+        print(y.shape)
+        #[5, 2, 3, 2, 12, 12]
+
+Pixel_Unshuffle 
+^^^^^^^^^^^^^^^^^^^^^^^^^
+.. py:class:: pyvqnet.nn.pixel_shuffle.Pixel_Unshuffle(downscale_factors)
+
+    通过重新排列元素来反转 Pixel_Shuffle 操作. 将 (*, C, H * r, W * r) 形状的张量变化为 (*, C * r^2, H, W) ，其中 r 是缩小因子。
+
+    :param downscale_factors: 增加尺度变换的因子
+
+    :return:
+            Pixel_Unshuffle 模块
+
+    Example::
+
+        from pyvqnet.nn import Pixel_Unshuffle
+        from pyvqnet.tensor import tensor
+        ps = Pixel_Unshuffle(3)
+        inx = tensor.ones([5, 2, 3, 2, 12, 12])
+        inx.requires_grad = True
+        y = ps(inx)
+        print(y.shape)
+        #[5, 2, 3, 18, 4, 4]
+
+
+GRU
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:class:: pyvqnet.nn.gru.GRU(input_size, hidden_size, num_layers=1, nonlinearity='tanh', batch_first=True, use_bias=True, bidirectional=False)

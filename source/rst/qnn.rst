@@ -685,6 +685,51 @@ QLinear 实现了一种量子全连接算法。首先将数据编码到量子态
         #[0.1524036, 0.1442845]
         #]
 
+grad
+^^^^^^^^^^
+.. py:function:: pyvqnet.qnn.quantumlayer.grad(quantum_prog_func,params)
+
+    grad 函数提供了一种对用户设计的含参量子线路参数的梯度进行计算的接口。
+    用户可按照如下例子，使用pyqpanda设计线路运行函数 ``quantum_prog_func`` ，并作为参数送入grad函数。
+    grad函数的第二个参数则是想要计算量子逻辑门参数梯度的坐标。
+    返回值的形状为  [num of parameters,num of output]。
+
+    :param quantum_prog_func: pyqpanda设计的量子线路运行函数。
+    :param params: 待求梯度的参数的坐标。
+    :return:
+            参数的梯度
+
+    Examples::
+
+        from pyvqnet.qnn import grad, ProbsMeasure
+        import pyqpanda as pq
+
+        def pqctest(param):
+            machine = pq.CPUQVM()
+            machine.init_qvm()
+            qubits = machine.qAlloc_many(2)
+            circuit = pq.QCircuit()
+
+            circuit.insert(pq.RX(qubits[0], param[0]))
+
+            circuit.insert(pq.RY(qubits[1], param[1]))
+            circuit.insert(pq.CNOT(qubits[0], qubits[1]))
+
+            circuit.insert(pq.RX(qubits[1], param[2]))
+
+            prog = pq.QProg()
+            prog.insert(circuit)
+
+            EXP = ProbsMeasure([1],prog,machine,qubits)
+            return EXP
+
+
+        g = grad(pqctest, [0.1,0.2, 0.3])
+        print(g)
+        # [[-0.04673668  0.04673668]
+        # [-0.09442394  0.09442394]
+        # [-0.14409127  0.14409127]]
+
 
 
 量子逻辑门
@@ -983,7 +1028,297 @@ CSWAPcircuit
         #           │
         # q_2:  |0>─X─
 
-常用量子线路
+Controlled_Hadamard
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:function:: pyvqnet.qnn.template.Controlled_Hadamard(qubits)
+
+    受控Hadamard逻辑门
+
+    .. math:: CH = \begin{bmatrix}
+            1 & 0 & 0 & 0 \\
+            0 & 1 & 0 & 0 \\
+            0 & 0 & \frac{1}{\sqrt{2}} & \frac{1}{\sqrt{2}} \\
+            0 & 0 & \frac{1}{\sqrt{2}} & -\frac{1}{\sqrt{2}}
+        \end{bmatrix}.
+
+    :param qubits: 使用pyqpanda申请的量子比特。
+
+    Examples::
+
+        import pyqpanda as pq
+
+        machine = pq.CPUQVM()
+        machine.init_qvm()
+        qubits = machine.qAlloc_many(2)
+        from pyvqnet.qnn import Controlled_Hadamard
+
+        cir = Controlled_Hadamard(qubits)
+        print(cir)
+        # q_0:  |0>──────────────── ──■─ ──────────────
+        #           ┌─────────────┐ ┌─┴┐ ┌────────────┐
+        # q_1:  |0>─┤RY(-0.785398)├ ┤CZ├ ┤RY(0.785398)├
+        #           └─────────────┘ └──┘ └────────────┘
+
+CCZ
+^^^^^^^^^^^^^^^^
+
+.. py:function:: pyvqnet.qnn.template.CCZ(qubits)
+
+    受控-受控-Z (controlled-controlled-Z) 逻辑门。
+
+    .. math::
+
+        CCZ =
+        \begin{pmatrix}
+        1 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\
+        0 & 1 & 0 & 0 & 0 & 0 & 0 & 0\\
+        0 & 0 & 1 & 0 & 0 & 0 & 0 & 0\\
+        0 & 0 & 0 & 1 & 0 & 0 & 0 & 0\\
+        0 & 0 & 0 & 0 & 1 & 0 & 0 & 0\\
+        0 & 0 & 0 & 0 & 0 & 1 & 0 & 0\\
+        0 & 0 & 0 & 0 & 0 & 0 & 1 & 0\\
+        0 & 0 & 0 & 0 & 0 & 0 & 0 & -1
+        \end{pmatrix}
+    
+    :param qubits: 使用pyqpanda申请的量子比特。
+
+    :return:
+            pyqpanda QCircuit 
+
+    Example::
+
+        import pyqpanda as pq
+
+        machine = pq.CPUQVM()
+        machine.init_qvm()
+        qubits = machine.qAlloc_many(3)
+        from pyvqnet.qnn import CCZ
+
+        cir = CCZ(qubits)
+        print(cir)
+        # q_0:  |0>─────── ─────── ───■── ─── ────── ─────── ───■── ───■── ┤T├──── ───■──
+        #                             │              ┌─┐        │   ┌──┴─┐ ├─┴───┐ ┌──┴─┐
+        # q_1:  |0>────■── ─────── ───┼── ─── ───■── ┤T├──── ───┼── ┤CNOT├ ┤T.dag├ ┤CNOT├
+        #           ┌──┴─┐ ┌─────┐ ┌──┴─┐ ┌─┐ ┌──┴─┐ ├─┴───┐ ┌──┴─┐ ├─┬──┘ ├─┬───┘ ├─┬──┘
+        # q_2:  |0>─┤CNOT├ ┤T.dag├ ┤CNOT├ ┤T├ ┤CNOT├ ┤T.dag├ ┤CNOT├ ┤T├─── ┤H├──── ┤H├───
+        #           └────┘ └─────┘ └────┘ └─┘ └────┘ └─────┘ └────┘ └─┘    └─┘     └─┘
+
+FermionicSingleExcitation
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:function:: pyvqnet.qnn.template.FermionicSingleExcitation(weight, wires, qubits)
+
+    对泡利矩阵的张量积求幂的耦合簇单激励算子。矩阵形式下式给出:
+
+    .. math::
+
+        \hat{U}_{pr}(\theta) = \mathrm{exp} \{ \theta_{pr} (\hat{c}_p^\dagger \hat{c}_r
+        -\mathrm{H.c.}) \},
+
+    :param weight:  量子比特 p 上的变参.
+    :param wires: 表示区间[r, p]中的量子比特索引子集。最小长度必须为2。第一索引值被解释为r，最后一个索引值被解释为p。
+                中间的索引被CNOT门作用，以计算量子位集的奇偶校验。
+    :param qubits: pyqpanda申请的量子比特。
+
+    :return:
+            pyqpanda QCircuit
+
+    Examples::
+
+        from pyvqnet.qnn import FermionicSingleExcitation, expval
+
+        weight = 0.5
+        import pyqpanda as pq
+        machine = pq.CPUQVM()
+        machine.init_qvm()
+        qlists = machine.qAlloc_many(3)
+
+        cir = FermionicSingleExcitation(weight, [1, 0, 2], qlists)
+
+        prog = pq.QProg()
+        prog.insert(cir)
+        pauli_dict = {'Z0': 1}
+        exp2 = expval(machine, prog, pauli_dict, qlists)
+        print(f"vqnet {exp2}")
+        #vqnet 1.0000000000000013
+
+
+FermionicDoubleExcitation
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:function:: pyvqnet.qnn.template.FermionicDoubleExcitation(weight,  wires1, wires2, qubits)
+
+    对泡利矩阵的张量积求幂的耦合聚类双激励算子,矩阵形式由下式给出:
+
+    .. math::
+
+        \hat{U}_{pqrs}(\theta) = \mathrm{exp} \{ \theta (\hat{c}_p^\dagger \hat{c}_q^\dagger
+        \hat{c}_r \hat{c}_s - \mathrm{H.c.}) \},
+
+    其中 :math:`\hat{c}` 和 :math:`\hat{c}^\dagger` 是费米子湮灭和
+    创建运算符和索引 :math:`r, s` 和 :math:`p, q` 在占用的和
+    分别为空分子轨道。 使用 `Jordan-Wigner 变换
+    <https://arxiv.org/abs/1208.5986>`_ 上面定义的费米子算子可以写成
+    根据 Pauli 矩阵（有关更多详细信息，请参见
+    `arXiv:1805.04340 <https://arxiv.org/abs/1805.04340>`_)
+
+    .. math::
+
+        \hat{U}_{pqrs}(\theta) = \mathrm{exp} \Big\{
+        \frac{i\theta}{8} \bigotimes_{b=s+1}^{r-1} \hat{Z}_b \bigotimes_{a=q+1}^{p-1}
+        \hat{Z}_a (\hat{X}_s \hat{X}_r \hat{Y}_q \hat{X}_p +
+        \hat{Y}_s \hat{X}_r \hat{Y}_q \hat{Y}_p +\\ \hat{X}_s \hat{Y}_r \hat{Y}_q \hat{Y}_p +
+        \hat{X}_s \hat{X}_r \hat{X}_q \hat{Y}_p - \mathrm{H.c.}  ) \Big\}
+
+    :param weight: 可变参数
+    :param wires1: 代表的量子比特的索引列表区间 [s, r] 中占据量子比特的子集。第一个索引被解释为 s，最后一索引被解释为 r。 CNOT 门对中间的索引进行操作，以计算一组量子位的奇偶性。
+    :param wires2: 代表的量子比特的索引列表区间 [q, p] 中占据量子比特的子集。第一根索引被解释为 q，最后一索引被解释为 p。 CNOT 门对中间的索引进行操作，以计算一组量子位的奇偶性。
+    :param qubits:  pyqpanda申请的量子比特。
+
+    :return:
+        pyqpanda QCircuit
+
+    Examples::
+
+        import pyqpanda as pq
+        from pyvqnet.qnn import FermionicDoubleExcitation, expval
+        machine = pq.CPUQVM()
+        machine.init_qvm()
+        qlists = machine.qAlloc_many(5)
+        weight = 1.5
+        cir = FermionicDoubleExcitation(weight,
+                                        wires1=[0, 1],
+                                        wires2=[2, 3, 4],
+                                        qubits=qlists)
+
+        prog = pq.QProg()
+        prog.insert(cir)
+        pauli_dict = {'Z0': 1}
+        exp2 = expval(machine, prog, pauli_dict, qlists)
+        print(f"vqnet {exp2}")
+        #vqnet 1.0000000000000058
+
+UCCSD
+^^^^^^^^^^^^^
+
+.. py:function:: pyvqnet.qnn.template.UCCSD(weights, wires, s_wires, d_wires, init_state, qubits)
+
+    实现酉耦合簇单激发和双激发拟设（UCCSD）。UCCSD 是 VQE 拟设，通常用于运行量子化学模拟。
+
+    在一阶 Trotter 近似内，UCCSD 酉函数由下式给出：
+
+    .. math::
+
+        \hat{U}(\vec{\theta}) =
+        \prod_{p > r} \mathrm{exp} \Big\{\theta_{pr}
+        (\hat{c}_p^\dagger \hat{c}_r-\mathrm{H.c.}) \Big\}
+        \prod_{p > q > r > s} \mathrm{exp} \Big\{\theta_{pqrs}
+        (\hat{c}_p^\dagger \hat{c}_q^\dagger \hat{c}_r \hat{c}_s-\mathrm{H.c.}) \Big\}
+
+    其中 :math:`\hat{c}` 和 :math:`\hat{c}^\dagger` 是费米子湮灭和
+    创建运算符和索引 :math:`r, s` 和 :math:`p, q` 在占用的和
+    分别为空分子轨道。（更多细节见
+    `arXiv:1805.04340 <https://arxiv.org/abs/1805.04340>`_):
+
+
+    :param weights: 包含参数的大小 ``(len(s_wires)+ len(d_wires))`` 张量
+        :math:`\theta_{pr}` 和 :math:`\theta_{pqrs}` 输入 Z 旋转
+        ``FermionicSingleExcitation`` 和 ``FermionicDoubleExcitation`` 。
+    :param wires: 模板作用的量子比特索引
+    :param s_wires: 包含量子比特索引的列表序列 ``[r,...,p]``
+        由单一激发产生
+        :math:`\vert r, p \rangle = \hat{c}_p^\dagger \hat{c}_r \vert \mathrm{HF} \rangle`,
+        其中 :math:`\vert \mathrm{HF} \rangle` 表示 Hartee-Fock 参考态。
+    :param d_wires: 列表序列，每个列表包含两个列表
+        指定索引 ``[s, ...,r]`` 和 ``[q,..., p]`` 
+        定义双激励 :math:`\vert s, r, q, p \rangle = \hat{c}_p^\dagger \hat{c}_q^\dagger \hat{c}_r\hat{c}_s \vert \mathrm{HF} \rangle` 。
+    :param init_state: 长度 ``len(wires)`` occupation-number vector 表示
+        高频状态。 ``init_state`` 在量子比特初始化状态。
+    :param qubits: pyqpanda分配的量子位。
+
+    Examples::
+
+        import pyqpanda as pq
+        from pyvqnet.tensor import tensor
+        from pyvqnet.qnn import UCCSD, expval
+        machine = pq.CPUQVM()
+        machine.init_qvm()
+        qlists = machine.qAlloc_many(6)
+        weight = tensor.zeros([8])
+        cir = UCCSD(weight,wires = [0,1,2,3,4,5,6],
+                                        s_wires=[[0, 1, 2], [0, 1, 2, 3, 4], [1, 2, 3], [1, 2, 3, 4, 5]],
+                                        d_wires=[[[0, 1], [2, 3]], [[0, 1], [2, 3, 4, 5]], [[0, 1], [3, 4]], [[0, 1], [4, 5]]],
+                                        init_state=[1, 1, 0, 0, 0, 0],
+                                        qubits=qlists)
+
+        prog = pq.QProg()
+        prog.insert(cir)
+        pauli_dict = {'Z0': 1}
+        exp2 = expval(machine, prog, pauli_dict, qlists)
+        print(f"vqnet {exp2}")
+        #vqnet -1.0000000000000004
+
+
+QuantumPoolingCircuit
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:function:: pyvqnet.qnn.template.QuantumPoolingCircuit(sources_wires, sinks_wires, params,qubits)
+
+    对数据进行降采样的量子电路。
+    为了减少我们电路中的量子位数量，我们首先在我们的系统中创建成对的量子位。
+    在最初配对所有量子位之后，我们将我们的广义 2 量子位酉元应用于每一对。
+    在应用这两个量子位酉元之后，我们会在神经网络的其余部分忽略每对量子位中的一个量子位。
+
+    :param sources_wires: 将被忽略的源量子位索引。
+    :param sinks_wires: 将保留的目标量子位索引。
+    :param params: 输入参数。
+    :param qubits: 由 pyqpanda 分配的 qubits 列表。
+
+    :return:
+        pyqpanda QCircuit
+
+    Examples:: 
+
+        from pyvqnet.qnn import QuantumPoolingCircuit
+        import pyqpanda as pq
+        from pyvqnet import tensor
+        machine = pq.CPUQVM()
+        machine.init_qvm()
+        qlists = machine.qAlloc_many(4)
+        p = tensor.full([6], 0.35)
+        cir = QuantumPoolingCircuit([0, 1], [2, 3], p, qlists)
+        print(cir)
+
+        #                           ┌────┐ ┌────────────┐                           !
+        # >
+        # q_0:  |0>──────────────── ┤CNOT├ ┤RZ(0.350000)├ ───■── ────────────── ────! ─────────────── ────── ────────────── 
+        # >
+        #                           └──┬─┘ └────────────┘    │                      !                 ┌────┐ ┌────────────┐ 
+        # >
+        # q_1:  |0>──────────────── ───┼── ────────────── ───┼── ────────────── ────! ─────────────── ┤CNOT├ ┤RZ(0.350000)├ 
+        # >
+        #           ┌─────────────┐    │   ┌────────────┐ ┌──┴─┐ ┌────────────┐     !                 └──┬─┘ └────────────┘ 
+        # >
+        # q_2:  |0>─┤RZ(-1.570796)├ ───■── ┤RY(0.350000)├ ┤CNOT├ ┤RY(0.350000)├ ────! ─────────────── ───┼── ────────────── 
+        # >
+        #           └─────────────┘        └────────────┘ └────┘ └────────────┘     ! ┌─────────────┐    │   ┌────────────┐ 
+        # >
+        # q_3:  |0>──────────────── ────── ────────────── ────── ────────────── ────! ┤RZ(-1.570796)├ ───■── ┤RY(0.350000)├ 
+        # >
+        #                                                                           ! └─────────────┘        └────────────┘ 
+        # >
+
+        #                                    !
+        # q_0:  |0>────── ────────────── ────!
+        #                                    !
+        # q_1:  |0>───■── ────────────── ────!
+        #             │                      !
+        # q_2:  |0>───┼── ────────────── ────!
+        #          ┌──┴─┐ ┌────────────┐     !
+        # q_3:  |0>┤CNOT├ ┤RY(0.350000)├ ────!
+
+常用量子线路组合
 ----------------------------------
 VQNet提供了量子机器学习研究中常用的一些量子线路
 
@@ -1189,6 +1524,7 @@ Quantum_Embedding
         #  [0.2302894],
         #  [0.2302894]
         # ]
+
 
 
 
@@ -1443,6 +1779,7 @@ MeasurePauliSum
 
 VarMeasure
 ^^^^^^^^^^^^^^^^^^^^
+
 .. py:function:: pyvqnet.qnn.measure.VarMeasure(machine, prog, actual_qlist)
 
     提供的可观察量的方差。
@@ -1473,6 +1810,37 @@ VarMeasure
         # 0.2298488470659339
 
 
+Purity
+^^^^^^^^^^^^^^^^^^^^
+
+.. py:function:: pyvqnet.qnn.measure.Purity(state, qubits_idx)
+
+
+    从态矢中计算特定量子比特上的纯度。
+
+    .. math::
+        \gamma = \text{Tr}(\rho^2)
+
+    式中 :math:`\rho` 为密度矩阵。标准化量子态的纯度满足 :math:`\frac{1}{d} \leq \gamma \leq 1` ，
+    其中 :math:`d` 是希尔伯特空间的维数。
+    纯态的纯度是1。
+
+    :param state: 从pyqpanda get_qstate()获取的量子态
+    :param qubits_idx: 要计算纯度的量子比特位索引
+
+    :return:
+            纯度
+
+    Examples::
+
+        from pyvqnet.qnn import Purity
+        qstate = [(0.9306699299765968 + 0j), (0.18865613455240968 + 0j),
+                (0.1886561345524097 + 0j), (0.03824249173404786 + 0j),
+                -0.048171819846746615j, -0.00976491131165138j, -0.23763904794287155j,
+                -0.048171819846746615j]
+        pp = Purity(qstate, [1])
+        print(pp)
+        #0.902503479761881
 
 量子机器学习算法接口
 ----------------------------------

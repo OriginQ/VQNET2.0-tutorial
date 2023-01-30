@@ -1254,6 +1254,35 @@ randn
         # [-0.6987777, -0.0089036, -0.5084590]
         # ]
 
+
+multinomial
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:function:: pyvqnet.tensor.multinomial(t, num_samples)
+
+    返回一个张量，其中每行包含 num_samples 个索引采样
+        来自位于张量输入的相应行中的多项式概率分布。
+    
+    :param t: 输入概率分布。
+    :param num_samples: 采样样本。
+
+    :return:
+         输出采样索引
+
+    Examples::
+
+        from pyvqnet import tensor
+        weights = tensor.QTensor([0,10, 3, 1]) 
+        idx = tensor.multinomial(weights,3)
+        print(idx)
+
+        from pyvqnet import tensor
+        weights = tensor.QTensor([0,10, 3, 0]) 
+        idx = tensor.multinomial(weights,3)
+        print(idx)
+        #[2.0000000, 1.0000000, 3.0000000]
+        #[1.0000000, 2.0000000, 0.0000000]
+
 triu
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

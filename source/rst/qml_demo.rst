@@ -831,6 +831,296 @@ VSQL在测试数据上准确率变化情况：
 
 |
 
+4.Quanvolution进行图像分类
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+在此示例中，我们实现了量子卷积神经网络，这是一种最初在论文 `Quanvolutional Neural Networks: Powering Image Recognition with Quantum Circuits <https://arxiv.org/abs/1904.04767>`_ 中介绍的方法。
+
+类似经典卷积，Quanvolution有以下步骤：
+输入图像的一小块区域，在我们的例子中是 2×2方形经典数据，嵌入到量子电路中。
+在此示例中，这是通过将参数化旋转逻辑门应用于在基态中初始化的量子位来实现的。此处的卷积核由参考文献中提出的随机电路生成变分线路。
+最后测量量子系统，获得经典期望值列表。 
+类似于经典的卷积层，每个期望值都映射到单个输出像素的不同通道。
+在不同区域重复相同的过程，可以扫描完整的输入图像，生成一个输出对象，该对象将被构造为多通道图像。
+为了进行分类任务，本例在Quanvolution获取测量值后，使用经典全连接层 ``Linear`` 进行分类任务。
+与经典卷积的主要区别在于，Quanvolution可以生成高度复杂的内核，其计算至少在原则上是经典难处理的。
+
+.. image:: ./images/quanvo.png
+   :width: 600 px
+   :align: center
+
+|
+
+
+Mnist数据集定义
+
+.. code-block::
+
+    import os
+    import os.path
+    import struct
+    import gzip
+    import sys
+    sys.path.insert(0, "../")
+    from pyvqnet.nn.module import Module
+    from pyvqnet.nn.loss import NLL_Loss
+    from pyvqnet.optim.adam import Adam
+    from pyvqnet.data.data import data_generator
+    from pyvqnet.tensor import tensor
+    from pyvqnet.qnn.measure import expval
+    from pyvqnet.nn.linear import Linear
+    import numpy as np
+    from pyvqnet.qnn.qcnn import Quanvolution
+    import matplotlib.pyplot as plt
+    import matplotlib
+    try:
+        matplotlib.use("TkAgg")
+    except:  #pylint:disable=bare-except
+        print("Can not use matplot TkAgg")
+        pass
+
+    try:
+        import urllib.request
+    except ImportError:
+        raise ImportError("You should use Python 3.x")
+
+    url_base = "http://yann.lecun.com/exdb/mnist/"
+    key_file = {
+        "train_img": "train-images-idx3-ubyte.gz",
+        "train_label": "train-labels-idx1-ubyte.gz",
+        "test_img": "t10k-images-idx3-ubyte.gz",
+        "test_label": "t10k-labels-idx1-ubyte.gz"
+    }
+
+
+    def _download(dataset_dir, file_name):
+        """
+        Download function for mnist dataset file
+        """
+        file_path = dataset_dir + "/" + file_name
+
+        if os.path.exists(file_path):
+            with gzip.GzipFile(file_path) as file:
+                file_path_ungz = file_path[:-3].replace("\\", "/")
+                if not os.path.exists(file_path_ungz):
+                    open(file_path_ungz, "wb").write(file.read())
+            return
+
+        print("Downloading " + file_name + " ... ")
+        urllib.request.urlretrieve(url_base + file_name, file_path)
+        if os.path.exists(file_path):
+            with gzip.GzipFile(file_path) as file:
+                file_path_ungz = file_path[:-3].replace("\\", "/")
+                file_path_ungz = file_path_ungz.replace("-idx", ".idx")
+                if not os.path.exists(file_path_ungz):
+                    open(file_path_ungz, "wb").write(file.read())
+        print("Done")
+
+
+    def download_mnist(dataset_dir):
+        for v in key_file.values():
+            _download(dataset_dir, v)
+
+
+    if not os.path.exists("./result"):
+        os.makedirs("./result")
+    else:
+        pass
+
+
+    def load_mnist(dataset="training_data", digits=np.arange(10), path="./"):
+        """
+        load mnist data
+        """
+        from array import array as pyarray
+        download_mnist(path)
+        if dataset == "training_data":
+            fname_image = os.path.join(path, "train-images.idx3-ubyte").replace(
+                "\\", "/")
+            fname_label = os.path.join(path, "train-labels.idx1-ubyte").replace(
+                "\\", "/")
+        elif dataset == "testing_data":
+            fname_image = os.path.join(path, "t10k-images.idx3-ubyte").replace(
+                "\\", "/")
+            fname_label = os.path.join(path, "t10k-labels.idx1-ubyte").replace(
+                "\\", "/")
+        else:
+            raise ValueError("dataset must be 'training_data' or 'testing_data'")
+
+        flbl = open(fname_label, "rb")
+        _, size = struct.unpack(">II", flbl.read(8))
+
+        lbl = pyarray("b", flbl.read())
+        flbl.close()
+
+        fimg = open(fname_image, "rb")
+        _, size, rows, cols = struct.unpack(">IIII", fimg.read(16))
+        img = pyarray("B", fimg.read())
+        fimg.close()
+
+        ind = [k for k in range(size) if lbl[k] in digits]
+        num = len(ind)
+        images = np.zeros((num, rows, cols))
+
+        labels = np.zeros((num, 1), dtype=int)
+        for i in range(len(ind)):
+            images[i] = np.array(img[ind[i] * rows * cols:(ind[i] + 1) * rows *
+                                    cols]).reshape((rows, cols))
+            labels[i] = lbl[ind[i]]
+
+        return images, labels
+
+
+    def show_image():
+        image, _ = load_mnist()
+        for img in range(len(image)):
+            plt.imshow(image[img])
+            plt.show()
+
+模型定义与运行函数定义
+
+.. code-block::
+
+    class QModel(Module):
+
+        def __init__(self):
+            super().__init__()
+            self.vq = Quanvolution([4, 2], (2, 2))
+            self.fc = Linear(4 * 14 * 14, 10)
+
+        def forward(self, x):
+            x = self.vq(x)
+            x = tensor.flatten(x, 1)
+            x = self.fc(x)
+            x = tensor.log_softmax(x)
+            return x
+
+
+
+    def run_quanvolution():
+
+        digit = 10
+        x_train, y_train = load_mnist("training_data", digits=np.arange(digit))
+        x_train = x_train / 255
+
+        y_train = y_train.flatten()
+
+        x_test, y_test = load_mnist("testing_data", digits=np.arange(digit))
+
+        x_test = x_test / 255
+        y_test = y_test.flatten()
+
+        x_train = x_train[:500]
+        y_train = y_train[:500]
+
+        x_test = x_test[:100]
+        y_test = y_test[:100]
+
+        print("model start")
+        model = QModel()
+
+        optimizer = Adam(model.parameters(), lr=5e-3)
+
+        model.train()
+        result_file = open("quanvolution.txt", "w")
+
+        cceloss = NLL_Loss()
+        N_EPOCH = 15
+
+        for epoch in range(1, N_EPOCH):
+
+            model.train()
+            full_loss = 0
+            n_loss = 0
+            n_eval = 0
+            batch_size = 10
+            correct = 0
+            for x, y in data_generator(x_train,
+                                    y_train,
+                                    batch_size=batch_size,
+                                    shuffle=True):
+                optimizer.zero_grad()
+                try:
+                    x = x.reshape(batch_size, 1, 28, 28)
+                except:  #pylint:disable=bare-except
+                    x = x.reshape(-1, 1, 28, 28)
+
+                output = model(x)
+
+                loss = cceloss(y, output)
+                print(f"loss {loss}")
+                loss.backward()
+                optimizer._step()
+
+                full_loss += loss.item()
+                n_loss += batch_size
+                np_output = np.array(output.data, copy=False)
+                mask = np_output.argmax(1) == y
+                print(np_output.argmax(1))
+                print(y)
+
+                correct += sum(mask)
+                print(f"correct {correct}")
+            print(f"Train Accuracy: {correct/n_loss}%")
+            print(f"Epoch: {epoch}, Loss: {full_loss / n_loss}")
+            result_file.write(f"{epoch}\t{full_loss / n_loss}\t{correct/n_loss}\t")
+
+            # Evaluation
+            model.eval()
+            print("eval")
+            correct = 0
+            full_loss = 0
+            n_loss = 0
+            n_eval = 0
+            batch_size = 1
+            for x, y in data_generator(x_test,
+                                    y_test,
+                                    batch_size=batch_size,
+                                    shuffle=True):
+                x = x.reshape(-1, 1, 28, 28)
+                output = model(x)
+
+                loss = cceloss(y, output)
+                full_loss += loss.item()
+
+                np_output = np.array(output.data, copy=False)
+                mask = np_output.argmax(1) == y
+                correct += sum(mask)
+                n_eval += 1
+                n_loss += 1
+
+            print(f"Eval Accuracy: {correct/n_eval}")
+            result_file.write(f"{full_loss / n_loss}\t{correct/n_eval}\n")
+
+        result_file.close()
+        del model
+        print("\ndone\n")
+
+
+    if __name__ == "__main__":
+
+        run_quanvolution()
+
+训练集、验证集损失，训练集、验证集分类准确率随Epoch 变换情况。
+
+.. code-block::
+
+    # epoch train_loss      train_accuracy eval_loss    eval_accuracy
+    # 1	0.2488900272846222	0.232	1.7297331787645818	0.39
+    # 2	0.12281704187393189	0.646	1.201728610806167	0.61
+    # 3	0.08001763761043548	0.772	0.8947569639235735	0.73
+    # 4	0.06211201059818268	0.83	0.777864265316166	0.74
+    # 5	0.052190632969141004	0.858	0.7291000287979841	0.76
+    # 6	0.04542196464538574	0.87	0.6764470228599384	0.8
+    # 7	0.04029472427070141	0.896	0.6153804161818698	0.79
+    # 8	0.03600500610470772	0.902	0.5644993982824963	0.81
+    # 9	0.03230033944547176	0.916	0.528938240573043	0.81
+    # 10	0.02912954458594322	0.93	0.5058713140769396	0.83
+    # 11	0.026443827204406262	0.936	0.49064547760412097	0.83
+    # 12	0.024144304402172564	0.942	0.4800815625616815	0.82
+    # 13	0.022141477409750223	0.952	0.4724775951183983	0.83
+    # 14	0.020372112181037665	0.956	0.46692863543197743	0.83
+
 量子自编码器模型
 ----------------------------------
 
