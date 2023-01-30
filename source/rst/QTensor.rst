@@ -3406,10 +3406,10 @@ pad_packed_sequence
         # [4 1 2]
 
 
-pad_packed_sequence
+pack_pad_sequence
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:function:: pyvqnet.tensor.pad_packed_sequence(nput, lengths, batch_first=False, enforce_sorted=True)
+.. py:function:: pyvqnet.tensor.pack_pad_sequence(input, lengths, batch_first=False, enforce_sorted=True)
 
     打包一个包含可变长度填充序列的张量。
     如果 batch_first 是 True, `input` 的形状应该为 [批大小,长度,*]，否则形状 [长度，批大小,*]。
