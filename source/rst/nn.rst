@@ -1171,8 +1171,8 @@ Dynamic_GRU
     :param hidden_size: 隐藏的特征维度。
     :param num_layers: 循环层数。 默认值：1
     :param batch_first: 如果为 True，输入形状提供为 [批大小,序列长度,特征维度]。如果为 False，输入形状提供为 [序列长度,批大小,特征维度]，默认为 True。
-    :param use_bias: 如果为False，则该层不使用偏置权重b_ih和b_hh。 默认值：真。
-    :param bidirectional: 如果为真，则成为双向 GRU。 默认值：假。
+    :param use_bias: 如果为False，则该层不使用偏置权重b_ih和b_hh。 默认值：True。
+    :param bidirectional: 如果为真，则成为双向 GRU。 默认值：False。
     :return: 一个 Dynamic_GRU 类
 
     Example::

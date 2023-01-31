@@ -3416,9 +3416,8 @@ pack_pad_sequence
 
     对于未排序的序列，使用 ``enforce_sorted`` 是 False。 如果 :attr:`enforce_sorted` 是 ``True``，序列应该按长度降序排列。
 
-    :param input: 'QTensor' - 填充的可变长度序列批次。
-    :parma lengths: 'list' - 每个批次的序列长度列表
-        元素。
+    :param input: 'QTensor' - 填充的可变长度序列。
+    :param lengths: 'list' - 每个批次的序列长度列表元素。
     :param batch_first: 'bool' - 如果 ``True``，则输入预期为 ``B x T x *``
         格式，默认：False。
     :param enforce_sorted: 'bool' - 如果 ``True``，输入应该是
