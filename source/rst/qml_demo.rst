@@ -3714,6 +3714,279 @@ QUnet主要是用于解决图像分割的技术。
 
 |
 
+6.混合量子经典的QDRL网络模型
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+我们介绍并分析了提出了一种量子强化学习网络 (QDRL) ，其特点将经典的深度强化学习算法（如经验回放和目标网络）重塑为变分量子电路的表示。
+此外，与经典神经网络相比，我们使用量子信息编码方案来减少模型参数的数量。`QDRL: Variational Quantum Circuits for Deep Reinforcement Learning <https://arxiv.org/pdf/1907.00397.pdf>`_ 。
+我们将编写一个将 `pyQPanda <https://pyqpanda-toturial.readthedocs.io/zh/latest/>`_ 与 `VQNet` 集成的简单示例。
+
+
+
+构建混合经典量子神经网络
+""""""""""""""""""""""""""
+
+.. code-block::
+
+
+    import numpy as np
+    import random
+    import gym
+    import time
+    from matplotlib import animation
+    import pyqpanda as pq
+    from pyvqnet.nn.module import Module
+    from pyvqnet.nn.loss import MeanSquaredError
+    from pyvqnet.optim.adam import Adam
+    from pyvqnet.tensor.tensor import QTensor
+    from pyvqnet.qnn.quantumlayer import QuantumLayerMultiProcess
+    from pyvqnet.tensor import tensor
+    from pyvqnet.qnn.measure import expval
+    from pyvqnet._core import Tensor as CoreTensor
+
+    import matplotlib
+    from matplotlib import pyplot as plt
+    try:
+        matplotlib.use("TkAgg")
+    except:  # pylint:disable=bare-except
+        print("Can not use matplot TkAgg")
+
+    def display_frames_as_gif(frames, c_index):
+        patch = plt.imshow(frames[0])
+        plt.axis('off')
+        def animate(i):
+            patch.set_data(frames[i])
+
+        anim = animation.FuncAnimation(plt.gcf(), animate, frames=len(frames), interval=5)
+        name_result = "./result_"+str(c_index)+".gif"
+        anim.save(name_result, writer='pillow', fps=10)
+
+
+    CIRCUIT_SIZE = 4
+    MAX_ITERATIONS = 50
+    MAX_STEPS = 250
+    BATCHSIZE = 5
+    TARGET_MAX = 20
+    GAMMA = 0.99
+
+    STATE_T = 0
+    ACTION = 1
+    REWARD = 2
+    STATE_NT = 3
+    DONE = 4
+
+
+    def RotCircuit(para, qlist):
+        r"""
+
+        Arbitrary single qubit rotation.Number of qlist should be 1,and number of parameters should
+        be 3
+
+        .. math::
+
+            R(\phi,\theta,\omega) = RZ(\omega)RY(\theta)RZ(\phi)= \begin{bmatrix}
+            e^{-i(\phi+\omega)/2}\cos(\theta/2) & -e^{i(\phi-\omega)/2}\sin(\theta/2) \\
+            e^{-i(\phi-\omega)/2}\sin(\theta/2) & e^{i(\phi+\omega)/2}\cos(\theta/2)
+            \end{bmatrix}.
+
+
+        :param para: numpy array which represents paramters [\phi, \theta, \omega]
+        :param qlist: qubits allocated by pyQpanda.qAlloc_many()
+        :return: quantum circuits
+
+        Example::
+
+            m_machine = pq.init_quantum_machine(pq.QMachineType.CPU)
+            m_clist = m_machine.cAlloc_many(2)
+            m_prog = pq.QProg()
+            m_qlist = m_machine.qAlloc_many(1)
+            param = np.array([3,4,5])
+            c = RotCircuit(param,m_qlist)
+            print(c)
+            pq.destroy_quantum_machine(m_machine)
+
+        """
+        if isinstance(para, QTensor):
+            para = QTensor._to_numpy(para)
+        if para.ndim > 1:
+            raise ValueError(" dim of paramters in Rot should be 1")
+        if para.shape[0] != 3:
+            raise ValueError(" numbers of paramters in Rot should be 3")
+
+        cir = pq.QCircuit()
+        cir.insert(pq.RZ(qlist, para[2]))
+        cir.insert(pq.RY(qlist, para[1]))
+        cir.insert(pq.RZ(qlist, para[0]))
+
+        return cir
+
+
+    def layer_circuit(qubits, weights):
+        cir = pq.QCircuit()
+        # Entanglement block
+        cir.insert(pq.CNOT(qubits[0], qubits[1]))
+        cir.insert(pq.CNOT(qubits[1], qubits[2]))
+        cir.insert(pq.CNOT(qubits[2], qubits[3]))
+
+        # u3 gate
+        cir.insert(RotCircuit(weights[0], qubits[0]))  # weights shape = [4, 3]
+        cir.insert(RotCircuit(weights[1], qubits[1]))
+        cir.insert(RotCircuit(weights[2], qubits[2]))
+        cir.insert(RotCircuit(weights[3], qubits[3]))
+
+        return cir
+
+
+    def encoder(encodings):
+        encodings = int(encodings[0])
+        return [i for i, b in enumerate(f'{encodings:0{CIRCUIT_SIZE}b}') if b == '1']
+
+
+    def build_qc(x, weights, num_qubits, num_clist):
+        machine = pq.CPUQVM()
+        machine.init_qvm()
+        qubits = machine.qAlloc_many(num_qubits)
+        cir = pq.QCircuit()
+        if x:
+            wires = encoder(x)
+            for wire in wires:
+                cir.insert(pq.RX(qubits[wire], np.pi))
+                cir.insert(pq.RZ(qubits[wire], np.pi))
+
+        # parameter number = 24
+        weights = weights.reshape([2, 4, 3])
+        # layer wise
+        for w in weights:
+            cir.insert(layer_circuit(qubits, w))
+
+        prog = pq.QProg()
+        prog.insert(cir)
+        exp_vals = []
+        for position in range(num_qubits):
+            pauli_str = {"Z" + str(position): 1.0}
+            exp2 = expval(machine, prog, pauli_str, qubits)
+            exp_vals.append(exp2)
+
+        return exp_vals
+
+    class DRLModel(Module):
+        def __init__(self):
+            super(DRLModel, self).__init__()
+            self.quantum_circuit = QuantumLayerMultiProcess(build_qc, 24, "CPU",
+                                                            4, 1, diff_method="finite_diff")
+
+        def forward(self, x):
+            quanutum_result = self.quantum_circuit(x)
+            return quanutum_result
+
+    env = gym.make("FrozenLake-v1", is_slippery = False, map_name = '4x4')
+    state = env.reset()
+
+
+    n_layers = 2
+    n_qubits = 4
+    targ_counter = 0
+    sampled_vs = []
+    memory = {}
+
+    param = QTensor(0.01 * np.random.randn(n_layers, n_qubits, 3))
+    bias = QTensor([[0.0, 0.0, 0.0, 0.0]])
+
+    param_targ = param.copy().reshape([1, -1]).pdata[0]
+    bias_targ = bias.copy()
+
+    loss_func = MeanSquaredError()
+    model = DRLModel()
+    opt = Adam(model.parameters(), lr=5)
+
+    for i in range(MAX_ITERATIONS):
+        start = time.time()
+        state_t = env.reset()
+        a_init = env.action_space.sample()
+        total_reward = 0
+        done = False
+        frames = []
+        for t in range(MAX_STEPS):
+            frames.append(env.render(mode='rgb_array'))
+            time.sleep(0.1)
+
+            input_x = QTensor([[state_t]])
+
+            acts = model(input_x) + bias
+            # print(f'type of acts: {type(acts)}')
+
+            act_t = tensor.QTensor.argmax(acts)
+            # print(f'act_t: {act_t} type of act_t: {type(act_t)}')
+
+            act_t_np = int(act_t.pdata[0])
+            print(f'Episode: {i}, Steps: {t}, act: {act_t_np}')
+            state_nt, reward, done, info = env.step(action=act_t_np)
+            targ_counter += 1
+
+
+            input_state_nt = QTensor([[state_nt]])
+            act_nt = QTensor.argmax(model(input_state_nt)+bias)
+            act_nt_np = int(act_nt.pdata[0])
+
+            memory[i, t] = (state_t, act_t, reward, state_nt, done)
+
+            if len(memory) >= BATCHSIZE:
+                # print('Optimizing...')
+                sampled_vs = [memory[k] for k in random.sample(list(memory), BATCHSIZE)]
+                target_temp = []
+                for s in sampled_vs:
+                    if s[DONE]:
+                        target_temp.append(QTensor(s[REWARD]).reshape([1, -1]))
+                    else:
+                        input_s = QTensor([[s[STATE_NT]]])
+                        out_temp = s[REWARD] + GAMMA * tensor.max(model(input_s) + bias_targ)
+                        out_temp = out_temp.reshape([1, -1])
+                        target_temp.append(out_temp)
+
+                target_out = []
+                for b in sampled_vs:
+                    input_b = QTensor([[b[STATE_T]]], requires_grad=True)
+                    out_result = model(input_b) + bias
+                    index = int(b[ACTION].pdata[0])
+                    out_result_temp = out_result[0][index].reshape([1, -1])
+                    target_out.append(out_result_temp)
+
+
+                opt.zero_grad()
+                target_label = tensor.concatenate(target_temp, 1)
+                output = tensor.concatenate(target_out, 1)
+                loss = loss_func(target_label, output)
+                loss.backward()
+                opt.step()
+
+            # update parameters in target circuit
+            if targ_counter == TARGET_MAX:
+                param_targ = param.copy().reshape([1, -1]).pdata[0]
+                bias_targ = bias.copy()
+                targ_counter = 0
+
+            state_t, act_t_np = state_nt, act_nt_np
+
+            if done:
+                print("reward", reward)
+                if reward == 1.0:
+                    frames.append(env.render(mode='rgb_array'))
+                    display_frames_as_gif(frames, i)
+                    exit()
+                break
+        end = time.time()
+
+
+数据结果
+"""""""""""""""
+
+训练结果如下图所示，可以看出经过一定步骤之后达到最终位置。
+
+.. image:: ./images/result_QDRL.gif
+   :width: 600 px
+   :align: center
+
+|
 
 
 无监督学习
