@@ -730,7 +730,169 @@ grad
         # [-0.09442394  0.09442394]
         # [-0.14409127  0.14409127]]
 
+MNIST_Dataset
+^^^^^^^^^^^^^^^^^
 
+
+
+.. py:class:: pyvqnet.data.MNIST_Dataset(mode: str,encoding: str,num_qubits: int,classes: list,data_num=-1,target_dimension=-1,need_cropping=True,need_relabel=True,seed=0,tmp_data_dir="./tmp")
+
+    使用量子编码方式对MNIST数据进行编码处理，使用量子态构成数据集的类。
+
+    :param mode: 数据模式包括 ``train`` 和 ``test`` 。
+    :param encoding: 支持编码方式: ``angle_encoding_rx`` , ``angle_encoding_ry`` , ``angle_encoding_rz`` ,
+     ``amplitude_encoding`` ``strongly_entangling_encoding`` ``basic_entangler_encoding_rx`` ,
+     ``basic_entangler_encoding_ry`` ， ``basic_entangler_encoding_rz`` ， ``IQP_encoding`` 。
+    :param num_qubits: 量子比特数。
+    :param classes: 需要分类的类，类别用数字标签表示。
+    :param data_num: 从数据集中选择特定的数据个数，默认-1。
+    :param target_dimension: 缩小后的维度，不能超过图形尺寸。 默认为“-1”。
+    :param need_cropping: 是否需要裁剪, 如果为 True , ``image[0:27][0:27]`` 将被裁剪为 ``image[4:24][4:24]`` . 默认为 True。
+    :param need_relabel: 我们是否需要将标签重新标记为 0,1,2... 以进行二元分类。例如 [1,2] 将被重新标记为 [0,1] 默认为 True。
+    :param seed: 选择随机种子。 默认为“0”。
+    :param tmp_data_dir: 下载数据文件目录。 默认值：“./tmp”。
+
+    Examples::
+
+        from pyvqnet.data import MNIST_Dataset
+        # encoding methods
+        RX_ANGLE_ENCODING = "angle_encoding_rx"
+        RY_ANGLE_ENCODING = "angle_encoding_ry"
+        RZ_ANGLE_ENCODING = "angle_encoding_rz"
+        AMPLITUDE_ENCODING = "amplitude_encoding"
+        StronglyEntanglingEncoding = "strongly_entangling_encoding"
+        RX_BasicEntanglerEncoding = "basic_entangler_encoding_rx"
+        RY_BasicEntanglerEncoding = "basic_entangler_encoding_ry"
+        RZ_BasicEntanglerEncoding = "basic_entangler_encoding_rz"
+        IQP_ENCODING = "IQP_encoding"
+
+        for m in ("TRAIN", "TEST"):
+            for encoding in [
+                    IQP_ENCODING, StronglyEntanglingEncoding,
+                    RX_BasicEntanglerEncoding, RY_BasicEntanglerEncoding,
+                    RZ_BasicEntanglerEncoding
+            ]:
+                nqubits =3
+                dim = 4 #resize ->2*2
+
+                print(
+                    f"nqubits {nqubits} dim {dim} encoding {encoding}")
+                qd = MNIST_Dataset(m, encoding, nqubits, [2, 4], 5,
+                                    dim)
+
+                print(len(qd.quantum_data))
+                print(qd.quantum_data[0].shape)
+        #nqubits 3 dim 4 encoding IQP_encoding
+        # 5
+        # (8,)
+        # nqubits 3 dim 4 encoding strongly_entangling_encoding
+        # 5
+        # (8,)
+        # nqubits 3 dim 4 encoding basic_entangler_encoding_rx
+        # 5
+        # (8,)
+        # nqubits 3 dim 4 encoding basic_entangler_encoding_ry
+        # 5
+        # (8,)
+        # nqubits 3 dim 4 encoding basic_entangler_encoding_rz
+        # 5
+        # (8,)
+        # nqubits 3 dim 4 encoding IQP_encoding
+        # 5
+        # (8,)
+        # nqubits 3 dim 4 encoding strongly_entangling_encoding
+        # 5
+        # (8,)
+        # nqubits 3 dim 4 encoding basic_entangler_encoding_rx
+        # 5
+        # (8,)
+        # nqubits 3 dim 4 encoding basic_entangler_encoding_ry
+        # 5
+        # (8,)
+        # nqubits 3 dim 4 encoding basic_entangler_encoding_rz
+        # 5
+        # (8,)
+
+
+CIFAR10_Dataset
+^^^^^^^^^^^^^^^^^
+
+.. py:class:: pyvqnet.data.CIFAR10_Dataset(mode: str,encoding: str,num_qubits: int,classes: list,data_num=-1,target_dimension=-1,need_relabel=True,seed=0,tmp_data_dir="./tmp")
+
+
+    构建基于 `CIFAR10 <https://www.cs.toronto.edu/~kriz/cifar.html>`_ 数据的量子态数据集.
+
+    :param mode: 数据模式包括 ``train`` 和 ``test`` 。
+    :param encoding: 支持编码方式: ``angle_encoding_rx`` , ``angle_encoding_ry`` , ``angle_encoding_rz`` ,
+     ``amplitude_encoding`` ``strongly_entangling_encoding`` ``basic_entangler_encoding_rx`` ,
+     ``basic_entangler_encoding_ry`` ， ``basic_entangler_encoding_rz`` ， ``IQP_encoding``。
+    :param num_qubits: 量子比特数。
+    :param classes: 需要分类的类，类别用数字标签表示。
+    :param data_num: 从数据集中选择特定的数据个数，默认-1。
+    :param target_dimension: 缩小后的维度，不能超过图形尺寸。 默认为“-1”。
+    :param need_relabel: 我们是否需要将标签重新标记为 0,1,2... 以进行二元分类。例如 [1,2] 将被重新标记为 [0,1] 默认为 True。
+    :param seed: 选择随机种子。 默认为“0”。
+    :param tmp_data_dir: 下载数据文件目录。 默认值：“./tmp”。
+    
+    Examples::
+
+        from pyvqnet.data import MNIST_Dataset,CIFAR10_Dataset
+        # encoding methods
+        RX_ANGLE_ENCODING = "angle_encoding_rx"
+        RY_ANGLE_ENCODING = "angle_encoding_ry"
+        RZ_ANGLE_ENCODING = "angle_encoding_rz"
+        AMPLITUDE_ENCODING = "amplitude_encoding"
+        StronglyEntanglingEncoding = "strongly_entangling_encoding"
+        RX_BasicEntanglerEncoding = "basic_entangler_encoding_rx"
+        RY_BasicEntanglerEncoding = "basic_entangler_encoding_ry"
+        RZ_BasicEntanglerEncoding = "basic_entangler_encoding_rz"
+        IQP_ENCODING = "IQP_encoding"
+
+        for m in ("TRAIN", "TEST"):
+            for encoding in [
+                    IQP_ENCODING, StronglyEntanglingEncoding,
+                    RX_BasicEntanglerEncoding, RY_BasicEntanglerEncoding,
+                    RZ_BasicEntanglerEncoding
+            ]:
+                nqubits =3
+                dim = 4 #resize ->2*2
+
+                print(
+                    f"nqubits {nqubits} dim {dim} encoding {encoding}")
+                qd = CIFAR10_Dataset(m, encoding, nqubits, [2, 4], 5, dim)
+
+                print(len(qd.quantum_data))
+                print(qd.quantum_data[0].shape)
+        # nqubits 3 dim 4 encoding IQP_encoding
+        # 5
+        # (8,)
+        # nqubits 3 dim 4 encoding strongly_entangling_encoding
+        # 5
+        # (8,)
+        # nqubits 3 dim 4 encoding basic_entangler_encoding_rx
+        # 5
+        # (8,)
+        # nqubits 3 dim 4 encoding basic_entangler_encoding_ry
+        # 5
+        # (8,)
+        # nqubits 3 dim 4 encoding basic_entangler_encoding_rz
+        # 5
+        # (8,)
+        # nqubits 3 dim 4 encoding IQP_encoding
+        # 5
+        # (8,)
+        # nqubits 3 dim 4 encoding strongly_entangling_encoding
+        # 5
+        # (8,)
+        # nqubits 3 dim 4 encoding basic_entangler_encoding_rx
+        # 5
+        # (8,)
+        # nqubits 3 dim 4 encoding basic_entangler_encoding_ry
+        # 5
+        # (8,)
+        # nqubits 3 dim 4 encoding basic_entangler_encoding_rz
+        # 5
+        # (8,)
 
 量子逻辑门
 ----------------------------------

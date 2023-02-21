@@ -4898,7 +4898,7 @@ QUnet主要是用于解决图像分割的技术。
 
     F\sim{P}(f)
 
-文献指出，量子神经网络 $U$ 能够均匀地分布在所有酉矩阵上时（此时称 :math:`U` 服从哈尔分布），保真度的概率分布 :math:`P_\text{Haar}(f)` 满足
+文献指出，量子神经网络 :math:`U` 能够均匀地分布在所有酉矩阵上时（此时称 :math:`U` 服从哈尔分布），保真度的概率分布 :math:`P_\text{Haar}(f)` 满足
 
 .. math::
 
@@ -4920,10 +4920,9 @@ QUnet主要是用于解决图像分割的技术。
 因此，当 :math:`P_\text{QNN}(f)` 越接近 :math:`P_\text{Haar}(f)` 时， :math:`\text{Expr}` 将越小（越趋近于 0），
 量子神经网络的表达能力也就越强；反之， :math:`\text{Expr}` 越大，量子神经网络的表达能力也就越弱。
 
-我们可以根据该定义直接计算单比特量子神经网络 :math:`R_Y(\theta)` ， :math:`R_Y(\theta_1)R_Z(\theta_2)` 和
- :math:`R_Y(\theta_1)R_Z(\theta_2)R_Y(\theta_3)` 的表达能力：
+我们可以根据该定义直接计算单比特量子神经网络 :math:`R_Y(\theta)` ， :math:`R_Y(\theta_1)R_Z(\theta_2)` 和 :math:`R_Y(\theta_1)R_Z(\theta_2)R_Y(\theta_3)` 的表达能力：
 
-以下用VQNet展示了`HardwareEfficientAnsatz <https://arxiv.org/abs/1704.05018>`_ 在不同深度下（1，2，3）的量子线路表达能力。
+以下用VQNet展示了 `HardwareEfficientAnsatz <https://arxiv.org/abs/1704.05018>`_ 在不同深度下（1，2，3）的量子线路表达能力。
 
 
 .. code-block::
@@ -4939,7 +4938,7 @@ QUnet主要是用于解决图像分割的技术。
     import numpy as np
     from pyvqnet.qnn.ansatz import HardwareEfficientAnsatz
     from pyvqnet.tensor import tensor
-    from pyvqnet.qnn.quantum_expressibility import fidelity_of_cir, fidelity_harr_sample
+    from pyvqnet.qnn.quantum_expressibility.quantum_express import fidelity_of_cir, fidelity_harr_sample
     num_qubit = 1  # the number of qubit
     num_sample = 2000  # the number of sample
     outputs_y = list()  # save QNN outputs
@@ -5842,7 +5841,7 @@ vqe_func_analytic()函数是使用参数偏移计算理论梯度，vqe_func_shot
 
 剪枝比例 :math:`r` ,累积窗口宽度 :math:`\omega_a` 和剪枝窗口宽度 :math:`\omega_p` 分别决定了梯度趋势评估的可靠性。
 因此，我们的概率梯度修剪方法节省的时间百分比是 :math:`r\tfrac{\omega_p}{\omega_a +\omega_p}\times 100\%`。
-以下是使用梯度剪枝接口 ``Gradient_Prune_Instance`` 对QVC 分类示例的运用。
+以下是运用梯度剪枝方法在QVC分类的示例。
 
 .. code-block::
 
@@ -5990,7 +5989,11 @@ vqe_func_analytic()函数是使用参数偏移计算理论梯度，vqe_func_shot
         return score
 
 
-我们定义一个 ``Gradient_Prune_Instance`` 类，输入24为当前模型的参数个数。当每次运行反向传播部分代码，在优化器 ``step`` 之前，
+我们使用 ``Gradient_Prune_Instance`` 类，
+输入24为当前模型的参数个数。裁剪比例 `prune_ratio` 输入为0.5，
+累计窗口大小 `accumulation_window_size` 为4，
+剪枝窗口 `pruning_window_size` 为2。
+当每次运行反向传播部分代码，在优化器 ``step`` 之前，
 运行 ``Gradient_Prune_Instance`` 的 ``step`` 函数。
 
 .. code-block::
@@ -6014,7 +6017,7 @@ vqe_func_analytic()函数是使用参数偏移计算理论梯度，vqe_func_shot
         print(datas.shape)
 
 
-        GBP_HELPER = Gradient_Prune_Instance(24)
+        GBP_HELPER = Gradient_Prune_Instance(param_num = 24,prune_ratio=0.5,accumulation_window_size=4,pruning_window_size=2)
         for i in range(epoch):
             count = 0
             sum_loss = 0

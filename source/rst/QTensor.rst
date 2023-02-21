@@ -1260,8 +1260,7 @@ multinomial
 
 .. py:function:: pyvqnet.tensor.multinomial(t, num_samples)
 
-    返回一个张量，其中每行包含 num_samples 个索引采样
-        来自位于张量输入的相应行中的多项式概率分布。
+    返回一个张量，其中每行包含 num_samples 个索引采样，来自位于张量输入的相应行中的多项式概率分布。
     
     :param t: 输入概率分布。
     :param num_samples: 采样样本。
