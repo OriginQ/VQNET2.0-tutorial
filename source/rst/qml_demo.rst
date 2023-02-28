@@ -6,7 +6,7 @@
 带参量子线路在分类任务的应用
 ----------------------------------
 
-1. QVC示例
+1. VQC示例
 ^^^^^^^^^^^^^^^^^^
 
 这个例子使用VQNet实现了论文 `Circuit-centric quantum classifiers <https://arxiv.org/pdf/1804.00633.pdf>`_ 中可变量子线路进行二分类任务。
@@ -237,7 +237,7 @@ Model中使用 :ref:`QuantumLayer` 类这个可进行自动微分的量子计算
     [0.3412148654]
     test:--------------->loss:QTensor(None, requires_grad=True) #####accuray:1.0
 
-QVC在测试数据上准确率变化情况：
+VQC在测试数据上准确率变化情况：
 
 .. image:: ./images/qvc_accuracy.png
    :width: 600 px
@@ -6061,7 +6061,7 @@ vqe_func_analytic()函数是使用参数偏移计算理论梯度，vqe_func_shot
 
 剪枝比例 :math:`r` ,累积窗口宽度 :math:`\omega_a` 和剪枝窗口宽度 :math:`\omega_p` 分别决定了梯度趋势评估的可靠性。
 因此，我们的概率梯度修剪方法节省的时间百分比是 :math:`r\tfrac{\omega_p}{\omega_a +\omega_p}\times 100\%`。
-以下是运用梯度剪枝方法在QVC分类的示例。
+以下是运用梯度剪枝方法在VQC分类任务的示例。
 
 .. code-block::
 

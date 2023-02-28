@@ -149,5 +149,5 @@ Added
 - 增加损失函数4个，包括MSE,BCE,CCE,SCE等。
 - 增加激活函数10个，包括ReLu，Sigmoid，ELU等。
 - 增加优化器6个，包括SGD,RMSPROP,ADAM等。
-- 增加机器学习示例：QVC,QDRL,Q-KMEANS,QUnet，HQCNN，VSQL,量子自编码器。
+- 增加机器学习示例：VQC,QDRL,Q-KMEANS,QUnet，HQCNN，VSQL,量子自编码器。
 - 增加量子机器学习层：QuantumLayer，NoiseQuantumLayer。
