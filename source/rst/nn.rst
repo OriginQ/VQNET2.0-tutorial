@@ -871,7 +871,53 @@ Dropout
         #  [0.0000000, 14.0000000]]]
         # ]
 
-GRU 
+Pixel_Shuffle 
+^^^^^^^^^^^^^^^^^^^^^^^^^
+.. py:class:: pyvqnet.nn.pixel_shuffle.Pixel_Shuffle(upscale_factors)
+
+    重新排列形状为：(*, C * r^2, H, W)  的张量
+    到形状为 (*, C, H * r, W * r) 的张量，其中 r 是尺度变换因子。
+
+    :param upscale_factors: 增加尺度变换的因子
+
+    :return:
+            Pixel_Shuffle 模块
+
+    Example::
+
+        from pyvqnet.nn import Pixel_Shuffle
+        from pyvqnet.tensor import tensor
+        ps = Pixel_Shuffle(3)
+        inx = tensor.ones([5,2,3,18,4,4])
+        inx.requires_grad=  True
+        y = ps(inx)
+        print(y.shape)
+        #[5, 2, 3, 2, 12, 12]
+
+Pixel_Unshuffle 
+^^^^^^^^^^^^^^^^^^^^^^^^^
+.. py:class:: pyvqnet.nn.pixel_shuffle.Pixel_Unshuffle(downscale_factors)
+
+    通过重新排列元素来反转 Pixel_Shuffle 操作. 将 (*, C, H * r, W * r) 形状的张量变化为 (*, C * r^2, H, W) ，其中 r 是缩小因子。
+
+    :param downscale_factors: 增加尺度变换的因子
+
+    :return:
+            Pixel_Unshuffle 模块
+
+    Example::
+
+        from pyvqnet.nn import Pixel_Unshuffle
+        from pyvqnet.tensor import tensor
+        ps = Pixel_Unshuffle(3)
+        inx = tensor.ones([5, 2, 3, 2, 12, 12])
+        inx.requires_grad = True
+        y = ps(inx)
+        print(y.shape)
+        #[5, 2, 3, 18, 4, 4]
+
+
+GRU
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:class:: pyvqnet.nn.gru.GRU(input_size, hidden_size, num_layers=1, nonlinearity='tanh', batch_first=True, use_bias=True, bidirectional=False)
@@ -1095,6 +1141,280 @@ LSTM
         #  [-0.0378819, 0.4589431, 0.0142352, -0.3194987, -0.3059436, -0.3285254]]
         # ]
 
+Dynamic_GRU
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:class:: pyvqnet.nn.gru.Dynamic_GRU(input_size,hidden_size, num_layers=1, batch_first=True, use_bias=True, bidirectional=False)
+
+    将多层门控循环单元 (GRU) RNN 应用于动态长度输入序列。
+
+    第一个输入应该是定义了可变长度的批处理序列输入
+    通过 ``tensor.PackedSequence`` 类。
+    ``tensor.PackedSequence`` 类可以构造为
+    连续调用下一个函数: ``pad_sequence`` 、 ``pack_pad_sequence``。
+
+    Dynamic_GRU 的第一个输出也是一个 ``tensor.PackedSequence`` 类，
+    可以使用 ``tensor.pad_pack_sequence`` 将其解压缩为普通 QTensor。
+
+    对于输入序列中的每个元素，每一层计算以下公式：
+
+    .. math::
+        \begin{array}{ll}
+            r_t = \sigma(W_{ir} x_t + b_{ir} + W_{hr} h_{(t-1)} + b_{hr}) \\
+            z_t = \sigma(W_{iz} x_t + b_{iz} + W_{hz} h_{(t-1)} + b_{hz}) \\
+            n_t = \tanh(W_{in} x_t + b_{in} + r_t * (W_{hn} h_{(t-1)}+ b_{hn})) \\
+            h_t = (1 - z_t) * n_t + z_t * h_{(t-1)}
+        \end{array}
+
+
+    :param input_size: 输入特征维度。
+    :param hidden_size: 隐藏的特征维度。
+    :param num_layers: 循环层数。 默认值：1
+    :param batch_first: 如果为 True，输入形状提供为 [批大小,序列长度,特征维度]。如果为 False，输入形状提供为 [序列长度,批大小,特征维度]，默认为 True。
+    :param use_bias: 如果为False，则该层不使用偏置权重b_ih和b_hh。 默认值：True。
+    :param bidirectional: 如果为真，则成为双向 GRU。 默认值：False。
+    :return: 一个 Dynamic_GRU 类
+
+    Example::
+
+        from pyvqnet.nn import Dynamic_GRU
+        from pyvqnet.tensor import tensor
+        seq_len = [4,1,2]
+        input_size = 4
+        batch_size =3
+        hidden_size = 2
+        ml = 2
+        rnn2 = Dynamic_GRU(input_size,
+                        hidden_size=2,
+                        num_layers=2,
+                        batch_first=False,
+                        bidirectional=True)
+
+        a = tensor.arange(1, seq_len[0] * input_size + 1).reshape(
+            [seq_len[0], input_size])
+        b = tensor.arange(1, seq_len[1] * input_size + 1).reshape(
+            [seq_len[1], input_size])
+        c = tensor.arange(1, seq_len[2] * input_size + 1).reshape(
+            [seq_len[2], input_size])
+
+        y = tensor.pad_sequence([a, b, c], False)
+
+        input = tensor.pack_pad_sequence(y,
+                                        seq_len,
+                                        batch_first=False,
+                                        enforce_sorted=False)
+
+        h0 = tensor.ones([ml * 2, batch_size, hidden_size])
+
+        output, hn = rnn2(input, h0)
+
+        seq_unpacked, lens_unpacked = \
+        tensor.pad_packed_sequence(output, batch_first=False)
+        print(seq_unpacked)
+        print(lens_unpacked)
+        # [
+        # [[-0.3918380, 0.0056273, 0.9018179, 0.9006662],
+        #  [-0.3715909, 0.0307644, 0.9756137, 0.9705784],
+        #  [-0.3917399, 0.0057521, 0.9507942, 0.9456232]],
+        # [[-0.6348240, -0.0603764, 0.9014163, 0.8903066],
+        #  [0.0000000, 0.0000000, 0.0000000, 0.0000000],
+        #  [-0.6333261, -0.0592172, 0.9660671, 0.9580816]],
+        # [[-0.4571511, 0.0210018, 0.9151242, 0.9011748],
+        #  [0.0000000, 0.0000000, 0.0000000, 0.0000000],
+        #  [0.0000000, 0.0000000, 0.0000000, 0.0000000]],
+        # [[-0.3585358, 0.0918219, 0.9496037, 0.9391552],
+        #  [0.0000000, 0.0000000, 0.0000000, 0.0000000],
+        #  [0.0000000, 0.0000000, 0.0000000, 0.0000000]]
+        # ]
+        # [4 1 2]
+
+Dynamic_RNN 
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:class:: pyvqnet.nn.rnn.Dynamic_RNN(input_size, hidden_size, num_layers=1, nonlinearity='tanh', batch_first=True, use_bias=True, bidirectional=False)
+
+
+    将循环神经网络 RNN 应用于动态长度输入序列。
+
+    第一个输入应该是定义了可变长度的批处理序列输入
+    通过 ``tensor.PackedSequence`` 类。
+    ``tensor.PackedSequence`` 类可以构造为
+    连续调用下一个函数: ``pad_sequence`` 、 ``pack_pad_sequence``。
+
+    Dynamic_RNN 的第一个输出也是一个 ``tensor.PackedSequence`` 类，
+    可以使用 ``tensor.pad_pack_sequence`` 将其解压缩为普通 QTensor。
+
+    循环神经网络(RNN)模块，使用 :math:`\tanh` 或 :math:`\text{ReLU}` 作为激活函数。支持双向，多层配置。
+    单层单向RNN计算公式如下:
+
+    .. math::
+        h_t = \tanh(W_{ih} x_t + b_{ih} + W_{hh} h_{(t-1)} + b_{hh})
+
+    如果 :attr:`nonlinearity` 是 ``'relu'``, 则 :math:`\text{ReLU}` 将替代 :math:`\tanh`。
+
+    :param input_size: 输入特征维度。
+    :param hidden_size:  隐藏特征维度。
+    :param num_layers: 堆叠RNN层数， 默认: 1。
+    :param nonlinearity: 非线性激活函数，默认为 ``'tanh'``。
+    :param batch_first: 如果为 True， 则输入形状为 [批大小,序列长度,特征维度]，
+     如果为 False， 则输入形状为 [序列长度,批大小,特征维度]，默认为 True。
+    :param use_bias: 如果为 False， 该模块不适用偏置项，默认: True。
+    :param bidirectional: 如果为 True，变为双向RNN，默认: False。
+    :return: Dynamic_RNN 实例
+
+    Example::
+
+        from pyvqnet.nn import Dynamic_RNN
+        from pyvqnet.tensor import tensor
+        seq_len = [4,1,2]
+        input_size = 4
+        batch_size =3
+        hidden_size = 2
+        ml = 2
+        rnn2 = Dynamic_RNN(input_size,
+                        hidden_size=2,
+                        num_layers=2,
+                        batch_first=False,
+                        bidirectional=True,
+                        nonlinearity='relu')
+
+        a = tensor.arange(1, seq_len[0] * input_size + 1).reshape(
+            [seq_len[0], input_size])
+        b = tensor.arange(1, seq_len[1] * input_size + 1).reshape(
+            [seq_len[1], input_size])
+        c = tensor.arange(1, seq_len[2] * input_size + 1).reshape(
+            [seq_len[2], input_size])
+
+        y = tensor.pad_sequence([a, b, c], False)
+
+        input = tensor.pack_pad_sequence(y,
+                                        seq_len,
+                                        batch_first=False,
+                                        enforce_sorted=False)
+
+        h0 = tensor.ones([ml * 2, batch_size, hidden_size])
+
+        output, hn = rnn2(input, h0)
+
+        seq_unpacked, lens_unpacked = \
+        tensor.pad_packed_sequence(output, batch_first=False)
+        print(seq_unpacked)
+        print(lens_unpacked)
+
+        # [
+        # [[1.2980951, 0.0000000, 0.0000000, 0.0000000],
+        #  [1.5040692, 0.0000000, 0.0000000, 0.0000000],
+        #  [1.4927036, 0.0000000, 0.0000000, 0.1065927]],
+        # [[2.6561704, 0.0000000, 0.0000000, 0.2532321],
+        #  [0.0000000, 0.0000000, 0.0000000, 0.0000000],
+        #  [3.1472805, 0.0000000, 0.0000000, 0.0000000]],
+        # [[5.1231661, 0.0000000, 0.0000000, 0.7596353],
+        #  [0.0000000, 0.0000000, 0.0000000, 0.0000000],
+        #  [0.0000000, 0.0000000, 0.0000000, 0.0000000]],
+        # [[8.4954977, 0.0000000, 0.0000000, 0.8191229],
+        #  [0.0000000, 0.0000000, 0.0000000, 0.0000000],
+        #  [0.0000000, 0.0000000, 0.0000000, 0.0000000]]
+        # ]
+        # [4 1 2]
+
+
+
+Dynamic_LSTM
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:class:: pyvqnet.nn.lstm.Dynamic_LSTM(input_size, hidden_size, num_layers=1, batch_first=True, use_bias=True, bidirectional=False)
+
+
+    将长短期记忆(LSTM) RNN 应用于动态长度输入序列。
+
+    第一个输入应该是定义了可变长度的批处理序列输入
+    通过 ``tensor.PackedSequence`` 类。
+    ``tensor.PackedSequence`` 类可以构造为
+    连续调用下一个函数: ``pad_sequence`` 、 ``pack_pad_sequence``。
+
+    Dynamic_LSTM 的第一个输出也是一个 ``tensor.PackedSequence`` 类，
+    可以使用 ``tensor.pad_pack_sequence`` 将其解压缩为普通 QTensor。
+
+    循环神经网络(RNN)模块，使用 :math:`\tanh` 或 :math:`\text{ReLU}` 作为激活函数。支持双向，多层配置。
+    单层单向RNN计算公式如下:
+
+    .. math::
+        \begin{array}{ll} \\
+            i_t = \sigma(W_{ii} x_t + b_{ii} + W_{hi} h_{t-1} + b_{hi}) \\
+            f_t = \sigma(W_{if} x_t + b_{if} + W_{hf} h_{t-1} + b_{hf}) \\
+            g_t = \tanh(W_{ig} x_t + b_{ig} + W_{hg} h_{t-1} + b_{hg}) \\
+            o_t = \sigma(W_{io} x_t + b_{io} + W_{ho} h_{t-1} + b_{ho}) \\
+            c_t = f_t \odot c_{t-1} + i_t \odot g_t \\
+            h_t = o_t \odot \tanh(c_t) \\
+        \end{array}
+
+    :param input_size: 输入特征维度。
+    :param hidden_size:  隐藏特征维度。
+    :param num_layers: 堆叠LSTM层数，默认: 1。
+    :param batch_first: 如果为 True，则输入形状为 [批大小,序列长度,特征维度]，
+     如果为 False, 则输入形状为 [序列长度,批大小,特征维度]，默认为 True。
+    :param use_bias: 如果为 False，该模块不适用偏置项， 默认: True。
+    :param bidirectional: 如果为 True，变为双向LSTM， 默认: False。
+    :return: Dynamic_LSTM 实例
+
+    Example::
+
+        from pyvqnet.nn import Dynamic_LSTM
+        from pyvqnet.tensor import tensor
+
+        input_size = 2
+        hidden_size = 2
+        ml = 2
+        seq_len = [3, 4, 1]
+        batch_size = 3
+        rnn2 = Dynamic_LSTM(input_size,
+                            hidden_size=hidden_size,
+                            num_layers=ml,
+                            batch_first=False,
+                            bidirectional=True)
+
+        a = tensor.arange(1, seq_len[0] * input_size + 1).reshape(
+            [seq_len[0], input_size])
+        b = tensor.arange(1, seq_len[1] * input_size + 1).reshape(
+            [seq_len[1], input_size])
+        c = tensor.arange(1, seq_len[2] * input_size + 1).reshape(
+            [seq_len[2], input_size])
+        a.requires_grad = True
+        b.requires_grad = True
+        c.requires_grad = True
+        y = tensor.pad_sequence([a, b, c], False)
+
+        input = tensor.pack_pad_sequence(y,
+                                        seq_len,
+                                        batch_first=False,
+                                        enforce_sorted=False)
+
+        h0 = tensor.ones([ml * 2, batch_size, hidden_size])
+        c0 = tensor.ones([ml * 2, batch_size, hidden_size])
+
+        output, (hn, cn) = rnn2(input, (h0, c0))
+
+        seq_unpacked, lens_unpacked = \
+        tensor.pad_packed_sequence(output, batch_first=False)
+
+        print(seq_unpacked)
+        print(lens_unpacked)
+
+        # [
+        # [[0.2038177, 0.1139005, 0.2312966, -0.1140076],
+        #  [0.1992285, 0.1221137, 0.2277344, -0.3147154],
+        #  [0.2293468, 0.0681745, 0.2426863, 0.2572871]],
+        # [[0.1398094, -0.0150359, 0.2513067, 0.0783743],
+        #  [0.1328388, -0.0031956, 0.2324090, -0.1962151],
+        #  [0.0000000, 0.0000000, 0.0000000, 0.0000000]],
+        # [[0.0898260, -0.0706460, 0.2396922, 0.2323916],
+        #  [0.0817787, -0.0449937, 0.2388873, -0.0000469],
+        #  [0.0000000, 0.0000000, 0.0000000, 0.0000000]],
+        # [[0.0000000, 0.0000000, 0.0000000, 0.0000000],
+        #  [0.0532839, -0.0870574, 0.2397324, 0.2103822],
+        #  [0.0000000, 0.0000000, 0.0000000, 0.0000000]]
+        # ]
+        # [3 4 1]
 
 损失函数层
 ----------------------------------
@@ -2351,4 +2671,5 @@ auc_calculate
                 pred_Qtensor = tensor.QTensor(pred)
                 result = vqnet_metrics.auc_calculate(y_Qtensor, pred_Qtensor, pos_label=2)
                 print("auc:", result) # 0.1111111111111111
+
 

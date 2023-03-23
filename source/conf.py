@@ -21,7 +21,7 @@ copyright = '2022, Original Quantum'
 author = 'Original Quantum'
 
 # The full version, including alpha/beta/rc tags
-release = 'v2.0.5'
+release = 'v2.0.6'
 
 
 # -- General configuration ---------------------------------------------------

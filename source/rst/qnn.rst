@@ -685,7 +685,214 @@ QLinear 实现了一种量子全连接算法。首先将数据编码到量子态
         #[0.1524036, 0.1442845]
         #]
 
+grad
+^^^^^^^^^^
+.. py:function:: pyvqnet.qnn.quantumlayer.grad(quantum_prog_func,params)
 
+    grad 函数提供了一种对用户设计的含参量子线路参数的梯度进行计算的接口。
+    用户可按照如下例子，使用pyqpanda设计线路运行函数 ``quantum_prog_func`` ，并作为参数送入grad函数。
+    grad函数的第二个参数则是想要计算量子逻辑门参数梯度的坐标。
+    返回值的形状为  [num of parameters,num of output]。
+
+    :param quantum_prog_func: pyqpanda设计的量子线路运行函数。
+    :param params: 待求梯度的参数的坐标。
+    :return:
+            参数的梯度
+
+    Examples::
+
+        from pyvqnet.qnn import grad, ProbsMeasure
+        import pyqpanda as pq
+
+        def pqctest(param):
+            machine = pq.CPUQVM()
+            machine.init_qvm()
+            qubits = machine.qAlloc_many(2)
+            circuit = pq.QCircuit()
+
+            circuit.insert(pq.RX(qubits[0], param[0]))
+
+            circuit.insert(pq.RY(qubits[1], param[1]))
+            circuit.insert(pq.CNOT(qubits[0], qubits[1]))
+
+            circuit.insert(pq.RX(qubits[1], param[2]))
+
+            prog = pq.QProg()
+            prog.insert(circuit)
+
+            EXP = ProbsMeasure([1],prog,machine,qubits)
+            return EXP
+
+
+        g = grad(pqctest, [0.1,0.2, 0.3])
+        print(g)
+        # [[-0.04673668  0.04673668]
+        # [-0.09442394  0.09442394]
+        # [-0.14409127  0.14409127]]
+
+MNIST_Dataset
+^^^^^^^^^^^^^^^^^
+
+
+
+.. py:class:: pyvqnet.data.MNIST_Dataset(mode: str,encoding: str,num_qubits: int,classes: list,data_num=-1,target_dimension=-1,need_cropping=True,need_relabel=True,seed=0,tmp_data_dir="./tmp")
+
+    使用量子编码方式对MNIST数据进行编码处理，使用量子态构成数据集的类。
+
+    :param mode: 数据模式包括 ``train`` 和 ``test`` 。
+    :param encoding: 支持编码方式: ``angle_encoding_rx`` , ``angle_encoding_ry`` , ``angle_encoding_rz`` ,
+     ``amplitude_encoding`` ``strongly_entangling_encoding`` ``basic_entangler_encoding_rx`` ,
+     ``basic_entangler_encoding_ry`` ， ``basic_entangler_encoding_rz`` ， ``IQP_encoding`` 。
+    :param num_qubits: 量子比特数。
+    :param classes: 需要分类的类，类别用数字标签表示。
+    :param data_num: 从数据集中选择特定的数据个数，默认-1。
+    :param target_dimension: 缩小后的维度，不能超过图形尺寸。 默认为“-1”。
+    :param need_cropping: 是否需要裁剪, 如果为 True , ``image[0:27][0:27]`` 将被裁剪为 ``image[4:24][4:24]`` . 默认为 True。
+    :param need_relabel: 我们是否需要将标签重新标记为 0,1,2... 以进行二元分类。例如 [1,2] 将被重新标记为 [0,1] 默认为 True。
+    :param seed: 选择随机种子。 默认为“0”。
+    :param tmp_data_dir: 下载数据文件目录。 默认值：“./tmp”。
+
+    Examples::
+
+        from pyvqnet.data import MNIST_Dataset
+        # encoding methods
+        RX_ANGLE_ENCODING = "angle_encoding_rx"
+        RY_ANGLE_ENCODING = "angle_encoding_ry"
+        RZ_ANGLE_ENCODING = "angle_encoding_rz"
+        AMPLITUDE_ENCODING = "amplitude_encoding"
+        StronglyEntanglingEncoding = "strongly_entangling_encoding"
+        RX_BasicEntanglerEncoding = "basic_entangler_encoding_rx"
+        RY_BasicEntanglerEncoding = "basic_entangler_encoding_ry"
+        RZ_BasicEntanglerEncoding = "basic_entangler_encoding_rz"
+        IQP_ENCODING = "IQP_encoding"
+
+        for m in ("TRAIN", "TEST"):
+            for encoding in [
+                    IQP_ENCODING, StronglyEntanglingEncoding,
+                    RX_BasicEntanglerEncoding, RY_BasicEntanglerEncoding,
+                    RZ_BasicEntanglerEncoding
+            ]:
+                nqubits =3
+                dim = 4 #resize ->2*2
+
+                print(
+                    f"nqubits {nqubits} dim {dim} encoding {encoding}")
+                qd = MNIST_Dataset(m, encoding, nqubits, [2, 4], 5,
+                                    dim)
+
+                print(len(qd.quantum_data))
+                print(qd.quantum_data[0].shape)
+        #nqubits 3 dim 4 encoding IQP_encoding
+        # 5
+        # (8,)
+        # nqubits 3 dim 4 encoding strongly_entangling_encoding
+        # 5
+        # (8,)
+        # nqubits 3 dim 4 encoding basic_entangler_encoding_rx
+        # 5
+        # (8,)
+        # nqubits 3 dim 4 encoding basic_entangler_encoding_ry
+        # 5
+        # (8,)
+        # nqubits 3 dim 4 encoding basic_entangler_encoding_rz
+        # 5
+        # (8,)
+        # nqubits 3 dim 4 encoding IQP_encoding
+        # 5
+        # (8,)
+        # nqubits 3 dim 4 encoding strongly_entangling_encoding
+        # 5
+        # (8,)
+        # nqubits 3 dim 4 encoding basic_entangler_encoding_rx
+        # 5
+        # (8,)
+        # nqubits 3 dim 4 encoding basic_entangler_encoding_ry
+        # 5
+        # (8,)
+        # nqubits 3 dim 4 encoding basic_entangler_encoding_rz
+        # 5
+        # (8,)
+
+
+CIFAR10_Dataset
+^^^^^^^^^^^^^^^^^
+
+.. py:class:: pyvqnet.data.CIFAR10_Dataset(mode: str,encoding: str,num_qubits: int,classes: list,data_num=-1,target_dimension=-1,need_relabel=True,seed=0,tmp_data_dir="./tmp")
+
+
+    构建基于 `CIFAR10 <https://www.cs.toronto.edu/~kriz/cifar.html>`_ 数据的量子态数据集.
+
+    :param mode: 数据模式包括 ``train`` 和 ``test`` 。
+    :param encoding: 支持编码方式: ``angle_encoding_rx`` , ``angle_encoding_ry`` , ``angle_encoding_rz`` ,
+     ``amplitude_encoding`` ``strongly_entangling_encoding`` ``basic_entangler_encoding_rx`` ,
+     ``basic_entangler_encoding_ry`` ， ``basic_entangler_encoding_rz`` ， ``IQP_encoding``。
+    :param num_qubits: 量子比特数。
+    :param classes: 需要分类的类，类别用数字标签表示。
+    :param data_num: 从数据集中选择特定的数据个数，默认-1。
+    :param target_dimension: 缩小后的维度，不能超过图形尺寸。 默认为“-1”。
+    :param need_relabel: 我们是否需要将标签重新标记为 0,1,2... 以进行二元分类。例如 [1,2] 将被重新标记为 [0,1] 默认为 True。
+    :param seed: 选择随机种子。 默认为“0”。
+    :param tmp_data_dir: 下载数据文件目录。 默认值：“./tmp”。
+    
+    Examples::
+
+        from pyvqnet.data import MNIST_Dataset,CIFAR10_Dataset
+        # encoding methods
+        RX_ANGLE_ENCODING = "angle_encoding_rx"
+        RY_ANGLE_ENCODING = "angle_encoding_ry"
+        RZ_ANGLE_ENCODING = "angle_encoding_rz"
+        AMPLITUDE_ENCODING = "amplitude_encoding"
+        StronglyEntanglingEncoding = "strongly_entangling_encoding"
+        RX_BasicEntanglerEncoding = "basic_entangler_encoding_rx"
+        RY_BasicEntanglerEncoding = "basic_entangler_encoding_ry"
+        RZ_BasicEntanglerEncoding = "basic_entangler_encoding_rz"
+        IQP_ENCODING = "IQP_encoding"
+
+        for m in ("TRAIN", "TEST"):
+            for encoding in [
+                    IQP_ENCODING, StronglyEntanglingEncoding,
+                    RX_BasicEntanglerEncoding, RY_BasicEntanglerEncoding,
+                    RZ_BasicEntanglerEncoding
+            ]:
+                nqubits =3
+                dim = 4 #resize ->2*2
+
+                print(
+                    f"nqubits {nqubits} dim {dim} encoding {encoding}")
+                qd = CIFAR10_Dataset(m, encoding, nqubits, [2, 4], 5, dim)
+
+                print(len(qd.quantum_data))
+                print(qd.quantum_data[0].shape)
+        # nqubits 3 dim 4 encoding IQP_encoding
+        # 5
+        # (8,)
+        # nqubits 3 dim 4 encoding strongly_entangling_encoding
+        # 5
+        # (8,)
+        # nqubits 3 dim 4 encoding basic_entangler_encoding_rx
+        # 5
+        # (8,)
+        # nqubits 3 dim 4 encoding basic_entangler_encoding_ry
+        # 5
+        # (8,)
+        # nqubits 3 dim 4 encoding basic_entangler_encoding_rz
+        # 5
+        # (8,)
+        # nqubits 3 dim 4 encoding IQP_encoding
+        # 5
+        # (8,)
+        # nqubits 3 dim 4 encoding strongly_entangling_encoding
+        # 5
+        # (8,)
+        # nqubits 3 dim 4 encoding basic_entangler_encoding_rx
+        # 5
+        # (8,)
+        # nqubits 3 dim 4 encoding basic_entangler_encoding_ry
+        # 5
+        # (8,)
+        # nqubits 3 dim 4 encoding basic_entangler_encoding_rz
+        # 5
+        # (8,)
 
 量子逻辑门
 ----------------------------------
@@ -983,7 +1190,297 @@ CSWAPcircuit
         #           │
         # q_2:  |0>─X─
 
-常用量子线路
+Controlled_Hadamard
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:function:: pyvqnet.qnn.template.Controlled_Hadamard(qubits)
+
+    受控Hadamard逻辑门
+
+    .. math:: CH = \begin{bmatrix}
+            1 & 0 & 0 & 0 \\
+            0 & 1 & 0 & 0 \\
+            0 & 0 & \frac{1}{\sqrt{2}} & \frac{1}{\sqrt{2}} \\
+            0 & 0 & \frac{1}{\sqrt{2}} & -\frac{1}{\sqrt{2}}
+        \end{bmatrix}.
+
+    :param qubits: 使用pyqpanda申请的量子比特。
+
+    Examples::
+
+        import pyqpanda as pq
+
+        machine = pq.CPUQVM()
+        machine.init_qvm()
+        qubits = machine.qAlloc_many(2)
+        from pyvqnet.qnn import Controlled_Hadamard
+
+        cir = Controlled_Hadamard(qubits)
+        print(cir)
+        # q_0:  |0>──────────────── ──■─ ──────────────
+        #           ┌─────────────┐ ┌─┴┐ ┌────────────┐
+        # q_1:  |0>─┤RY(-0.785398)├ ┤CZ├ ┤RY(0.785398)├
+        #           └─────────────┘ └──┘ └────────────┘
+
+CCZ
+^^^^^^^^^^^^^^^^
+
+.. py:function:: pyvqnet.qnn.template.CCZ(qubits)
+
+    受控-受控-Z (controlled-controlled-Z) 逻辑门。
+
+    .. math::
+
+        CCZ =
+        \begin{pmatrix}
+        1 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\
+        0 & 1 & 0 & 0 & 0 & 0 & 0 & 0\\
+        0 & 0 & 1 & 0 & 0 & 0 & 0 & 0\\
+        0 & 0 & 0 & 1 & 0 & 0 & 0 & 0\\
+        0 & 0 & 0 & 0 & 1 & 0 & 0 & 0\\
+        0 & 0 & 0 & 0 & 0 & 1 & 0 & 0\\
+        0 & 0 & 0 & 0 & 0 & 0 & 1 & 0\\
+        0 & 0 & 0 & 0 & 0 & 0 & 0 & -1
+        \end{pmatrix}
+    
+    :param qubits: 使用pyqpanda申请的量子比特。
+
+    :return:
+            pyqpanda QCircuit 
+
+    Example::
+
+        import pyqpanda as pq
+
+        machine = pq.CPUQVM()
+        machine.init_qvm()
+        qubits = machine.qAlloc_many(3)
+        from pyvqnet.qnn import CCZ
+
+        cir = CCZ(qubits)
+        print(cir)
+        # q_0:  |0>─────── ─────── ───■── ─── ────── ─────── ───■── ───■── ┤T├──── ───■──
+        #                             │              ┌─┐        │   ┌──┴─┐ ├─┴───┐ ┌──┴─┐
+        # q_1:  |0>────■── ─────── ───┼── ─── ───■── ┤T├──── ───┼── ┤CNOT├ ┤T.dag├ ┤CNOT├
+        #           ┌──┴─┐ ┌─────┐ ┌──┴─┐ ┌─┐ ┌──┴─┐ ├─┴───┐ ┌──┴─┐ ├─┬──┘ ├─┬───┘ ├─┬──┘
+        # q_2:  |0>─┤CNOT├ ┤T.dag├ ┤CNOT├ ┤T├ ┤CNOT├ ┤T.dag├ ┤CNOT├ ┤T├─── ┤H├──── ┤H├───
+        #           └────┘ └─────┘ └────┘ └─┘ └────┘ └─────┘ └────┘ └─┘    └─┘     └─┘
+
+FermionicSingleExcitation
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:function:: pyvqnet.qnn.template.FermionicSingleExcitation(weight, wires, qubits)
+
+    对泡利矩阵的张量积求幂的耦合簇单激励算子。矩阵形式下式给出:
+
+    .. math::
+
+        \hat{U}_{pr}(\theta) = \mathrm{exp} \{ \theta_{pr} (\hat{c}_p^\dagger \hat{c}_r
+        -\mathrm{H.c.}) \},
+
+    :param weight:  量子比特 p 上的变参.
+    :param wires: 表示区间[r, p]中的量子比特索引子集。最小长度必须为2。第一索引值被解释为r，最后一个索引值被解释为p。
+                中间的索引被CNOT门作用，以计算量子位集的奇偶校验。
+    :param qubits: pyqpanda申请的量子比特。
+
+    :return:
+            pyqpanda QCircuit
+
+    Examples::
+
+        from pyvqnet.qnn import FermionicSingleExcitation, expval
+
+        weight = 0.5
+        import pyqpanda as pq
+        machine = pq.CPUQVM()
+        machine.init_qvm()
+        qlists = machine.qAlloc_many(3)
+
+        cir = FermionicSingleExcitation(weight, [1, 0, 2], qlists)
+
+        prog = pq.QProg()
+        prog.insert(cir)
+        pauli_dict = {'Z0': 1}
+        exp2 = expval(machine, prog, pauli_dict, qlists)
+        print(f"vqnet {exp2}")
+        #vqnet 1.0000000000000013
+
+
+FermionicDoubleExcitation
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:function:: pyvqnet.qnn.template.FermionicDoubleExcitation(weight,  wires1, wires2, qubits)
+
+    对泡利矩阵的张量积求幂的耦合聚类双激励算子,矩阵形式由下式给出:
+
+    .. math::
+
+        \hat{U}_{pqrs}(\theta) = \mathrm{exp} \{ \theta (\hat{c}_p^\dagger \hat{c}_q^\dagger
+        \hat{c}_r \hat{c}_s - \mathrm{H.c.}) \},
+
+    其中 :math:`\hat{c}` 和 :math:`\hat{c}^\dagger` 是费米子湮灭和
+    创建运算符和索引 :math:`r, s` 和 :math:`p, q` 在占用的和
+    分别为空分子轨道。 使用 `Jordan-Wigner 变换
+    <https://arxiv.org/abs/1208.5986>`_ 上面定义的费米子算子可以写成
+    根据 Pauli 矩阵（有关更多详细信息，请参见
+    `arXiv:1805.04340 <https://arxiv.org/abs/1805.04340>`_)
+
+    .. math::
+
+        \hat{U}_{pqrs}(\theta) = \mathrm{exp} \Big\{
+        \frac{i\theta}{8} \bigotimes_{b=s+1}^{r-1} \hat{Z}_b \bigotimes_{a=q+1}^{p-1}
+        \hat{Z}_a (\hat{X}_s \hat{X}_r \hat{Y}_q \hat{X}_p +
+        \hat{Y}_s \hat{X}_r \hat{Y}_q \hat{Y}_p +\\ \hat{X}_s \hat{Y}_r \hat{Y}_q \hat{Y}_p +
+        \hat{X}_s \hat{X}_r \hat{X}_q \hat{Y}_p - \mathrm{H.c.}  ) \Big\}
+
+    :param weight: 可变参数
+    :param wires1: 代表的量子比特的索引列表区间 [s, r] 中占据量子比特的子集。第一个索引被解释为 s，最后一索引被解释为 r。 CNOT 门对中间的索引进行操作，以计算一组量子位的奇偶性。
+    :param wires2: 代表的量子比特的索引列表区间 [q, p] 中占据量子比特的子集。第一根索引被解释为 q，最后一索引被解释为 p。 CNOT 门对中间的索引进行操作，以计算一组量子位的奇偶性。
+    :param qubits:  pyqpanda申请的量子比特。
+
+    :return:
+        pyqpanda QCircuit
+
+    Examples::
+
+        import pyqpanda as pq
+        from pyvqnet.qnn import FermionicDoubleExcitation, expval
+        machine = pq.CPUQVM()
+        machine.init_qvm()
+        qlists = machine.qAlloc_many(5)
+        weight = 1.5
+        cir = FermionicDoubleExcitation(weight,
+                                        wires1=[0, 1],
+                                        wires2=[2, 3, 4],
+                                        qubits=qlists)
+
+        prog = pq.QProg()
+        prog.insert(cir)
+        pauli_dict = {'Z0': 1}
+        exp2 = expval(machine, prog, pauli_dict, qlists)
+        print(f"vqnet {exp2}")
+        #vqnet 1.0000000000000058
+
+UCCSD
+^^^^^^^^^^^^^
+
+.. py:function:: pyvqnet.qnn.template.UCCSD(weights, wires, s_wires, d_wires, init_state, qubits)
+
+    实现酉耦合簇单激发和双激发拟设（UCCSD）。UCCSD 是 VQE 拟设，通常用于运行量子化学模拟。
+
+    在一阶 Trotter 近似内，UCCSD 酉函数由下式给出：
+
+    .. math::
+
+        \hat{U}(\vec{\theta}) =
+        \prod_{p > r} \mathrm{exp} \Big\{\theta_{pr}
+        (\hat{c}_p^\dagger \hat{c}_r-\mathrm{H.c.}) \Big\}
+        \prod_{p > q > r > s} \mathrm{exp} \Big\{\theta_{pqrs}
+        (\hat{c}_p^\dagger \hat{c}_q^\dagger \hat{c}_r \hat{c}_s-\mathrm{H.c.}) \Big\}
+
+    其中 :math:`\hat{c}` 和 :math:`\hat{c}^\dagger` 是费米子湮灭和
+    创建运算符和索引 :math:`r, s` 和 :math:`p, q` 在占用的和
+    分别为空分子轨道。（更多细节见
+    `arXiv:1805.04340 <https://arxiv.org/abs/1805.04340>`_):
+
+
+    :param weights: 包含参数的大小 ``(len(s_wires)+ len(d_wires))`` 张量
+        :math:`\theta_{pr}` 和 :math:`\theta_{pqrs}` 输入 Z 旋转
+        ``FermionicSingleExcitation`` 和 ``FermionicDoubleExcitation`` 。
+    :param wires: 模板作用的量子比特索引
+    :param s_wires: 包含量子比特索引的列表序列 ``[r,...,p]``
+        由单一激发产生
+        :math:`\vert r, p \rangle = \hat{c}_p^\dagger \hat{c}_r \vert \mathrm{HF} \rangle`,
+        其中 :math:`\vert \mathrm{HF} \rangle` 表示 Hartee-Fock 参考态。
+    :param d_wires: 列表序列，每个列表包含两个列表
+        指定索引 ``[s, ...,r]`` 和 ``[q,..., p]`` 
+        定义双激励 :math:`\vert s, r, q, p \rangle = \hat{c}_p^\dagger \hat{c}_q^\dagger \hat{c}_r\hat{c}_s \vert \mathrm{HF} \rangle` 。
+    :param init_state: 长度 ``len(wires)`` occupation-number vector 表示
+        高频状态。 ``init_state`` 在量子比特初始化状态。
+    :param qubits: pyqpanda分配的量子位。
+
+    Examples::
+
+        import pyqpanda as pq
+        from pyvqnet.tensor import tensor
+        from pyvqnet.qnn import UCCSD, expval
+        machine = pq.CPUQVM()
+        machine.init_qvm()
+        qlists = machine.qAlloc_many(6)
+        weight = tensor.zeros([8])
+        cir = UCCSD(weight,wires = [0,1,2,3,4,5,6],
+                                        s_wires=[[0, 1, 2], [0, 1, 2, 3, 4], [1, 2, 3], [1, 2, 3, 4, 5]],
+                                        d_wires=[[[0, 1], [2, 3]], [[0, 1], [2, 3, 4, 5]], [[0, 1], [3, 4]], [[0, 1], [4, 5]]],
+                                        init_state=[1, 1, 0, 0, 0, 0],
+                                        qubits=qlists)
+
+        prog = pq.QProg()
+        prog.insert(cir)
+        pauli_dict = {'Z0': 1}
+        exp2 = expval(machine, prog, pauli_dict, qlists)
+        print(f"vqnet {exp2}")
+        #vqnet -1.0000000000000004
+
+
+QuantumPoolingCircuit
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:function:: pyvqnet.qnn.template.QuantumPoolingCircuit(sources_wires, sinks_wires, params,qubits)
+
+    对数据进行降采样的量子电路。
+    为了减少我们电路中的量子位数量，我们首先在我们的系统中创建成对的量子位。
+    在最初配对所有量子位之后，我们将我们的广义 2 量子位酉元应用于每一对。
+    在应用这两个量子位酉元之后，我们会在神经网络的其余部分忽略每对量子位中的一个量子位。
+
+    :param sources_wires: 将被忽略的源量子位索引。
+    :param sinks_wires: 将保留的目标量子位索引。
+    :param params: 输入参数。
+    :param qubits: 由 pyqpanda 分配的 qubits 列表。
+
+    :return:
+        pyqpanda QCircuit
+
+    Examples:: 
+
+        from pyvqnet.qnn import QuantumPoolingCircuit
+        import pyqpanda as pq
+        from pyvqnet import tensor
+        machine = pq.CPUQVM()
+        machine.init_qvm()
+        qlists = machine.qAlloc_many(4)
+        p = tensor.full([6], 0.35)
+        cir = QuantumPoolingCircuit([0, 1], [2, 3], p, qlists)
+        print(cir)
+
+        #                           ┌────┐ ┌────────────┐                           !
+        # >
+        # q_0:  |0>──────────────── ┤CNOT├ ┤RZ(0.350000)├ ───■── ────────────── ────! ─────────────── ────── ────────────── 
+        # >
+        #                           └──┬─┘ └────────────┘    │                      !                 ┌────┐ ┌────────────┐ 
+        # >
+        # q_1:  |0>──────────────── ───┼── ────────────── ───┼── ────────────── ────! ─────────────── ┤CNOT├ ┤RZ(0.350000)├ 
+        # >
+        #           ┌─────────────┐    │   ┌────────────┐ ┌──┴─┐ ┌────────────┐     !                 └──┬─┘ └────────────┘ 
+        # >
+        # q_2:  |0>─┤RZ(-1.570796)├ ───■── ┤RY(0.350000)├ ┤CNOT├ ┤RY(0.350000)├ ────! ─────────────── ───┼── ────────────── 
+        # >
+        #           └─────────────┘        └────────────┘ └────┘ └────────────┘     ! ┌─────────────┐    │   ┌────────────┐ 
+        # >
+        # q_3:  |0>──────────────── ────── ────────────── ────── ────────────── ────! ┤RZ(-1.570796)├ ───■── ┤RY(0.350000)├ 
+        # >
+        #                                                                           ! └─────────────┘        └────────────┘ 
+        # >
+
+        #                                    !
+        # q_0:  |0>────── ────────────── ────!
+        #                                    !
+        # q_1:  |0>───■── ────────────── ────!
+        #             │                      !
+        # q_2:  |0>───┼── ────────────── ────!
+        #          ┌──┴─┐ ┌────────────┐     !
+        # q_3:  |0>┤CNOT├ ┤RY(0.350000)├ ────!
+
+常用量子线路组合
 ----------------------------------
 VQNet提供了量子机器学习研究中常用的一些量子线路
 
@@ -1189,6 +1686,7 @@ Quantum_Embedding
         #  [0.2302894],
         #  [0.2302894]
         # ]
+
 
 
 
@@ -1443,6 +1941,7 @@ MeasurePauliSum
 
 VarMeasure
 ^^^^^^^^^^^^^^^^^^^^
+
 .. py:function:: pyvqnet.qnn.measure.VarMeasure(machine, prog, actual_qlist)
 
     提供的可观察量的方差。
@@ -1473,82 +1972,40 @@ VarMeasure
         # 0.2298488470659339
 
 
+Purity
+^^^^^^^^^^^^^^^^^^^^
+
+.. py:function:: pyvqnet.qnn.measure.Purity(state, qubits_idx)
+
+
+    从态矢中计算特定量子比特上的纯度。
+
+    .. math::
+        \gamma = \text{Tr}(\rho^2)
+
+    式中 :math:`\rho` 为密度矩阵。标准化量子态的纯度满足 :math:`\frac{1}{d} \leq \gamma \leq 1` ，
+    其中 :math:`d` 是希尔伯特空间的维数。
+    纯态的纯度是1。
+
+    :param state: 从pyqpanda get_qstate()获取的量子态
+    :param qubits_idx: 要计算纯度的量子比特位索引
+
+    :return:
+            纯度
+
+    Examples::
+
+        from pyvqnet.qnn import Purity
+        qstate = [(0.9306699299765968 + 0j), (0.18865613455240968 + 0j),
+                (0.1886561345524097 + 0j), (0.03824249173404786 + 0j),
+                -0.048171819846746615j, -0.00976491131165138j, -0.23763904794287155j,
+                -0.048171819846746615j]
+        pp = Purity(qstate, [1])
+        print(pp)
+        #0.902503479761881
 
 量子机器学习算法接口
 ----------------------------------
-
-量子感知机
-^^^^^^^^^^^^^^^^
-
-人工神经网络是机器学习算法和人工智能的一种经典方法。从历史上看，人工神经元的最简单实现可以追溯到经典Rosenblatt 的“感知器”，但其长期实际应用可能会受到计算复杂度快速扩展的阻碍，尤其是与多层感知器的训练相关网络。这里我们参照论文 `An Artificial Neuron Implemented on an Actual Quantum Processor <https://arxiv.org/abs/1811.02266>`__ 一种基于量子信息的算法实现量子计算机版本的感知器，在编码资源方面显示出相比经典模型指数优势。
-
-对于该量子感知机，处理的数据是 0 1 二进制比特字符串。其目标是想识别形如下图 :math:`w` 十字形状的模式。
-
-.. image:: ./images/QP-data.png
-   :width: 600 px
-   :align: center
-
-|
-
-使用二进制比特字符串对其进行编码，其中黑为0，白为1，可知 :math:`w` 编码为（1，1，1，1，1，1，0，1，1，0，0，0，1，1，0，1）。共16位的字符串正好可以编码进4bit的量子态的振幅的符号上，符号为负数编码为0，符号为正数编码为1。通过以上编码方式，我们算法输入input转化为16位的二进制串。这样的不重复的二进制串可以分别对应特定的输入线路 :math:`U_i` 。
- 
-该论文提出的量子感知机线路结构如下：
-
-.. image:: ./images/QP-cir.png
-   :width: 600 px
-   :align: center
-
-|
-
-在比特0~3上构建编码线路 :math:`U_i` ，包含多受控的 :math:`CZ` 门， :math:`CNOT` 门， :math:`H` 门；在 :math:`U_i` 后面紧接着构建权重变换线路 :math:`U_w` ，同样由受控门以及 :math:`H` 门构成。使用 :math:`U_i` 可以进行酉矩阵变化，将数据编码到量子态上：
-
-.. math::
-    U_i|0\rangle^{\otimes N}=\left|\psi_i\right\rangle
-
-使用酉矩阵变换 :math:`U_w` 来计算输入和权重之间的内积：
-
-.. math::
-    U_w\left|\psi_i\right\rangle=\sum_{j=0}^{m-1} c_j|j\rangle \equiv\left|\phi_{i, w}\right\rangle
-
-使用一个目标比特在辅助比特上的多受控 :math:`NOT` 门，并使用一些后续的 :math:`H` 门， :math:`X` 门，:math:`CX` 门作为激活函数可以获取 :math:`U_i` 和 :math:`U_w` 的归一化激活概率值：
-
-.. math::
-    \left|\phi_{i, w}\right\rangle|0\rangle_a \rightarrow \sum_{j=0}^{m-2} c_j|j\rangle|0\rangle_a+c_{m-1}|m-1\rangle|1\rangle_a
-
-当输入 :math:`i` 的2进制串和 :math:`w` 完全一致时，该归一化概率值应为最大。
-
-VQNet提供了 ``QuantumNeuron`` 模块实现该算法。首先初始化一个量子感知机 ``QuantumNeuron``。
-
-.. code-block::
-
-    perceptron = QuantumNeuron()
-
-使用 ``gen_4bitstring_data`` 接口生成论文中的各种数据以及其类别标签。
-
-.. code-block::
-
-    training_label, test_label = perceptron.gen_4bitstring_data()
-
-使用 ``train`` 接口遍历所有数据，可以获取最后训练好的量子感知器线路Uw。
-
-.. code-block::
-
-    trained_para = perceptron.train(training_label, test_label)
-
-.. image:: ./images/QP-pic.png
-   :width: 600 px
-   :align: center
-
-|
-
-在测试数据上，可以获取测试数据上的准确率结果
-
-.. image:: ./images/QP-acc.png
-   :width: 600 px
-   :align: center
-
-|
-
 
 
 QGAN制备任意分布初态
@@ -1889,537 +2346,4 @@ QGAN使用经典的GAN模型结构，分为Generator生成器与Discriminator鉴
         y = model(data)
         print(y)
 
-量子自然梯度
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-量子机器学习模型一般使用梯度下降法对可变量子逻辑线路中参数进行优化。经典梯度下降法公式如下：
 
-.. math:: \theta_{t+1} = \theta_t -\eta \nabla \mathcal{L}(\theta),
-
-本质上，每次迭代时候，我们将计算参数空间下，梯度下降最陡的方向作为参数变化的方向。
-在空间中任何一个方向，在局部范围内下降的速度都不如负梯度方向快。
-不同空间上，最速下降方向的推导是依赖于参数微分的范数——距离度量。距离度量在这里起着核心作用，
-不同的度量会得到不同的最速下降方向。对于经典优化问题中参数所处的欧几里得空间，最速下降方向就是负梯度方向。
-即使如此，在参数优化的每一步，由于损失函数随着参数的变化，其参数空间发生变换。使得找到另一个更优的距离范数成为可能。
-
-`量子自然梯度法 <https://arxiv.org/abs/1909.02108>`_ 借鉴经典自然梯度法的概念 `Amari (1998) <https://www.mitpressjournals.org/doi/abs/10.1162/089976698300017746>`__ ，
-我们改为将优化问题视为给定输入的可能输出值的概率分布（即，最大似然估计），则更好的方法是在分布
-空间中执行梯度下降，它相对于参数化是无量纲和不变的. 因此，无论参数化如何，每个优化步骤总是会为每个参数选择最佳步长。
-在量子机器学习任务中，量子态空间拥有一个独特的不变度量张量，称为 Fubini-Study 度量张量 :math:`g_{ij}`。
-该张量将量子线路参数空间中的最速下降转换为分布空间中的最速下降。
-量子自然梯度的公式如下：
-
-.. math:: \theta_{t+1} = \theta_t - \eta g^{+}(\theta_t)\nabla \mathcal{L}(\theta),
-
-其中 :math:`g^{+}` 是伪逆。
-
-以下我们基于VQNet实现对一个量子变分线路参数进行量子自然梯度优化的例子，可见使用量子自然梯度(Quantum Nature Gradient)使得某些损失函数下降更快。
-
-我们的目标是使如下的量子变分线路的期望最小，可见其中含有两层共3个量子含参逻辑门，第一层由0和1比特上的 RZ, RY 逻辑门构成，第二层由2比特上的RX 逻辑门构成。
-
-.. image:: ./images/qng_all_cir.png
-   :width: 600 px
-   :align: center
-
-|
-
-.. code-block::
-
-    import pyqpanda as pq
-    import numpy as np
-    from pyvqnet.tensor import QTensor
-    from pyvqnet.qnn.measure import expval, ProbsMeasure
-    from pyvqnet.qnn import insert_pauli_for_mt, get_metric_tensor, QNG,QuantumLayer
-    import matplotlib.pyplot as plt
-    from pyvqnet.optim import SGD
-    from pyvqnet import _core
-    ###################################################
-    # Quantum Nature Gradients Examples
-    ###################################################
-    class pyqpanda_config_wrapper:
-        """
-        A wrapper for pyqpanda config,including QVM machine, allocated qubits, classic bits.
-        """
-        def __init__(self, qubits_num) -> None:
-            self._machine = pq.CPUQVM()
-            self._machine.init_qvm()
-            self._qubits = self._machine.qAlloc_many(qubits_num)
-            self._cubits = self._machine.cAlloc_many(qubits_num)
-            self._qcir = pq.QCircuit()
-
-        def __del__(self):
-            self._machine.finalize()
-
-
-    # use quantum nature gradient optimzer to optimize circuit quantum_net
-    steps = 200
-
-    def quantum_net(
-            q_input_features,
-            params,
-            qubits,
-            cubits,
-            machine):
-        qcir = pq.QCircuit()
-        qcir.insert(pq.RY(qubits[0], np.pi / 4))
-        qcir.insert(pq.RY(qubits[1], np.pi / 3))
-        qcir.insert(pq.RY(qubits[2], np.pi / 7))
-
-        qcir.insert(pq.RZ(qubits[0], params[0]))
-        qcir.insert(pq.RY(qubits[1], params[1]))
-
-        qcir.insert(pq.CNOT(qubits[0], qubits[1]))
-        qcir.insert(pq.CNOT(qubits[1], qubits[2]))
-        qcir.insert(pq.RX(qubits[2], params[2]))
-
-        qcir.insert(pq.CNOT(qubits[0], qubits[1]))
-        qcir.insert(pq.CNOT(qubits[1], qubits[2]))
-        m_prog = pq.QProg()
-        m_prog.insert(qcir)
-
-        return expval(machine, m_prog, {'Y0': 1}, qubits)
-
-
-要使用量子自然梯度算法，我们首先需要计算出度量张量。
-按照算法定义，我们人工定义了如下两个子线路，分别计算两层含参线路的Fubini-Study 张量。
-第一个参数层计算度量张量的子线路如下：
-
-.. image:: ./images/qng_subcir1.png
-   :width: 600 px
-   :align: center
-
-|
-
-.. code-block::
-
-    def layer0_subcircuit(config: pyqpanda_config_wrapper, params):
-        qcir = pq.QCircuit()
-        qcir.insert(pq.RY(config._qubits[0], np.pi / 4))
-        qcir.insert(pq.RY(config._qubits[1], np.pi / 3))
-        return qcir
-
-    def get_p01_diagonal_(config, params, target_gate_type, target_gate_bits,
-                            wires):
-        qcir = layer0_subcircuit(config, params)
-        qcir2 = insert_pauli_for_mt(config._qubits, target_gate_type,
-                                    target_gate_bits)
-        qcir3 = pq.QCircuit()
-        qcir3.insert(qcir)
-        qcir3.insert(qcir2)
-        m_prog = pq.QProg()
-        m_prog.insert(qcir3)
-
-        return ProbsMeasure(wires, m_prog, config._machine, config._qubits)
-
-第二个参数层计算度量张量的子线路如下：
-
-.. image:: ./images/qng_subcir2.png
-   :width: 600 px
-   :align: center
-
-|
-
-.. code-block::
-
-
-    def layer1_subcircuit(config: pyqpanda_config_wrapper, params):
-        qcir = pq.QCircuit()
-        qcir.insert(pq.RY(config._qubits[0], np.pi / 4))
-        qcir.insert(pq.RY(config._qubits[1], np.pi / 3))
-        qcir.insert(pq.RY(config._qubits[2], np.pi / 7))
-
-        qcir.insert(pq.RZ(config._qubits[0], params[0]))
-        qcir.insert(pq.RY(config._qubits[1], params[1]))
-
-        qcir.insert(pq.CNOT(config._qubits[0], config._qubits[1]))
-        qcir.insert(pq.CNOT(config._qubits[1], config._qubits[2]))
-
-        return qcir
-    def get_p1_diagonal_(config, params, target_gate_type, target_gate_bits,
-                            wires):
-        qcir = layer1_subcircuit(config, params)
-        qcir2 = insert_pauli_for_mt(config._qubits, target_gate_type,
-                                    target_gate_bits)
-        qcir3 = pq.QCircuit()
-        qcir3.insert(qcir)
-        qcir3.insert(qcir2)
-        m_prog = pq.QProg()
-        m_prog.insert(qcir3)
-        
-        return ProbsMeasure(wires, m_prog, config._machine, config._qubits)
-
-使用 `QNG` 类定义的量子自然梯度类，其中[['RZ', 'RY'], ['RX']]为3个含参逻辑门的门类型，
-[[0, 1], [2]]为作用的比特，qcir为计算张量的线路函数列表，[0,1,2]为整个线路的量子比特索引。
-
-.. code-block::
-
-    config = pyqpanda_config_wrapper(3)
-    qcir = []
-    qcir.append(get_p01_diagonal_)
-    qcir.append(get_p1_diagonal_)
-
-
-    # define QNG optimzer
-    opt = QNG(config, quantum_net, 0.02, [['RZ', 'RY'], ['RX']], [[0, 1], [2]],
-                qcir, [0, 1, 2])
-
-进行迭代优化，使用 `opt` 函数进行单步优化，其中第一个入参为输入数据，
-此处线路没有输入，故为None，第二个入参为待优化参数theta。
-
-.. code-block::
-
-    qng_cost = []
-    theta2 = QTensor([0.432, 0.543, 0.233])
-
-    # iteration
-    for _ in range(steps):
-        theta2 = opt.step(None, theta2)
-
-        qng_cost.append(
-            quantum_net(None, theta2, config._qubits, config._cubits,
-                        config._machine))
-
-使用SGD经典梯度下降法作为基线比较两者在相同迭代次数下的损失值变化情况，可见使用量子自然梯度，该损失函数下降更快。
-
-.. code-block::
-
-    # use gradient descent as the baseline
-    sgd_cost = []
-    qlayer = QuantumLayer(quantum_net, 3, 'cpu', 3)
-
-    temp = _core.Tensor([0.432, 0.543, 0.233])
-    _core.vqnet.copyTensor(temp, qlayer.m_para.data)
-    opti = SGD(qlayer.parameters())
-
-    for i in range(steps):
-        opti.zero_grad()
-        loss = qlayer(QTensor([[1]]))
-        print(f'step {i}')
-        print(f'q param before {qlayer.m_para}')
-        loss.backward()
-        sgd_cost.append(loss.item())
-        opti._step()
-        print(f'q param after{qlayer.m_para}')
-        
-    plt.style.use("seaborn")
-    plt.plot(qng_cost, "b", label="Quantum natural gradient descent")
-    plt.plot(sgd_cost, "g", label="Vanilla gradient descent")
-
-    plt.ylabel("Cost function value")
-    plt.xlabel("Optimization steps")
-    plt.legend()
-    plt.show()
-
-.. image:: ./images/qng_vs_sgd.png
-   :width: 600 px
-   :align: center
-
-|
-
-随机参数偏移算法
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-在量子变分线路中，使用参数偏移法 `parameter-shift` 计算量子参数的梯度是一种常用的方法。
-参数偏移法并不普遍适用所有的量子含参逻辑门。
-在它不成立（或不知道成立）的情况下，我们要么必须将门分解为兼容的门，要么使用梯度的替代估计器，例如有限差分近似。
-但是，由于增加了电路复杂性或梯度值中的潜在误差，这两种替代方案都可能存在缺陷。
-Banchi 和 Crooks 1 发现一种可以适用在任一酉矩阵量子逻辑门上的 `随机参数偏移算法(Stochastic Parameter-Shift Rule) <https://arxiv.org/abs/2005.10299>`_ 。
-
-下面展示适用VQNet对一个量子变分线路使用随机参数偏移法计算梯度的示例。其中，pyqpanda建议版本为3.7.12。示例线路定义如下：
-
-.. code-block::
-
-    import pyqpanda as pq
-    import numpy as np
-    from pyvqnet.qnn.measure import expval
-    from scipy.linalg import expm
-    import matplotlib
-    try:
-        matplotlib.use('TkAgg')
-    except:
-        pass
-    import matplotlib.pyplot as plt
-
-
-    machine = pq.init_quantum_machine(pq.QMachineType.CPU)
-    q = machine.qAlloc_many(2)
-    c = machine.cAlloc_many(2)
-
-    # some basic Pauli matrices
-    I = np.eye(2)
-    X = np.array([[0, 1], [1, 0]])
-    Z = np.array([[1, 0], [0, -1]])
-
-    def Generator(theta1, theta2, theta3):
-        G = theta1.item() * np.kron(X, I) - \
-            theta2 * np.kron(Z, X) + \
-            theta3 * np.kron(I, X)
-        return G
-
-    def pq_demo_circuit(gate_pars):
-        G = Generator(*gate_pars)
-        G = expm(-1j * G)
-        x = G.flatten().tolist()
-
-        cir = pq.matrix_decompose(q, x)
-        m_prog = pq.QProg()
-        m_prog.insert(cir)
-        pauli_dict = {'Z0': 1}
-        exp2 = expval(machine, m_prog, pauli_dict, q)
-        return exp2
-
-随机参数偏移法首先随机从[0,1]的均匀分布中采样一个变量s，接着对线路分别进行如下的酉矩阵变换：
-
-     a) :math:`e^{i(1-s)(\hat{H} + \theta\hat{V})}`
-     b) :math:`e^{+i\tfrac{\pi}{4}\hat{V}}`
-     c) :math:`e^{is(\hat{H} + \theta\hat{V})}`
-
-其中 :math:`\hat{V}` 是一个泡利算符的张量积， :math:`\hat{H}` 是任意泡利算符张量积的线性组合。
-此时获取的观测量的期望值我们定义为 :math:`\langle r_+ \rangle` 。
-
-.. code-block::
-
-    def pq_SPSRgates(gate_pars, s, sign):
-        G = Generator(*gate_pars)
-        # step a)
-        G1 = expm(1j * (1 - s) * G)
-        x = G1.flatten().tolist()
-
-        cir = pq.matrix_decompose(q, x)
-        m_prog = pq.QProg()
-        m_prog.insert(cir)
-
-        # step b)
-        G2 = expm(1j * sign * np.pi / 4 * X)
-        x = G2.flatten().tolist()
-        cir = pq.matrix_decompose(q[0], x)
-        m_prog.insert(cir)
-
-        # step c)
-        G3 = expm(1j * s * G)
-        x = G3.flatten().tolist()
-        cir = pq.matrix_decompose(q, x)
-        m_prog.insert(cir)
-        pauli_dict = {'Z0': 1}
-        exp2 = expval(machine, m_prog, pauli_dict, q)
-        return exp2
-
-将上一步骤中 :math:`\tfrac{\pi}{4}` 变成  :math:`-\tfrac{\pi}{4}`，
-重复进行 a, b, c 操作，获取观测量的期望 :math:`\langle r_- \rangle` 。
-
-随机参数偏移算法计算的梯度公式如下：
-
- .. math::
-
-     \mathbb{E}_{s\in\mathcal{U}[0,1]}[\langle r_+ \rangle - \langle r_-\rangle]
-
-我们画出使用随机参数偏移法计算的参数 :math:`\theta_1` 梯度与观测量期望的之间的关系。
-通过观察可见，观测量期望符合 :math:`\cos(2\theta_1)` 的函数形式；而使用随机参数偏移法计算梯度
-符合 :math:`-2\sin(2\theta_1)` , 正好是 :math:`\cos(2\theta_1)` 的微分。
-
-.. code-block::
-
-    theta2, theta3 = -0.15, 1.6
-    angles = np.linspace(0, 2 * np.pi, 50)
-    pos_vals = np.array([[
-        pq_SPSRgates([theta1, theta2, theta3], s=s, sign=+1)
-        for s in np.random.uniform(size=10)
-    ] for theta1 in angles])
-    neg_vals = np.array([[
-        pq_SPSRgates([theta1, theta2, theta3], s=s, sign=-1)
-        for s in np.random.uniform(size=10)
-    ] for theta1 in angles])
-
-    # Plot the results
-    evals = [pq_demo_circuit([theta1, theta2, theta3]) for theta1 in angles]
-    spsr_vals = (pos_vals - neg_vals).mean(axis=1)
-    plt.plot(angles, evals, 'b', label="Expectation Value")
-    plt.plot(angles, spsr_vals, 'r', label="Stochastic parameter-shift rule")
-    plt.xlabel("theta1")
-    plt.legend()
-    plt.title("VQNet")
-    plt.show()
-
-.. image:: ./images/stochastic_parameter-shift.png
-   :width: 600 px
-   :align: center
-
-|
-
-
-双随机梯度下降
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-在变分量子算法中，参数化量子电路通过经典梯度下降法进行优化，以最小化期望函数值。
-虽然可以在经典模拟中分析计算期望值，在量子硬件上，程序仅限于从期望值中采样；随着样本数量以及shots次数的增加，这种方式获得的期望值会收敛于理论期望值，但可能永远得到准确值。
-Sweke 等人 在 `论文 <https://arxiv.org/abs/1910.01155>`_ 中发现了一种双随机梯度下降法。
-在本文中，他们证明了使用有限数量的测量样本（或shots）来估计梯度的量子梯度下降是随机梯度下降的一种形式。
-此外，如果优化涉及期望值的线性组合（例如 VQE），从该线性组合中的项中抽样可以进一步减少所需的时间复杂度。
-
-VQNet实现了该算法的一个示例：使用VQE 求解目标Hamiltonian的基态能量。注意此处我们设置量子线路观测的次数shots仅为1次。
-
-.. math::
-
-    H = \begin{bmatrix}
-          8 & 4 & 0 & -6\\
-          4 & 0 & 4 & 0\\
-          0 & 4 & 8 & 0\\
-          -6 & 0 & 0 & 0
-        \end{bmatrix}.
-
-.. code-block::
-
-    import numpy as np
-    import pyqpanda as pq
-    from pyvqnet.qnn.template import StronglyEntanglingTemplate
-    from pyvqnet.qnn.measure import Hermitian_expval
-    from pyvqnet.qnn import QuantumLayerV2
-    from pyvqnet.optim import SGD
-    import pyvqnet._core as _core
-    from pyvqnet.tensor import QTensor
-    from matplotlib import pyplot as plt
-
-    num_layers = 2
-    num_wires = 2
-    eta = 0.01
-    steps = 200
-    n = 1
-    param_shape = [2, 2, 3]
-    shots = 1
-
-    H = np.array([[8, 4, 0, -6], [4, 0, 4, 0], [0, 4, 8, 0], [-6, 0, 0, 0]])
-
-    # some basic Pauli matrices
-    I = np.eye(2)
-    X = np.array([[0, 1], [1, 0]])
-    Y = np.array([[0, -1j], [1j, 0]])
-    Z = np.array([[1, 0], [0, -1]])
-
-    init_params = np.random.uniform(low=0,
-                                    high=2 * np.pi,
-                                    size=param_shape)
-
-    def pq_circuit(params):
-        params = params.reshape(param_shape)
-        num_qubits = 2
-
-        machine = pq.CPUQVM()
-        machine.init_qvm()
-        qubits = machine.qAlloc_many(num_qubits)
-        circuit = StronglyEntanglingTemplate(params, num_qubits=num_qubits)
-        qcir = circuit.create_circuit(qubits)
-        prog = pq.QProg()
-        prog.insert(qcir)
-        machine.directly_run(prog)
-        result = machine.get_qstate()
-        return result
-
-
-该示例中的哈密顿量是厄密特矩阵，我们总是可以将其表示为泡利矩阵的总和。
-
-.. math::
-
-    H = \sum_{i,j=0,1,2,3} a_{i,j} (\sigma_i\otimes \sigma_j),
-
-其中
-
-.. math::
-
-    a_{i,j} = \frac{1}{4}\text{tr}[(\sigma_i\otimes \sigma_j )H], ~~ \sigma = \{I, X, Y, Z\}.
-
-代入以上公式，可见
-
-.. math::
-
-    H = 4  + 2I\otimes X + 4I \otimes Z - X\otimes X + 5 Y\otimes Y + 2Z\otimes X.
-
-为了执行“双随机”梯度下降，我们简单地应用随机梯度下降方法，但另外也均匀采样每个优化步骤的哈密顿期望项的子集。
-vqe_func_analytic()函数是使用参数偏移计算理论梯度，vqe_func_shots()则是使用随机采样值以及随机采样哈密顿期望子集的“双随机”梯度计算。
-
-.. code-block::
-
-    terms = np.array([
-        2 * np.kron(I, X),
-        4 * np.kron(I, Z),
-        -np.kron(X, X),
-        5 * np.kron(Y, Y),
-        2 * np.kron(Z, X),
-    ])
-
-
-    def vqe_func_analytic(input, init_params):
-        qstate = pq_circuit(init_params)
-        expval = Hermitian_expval(H, qstate, [0, 1], 2)
-        return  expval
-
-    def vqe_func_shots(input, init_params):
-        qstate = pq_circuit(init_params)
-        idx = np.random.choice(np.arange(5), size=n, replace=False)
-        A = np.sum(terms[idx], axis=0)
-        expval = Hermitian_expval(A, qstate, [0, 1], 2, shots)
-        return 4 + (5 / 1) * expval
-
-
-使用VQNet进行参数优化，对比损失函数的曲线，由于双随机梯度下降法每次仅计算H的部分泡利算符和，
-故使用其平均值才能代表最终观测量的期望结果，这里使用滑动平均moving_average()进行计算。
-
-.. code-block::
-
-    ##############################################################################
-    # Optimizing the circuit using gradient descent via the parameter-shift rule:
-    qlayer_ana = QuantumLayerV2(vqe_func_analytic, 2*2*3 )
-    qlayer_shots = QuantumLayerV2(vqe_func_shots, 2*2*3 )
-    cost_sgd = []
-    cost_dsgd = []
-    temp = _core.Tensor(init_params)
-    _core.vqnet.copyTensor(temp, qlayer_ana.m_para.data)
-    opti_ana = SGD(qlayer_ana.parameters())
-
-    _core.vqnet.copyTensor(temp, qlayer_shots.m_para.data)
-    opti_shots = SGD(qlayer_shots.parameters())
-
-    for i in range(steps):
-        opti_ana.zero_grad()
-        loss = qlayer_ana(QTensor([[1]]))
-
-        loss.backward()
-        cost_sgd.append(loss.item())
-        opti_ana._step()
-
-    for i in range(steps+50):
-        opti_shots.zero_grad()
-        loss = qlayer_shots(QTensor([[1]]))
-
-        loss.backward()
-        cost_dsgd.append(loss.item())
-        opti_shots._step()
-
-    def moving_average(data, n=3):
-        ret = np.cumsum(data, dtype=np.float64)
-        ret[n:] = ret[n:] - ret[:-n]
-        return ret[n - 1:] / n
-    ta = moving_average(np.array(cost_dsgd), n=50)
-    ta = ta[:-26]
-    average = np.vstack([np.arange(25, 200),ta ])
-    final_param = qlayer_shots.parameters()[0].to_numpy()
-    print("Doubly stochastic gradient descent min energy = ", vqe_func_analytic(QTensor([1]),final_param))
-    final_param  = qlayer_ana.parameters()[0].to_numpy()
-    print("stochastic gradient descent min energy = ", vqe_func_analytic(QTensor([1]),final_param))
-
-    plt.plot(cost_sgd, label="Vanilla gradient descent")
-    plt.plot(cost_dsgd, ".", label="Doubly QSGD")
-    plt.plot(average[0], average[1], "--", label="Doubly QSGD (moving average)")
-
-    plt.ylabel("Cost function value")
-    plt.xlabel("Optimization steps")
-    plt.xlim(-2, 200)
-    plt.legend()
-    plt.show()
-
-    #Doubly stochastic gradient descent min energy =  -4.337801834749975
-    #stochastic gradient descent min energy =  -4.531484333030544
-
-.. image:: ./images/dsgd.png
-   :width: 600 px
-   :align: center
-
-|

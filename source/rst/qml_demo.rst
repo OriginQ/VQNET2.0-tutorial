@@ -6,7 +6,7 @@
 带参量子线路在分类任务的应用
 ----------------------------------
 
-1. QVC示例
+1. VQC示例
 ^^^^^^^^^^^^^^^^^^
 
 这个例子使用VQNet实现了论文 `Circuit-centric quantum classifiers <https://arxiv.org/pdf/1804.00633.pdf>`_ 中可变量子线路进行二分类任务。
@@ -237,7 +237,7 @@ Model中使用 :ref:`QuantumLayer` 类这个可进行自动微分的量子计算
     [0.3412148654]
     test:--------------->loss:QTensor(None, requires_grad=True) #####accuray:1.0
 
-QVC在测试数据上准确率变化情况：
+VQC在测试数据上准确率变化情况：
 
 .. image:: ./images/qvc_accuracy.png
    :width: 600 px
@@ -830,6 +830,296 @@ VSQL在测试数据上准确率变化情况：
    :align: center
 
 |
+
+4.Quanvolution进行图像分类
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+在此示例中，我们实现了量子卷积神经网络，这是一种最初在论文 `Quanvolutional Neural Networks: Powering Image Recognition with Quantum Circuits <https://arxiv.org/abs/1904.04767>`_ 中介绍的方法。
+
+类似经典卷积，Quanvolution有以下步骤：
+输入图像的一小块区域，在我们的例子中是 2×2方形经典数据，嵌入到量子电路中。
+在此示例中，这是通过将参数化旋转逻辑门应用于在基态中初始化的量子位来实现的。此处的卷积核由参考文献中提出的随机电路生成变分线路。
+最后测量量子系统，获得经典期望值列表。 
+类似于经典的卷积层，每个期望值都映射到单个输出像素的不同通道。
+在不同区域重复相同的过程，可以扫描完整的输入图像，生成一个输出对象，该对象将被构造为多通道图像。
+为了进行分类任务，本例在Quanvolution获取测量值后，使用经典全连接层 ``Linear`` 进行分类任务。
+与经典卷积的主要区别在于，Quanvolution可以生成高度复杂的内核，其计算至少在原则上是经典难处理的。
+
+.. image:: ./images/quanvo.png
+   :width: 600 px
+   :align: center
+
+|
+
+
+Mnist数据集定义
+
+.. code-block::
+
+    import os
+    import os.path
+    import struct
+    import gzip
+    import sys
+    sys.path.insert(0, "../")
+    from pyvqnet.nn.module import Module
+    from pyvqnet.nn.loss import NLL_Loss
+    from pyvqnet.optim.adam import Adam
+    from pyvqnet.data.data import data_generator
+    from pyvqnet.tensor import tensor
+    from pyvqnet.qnn.measure import expval
+    from pyvqnet.nn.linear import Linear
+    import numpy as np
+    from pyvqnet.qnn.qcnn import Quanvolution
+    import matplotlib.pyplot as plt
+    import matplotlib
+    try:
+        matplotlib.use("TkAgg")
+    except:  #pylint:disable=bare-except
+        print("Can not use matplot TkAgg")
+        pass
+
+    try:
+        import urllib.request
+    except ImportError:
+        raise ImportError("You should use Python 3.x")
+
+    url_base = "http://yann.lecun.com/exdb/mnist/"
+    key_file = {
+        "train_img": "train-images-idx3-ubyte.gz",
+        "train_label": "train-labels-idx1-ubyte.gz",
+        "test_img": "t10k-images-idx3-ubyte.gz",
+        "test_label": "t10k-labels-idx1-ubyte.gz"
+    }
+
+
+    def _download(dataset_dir, file_name):
+        """
+        Download function for mnist dataset file
+        """
+        file_path = dataset_dir + "/" + file_name
+
+        if os.path.exists(file_path):
+            with gzip.GzipFile(file_path) as file:
+                file_path_ungz = file_path[:-3].replace("\\", "/")
+                if not os.path.exists(file_path_ungz):
+                    open(file_path_ungz, "wb").write(file.read())
+            return
+
+        print("Downloading " + file_name + " ... ")
+        urllib.request.urlretrieve(url_base + file_name, file_path)
+        if os.path.exists(file_path):
+            with gzip.GzipFile(file_path) as file:
+                file_path_ungz = file_path[:-3].replace("\\", "/")
+                file_path_ungz = file_path_ungz.replace("-idx", ".idx")
+                if not os.path.exists(file_path_ungz):
+                    open(file_path_ungz, "wb").write(file.read())
+        print("Done")
+
+
+    def download_mnist(dataset_dir):
+        for v in key_file.values():
+            _download(dataset_dir, v)
+
+
+    if not os.path.exists("./result"):
+        os.makedirs("./result")
+    else:
+        pass
+
+
+    def load_mnist(dataset="training_data", digits=np.arange(10), path="./"):
+        """
+        load mnist data
+        """
+        from array import array as pyarray
+        download_mnist(path)
+        if dataset == "training_data":
+            fname_image = os.path.join(path, "train-images.idx3-ubyte").replace(
+                "\\", "/")
+            fname_label = os.path.join(path, "train-labels.idx1-ubyte").replace(
+                "\\", "/")
+        elif dataset == "testing_data":
+            fname_image = os.path.join(path, "t10k-images.idx3-ubyte").replace(
+                "\\", "/")
+            fname_label = os.path.join(path, "t10k-labels.idx1-ubyte").replace(
+                "\\", "/")
+        else:
+            raise ValueError("dataset must be 'training_data' or 'testing_data'")
+
+        flbl = open(fname_label, "rb")
+        _, size = struct.unpack(">II", flbl.read(8))
+
+        lbl = pyarray("b", flbl.read())
+        flbl.close()
+
+        fimg = open(fname_image, "rb")
+        _, size, rows, cols = struct.unpack(">IIII", fimg.read(16))
+        img = pyarray("B", fimg.read())
+        fimg.close()
+
+        ind = [k for k in range(size) if lbl[k] in digits]
+        num = len(ind)
+        images = np.zeros((num, rows, cols))
+
+        labels = np.zeros((num, 1), dtype=int)
+        for i in range(len(ind)):
+            images[i] = np.array(img[ind[i] * rows * cols:(ind[i] + 1) * rows *
+                                    cols]).reshape((rows, cols))
+            labels[i] = lbl[ind[i]]
+
+        return images, labels
+
+
+    def show_image():
+        image, _ = load_mnist()
+        for img in range(len(image)):
+            plt.imshow(image[img])
+            plt.show()
+
+模型定义与运行函数定义
+
+.. code-block::
+
+    class QModel(Module):
+
+        def __init__(self):
+            super().__init__()
+            self.vq = Quanvolution([4, 2], (2, 2))
+            self.fc = Linear(4 * 14 * 14, 10)
+
+        def forward(self, x):
+            x = self.vq(x)
+            x = tensor.flatten(x, 1)
+            x = self.fc(x)
+            x = tensor.log_softmax(x)
+            return x
+
+
+
+    def run_quanvolution():
+
+        digit = 10
+        x_train, y_train = load_mnist("training_data", digits=np.arange(digit))
+        x_train = x_train / 255
+
+        y_train = y_train.flatten()
+
+        x_test, y_test = load_mnist("testing_data", digits=np.arange(digit))
+
+        x_test = x_test / 255
+        y_test = y_test.flatten()
+
+        x_train = x_train[:500]
+        y_train = y_train[:500]
+
+        x_test = x_test[:100]
+        y_test = y_test[:100]
+
+        print("model start")
+        model = QModel()
+
+        optimizer = Adam(model.parameters(), lr=5e-3)
+
+        model.train()
+        result_file = open("quanvolution.txt", "w")
+
+        cceloss = NLL_Loss()
+        N_EPOCH = 15
+
+        for epoch in range(1, N_EPOCH):
+
+            model.train()
+            full_loss = 0
+            n_loss = 0
+            n_eval = 0
+            batch_size = 10
+            correct = 0
+            for x, y in data_generator(x_train,
+                                    y_train,
+                                    batch_size=batch_size,
+                                    shuffle=True):
+                optimizer.zero_grad()
+                try:
+                    x = x.reshape(batch_size, 1, 28, 28)
+                except:  #pylint:disable=bare-except
+                    x = x.reshape(-1, 1, 28, 28)
+
+                output = model(x)
+
+                loss = cceloss(y, output)
+                print(f"loss {loss}")
+                loss.backward()
+                optimizer._step()
+
+                full_loss += loss.item()
+                n_loss += batch_size
+                np_output = np.array(output.data, copy=False)
+                mask = np_output.argmax(1) == y
+                print(np_output.argmax(1))
+                print(y)
+
+                correct += sum(mask)
+                print(f"correct {correct}")
+            print(f"Train Accuracy: {correct/n_loss}%")
+            print(f"Epoch: {epoch}, Loss: {full_loss / n_loss}")
+            result_file.write(f"{epoch}\t{full_loss / n_loss}\t{correct/n_loss}\t")
+
+            # Evaluation
+            model.eval()
+            print("eval")
+            correct = 0
+            full_loss = 0
+            n_loss = 0
+            n_eval = 0
+            batch_size = 1
+            for x, y in data_generator(x_test,
+                                    y_test,
+                                    batch_size=batch_size,
+                                    shuffle=True):
+                x = x.reshape(-1, 1, 28, 28)
+                output = model(x)
+
+                loss = cceloss(y, output)
+                full_loss += loss.item()
+
+                np_output = np.array(output.data, copy=False)
+                mask = np_output.argmax(1) == y
+                correct += sum(mask)
+                n_eval += 1
+                n_loss += 1
+
+            print(f"Eval Accuracy: {correct/n_eval}")
+            result_file.write(f"{full_loss / n_loss}\t{correct/n_eval}\n")
+
+        result_file.close()
+        del model
+        print("\ndone\n")
+
+
+    if __name__ == "__main__":
+
+        run_quanvolution()
+
+训练集、验证集损失，训练集、验证集分类准确率随Epoch 变换情况。
+
+.. code-block::
+
+    # epoch train_loss      train_accuracy eval_loss    eval_accuracy
+    # 1	0.2488900272846222	0.232	1.7297331787645818	0.39
+    # 2	0.12281704187393189	0.646	1.201728610806167	0.61
+    # 3	0.08001763761043548	0.772	0.8947569639235735	0.73
+    # 4	0.06211201059818268	0.83	0.777864265316166	0.74
+    # 5	0.052190632969141004	0.858	0.7291000287979841	0.76
+    # 6	0.04542196464538574	0.87	0.6764470228599384	0.8
+    # 7	0.04029472427070141	0.896	0.6153804161818698	0.79
+    # 8	0.03600500610470772	0.902	0.5644993982824963	0.81
+    # 9	0.03230033944547176	0.916	0.528938240573043	0.81
+    # 10	0.02912954458594322	0.93	0.5058713140769396	0.83
+    # 11	0.026443827204406262	0.936	0.49064547760412097	0.83
+    # 12	0.024144304402172564	0.942	0.4800815625616815	0.82
+    # 13	0.022141477409750223	0.952	0.4724775951183983	0.83
+    # 14	0.020372112181037665	0.956	0.46692863543197743	0.83
 
 量子自编码器模型
 ----------------------------------
@@ -3714,7 +4004,228 @@ QUnet主要是用于解决图像分割的技术。
 
 |
 
+6.混合量子经典的QDRL网络模型
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+
+我们介绍并分析了提出了一种量子强化学习网络 (QDRL) ，其特点将经典的深度强化学习算法（如经验回放和目标网络）重塑为变分量子电路的表示。
+此外，与经典神经网络相比，我们使用量子信息编码方案来减少模型参数的数量。 `QDRL: Variational Quantum Circuits for Deep Reinforcement Learning <https://arxiv.org/pdf/1907.00397.pdf>`_ 。
+我们将编写一个将 `pyQPanda <https://pyqpanda-toturial.readthedocs.io/zh/latest/>`_ 与 `VQNet` 集成的简单示例。
+
+
+
+构建混合经典量子神经网络
+""""""""""""""""""""""""""
+
+需要安装 ``gym`` == 0.23.0 , ``pygame`` == 2.1.2 。
+
+.. code-block::
+
+    import numpy as np
+    import random
+    import gym
+    import time
+    from matplotlib import animation
+    import pyqpanda as pq
+    from pyvqnet.nn.module import Module
+    from pyvqnet.nn.loss import MeanSquaredError
+    from pyvqnet.optim.adam import Adam
+    from pyvqnet.tensor.tensor import QTensor
+    from pyvqnet.qnn.quantumlayer import QuantumLayerMultiProcess
+    from pyvqnet.tensor import tensor
+    from pyvqnet.qnn.measure import expval
+    from pyvqnet._core import Tensor as CoreTensor
+    import matplotlib
+    from matplotlib import pyplot as plt
+    try:
+        matplotlib.use("TkAgg")
+    except:  # pylint:disable=bare-except
+        print("Can not use matplot TkAgg")
+    def display_frames_as_gif(frames, c_index):
+        patch = plt.imshow(frames[0])
+        plt.axis('off')
+        def animate(i):
+            patch.set_data(frames[i])
+        anim = animation.FuncAnimation(plt.gcf(), animate, frames=len(frames), interval=5)
+        name_result = "./result_"+str(c_index)+".gif"
+        anim.save(name_result, writer='pillow', fps=10)
+    CIRCUIT_SIZE = 4
+    MAX_ITERATIONS = 50
+    MAX_STEPS = 250
+    BATCHSIZE = 5
+    TARGET_MAX = 20
+    GAMMA = 0.99
+    STATE_T = 0
+    ACTION = 1
+    REWARD = 2
+    STATE_NT = 3
+    DONE = 4
+    def RotCircuit(para, qlist):
+        r"""
+        Arbitrary single qubit rotation.Number of qlist should be 1,and number of parameters should
+        be 3
+        .. math::
+            R(\phi,\theta,\omega) = RZ(\omega)RY(\theta)RZ(\phi)= \begin{bmatrix}
+            e^{-i(\phi+\omega)/2}\cos(\theta/2) & -e^{i(\phi-\omega)/2}\sin(\theta/2) \\
+            e^{-i(\phi-\omega)/2}\sin(\theta/2) & e^{i(\phi+\omega)/2}\cos(\theta/2)
+            \end{bmatrix}.
+        :param para: numpy array which represents paramters [\phi, \theta, \omega]
+        :param qlist: qubits allocated by pyQpanda.qAlloc_many()
+        :return: quantum circuits
+        Example::
+            m_machine = pq.init_quantum_machine(pq.QMachineType.CPU)
+            m_clist = m_machine.cAlloc_many(2)
+            m_prog = pq.QProg()
+            m_qlist = m_machine.qAlloc_many(1)
+            param = np.array([3,4,5])
+            c = RotCircuit(param,m_qlist)
+            print(c)
+            pq.destroy_quantum_machine(m_machine)
+        """
+        if isinstance(para, QTensor):
+            para = QTensor._to_numpy(para)
+        if para.ndim > 1:
+            raise ValueError(" dim of paramters in Rot should be 1")
+        if para.shape[0] != 3:
+            raise ValueError(" numbers of paramters in Rot should be 3")
+        cir = pq.QCircuit()
+        cir.insert(pq.RZ(qlist, para[2]))
+        cir.insert(pq.RY(qlist, para[1]))
+        cir.insert(pq.RZ(qlist, para[0]))
+        return cir
+    def layer_circuit(qubits, weights):
+        cir = pq.QCircuit()
+        # Entanglement block
+        cir.insert(pq.CNOT(qubits[0], qubits[1]))
+        cir.insert(pq.CNOT(qubits[1], qubits[2]))
+        cir.insert(pq.CNOT(qubits[2], qubits[3]))
+        # u3 gate
+        cir.insert(RotCircuit(weights[0], qubits[0]))  # weights shape = [4, 3]
+        cir.insert(RotCircuit(weights[1], qubits[1]))
+        cir.insert(RotCircuit(weights[2], qubits[2]))
+        cir.insert(RotCircuit(weights[3], qubits[3]))
+        return cir
+    def encoder(encodings):
+        encodings = int(encodings[0])
+        return [i for i, b in enumerate(f'{encodings:0{CIRCUIT_SIZE}b}') if b == '1']
+    def build_qc(x, weights, num_qubits, num_clist):
+        machine = pq.CPUQVM()
+        machine.init_qvm()
+        qubits = machine.qAlloc_many(num_qubits)
+        cir = pq.QCircuit()
+        if x:
+            wires = encoder(x)
+            for wire in wires:
+                cir.insert(pq.RX(qubits[wire], np.pi))
+                cir.insert(pq.RZ(qubits[wire], np.pi))
+        # parameter number = 24
+        weights = weights.reshape([2, 4, 3])
+        # layer wise
+        for w in weights:
+            cir.insert(layer_circuit(qubits, w))
+        prog = pq.QProg()
+        prog.insert(cir)
+        exp_vals = []
+        for position in range(num_qubits):
+            pauli_str = {"Z" + str(position): 1.0}
+            exp2 = expval(machine, prog, pauli_str, qubits)
+            exp_vals.append(exp2)
+        return exp_vals
+    class DRLModel(Module):
+        def __init__(self):
+            super(DRLModel, self).__init__()
+            self.quantum_circuit = QuantumLayerMultiProcess(build_qc, 24, "CPU",
+                                                            4, 1, diff_method="finite_diff")
+        def forward(self, x):
+            quanutum_result = self.quantum_circuit(x)
+            return quanutum_result
+    env = gym.make("FrozenLake-v1", is_slippery = False, map_name = '4x4')
+    state = env.reset()
+    n_layers = 2
+    n_qubits = 4
+    targ_counter = 0
+    sampled_vs = []
+    memory = {}
+    param = QTensor(0.01 * np.random.randn(n_layers, n_qubits, 3))
+    bias = QTensor([[0.0, 0.0, 0.0, 0.0]])
+    param_targ = param.copy().reshape([1, -1]).pdata[0]
+    bias_targ = bias.copy()
+    loss_func = MeanSquaredError()
+    model = DRLModel()
+    opt = Adam(model.parameters(), lr=5)
+    for i in range(MAX_ITERATIONS):
+        start = time.time()
+        state_t = env.reset()
+        a_init = env.action_space.sample()
+        total_reward = 0
+        done = False
+        frames = []
+        for t in range(MAX_STEPS):
+            frames.append(env.render(mode='rgb_array'))
+            time.sleep(0.1)
+            input_x = QTensor([[state_t]])
+            acts = model(input_x) + bias
+            # print(f'type of acts: {type(acts)}')
+            act_t = tensor.QTensor.argmax(acts)
+            # print(f'act_t: {act_t} type of act_t: {type(act_t)}')
+            act_t_np = int(act_t.pdata[0])
+            print(f'Episode: {i}, Steps: {t}, act: {act_t_np}')
+            state_nt, reward, done, info = env.step(action=act_t_np)
+            targ_counter += 1
+            input_state_nt = QTensor([[state_nt]])
+            act_nt = QTensor.argmax(model(input_state_nt)+bias)
+            act_nt_np = int(act_nt.pdata[0])
+            memory[i, t] = (state_t, act_t, reward, state_nt, done)
+            if len(memory) >= BATCHSIZE:
+                # print('Optimizing...')
+                sampled_vs = [memory[k] for k in random.sample(list(memory), BATCHSIZE)]
+                target_temp = []
+                for s in sampled_vs:
+                    if s[DONE]:
+                        target_temp.append(QTensor(s[REWARD]).reshape([1, -1]))
+                    else:
+                        input_s = QTensor([[s[STATE_NT]]])
+                        out_temp = s[REWARD] + GAMMA * tensor.max(model(input_s) + bias_targ)
+                        out_temp = out_temp.reshape([1, -1])
+                        target_temp.append(out_temp)
+                target_out = []
+                for b in sampled_vs:
+                    input_b = QTensor([[b[STATE_T]]], requires_grad=True)
+                    out_result = model(input_b) + bias
+                    index = int(b[ACTION].pdata[0])
+                    out_result_temp = out_result[0][index].reshape([1, -1])
+                    target_out.append(out_result_temp)
+                opt.zero_grad()
+                target_label = tensor.concatenate(target_temp, 1)
+                output = tensor.concatenate(target_out, 1)
+                loss = loss_func(target_label, output)
+                loss.backward()
+                opt.step()
+            # update parameters in target circuit
+            if targ_counter == TARGET_MAX:
+                param_targ = param.copy().reshape([1, -1]).pdata[0]
+                bias_targ = bias.copy()
+                targ_counter = 0
+            state_t, act_t_np = state_nt, act_nt_np
+            if done:
+                print("reward", reward)
+                if reward == 1.0:
+                    frames.append(env.render(mode='rgb_array'))
+                    display_frames_as_gif(frames, i)
+                    exit()
+                break
+        end = time.time()
+
+数据结果
+"""""""""""""""
+
+训练结果如下图所示，可以看出经过一定步骤之后达到最终位置。
+
+.. image:: ./images/result_QDRL.gif
+   :width: 600 px
+   :align: center
+
+|
 
 无监督学习
 -------------------
@@ -3971,6 +4482,1825 @@ QUnet主要是用于解决图像分割的技术。
    :align: center
 
 |
+
+
+量子机器学习研究
+-----------------------------
+
+量子模型拟合fourier series算法
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+通过参数化的量子线路将数据输入映射到预测的模型，量子计算机可用于监督学习。虽然已经做了大量工作来研究这种方法的实际意义，
+但这些模型的许多重要理论特性仍然未知。在这里，我们研究了将数据编码到模型中的策略如何影响参数化量子电路作为函数逼近器的表达能力。
+
+本例参照 `The effect of data encoding on the expressive power of variational quantum machine learning models <https://arxiv.org/pdf/2008.08605.pdf>`_ 论文将量子计算机设计的常见量子机器学习模型与傅里叶级数联系起来。
+
+1.1用串行Pauli旋转编码拟合傅里叶级数
+"""""""""""""""""""""""""""""""""""""""""""
+
+首先我们展示使用Pauli旋转作为数据编码门的量子模型如何只能在一定程度上拟合傅里叶级数。为简单起见，我们将只看单量子比特电路：
+
+.. image:: ./images/single_qubit_model.png
+   :width: 600 px
+   :align: center
+
+|
+
+制作输入数据，定义并行量子模型，不进行模型训练结果。
+
+.. code-block::
+
+    """
+    Quantum Fourier Series
+    """
+    import numpy as np
+    import pyqpanda as pq
+    from pyvqnet.qnn.measure import expval
+    import matplotlib.pyplot as plt
+    import matplotlib
+    try:
+        matplotlib.use("TkAgg")
+    except:  # pylint:disable=bare-except
+        print("Can not use matplot TkAgg")
+        pass
+
+    np.random.seed(42)
+
+
+    degree = 1  # degree of the target function
+    scaling = 1  # scaling of the data
+    coeffs = [0.15 + 0.15j]*degree  # coefficients of non-zero frequencies
+    coeff0 = 0.1  # coefficient of zero frequency
+
+    def target_function(x):
+        """Generate a truncated Fourier series, where the data gets re-scaled."""
+        res = coeff0
+        for idx, coeff in enumerate(coeffs):
+            exponent = np.complex128(scaling * (idx+1) * x * 1j)
+            conj_coeff = np.conjugate(coeff)
+            res += coeff * np.exp(exponent) + conj_coeff * np.exp(-exponent)
+        return np.real(res)
+
+    x = np.linspace(-6, 6, 70)
+    target_y = np.array([target_function(x_) for x_ in x])
+
+    plt.plot(x, target_y, c='black')
+    plt.scatter(x, target_y, facecolor='white', edgecolor='black')
+    plt.ylim(-1, 1)
+    plt.show()
+
+
+    def S(scaling, x, qubits):
+        cir = pq.QCircuit()
+        cir.insert(pq.RX(qubits[0], scaling * x))
+        return cir
+
+    def W(theta, qubits):
+        cir = pq.QCircuit()
+        cir.insert(pq.RZ(qubits[0], theta[0]))
+        cir.insert(pq.RY(qubits[0], theta[1]))
+        cir.insert(pq.RZ(qubits[0], theta[2]))
+        return cir
+
+    def serial_quantum_model(weights, x, num_qubits, scaling):
+        cir = pq.QCircuit()
+        machine = pq.CPUQVM()  
+        machine.init_qvm()  
+        qubits = machine.qAlloc_many(num_qubits)
+
+        for theta in weights[:-1]:
+            cir.insert(W(theta, qubits))
+            cir.insert(S(scaling, x, qubits))
+
+        # (L+1)'th unitary
+        cir.insert(W(weights[-1], qubits))
+        prog = pq.QProg()
+        prog.insert(cir)
+
+        exp_vals = []
+        for position in range(num_qubits):
+            pauli_str = {"Z" + str(position): 1.0}
+            exp2 = expval(machine, prog, pauli_str, qubits)
+            exp_vals.append(exp2)
+
+        return exp_vals
+
+    r = 1
+    weights = 2 * np.pi * np.random.random(size=(r+1, 3))  # some random initial weights
+
+    x = np.linspace(-6, 6, 70)
+    random_quantum_model_y = [serial_quantum_model(weights, x_, 1, 1) for x_ in x]
+
+    plt.plot(x, target_y, c='black', label="true")
+    plt.scatter(x, target_y, facecolor='white', edgecolor='black')
+    plt.plot(x, random_quantum_model_y, c='blue', label="predict")
+    plt.ylim(-1, 1)
+    plt.legend(loc="upper right")
+    plt.show()
+
+
+不训练的量子线路运行结果为：
+
+.. image:: ./images/single_qubit_model_result_no_train.png
+   :width: 600 px
+   :align: center
+
+|
+
+
+制作输入数据，定义串行量子模型，并结合VQNet框架的QuantumLayer层构建训练模型。
+
+.. code-block::
+
+    """
+    Quantum Fourier Series Serial
+    """
+    import numpy as np
+    from pyvqnet.nn.module import Module
+    from pyvqnet.nn.loss import MeanSquaredError
+    from pyvqnet.optim.adam import Adam
+    from pyvqnet.tensor.tensor import QTensor
+    import pyqpanda as pq
+    from pyvqnet.qnn.measure import expval
+    from pyvqnet.qnn.quantumlayer import QuantumLayer
+    import matplotlib.pyplot as plt
+    import matplotlib
+    try:
+        matplotlib.use("TkAgg")
+    except:  # pylint:disable=bare-except
+        print("Can not use matplot TkAgg")
+        pass
+
+    np.random.seed(42)
+
+    degree = 1  # degree of the target function
+    scaling = 1  # scaling of the data
+    coeffs = [0.15 + 0.15j]*degree  # coefficients of non-zero frequencies
+    coeff0 = 0.1  # coefficient of zero frequency
+
+    def target_function(x):
+        """Generate a truncated Fourier series, where the data gets re-scaled."""
+        res = coeff0
+        for idx, coeff in enumerate(coeffs):
+            exponent = np.complex128(scaling * (idx+1) * x * 1j)
+            conj_coeff = np.conjugate(coeff)
+            res += coeff * np.exp(exponent) + conj_coeff * np.exp(-exponent)
+        return np.real(res)
+
+    x = np.linspace(-6, 6, 70)
+    target_y = np.array([target_function(xx) for xx in x])
+
+    plt.plot(x, target_y, c='black')
+    plt.scatter(x, target_y, facecolor='white', edgecolor='black')
+    plt.ylim(-1, 1)
+    plt.show()
+
+
+    def S(x, qubits):
+        cir = pq.QCircuit()
+        cir.insert(pq.RX(qubits[0], x))
+        return cir
+
+    def W(theta, qubits):
+        cir = pq.QCircuit()
+        cir.insert(pq.RZ(qubits[0], theta[0]))
+        cir.insert(pq.RY(qubits[0], theta[1]))
+        cir.insert(pq.RZ(qubits[0], theta[2]))
+        return cir
+
+
+    r = 1
+    weights = 2 * np.pi * np.random.random(size=(r+1, 3))  # some random initial weights
+
+    x = np.linspace(-6, 6, 70)
+
+
+    def q_circuits_loop(x, weights, qubits, clist, machine):
+
+        result = []
+        for xx in x:
+            cir = pq.QCircuit()
+            weights = weights.reshape([2, 3])
+
+            for theta in weights[:-1]:
+                cir.insert(W(theta, qubits))
+                cir.insert(S(xx, qubits))
+
+            cir.insert(W(weights[-1], qubits))
+            prog = pq.QProg()
+            prog.insert(cir)
+
+            exp_vals = []
+            for position in range(1):
+                pauli_str = {"Z" + str(position): 1.0}
+                exp2 = expval(machine, prog, pauli_str, qubits)
+                exp_vals.append(exp2)
+                result.append(exp2)
+        return result
+
+    class Model(Module):
+        def __init__(self):
+            super(Model, self).__init__()
+            self.q_fourier_series = QuantumLayer(q_circuits_loop, 6, "CPU", 1)
+
+        def forward(self, x):
+            return self.q_fourier_series(x)
+
+    def run():
+        model = Model()
+
+        optimizer = Adam(model.parameters(), lr=0.5)
+        batch_size = 2
+        epoch = 5
+        loss = MeanSquaredError()
+        print("start training..............")
+        model.train()
+        max_steps = 50
+        for i in range(epoch):
+            sum_loss = 0
+            count = 0
+            for step in range(max_steps):
+                optimizer.zero_grad()
+                # Select batch of data
+                batch_index = np.random.randint(0, len(x), (batch_size,))
+                x_batch = x[batch_index]
+                y_batch = target_y[batch_index]
+                data, label = QTensor([x_batch]), QTensor([y_batch])
+                result = model(data)
+                loss_b = loss(label, result)
+                loss_b.backward()
+                optimizer._step()
+                sum_loss += loss_b.item()
+                count += batch_size
+            print(f"epoch:{i}, #### loss:{sum_loss/count} ")
+
+            model.eval()
+            predictions = []
+            for xx in x:
+                data = QTensor([[xx]])
+                result = model(data)
+                predictions.append(result.pdata[0])
+
+            plt.plot(x, target_y, c='black', label="true")
+            plt.scatter(x, target_y, facecolor='white', edgecolor='black')
+            plt.plot(x, predictions, c='blue', label="predict")
+            plt.ylim(-1, 1)
+            plt.legend(loc="upper right")
+            plt.show()
+
+    if __name__ == "__main__":
+        run()
+
+其中量子模型为：
+
+.. image:: ./images/single_qubit_model_circuit.png
+   :width: 600 px
+   :align: center
+
+|
+
+网络训练结果为：
+
+.. image:: ./images/single_qubit_model_result.png
+   :width: 600 px
+   :align: center
+
+|
+
+网络训练损失为：
+
+.. code-block::
+
+    start training..............
+    epoch:0, #### loss:0.04852807720773853
+    epoch:1, #### loss:0.012945819365559146
+    epoch:2, #### loss:0.0009359727291666786
+    epoch:3, #### loss:0.00015995280153333625
+    epoch:4, #### loss:3.988249877352246e-05
+
+
+1.2用并行Pauli旋转编码拟合傅里叶级数
+"""""""""""""""""""""""""""""""""""""""""""
+
+根据论文所示，我们期望与串行模型相似的结果：只有在量子模型中编码门至少有r个重复时，才能拟合r阶的傅立叶级数。量子比特电路：
+
+.. image:: ./images/parallel_model.png
+   :width: 600 px
+   :align: center
+
+|
+
+制作输入数据，定义并行量子模型，不进行模型训练结果。
+
+.. code-block::
+
+    """
+    Quantum Fourier Series
+    """
+    import numpy as np
+    import pyqpanda as pq
+    from pyvqnet.qnn.measure import expval
+    import matplotlib.pyplot as plt
+    import matplotlib
+    try:
+        matplotlib.use("TkAgg")
+    except:  # pylint:disable=bare-except
+        print("Can not use matplot TkAgg")
+        pass
+
+    np.random.seed(42)
+
+    degree = 1  # degree of the target function
+    scaling = 1  # scaling of the data
+    coeffs = [0.15 + 0.15j] * degree  # coefficients of non-zero frequencies
+    coeff0 = 0.1  # coefficient of zero frequency
+
+    def target_function(x):
+        """Generate a truncated Fourier series, where the data gets re-scaled."""
+        res = coeff0
+        for idx, coeff in enumerate(coeffs):
+            exponent = np.complex128(scaling * (idx + 1) * x * 1j)
+            conj_coeff = np.conjugate(coeff)
+            res += coeff * np.exp(exponent) + conj_coeff * np.exp(-exponent)
+        return np.real(res)
+
+    x = np.linspace(-6, 6, 70)
+    target_y = np.array([target_function(xx) for xx in x])
+
+
+    def S1(x, qubits):
+        cir = pq.QCircuit()
+        for q in qubits:
+            cir.insert(pq.RX(q, x))
+        return cir
+
+    def W1(theta, qubits):
+        cir = pq.QCircuit()
+        for i in range(len(qubits)):
+            cir.insert(pq.RZ(qubits[i], theta[0][i][0]))
+            cir.insert(pq.RY(qubits[i], theta[0][i][1]))
+            cir.insert(pq.RZ(qubits[i], theta[0][i][2]))
+
+        for i in range(len(qubits) - 1):
+            cir.insert(pq.CNOT(qubits[i], qubits[i + 1]))
+        cir.insert(pq.CNOT(qubits[len(qubits) - 1], qubits[0]))
+
+        for i in range(len(qubits)):
+            cir.insert(pq.RZ(qubits[i], theta[1][i][0]))
+            cir.insert(pq.RY(qubits[i], theta[1][i][1]))
+            cir.insert(pq.RZ(qubits[i], theta[1][i][2]))
+
+        cir.insert(pq.CNOT(qubits[0], qubits[len(qubits) - 1]))
+        for i in range(len(qubits) - 1):
+            cir.insert(pq.CNOT(qubits[i + 1], qubits[i]))
+
+        for i in range(len(qubits)):
+            cir.insert(pq.RZ(qubits[i], theta[2][i][0]))
+            cir.insert(pq.RY(qubits[i], theta[2][i][1]))
+            cir.insert(pq.RZ(qubits[i], theta[2][i][2]))
+
+        for i in range(len(qubits) - 1):
+            cir.insert(pq.CNOT(qubits[i], qubits[i + 1]))
+        cir.insert(pq.CNOT(qubits[len(qubits) - 1], qubits[0]))
+
+        return cir
+
+    def parallel_quantum_model(weights, x, num_qubits):
+        cir = pq.QCircuit()
+        machine = pq.CPUQVM()  
+        machine.init_qvm()  
+        qubits = machine.qAlloc_many(num_qubits)
+
+        cir.insert(W1(weights[0], qubits))
+        cir.insert(S1(x, qubits))
+
+        cir.insert(W1(weights[1], qubits))
+        prog = pq.QProg()
+        prog.insert(cir)
+
+        exp_vals = []
+        for position in range(1):
+            pauli_str = {"Z" + str(position): 1.0}
+            exp2 = expval(machine, prog, pauli_str, qubits)
+            exp_vals.append(exp2)
+
+        return exp_vals
+
+    r = 3
+
+    trainable_block_layers = 3
+    weights = 2 * np.pi * np.random.random(size=(2, trainable_block_layers, r, 3))
+    # print(weights)
+    x = np.linspace(-6, 6, 70)
+    random_quantum_model_y = [parallel_quantum_model(weights, xx, r) for xx in x]
+
+    plt.plot(x, target_y, c='black', label="true")
+    plt.scatter(x, target_y, facecolor='white', edgecolor='black')
+    plt.plot(x, random_quantum_model_y, c='blue', label="predict")
+    plt.ylim(-1, 1)
+    plt.legend(loc="upper right")
+    plt.show()
+
+不训练的量子线路运行结果为：
+
+.. image:: ./images/parallel_model_result_no_train.png
+   :width: 600 px
+   :align: center
+
+|
+
+
+制作输入数据，定义并行量子模型，并结合VQNet框架的QuantumLayer层构建训练模型。
+
+.. code-block::
+
+    """
+    Quantum Fourier Series
+    """
+    import numpy as np
+
+    from pyvqnet.nn.module import Module
+    from pyvqnet.nn.loss import MeanSquaredError
+    from pyvqnet.optim.adam import Adam
+    from pyvqnet.tensor.tensor import QTensor
+    import pyqpanda as pq
+    from pyvqnet.qnn.measure import expval
+    from pyvqnet.qnn.quantumlayer import QuantumLayer, QuantumLayerMultiProcess
+    import matplotlib.pyplot as plt
+    import matplotlib
+    try:
+        matplotlib.use("TkAgg")
+    except:  # pylint:disable=bare-except
+        print("Can not use matplot TkAgg")
+        pass
+
+    np.random.seed(42)
+
+    degree = 1  # degree of the target function
+    scaling = 1  # scaling of the data
+    coeffs = [0.15 + 0.15j] * degree  # coefficients of non-zero frequencies
+    coeff0 = 0.1  # coefficient of zero frequency
+
+    def target_function(x):
+        """Generate a truncated Fourier series, where the data gets re-scaled."""
+        res = coeff0
+        for idx, coeff in enumerate(coeffs):
+            exponent = np.complex128(scaling * (idx + 1) * x * 1j)
+            conj_coeff = np.conjugate(coeff)
+            res += coeff * np.exp(exponent) + conj_coeff * np.exp(-exponent)
+        return np.real(res)
+
+    x = np.linspace(-6, 6, 70)
+    target_y = np.array([target_function(xx) for xx in x])
+
+    plt.plot(x, target_y, c='black')
+    plt.scatter(x, target_y, facecolor='white', edgecolor='black')
+    plt.ylim(-1, 1)
+    plt.show()
+
+    def S1(x, qubits):
+        cir = pq.QCircuit()
+        for q in qubits:
+            cir.insert(pq.RX(q, x))
+        return cir
+
+    def W1(theta, qubits):
+        cir = pq.QCircuit()
+        for i in range(len(qubits)):
+            cir.insert(pq.RZ(qubits[i], theta[0][i][0]))
+            cir.insert(pq.RY(qubits[i], theta[0][i][1]))
+            cir.insert(pq.RZ(qubits[i], theta[0][i][2]))
+
+        for i in range(len(qubits) - 1):
+            cir.insert(pq.CNOT(qubits[i], qubits[i + 1]))
+        cir.insert(pq.CNOT(qubits[len(qubits) - 1], qubits[0]))
+
+        for i in range(len(qubits)):
+            cir.insert(pq.RZ(qubits[i], theta[1][i][0]))
+            cir.insert(pq.RY(qubits[i], theta[1][i][1]))
+            cir.insert(pq.RZ(qubits[i], theta[1][i][2]))
+
+        cir.insert(pq.CNOT(qubits[0], qubits[len(qubits) - 1]))
+        for i in range(len(qubits) - 1):
+            cir.insert(pq.CNOT(qubits[i + 1], qubits[i]))
+
+        for i in range(len(qubits)):
+            cir.insert(pq.RZ(qubits[i], theta[2][i][0]))
+            cir.insert(pq.RY(qubits[i], theta[2][i][1]))
+            cir.insert(pq.RZ(qubits[i], theta[2][i][2]))
+
+        for i in range(len(qubits) - 1):
+            cir.insert(pq.CNOT(qubits[i], qubits[i + 1]))
+        cir.insert(pq.CNOT(qubits[len(qubits) - 1], qubits[0]))
+
+        return cir
+
+    def q_circuits_loop(x, weights, qubits, clist, machine):
+
+        result = []
+        for xx in x:
+            cir = pq.QCircuit()
+            weights = weights.reshape([2, 3, 3, 3])
+
+            cir.insert(W1(weights[0], qubits))
+            cir.insert(S1(xx, qubits))
+
+            cir.insert(W1(weights[1], qubits))
+            prog = pq.QProg()
+            prog.insert(cir)
+
+            exp_vals = []
+            for position in range(1):
+                pauli_str = {"Z" + str(position): 1.0}
+                exp2 = expval(machine, prog, pauli_str, qubits)
+                exp_vals.append(exp2)
+                result.append(exp2)
+        return result
+
+
+    class Model(Module):
+        def __init__(self):
+            super(Model, self).__init__()
+
+            self.q_fourier_series = QuantumLayer(q_circuits_loop, 2 * 3 * 3 * 3, "CPU", 1)
+
+        def forward(self, x):
+            return self.q_fourier_series(x)
+
+    def run():
+        model = Model()
+
+        optimizer = Adam(model.parameters(), lr=0.01)
+        batch_size = 2
+        epoch = 5
+        loss = MeanSquaredError()
+        print("start training..............")
+        model.train()
+        max_steps = 50
+        for i in range(epoch):
+            sum_loss = 0
+            count = 0
+            for step in range(max_steps):
+                optimizer.zero_grad()
+                # Select batch of data
+                batch_index = np.random.randint(0, len(x), (batch_size,))
+                x_batch = x[batch_index]
+                y_batch = target_y[batch_index]
+                data, label = QTensor([x_batch]), QTensor([y_batch])
+                result = model(data)
+                loss_b = loss(label, result)
+                loss_b.backward()
+                optimizer._step()
+                sum_loss += loss_b.item()
+                count += batch_size
+
+            loss_cout = sum_loss / count
+            print(f"epoch:{i}, #### loss:{loss_cout} ")
+
+            if loss_cout < 0.002:
+                model.eval()
+                predictions = []
+                for xx in x:
+                    data = QTensor([[xx]])
+                    result = model(data)
+                    predictions.append(result.pdata[0])
+
+                plt.plot(x, target_y, c='black', label="true")
+                plt.scatter(x, target_y, facecolor='white', edgecolor='black')
+                plt.plot(x, predictions, c='blue', label="predict")
+                plt.ylim(-1, 1)
+                plt.legend(loc="upper right")
+                plt.show()
+
+
+
+    if __name__ == "__main__":
+        run()
+
+其中量子模型为：
+
+.. image:: ./images/parallel_model_circuit.png
+   :width: 600 px
+   :align: center
+
+|
+
+网络训练结果为：
+
+.. image:: ./images/parallel_model_result.png
+   :width: 600 px
+   :align: center
+
+|
+
+网络训练损失为：
+
+.. code-block::
+
+    start training..............
+    epoch:0, #### loss:0.0037272341538482578
+    epoch:1, #### loss:5.271130586635309e-05
+    epoch:2, #### loss:4.714951917250687e-07
+    epoch:3, #### loss:1.0968826371082763e-08
+    epoch:4, #### loss:2.1258629738507562e-10
+
+
+
+量子线路表达能力
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+在论文 `Expressibility and entangling capability of parameterized quantum circuits for hybrid quantum-classical algorithms <https://arxiv.org/abs/1905.10876>`_ 中，
+作者提出了基于神经网络输出态之间的保真度概率分布的表达能力量化方法。
+对任意量子神经网络 :math:`U(\vec{\theta})` ，采样两次神经网络参数（设为 :math:`\vec{\phi}` 和 :math:`\vec{\psi}` ），
+则两个量子电路输出态之间的保真度 :math:`F=|\langle0|U(\vec{\phi})^\dagger U(\vec{\psi})|0\rangle|^2` 服从某个概率分布：
+
+.. math::
+
+    F\sim{P}(f)
+
+文献指出，量子神经网络 :math:`U` 能够均匀地分布在所有酉矩阵上时（此时称 :math:`U` 服从哈尔分布），保真度的概率分布 :math:`P_\text{Haar}(f)` 满足
+
+.. math::
+
+    P_\text{Haar}(f)=(2^{n}-1)(1-f)^{2^n-2}
+
+统计数学中的 K-L 散度（也称相对熵）可以衡量两个概率分布之间的差异。两个离散概率分布 :math:`P,Q` 之间的 K-L 散度定义为
+
+.. math::
+
+    D_{KL}(P||Q)=\sum_jP(j)\ln\frac{P(j)}{Q(j)}
+
+如果将量子神经网络输出的保真度分布记为 :math:`P_\text{QNN}(f)` ，则量子神经网络的表达能力定义为 :math:`P_\text{QNN}(f)` 和 :math:`P_\text{Haar}(f)` 之间的 K-L 散度 ：
+
+.. math::
+
+    \text{Expr}_\text{QNN}=D_{KL}(P_\text{QNN}(f)||P_\text{Haar}(f))
+
+
+因此，当 :math:`P_\text{QNN}(f)` 越接近 :math:`P_\text{Haar}(f)` 时， :math:`\text{Expr}` 将越小（越趋近于 0），
+量子神经网络的表达能力也就越强；反之， :math:`\text{Expr}` 越大，量子神经网络的表达能力也就越弱。
+
+我们可以根据该定义直接计算单比特量子神经网络 :math:`R_Y(\theta)` ， :math:`R_Y(\theta_1)R_Z(\theta_2)` 和 :math:`R_Y(\theta_1)R_Z(\theta_2)R_Y(\theta_3)` 的表达能力：
+
+以下用VQNet展示了 `HardwareEfficientAnsatz <https://arxiv.org/abs/1704.05018>`_ 在不同深度下（1，2，3）的量子线路表达能力。
+
+
+.. code-block::
+
+    import numpy as np
+    import matplotlib.pyplot as plt
+    from matplotlib.ticker import FuncFormatter
+    from scipy import integrate
+    from scipy.linalg import sqrtm
+    from scipy.stats import entropy
+
+    import pyqpanda as pq
+    import numpy as np
+    from pyvqnet.qnn.ansatz import HardwareEfficientAnsatz
+    from pyvqnet.tensor import tensor
+    from pyvqnet.qnn.quantum_expressibility.quantum_express import fidelity_of_cir, fidelity_harr_sample
+    num_qubit = 1  # the number of qubit
+    num_sample = 2000  # the number of sample
+    outputs_y = list()  # save QNN outputs
+
+
+    # plot histgram
+    def plot_hist(data, num_bin, title_str):
+        def to_percent(y, position):
+            return str(np.around(y * 100, decimals=2)) + '%'
+
+        plt.hist(data,
+                weights=[1. / len(data)] * len(data),
+                bins=np.linspace(0, 1, num=num_bin),
+                facecolor="blue",
+                edgecolor="black",
+                alpha=0.7)
+        plt.xlabel("Fidelity")
+        plt.ylabel("frequency")
+        plt.title(title_str)
+        formatter = FuncFormatter(to_percent)
+        plt.gca().yaxis.set_major_formatter(formatter)
+        plt.show()
+
+
+
+    def cir(num_qubits, depth):
+
+        machine = pq.CPUQVM()
+        machine.init_qvm()
+        qlist = machine.qAlloc_many(num_qubits)
+        az = HardwareEfficientAnsatz(num_qubits, ["rx", "RY", "rz"],
+                                    qlist,
+                                    entangle_gate="cnot",
+                                    entangle_rules="linear",
+                                    depth=depth)
+        w = tensor.QTensor(
+            np.random.uniform(size=[az.get_para_num()], low=0, high=2 * np.pi))
+
+        cir1 = az.create_ansatz(w)
+        return cir1, machine, qlist
+
+哈尔采样输出的保真度服从分布：
+
+.. image:: ./images/haar-fidelity.png
+   :width: 600 px
+   :align: center
+
+|
+
+.. code-block::
+
+
+    # 设置电路宽度和最大深度
+    num_qubit = 4
+    max_depth = 3
+    # 计算哈尔采样对应的保真度分布
+
+    flist, p_haar, theory_haar = fidelity_harr_sample(num_qubit, num_sample)
+    title_str = "haar, %d qubit(s)" % num_qubit
+    plot_hist(flist, 50, title_str)
+
+
+
+    Expr_cel = list()
+    # 计算不同深度的神经网络的表达能力
+    for DEPTH in range(1, max_depth + 1):
+
+        f_list, p_cel = fidelity_of_cir(HardwareEfficientAnsatz, num_qubit, DEPTH,
+                                        num_sample)
+        title_str = f"HardwareEfficientAnsatz, {num_qubit} qubit(s) {DEPTH} layer(s)"
+        plot_hist(f_list, 50, title_str)
+        expr = entropy(p_cel, theory_haar)
+        Expr_cel.append(expr)
+    # 比较不同深度的神经网络的表达能力
+    print(
+        f"深度为 1,2,3 的神经网络的表达能力分别为 { np.around(Expr_cel, decimals=4)} 越小越好。", )
+    plt.plot(range(1, max_depth + 1), Expr_cel, marker='>')
+    plt.xlabel("depth")
+    plt.yscale('log')
+    plt.ylabel("Expr.")
+    plt.xticks(range(1, max_depth + 1))
+    plt.title("Expressibility vs Circuit Depth")
+    plt.show()
+
+
+采样深度为 1 的电路的保真度分布
+
+.. image:: ./images/f1.png
+   :width: 600 px
+   :align: center
+
+|
+
+采样深度为 2 的电路的保真度分布
+
+.. image:: ./images/f2.png
+   :width: 600 px
+   :align: center
+
+|
+
+采样深度为 3 的电路的保真度分布
+
+.. image:: ./images/f3.png
+   :width: 600 px
+   :align: center
+
+|
+
+可见，随着量子线路深度提升，保真度KL散度越小，表达力越强。
+
+.. image:: ./images/express.png
+   :width: 600 px
+   :align: center
+
+|
+
+贫瘠高原现象
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+在经典神经网络的训练中，基于梯度的优化方法不仅会遇到局部极小值的问题，
+而且还会遇到梯度接近于零的鞍点等几何结构。
+相应的，量子神经网络中也存在 "贫瘠高原效应" 。
+这一奇特现象最早由McClean等人在2018年发现 `Barren plateaus in quantum neural network training landscapes <https://arxiv.org/abs/1803.11173>`_。
+简单地说，当你选择的随机电路结构满足一定程度的复杂性时，优化曲面会变得非常平坦，
+这使得基于梯度下降的优化方法很难找到全局最小值
+。对于大多数变分量子算法(VQE等)来说，这种现象意味着当量子位的数量增加时，
+具有随机结构的电路可能无法很好地工作。
+这将使精心设计的损失函数对应的优化曲面变成一个巨大的平台，
+使量子神经网络的训练更加困难。
+模型随机找到的初值很难逃离这个平台，梯度下降的收敛速度会非常慢。
+
+
+本案例主要使用VQNet展示贫瘠高原现象，使用梯度分析函数对用户自定义量子神经网络中的参数梯度进行分析。
+
+以下代码按照原论文中提及的类似方法搭建如下随机电路：
+
+首先作用在所有量子比特上绕布洛赫球的 Y-轴旋转 :math:`\pi/4` 。
+
+其余的结构加起来构成一个模块（Block）, 每个模块共分为两层：
+
+- 第一层搭建随机的旋转门, 其中 :math:`R \in \{R_x, R_y, R_z\}` 。
+- 第二层由 CZ 门组成，作用在每两个相邻的量子比特上。
+
+线路代码如rand_circuit_pq函数所示。
+
+当我们确定了电路的结构之后，我们还需要定义一个损失函数（loss function）来确定优化曲面。
+按照原论文中提及的，我们采用 VQE算法中常用的损失函数：
+
+.. math::
+
+    \mathcal{L}(\boldsymbol{\theta})= \langle0| U^{\dagger}(\boldsymbol{\theta})H U(\boldsymbol{\theta}) |0\rangle
+
+其中的酉矩阵  :math:`U(\boldsymbol{\theta})` 就是我们上一部分搭建的带有随机结构的量子神经网络。
+哈密顿量 :math:`H = |00\cdots 0\rangle\langle00\cdots 0|` 。
+本案例使用在不同量子比特数上构建如上VQE算法，并生成200组随机网络结构和不同的随机初始参数.
+含参线路中参数的梯度按照paramter-shift算法进行计算。
+然后统计得到的其中变分参数的200个梯度的平均值和方差。
+
+以下例子对变分量子参数的最后一个进行分析，读者也可自行修改为其他合理的值。
+通过运行，读者不难发现，随着量子比特数增加，量子参数的梯度的方差越来越小，均值越来越接近0。
+
+.. code-block::
+
+
+        """
+        贫瘠高原
+        """
+        import pyqpanda as pq
+        import numpy as np
+        import matplotlib.pyplot as plt
+
+        from pyvqnet.qnn import Hermitian_expval, grad
+
+        param_idx = -1
+        gate_set = [pq.RX, pq.RY, pq.RZ]
+
+
+        def rand_circuit_pq(params, num_qubits):
+            cir = pq.QCircuit()
+            machine = pq.CPUQVM()
+            machine.init_qvm()
+            qlist = machine.qAlloc_many(num_qubits)
+
+            for i in range(num_qubits):
+                cir << pq.RY(
+                    qlist[i],
+                    np.pi / 4,
+                )
+
+            random_gate_sequence = {
+                i: np.random.choice(gate_set)
+                for i in range(num_qubits)
+            }
+            for i in range(num_qubits):
+                cir << random_gate_sequence[i](qlist[i], params[i])
+
+            for i in range(num_qubits - 1):
+                cir << pq.CZ(qlist[i], qlist[i + 1])
+
+            prog = pq.QProg()
+            prog.insert(cir)
+            machine.directly_run(prog)
+            result = machine.get_qstate()
+
+            H = np.zeros((2**num_qubits, 2**num_qubits))
+            H[0, 0] = 1
+            expval = Hermitian_expval(H, result, [i for i in range(num_qubits)],
+                                    num_qubits)
+
+            return expval
+
+
+        qubits = [2, 3, 4, 5, 6]
+        variances = []
+        num_samples = 200
+        means = []
+        for num_qubits in qubits:
+            grad_vals = []
+            for i in range(num_samples):
+                params = np.random.uniform(0, np.pi, size=num_qubits)
+                g = grad(rand_circuit_pq, params, num_qubits)
+
+                grad_vals.append(g[-1])
+            variances.append(np.var(grad_vals))
+            means.append(np.mean(grad_vals))
+        variances = np.array(variances)
+        means = np.array(means)
+        qubits = np.array(qubits)
+
+
+        plt.figure()
+
+        plt.plot(qubits, variances, "v-")
+
+        plt.xlabel(r"N Qubits")
+        plt.ylabel(r"variance")
+        plt.show()
+
+
+        plt.figure()
+
+        plt.plot(qubits, means, "v-")
+
+        plt.xlabel(r"N Qubits")
+        plt.ylabel(r"means")
+
+        plt.show()
+
+
+下图显示了参数梯度的均值随着量子比特数变化的情况，随着量子比特数增加，参数梯度趋近0。
+
+.. image:: ./images/Barren_Plateau_mean.png
+   :width: 600 px
+   :align: center
+
+|
+
+下图显示了参数梯度的方差随着量子比特数变化的情况，随着量子比特数增加，参数梯度几乎不变化。
+可以预见，任意含参逻辑门搭建的量子线路随着量子比特提升，在任意参数初始化情况下，参数训练容易陷入难以更新的情况。
+
+.. image:: ./images/Barren_Plateau_variance.png
+   :width: 600 px
+   :align: center
+
+|
+
+
+量子感知机
+^^^^^^^^^^^^^^^^
+
+人工神经网络是机器学习算法和人工智能的一种经典方法。从历史上看，人工神经元的最简单实现可以追溯到经典Rosenblatt 的“感知器”，但其长期实际应用可能会受到计算复杂度快速扩展的阻碍，尤其是与多层感知器的训练相关网络。这里我们参照论文 `An Artificial Neuron Implemented on an Actual Quantum Processor <https://arxiv.org/abs/1811.02266>`__ 一种基于量子信息的算法实现量子计算机版本的感知器，在编码资源方面显示出相比经典模型指数优势。
+
+对于该量子感知机，处理的数据是 0 1 二进制比特字符串。其目标是想识别形如下图 :math:`w` 十字形状的模式。
+
+.. image:: ./images/QP-data.png
+   :width: 600 px
+   :align: center
+
+|
+
+使用二进制比特字符串对其进行编码，其中黑为0，白为1，可知 :math:`w` 编码为（1，1，1，1，1，1，0，1，1，0，0，0，1，1，0，1）。共16位的字符串正好可以编码进4bit的量子态的振幅的符号上，符号为负数编码为0，符号为正数编码为1。通过以上编码方式，我们算法输入input转化为16位的二进制串。这样的不重复的二进制串可以分别对应特定的输入线路 :math:`U_i` 。
+ 
+该论文提出的量子感知机线路结构如下：
+
+.. image:: ./images/QP-cir.png
+   :width: 600 px
+   :align: center
+
+|
+
+在比特0~3上构建编码线路 :math:`U_i` ，包含多受控的 :math:`CZ` 门， :math:`CNOT` 门， :math:`H` 门；在 :math:`U_i` 后面紧接着构建权重变换线路 :math:`U_w` ，同样由受控门以及 :math:`H` 门构成。使用 :math:`U_i` 可以进行酉矩阵变化，将数据编码到量子态上：
+
+.. math::
+    U_i|0\rangle^{\otimes N}=\left|\psi_i\right\rangle
+
+使用酉矩阵变换 :math:`U_w` 来计算输入和权重之间的内积：
+
+.. math::
+    U_w\left|\psi_i\right\rangle=\sum_{j=0}^{m-1} c_j|j\rangle \equiv\left|\phi_{i, w}\right\rangle
+
+使用一个目标比特在辅助比特上的多受控 :math:`NOT` 门，并使用一些后续的 :math:`H` 门， :math:`X` 门，:math:`CX` 门作为激活函数可以获取 :math:`U_i` 和 :math:`U_w` 的归一化激活概率值：
+
+.. math::
+    \left|\phi_{i, w}\right\rangle|0\rangle_a \rightarrow \sum_{j=0}^{m-2} c_j|j\rangle|0\rangle_a+c_{m-1}|m-1\rangle|1\rangle_a
+
+当输入 :math:`i` 的2进制串和 :math:`w` 完全一致时，该归一化概率值应为最大。
+
+VQNet提供了 ``QuantumNeuron`` 模块实现该算法。首先初始化一个量子感知机 ``QuantumNeuron``。
+
+.. code-block::
+
+    perceptron = QuantumNeuron()
+
+使用 ``gen_4bitstring_data`` 接口生成论文中的各种数据以及其类别标签。
+
+.. code-block::
+
+    training_label, test_label = perceptron.gen_4bitstring_data()
+
+使用 ``train`` 接口遍历所有数据，可以获取最后训练好的量子感知器线路Uw。
+
+.. code-block::
+
+    trained_para = perceptron.train(training_label, test_label)
+
+.. image:: ./images/QP-pic.png
+   :width: 600 px
+   :align: center
+
+|
+
+在测试数据上，可以获取测试数据上的准确率结果
+
+.. image:: ./images/QP-acc.png
+   :width: 600 px
+   :align: center
+
+|
+
+量子自然梯度
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+量子机器学习模型一般使用梯度下降法对可变量子逻辑线路中参数进行优化。经典梯度下降法公式如下：
+
+.. math:: \theta_{t+1} = \theta_t -\eta \nabla \mathcal{L}(\theta),
+
+本质上，每次迭代时候，我们将计算参数空间下，梯度下降最陡的方向作为参数变化的方向。
+在空间中任何一个方向，在局部范围内下降的速度都不如负梯度方向快。
+不同空间上，最速下降方向的推导是依赖于参数微分的范数——距离度量。距离度量在这里起着核心作用，
+不同的度量会得到不同的最速下降方向。对于经典优化问题中参数所处的欧几里得空间，最速下降方向就是负梯度方向。
+即使如此，在参数优化的每一步，由于损失函数随着参数的变化，其参数空间发生变换。使得找到另一个更优的距离范数成为可能。
+
+`量子自然梯度法 <https://arxiv.org/abs/1909.02108>`_ 借鉴经典自然梯度法的概念 `Amari (1998) <https://www.mitpressjournals.org/doi/abs/10.1162/089976698300017746>`__ ，
+我们改为将优化问题视为给定输入的可能输出值的概率分布（即，最大似然估计），则更好的方法是在分布
+空间中执行梯度下降，它相对于参数化是无量纲和不变的. 因此，无论参数化如何，每个优化步骤总是会为每个参数选择最佳步长。
+在量子机器学习任务中，量子态空间拥有一个独特的不变度量张量，称为 Fubini-Study 度量张量 :math:`g_{ij}`。
+该张量将量子线路参数空间中的最速下降转换为分布空间中的最速下降。
+量子自然梯度的公式如下：
+
+.. math:: \theta_{t+1} = \theta_t - \eta g^{+}(\theta_t)\nabla \mathcal{L}(\theta),
+
+其中 :math:`g^{+}` 是伪逆。
+
+以下我们基于VQNet实现对一个量子变分线路参数进行量子自然梯度优化的例子，可见使用量子自然梯度(Quantum Nature Gradient)使得某些损失函数下降更快。
+
+我们的目标是使如下的量子变分线路的期望最小，可见其中含有两层共3个量子含参逻辑门，第一层由0和1比特上的 RZ, RY 逻辑门构成，第二层由2比特上的RX 逻辑门构成。
+
+.. image:: ./images/qng_all_cir.png
+   :width: 600 px
+   :align: center
+
+|
+
+.. code-block::
+
+    import pyqpanda as pq
+    import numpy as np
+    from pyvqnet.tensor import QTensor
+    from pyvqnet.qnn.measure import expval, ProbsMeasure
+    from pyvqnet.qnn import insert_pauli_for_mt, get_metric_tensor, QNG,QuantumLayer
+    import matplotlib.pyplot as plt
+    from pyvqnet.optim import SGD
+    from pyvqnet import _core
+    ###################################################
+    # Quantum Nature Gradients Examples
+    ###################################################
+    class pyqpanda_config_wrapper:
+        """
+        A wrapper for pyqpanda config,including QVM machine, allocated qubits, classic bits.
+        """
+        def __init__(self, qubits_num) -> None:
+            self._machine = pq.CPUQVM()
+            self._machine.init_qvm()
+            self._qubits = self._machine.qAlloc_many(qubits_num)
+            self._cubits = self._machine.cAlloc_many(qubits_num)
+            self._qcir = pq.QCircuit()
+
+        def __del__(self):
+            self._machine.finalize()
+
+
+    # use quantum nature gradient optimzer to optimize circuit quantum_net
+    steps = 200
+
+    def quantum_net(
+            q_input_features,
+            params,
+            qubits,
+            cubits,
+            machine):
+        qcir = pq.QCircuit()
+        qcir.insert(pq.RY(qubits[0], np.pi / 4))
+        qcir.insert(pq.RY(qubits[1], np.pi / 3))
+        qcir.insert(pq.RY(qubits[2], np.pi / 7))
+
+        qcir.insert(pq.RZ(qubits[0], params[0]))
+        qcir.insert(pq.RY(qubits[1], params[1]))
+
+        qcir.insert(pq.CNOT(qubits[0], qubits[1]))
+        qcir.insert(pq.CNOT(qubits[1], qubits[2]))
+        qcir.insert(pq.RX(qubits[2], params[2]))
+
+        qcir.insert(pq.CNOT(qubits[0], qubits[1]))
+        qcir.insert(pq.CNOT(qubits[1], qubits[2]))
+        m_prog = pq.QProg()
+        m_prog.insert(qcir)
+
+        return expval(machine, m_prog, {'Y0': 1}, qubits)
+
+
+要使用量子自然梯度算法，我们首先需要计算出度量张量。
+按照算法定义，我们人工定义了如下两个子线路，分别计算两层含参线路的Fubini-Study 张量。
+第一个参数层计算度量张量的子线路如下：
+
+.. image:: ./images/qng_subcir1.png
+   :width: 600 px
+   :align: center
+
+|
+
+.. code-block::
+
+    def layer0_subcircuit(config: pyqpanda_config_wrapper, params):
+        qcir = pq.QCircuit()
+        qcir.insert(pq.RY(config._qubits[0], np.pi / 4))
+        qcir.insert(pq.RY(config._qubits[1], np.pi / 3))
+        return qcir
+
+    def get_p01_diagonal_(config, params, target_gate_type, target_gate_bits,
+                            wires):
+        qcir = layer0_subcircuit(config, params)
+        qcir2 = insert_pauli_for_mt(config._qubits, target_gate_type,
+                                    target_gate_bits)
+        qcir3 = pq.QCircuit()
+        qcir3.insert(qcir)
+        qcir3.insert(qcir2)
+        m_prog = pq.QProg()
+        m_prog.insert(qcir3)
+
+        return ProbsMeasure(wires, m_prog, config._machine, config._qubits)
+
+第二个参数层计算度量张量的子线路如下：
+
+.. image:: ./images/qng_subcir2.png
+   :width: 600 px
+   :align: center
+
+|
+
+.. code-block::
+
+
+    def layer1_subcircuit(config: pyqpanda_config_wrapper, params):
+        qcir = pq.QCircuit()
+        qcir.insert(pq.RY(config._qubits[0], np.pi / 4))
+        qcir.insert(pq.RY(config._qubits[1], np.pi / 3))
+        qcir.insert(pq.RY(config._qubits[2], np.pi / 7))
+
+        qcir.insert(pq.RZ(config._qubits[0], params[0]))
+        qcir.insert(pq.RY(config._qubits[1], params[1]))
+
+        qcir.insert(pq.CNOT(config._qubits[0], config._qubits[1]))
+        qcir.insert(pq.CNOT(config._qubits[1], config._qubits[2]))
+
+        return qcir
+    def get_p1_diagonal_(config, params, target_gate_type, target_gate_bits,
+                            wires):
+        qcir = layer1_subcircuit(config, params)
+        qcir2 = insert_pauli_for_mt(config._qubits, target_gate_type,
+                                    target_gate_bits)
+        qcir3 = pq.QCircuit()
+        qcir3.insert(qcir)
+        qcir3.insert(qcir2)
+        m_prog = pq.QProg()
+        m_prog.insert(qcir3)
+        
+        return ProbsMeasure(wires, m_prog, config._machine, config._qubits)
+
+使用 `QNG` 类定义的量子自然梯度类，其中[['RZ', 'RY'], ['RX']]为3个含参逻辑门的门类型，
+[[0, 1], [2]]为作用的比特，qcir为计算张量的线路函数列表，[0,1,2]为整个线路的量子比特索引。
+
+.. code-block::
+
+    config = pyqpanda_config_wrapper(3)
+    qcir = []
+    qcir.append(get_p01_diagonal_)
+    qcir.append(get_p1_diagonal_)
+
+
+    # define QNG optimzer
+    opt = QNG(config, quantum_net, 0.02, [['RZ', 'RY'], ['RX']], [[0, 1], [2]],
+                qcir, [0, 1, 2])
+
+进行迭代优化，使用 `opt` 函数进行单步优化，其中第一个入参为输入数据，
+此处线路没有输入，故为None，第二个入参为待优化参数theta。
+
+.. code-block::
+
+    qng_cost = []
+    theta2 = QTensor([0.432, 0.543, 0.233])
+
+    # iteration
+    for _ in range(steps):
+        theta2 = opt.step(None, theta2)
+
+        qng_cost.append(
+            quantum_net(None, theta2, config._qubits, config._cubits,
+                        config._machine))
+
+使用SGD经典梯度下降法作为基线比较两者在相同迭代次数下的损失值变化情况，可见使用量子自然梯度，该损失函数下降更快。
+
+.. code-block::
+
+    # use gradient descent as the baseline
+    sgd_cost = []
+    qlayer = QuantumLayer(quantum_net, 3, 'cpu', 3)
+
+    temp = _core.Tensor([0.432, 0.543, 0.233])
+    _core.vqnet.copyTensor(temp, qlayer.m_para.data)
+    opti = SGD(qlayer.parameters())
+
+    for i in range(steps):
+        opti.zero_grad()
+        loss = qlayer(QTensor([[1]]))
+        print(f'step {i}')
+        print(f'q param before {qlayer.m_para}')
+        loss.backward()
+        sgd_cost.append(loss.item())
+        opti._step()
+        print(f'q param after{qlayer.m_para}')
+        
+    plt.style.use("seaborn")
+    plt.plot(qng_cost, "b", label="Quantum natural gradient descent")
+    plt.plot(sgd_cost, "g", label="Vanilla gradient descent")
+
+    plt.ylabel("Cost function value")
+    plt.xlabel("Optimization steps")
+    plt.legend()
+    plt.show()
+
+.. image:: ./images/qng_vs_sgd.png
+   :width: 600 px
+   :align: center
+
+|
+
+随机参数偏移算法
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+在量子变分线路中，使用参数偏移法 `parameter-shift` 计算量子参数的梯度是一种常用的方法。
+参数偏移法并不普遍适用所有的量子含参逻辑门。
+在它不成立（或不知道成立）的情况下，我们要么必须将门分解为兼容的门，要么使用梯度的替代估计器，例如有限差分近似。
+但是，由于增加了电路复杂性或梯度值中的潜在误差，这两种替代方案都可能存在缺陷。
+Banchi 和 Crooks 1 发现一种可以适用在任一酉矩阵量子逻辑门上的 `随机参数偏移算法(Stochastic Parameter-Shift Rule) <https://arxiv.org/abs/2005.10299>`_ 。
+
+下面展示适用VQNet对一个量子变分线路使用随机参数偏移法计算梯度的示例。其中，pyqpanda建议版本为3.7.12。示例线路定义如下：
+
+.. code-block::
+
+    import pyqpanda as pq
+    import numpy as np
+    from pyvqnet.qnn.measure import expval
+    from scipy.linalg import expm
+    import matplotlib
+    try:
+        matplotlib.use('TkAgg')
+    except:
+        pass
+    import matplotlib.pyplot as plt
+
+
+    machine = pq.init_quantum_machine(pq.QMachineType.CPU)
+    q = machine.qAlloc_many(2)
+    c = machine.cAlloc_many(2)
+
+    # some basic Pauli matrices
+    I = np.eye(2)
+    X = np.array([[0, 1], [1, 0]])
+    Z = np.array([[1, 0], [0, -1]])
+
+    def Generator(theta1, theta2, theta3):
+        G = theta1.item() * np.kron(X, I) - \
+            theta2 * np.kron(Z, X) + \
+            theta3 * np.kron(I, X)
+        return G
+
+    def pq_demo_circuit(gate_pars):
+        G = Generator(*gate_pars)
+        G = expm(-1j * G)
+        x = G.flatten().tolist()
+
+        cir = pq.matrix_decompose(q, x)
+        m_prog = pq.QProg()
+        m_prog.insert(cir)
+        pauli_dict = {'Z0': 1}
+        exp2 = expval(machine, m_prog, pauli_dict, q)
+        return exp2
+
+随机参数偏移法首先随机从[0,1]的均匀分布中采样一个变量s，接着对线路分别进行如下的酉矩阵变换：
+
+     a) :math:`e^{i(1-s)(\hat{H} + \theta\hat{V})}`
+     b) :math:`e^{+i\tfrac{\pi}{4}\hat{V}}`
+     c) :math:`e^{is(\hat{H} + \theta\hat{V})}`
+
+其中 :math:`\hat{V}` 是一个泡利算符的张量积， :math:`\hat{H}` 是任意泡利算符张量积的线性组合。
+此时获取的观测量的期望值我们定义为 :math:`\langle r_+ \rangle` 。
+
+.. code-block::
+
+    def pq_SPSRgates(gate_pars, s, sign):
+        G = Generator(*gate_pars)
+        # step a)
+        G1 = expm(1j * (1 - s) * G)
+        x = G1.flatten().tolist()
+
+        cir = pq.matrix_decompose(q, x)
+        m_prog = pq.QProg()
+        m_prog.insert(cir)
+
+        # step b)
+        G2 = expm(1j * sign * np.pi / 4 * X)
+        x = G2.flatten().tolist()
+        cir = pq.matrix_decompose(q[0], x)
+        m_prog.insert(cir)
+
+        # step c)
+        G3 = expm(1j * s * G)
+        x = G3.flatten().tolist()
+        cir = pq.matrix_decompose(q, x)
+        m_prog.insert(cir)
+        pauli_dict = {'Z0': 1}
+        exp2 = expval(machine, m_prog, pauli_dict, q)
+        return exp2
+
+将上一步骤中 :math:`\tfrac{\pi}{4}` 变成  :math:`-\tfrac{\pi}{4}`，
+重复进行 a, b, c 操作，获取观测量的期望 :math:`\langle r_- \rangle` 。
+
+随机参数偏移算法计算的梯度公式如下：
+
+ .. math::
+
+     \mathbb{E}_{s\in\mathcal{U}[0,1]}[\langle r_+ \rangle - \langle r_-\rangle]
+
+我们画出使用随机参数偏移法计算的参数 :math:`\theta_1` 梯度与观测量期望的之间的关系。
+通过观察可见，观测量期望符合 :math:`\cos(2\theta_1)` 的函数形式；而使用随机参数偏移法计算梯度
+符合 :math:`-2\sin(2\theta_1)` , 正好是 :math:`\cos(2\theta_1)` 的微分。
+
+.. code-block::
+
+    theta2, theta3 = -0.15, 1.6
+    angles = np.linspace(0, 2 * np.pi, 50)
+    pos_vals = np.array([[
+        pq_SPSRgates([theta1, theta2, theta3], s=s, sign=+1)
+        for s in np.random.uniform(size=10)
+    ] for theta1 in angles])
+    neg_vals = np.array([[
+        pq_SPSRgates([theta1, theta2, theta3], s=s, sign=-1)
+        for s in np.random.uniform(size=10)
+    ] for theta1 in angles])
+
+    # Plot the results
+    evals = [pq_demo_circuit([theta1, theta2, theta3]) for theta1 in angles]
+    spsr_vals = (pos_vals - neg_vals).mean(axis=1)
+    plt.plot(angles, evals, 'b', label="Expectation Value")
+    plt.plot(angles, spsr_vals, 'r', label="Stochastic parameter-shift rule")
+    plt.xlabel("theta1")
+    plt.legend()
+    plt.title("VQNet")
+    plt.show()
+
+.. image:: ./images/stochastic_parameter-shift.png
+   :width: 600 px
+   :align: center
+
+|
+
+
+双随机梯度下降
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+在变分量子算法中，参数化量子电路通过经典梯度下降法进行优化，以最小化期望函数值。
+虽然可以在经典模拟中分析计算期望值，在量子硬件上，程序仅限于从期望值中采样；随着样本数量以及shots次数的增加，这种方式获得的期望值会收敛于理论期望值，但可能永远得到准确值。
+Sweke 等人 在 `论文 <https://arxiv.org/abs/1910.01155>`_ 中发现了一种双随机梯度下降法。
+在本文中，他们证明了使用有限数量的测量样本（或shots）来估计梯度的量子梯度下降是随机梯度下降的一种形式。
+此外，如果优化涉及期望值的线性组合（例如 VQE），从该线性组合中的项中抽样可以进一步减少所需的时间复杂度。
+
+VQNet实现了该算法的一个示例：使用VQE 求解目标Hamiltonian的基态能量。注意此处我们设置量子线路观测的次数shots仅为1次。
+
+.. math::
+
+    H = \begin{bmatrix}
+          8 & 4 & 0 & -6\\
+          4 & 0 & 4 & 0\\
+          0 & 4 & 8 & 0\\
+          -6 & 0 & 0 & 0
+        \end{bmatrix}.
+
+.. code-block::
+
+    import numpy as np
+    import pyqpanda as pq
+    from pyvqnet.qnn.template import StronglyEntanglingTemplate
+    from pyvqnet.qnn.measure import Hermitian_expval
+    from pyvqnet.qnn import QuantumLayerV2
+    from pyvqnet.optim import SGD
+    import pyvqnet._core as _core
+    from pyvqnet.tensor import QTensor
+    from matplotlib import pyplot as plt
+
+    num_layers = 2
+    num_wires = 2
+    eta = 0.01
+    steps = 200
+    n = 1
+    param_shape = [2, 2, 3]
+    shots = 1
+
+    H = np.array([[8, 4, 0, -6], [4, 0, 4, 0], [0, 4, 8, 0], [-6, 0, 0, 0]])
+
+    # some basic Pauli matrices
+    I = np.eye(2)
+    X = np.array([[0, 1], [1, 0]])
+    Y = np.array([[0, -1j], [1j, 0]])
+    Z = np.array([[1, 0], [0, -1]])
+
+    init_params = np.random.uniform(low=0,
+                                    high=2 * np.pi,
+                                    size=param_shape)
+
+    def pq_circuit(params):
+        params = params.reshape(param_shape)
+        num_qubits = 2
+
+        machine = pq.CPUQVM()
+        machine.init_qvm()
+        qubits = machine.qAlloc_many(num_qubits)
+        circuit = StronglyEntanglingTemplate(params, num_qubits=num_qubits)
+        qcir = circuit.create_circuit(qubits)
+        prog = pq.QProg()
+        prog.insert(qcir)
+        machine.directly_run(prog)
+        result = machine.get_qstate()
+        return result
+
+
+该示例中的哈密顿量是厄密特矩阵，我们总是可以将其表示为泡利矩阵的总和。
+
+.. math::
+
+    H = \sum_{i,j=0,1,2,3} a_{i,j} (\sigma_i\otimes \sigma_j),
+
+其中
+
+.. math::
+
+    a_{i,j} = \frac{1}{4}\text{tr}[(\sigma_i\otimes \sigma_j )H], ~~ \sigma = \{I, X, Y, Z\}.
+
+代入以上公式，可见
+
+.. math::
+
+    H = 4  + 2I\otimes X + 4I \otimes Z - X\otimes X + 5 Y\otimes Y + 2Z\otimes X.
+
+为了执行“双随机”梯度下降，我们简单地应用随机梯度下降方法，但另外也均匀采样每个优化步骤的哈密顿期望项的子集。
+vqe_func_analytic()函数是使用参数偏移计算理论梯度，vqe_func_shots()则是使用随机采样值以及随机采样哈密顿期望子集的“双随机”梯度计算。
+
+.. code-block::
+
+    terms = np.array([
+        2 * np.kron(I, X),
+        4 * np.kron(I, Z),
+        -np.kron(X, X),
+        5 * np.kron(Y, Y),
+        2 * np.kron(Z, X),
+    ])
+
+
+    def vqe_func_analytic(input, init_params):
+        qstate = pq_circuit(init_params)
+        expval = Hermitian_expval(H, qstate, [0, 1], 2)
+        return  expval
+
+    def vqe_func_shots(input, init_params):
+        qstate = pq_circuit(init_params)
+        idx = np.random.choice(np.arange(5), size=n, replace=False)
+        A = np.sum(terms[idx], axis=0)
+        expval = Hermitian_expval(A, qstate, [0, 1], 2, shots)
+        return 4 + (5 / 1) * expval
+
+
+使用VQNet进行参数优化，对比损失函数的曲线，由于双随机梯度下降法每次仅计算H的部分泡利算符和，
+故使用其平均值才能代表最终观测量的期望结果，这里使用滑动平均moving_average()进行计算。
+
+.. code-block::
+
+    ##############################################################################
+    # Optimizing the circuit using gradient descent via the parameter-shift rule:
+    qlayer_ana = QuantumLayerV2(vqe_func_analytic, 2*2*3 )
+    qlayer_shots = QuantumLayerV2(vqe_func_shots, 2*2*3 )
+    cost_sgd = []
+    cost_dsgd = []
+    temp = _core.Tensor(init_params)
+    _core.vqnet.copyTensor(temp, qlayer_ana.m_para.data)
+    opti_ana = SGD(qlayer_ana.parameters())
+
+    _core.vqnet.copyTensor(temp, qlayer_shots.m_para.data)
+    opti_shots = SGD(qlayer_shots.parameters())
+
+    for i in range(steps):
+        opti_ana.zero_grad()
+        loss = qlayer_ana(QTensor([[1]]))
+
+        loss.backward()
+        cost_sgd.append(loss.item())
+        opti_ana._step()
+
+    for i in range(steps+50):
+        opti_shots.zero_grad()
+        loss = qlayer_shots(QTensor([[1]]))
+
+        loss.backward()
+        cost_dsgd.append(loss.item())
+        opti_shots._step()
+
+    def moving_average(data, n=3):
+        ret = np.cumsum(data, dtype=np.float64)
+        ret[n:] = ret[n:] - ret[:-n]
+        return ret[n - 1:] / n
+    ta = moving_average(np.array(cost_dsgd), n=50)
+    ta = ta[:-26]
+    average = np.vstack([np.arange(25, 200),ta ])
+    final_param = qlayer_shots.parameters()[0].to_numpy()
+    print("Doubly stochastic gradient descent min energy = ", vqe_func_analytic(QTensor([1]),final_param))
+    final_param  = qlayer_ana.parameters()[0].to_numpy()
+    print("stochastic gradient descent min energy = ", vqe_func_analytic(QTensor([1]),final_param))
+
+    plt.plot(cost_sgd, label="Vanilla gradient descent")
+    plt.plot(cost_dsgd, ".", label="Doubly QSGD")
+    plt.plot(average[0], average[1], "--", label="Doubly QSGD (moving average)")
+
+    plt.ylabel("Cost function value")
+    plt.xlabel("Optimization steps")
+    plt.xlim(-2, 200)
+    plt.legend()
+    plt.show()
+
+    #Doubly stochastic gradient descent min energy =  -4.337801834749975
+    #stochastic gradient descent min energy =  -4.531484333030544
+
+.. image:: ./images/dsgd.png
+   :width: 600 px
+   :align: center
+
+|
+
+基于梯度的剪枝
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+下面的例子实现了论文 `Towards Efficient On-Chip Training of Quantum Neural Networks <https://openreview.net/forum?id=vKefw-zKOft>`_ 中的算法。
+通过仔细研究量子变分线路中参数的过程，作者观察到小梯度在量子噪声下往往具有较大的相对变化甚至错误的方向。
+此外，并非所有梯度计算对于训练过程都是必需的，尤其是对于小幅度梯度。
+受此启发，作者提出了一种概率梯度修剪方法来预测并仅计算高可靠性的梯度。
+该方法可以减少噪声影响，还可以节省在真实量子机器上运行所需的电路数量。
+
+在gradient based pruning算法中，对于参数的优化过程，划分了积累窗口和修剪窗口两个阶段，所有训练时期分成一个重复的累积窗口，然后是一个修剪窗口。 概率梯度修剪方法中有三个重要的超参数：
+
+    * 累积窗口宽度 :math:`\omega_a` ，
+    * 修剪比例 :math:`r` ，
+    * 修剪窗口宽度 :math:`\omega_p` .
+
+在累积窗口中，算法收集每个训练步骤中的梯度信息。 在修剪窗口的每一步中，算法根据从累积窗口和修剪比率收集的信息，
+概率地免除一些梯度的计算。
+
+.. image:: ./images/gbp_arch.png
+   :width: 600 px
+   :align: center
+
+|
+
+剪枝比例 :math:`r` ,累积窗口宽度 :math:`\omega_a` 和剪枝窗口宽度 :math:`\omega_p` 分别决定了梯度趋势评估的可靠性。
+因此，我们的概率梯度修剪方法节省的时间百分比是 :math:`r\tfrac{\omega_p}{\omega_a +\omega_p}\times 100\%`。
+以下是运用梯度剪枝方法在VQC分类任务的示例。
+
+.. code-block::
+
+    import random
+    import numpy as np
+    import pyqpanda as pq
+
+    from pyvqnet.nn.module import Module
+    from pyvqnet.optim import sgd
+    from pyvqnet.qnn.quantumlayer import QuantumLayer
+    from pyvqnet.nn.loss import CategoricalCrossEntropy
+    from pyvqnet.tensor.tensor import QTensor
+    from pyvqnet.qnn import Gradient_Prune_Instance
+    random.seed(1234)
+
+    qvc_train_data = [
+        0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1,
+        1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 0, 1, 1,
+        1, 1, 1, 0, 1, 1, 1, 1, 1, 0
+    ]
+    qvc_test_data = [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 1, 0, 0, 1, 1, 0]
+
+
+    def qvc_circuits(x, weights, qlist, clist, machine):#pylint:disable=unused-argument
+        """
+        Quantum circuits run function
+        """
+        def get_cnot(nqubits):
+            cir = pq.QCircuit()
+            for i in range(len(nqubits) - 1):
+                cir.insert(pq.CNOT(nqubits[i], nqubits[i + 1]))
+            cir.insert(pq.CNOT(nqubits[len(nqubits) - 1], nqubits[0]))
+            return cir
+
+        def build_circult(weights, xx, nqubits):
+            def Rot(weights_j, qubits):#pylint:disable=invalid-name
+                circult = pq.QCircuit()
+                circult.insert(pq.RZ(qubits, weights_j[0]))
+                circult.insert(pq.RY(qubits, weights_j[1]))
+                circult.insert(pq.RZ(qubits, weights_j[2]))
+                return circult
+
+            def basisstate():
+                circult = pq.QCircuit()
+                for i in range(len(nqubits)):
+                    if xx[i] == 1:
+                        circult.insert(pq.X(nqubits[i]))
+                return circult
+
+            circult = pq.QCircuit()
+            circult.insert(basisstate())
+
+            for i in range(weights.shape[0]):
+
+                weights_i = weights[i, :, :]
+                for j in range(len(nqubits)):
+                    weights_j = weights_i[j]
+                    circult.insert(Rot(weights_j, nqubits[j]))
+                cnots = get_cnot(nqubits)
+                circult.insert(cnots)
+
+            circult.insert(pq.Z(nqubits[0]))
+
+            prog = pq.QProg()
+
+            prog.insert(circult)
+            return prog
+
+        weights = weights.reshape([2, 4, 3])
+        prog = build_circult(weights, x, qlist)
+        prob = machine.prob_run_dict(prog, qlist[0], -1)
+        prob = list(prob.values())
+
+        return prob
+
+
+    def qvc_circuits2(x, weights, qlist, clist, machine):#pylint:disable=unused-argument
+        """
+        Quantum circuits run function
+        """
+        prog = pq.QProg()
+        circult = pq.QCircuit()
+        circult.insert(pq.RZ(qlist[0], x[0]))
+        circult.insert(pq.RZ(qlist[1], x[1]))
+        circult.insert(pq.CNOT(qlist[0], qlist[1]))
+        circult.insert(pq.CNOT(qlist[1], qlist[2]))
+        circult.insert(pq.CNOT(qlist[2], qlist[3]))
+        circult.insert(pq.RY(qlist[0], weights[0]))
+        circult.insert(pq.RY(qlist[1], weights[1]))
+        circult.insert(pq.RY(qlist[2], weights[2]))
+
+        circult.insert(pq.CNOT(qlist[0], qlist[1]))
+        circult.insert(pq.CNOT(qlist[1], qlist[2]))
+        circult.insert(pq.CNOT(qlist[2], qlist[3]))
+        prog.insert(circult)
+        prob = machine.prob_run_dict(prog, qlist[0], -1)
+        prob = list(prob.values())
+
+        return prob
+
+    class Model(Module):
+        def __init__(self):
+            super(Model, self).__init__()
+            self.qvc = QuantumLayer(qvc_circuits, 24, "cpu", 4)
+            #self.qvc2 = QuantumLayer(qvc_circuits2, 3, "cpu", 4)
+
+        def forward(self, x):
+            y = self.qvc(x)
+            #y = self.qvc2(y)
+            return y
+
+
+    def get_data(dataset_str):
+        """
+        Tranform data to valid form
+        """
+        if dataset_str == "train":
+            datasets = np.array(qvc_train_data)
+
+        else:
+            datasets = np.array(qvc_test_data)
+
+        datasets = datasets.reshape([-1, 5])
+        data = datasets[:, :-1]
+        label = datasets[:, -1].astype(int)
+        label = np.eye(2)[label].reshape(-1, 2)
+        return data, label
+
+
+    def dataloader(data, label, batch_size, shuffle=True) -> np:
+        if shuffle:
+            for _ in range(len(data) // batch_size):
+                random_index = np.random.randint(0, len(data), (batch_size, 1))
+                yield data[random_index].reshape(batch_size,
+                                                -1), label[random_index].reshape(
+                                                    batch_size, -1)
+        else:
+            for i in range(0, len(data) - batch_size + 1, batch_size):
+                yield data[i:i + batch_size], label[i:i + batch_size]
+
+
+    def get_accuary(result, label):
+        result, label = np.array(result.data), np.array(label.data)
+        score = np.sum(np.argmax(result, axis=1) == np.argmax(label, 1))
+        return score
+
+
+我们使用 ``Gradient_Prune_Instance`` 类，
+输入24为当前模型的参数个数。裁剪比例 `prune_ratio` 输入为0.5，
+累计窗口大小 `accumulation_window_size` 为4，
+剪枝窗口 `pruning_window_size` 为2。
+当每次运行反向传播部分代码，在优化器 ``step`` 之前，
+运行 ``Gradient_Prune_Instance`` 的 ``step`` 函数。
+
+.. code-block::
+
+    def run():
+        """
+        Main run function
+        """
+        model = Model()
+
+        optimizer = sgd.SGD(model.parameters(), lr=0.5)
+        batch_size = 3
+        epoch = 10
+        loss = CategoricalCrossEntropy()
+        print("start training..............")
+        model.train()
+
+        datas, labels = get_data("train")
+        print(datas)
+        print(labels)
+        print(datas.shape)
+
+
+        GBP_HELPER = Gradient_Prune_Instance(param_num = 24,prune_ratio=0.5,accumulation_window_size=4,pruning_window_size=2)
+        for i in range(epoch):
+            count = 0
+            sum_loss = 0
+            accuary = 0
+            t = 0
+            for data, label in dataloader(datas, labels, batch_size, False):
+                optimizer.zero_grad()
+                data, label = QTensor(data), QTensor(label)
+
+                result = model(data)
+
+                loss_b = loss(label, result)
+
+                loss_b.backward()
+                
+                GBP_HELPER.step(model.parameters())
+                optimizer._step()
+                sum_loss += loss_b.item()
+                count += batch_size
+                accuary += get_accuary(result, label)
+                t = t + 1
+
+            print(
+                f"epoch:{i}, #### loss:{sum_loss/count} #####accuray:{accuary/count}"
+            )
+        print("start testing..............")
+        model.eval()
+        count = 0
+
+        test_data, test_label = get_data("test")
+        test_batch_size = 1
+        accuary = 0
+        sum_loss = 0
+        for testd, testl in dataloader(test_data, test_label, test_batch_size):
+            testd = QTensor(testd)
+            test_result = model(testd)
+            test_loss = loss(testl, test_result)
+            sum_loss += test_loss
+            count += test_batch_size
+            accuary += get_accuary(test_result, testl)
+        print(
+            f"test:--------------->loss:{sum_loss/count} #####accuray:{accuary/count}"
+        )
+
+
+    if __name__ == "__main__":
+
+        run()
+
+    # epoch:0, #### loss:0.2255942871173223 #####accuray:0.5833333333333334
+    # epoch:1, #### loss:0.1989427705605825 #####accuray:1.0
+    # epoch:2, #### loss:0.16489211718241373 #####accuray:1.0
+    # epoch:3, #### loss:0.13245886812607446 #####accuray:1.0
+    # epoch:4, #### loss:0.11463981121778488 #####accuray:1.0
+    # epoch:5, #### loss:0.1078591321905454 #####accuray:1.0
+    # epoch:6, #### loss:0.10561319688955943 #####accuray:1.0
+    # epoch:7, #### loss:0.10483601937691371 #####accuray:1.0
+    # epoch:8, #### loss:0.10457512239615123 #####accuray:1.0
+    # epoch:9, #### loss:0.10448987782001495 #####accuray:1.0
+    # start testing..............
+    # test:--------------->loss:[0.3134713] #####accuray:1.0
+
 
 在VQNet使用量子计算层进行模型训练
 ----------------------------------
@@ -4709,626 +7039,6 @@ VQNet提供了封装类 ``VQC_wrapper`` ，用户使用普通逻辑门在函数 
     [0.3132616580]
     test:--------------->loss:QTensor(None, requires_grad=True) #####accuray:1.0
 
-
-
-
-
-量子模型拟合fourier series算法
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-通过参数化的量子线路将数据输入映射到预测的模型，量子计算机可用于监督学习。虽然已经做了大量工作来研究这种方法的实际意义，
-但这些模型的许多重要理论特性仍然未知。在这里，我们研究了将数据编码到模型中的策略如何影响参数化量子电路作为函数逼近器的表达能力。
-
-本例参照 `The effect of data encoding on the expressive power of variational quantum machine learning models <https://arxiv.org/pdf/2008.08605.pdf>`_ 论文将量子计算机设计的常见量子机器学习模型与傅里叶级数联系起来。
-
-1.1用串行Pauli旋转编码拟合傅里叶级数
-"""""""""""""""""""""""""""""""""""""""""""
-
-首先我们展示使用Pauli旋转作为数据编码门的量子模型如何只能在一定程度上拟合傅里叶级数。为简单起见，我们将只看单量子比特电路：
-
-.. image:: ./images/single_qubit_model.png
-   :width: 600 px
-   :align: center
-
-|
-
-制作输入数据，定义并行量子模型，不进行模型训练结果。
-
-.. code-block::
-
-    """
-    Quantum Fourier Series
-    """
-    import numpy as np
-    import pyqpanda as pq
-    from pyvqnet.qnn.measure import expval
-    import matplotlib.pyplot as plt
-    import matplotlib
-    try:
-        matplotlib.use("TkAgg")
-    except:  # pylint:disable=bare-except
-        print("Can not use matplot TkAgg")
-        pass
-
-    np.random.seed(42)
-
-
-    degree = 1  # degree of the target function
-    scaling = 1  # scaling of the data
-    coeffs = [0.15 + 0.15j]*degree  # coefficients of non-zero frequencies
-    coeff0 = 0.1  # coefficient of zero frequency
-
-    def target_function(x):
-        """Generate a truncated Fourier series, where the data gets re-scaled."""
-        res = coeff0
-        for idx, coeff in enumerate(coeffs):
-            exponent = np.complex128(scaling * (idx+1) * x * 1j)
-            conj_coeff = np.conjugate(coeff)
-            res += coeff * np.exp(exponent) + conj_coeff * np.exp(-exponent)
-        return np.real(res)
-
-    x = np.linspace(-6, 6, 70)
-    target_y = np.array([target_function(x_) for x_ in x])
-
-    plt.plot(x, target_y, c='black')
-    plt.scatter(x, target_y, facecolor='white', edgecolor='black')
-    plt.ylim(-1, 1)
-    plt.show()
-
-
-    def S(scaling, x, qubits):
-        cir = pq.QCircuit()
-        cir.insert(pq.RX(qubits[0], scaling * x))
-        return cir
-
-    def W(theta, qubits):
-        cir = pq.QCircuit()
-        cir.insert(pq.RZ(qubits[0], theta[0]))
-        cir.insert(pq.RY(qubits[0], theta[1]))
-        cir.insert(pq.RZ(qubits[0], theta[2]))
-        return cir
-
-    def serial_quantum_model(weights, x, num_qubits, scaling):
-        cir = pq.QCircuit()
-        machine = pq.CPUQVM()  
-        machine.init_qvm()  
-        qubits = machine.qAlloc_many(num_qubits)
-
-        for theta in weights[:-1]:
-            cir.insert(W(theta, qubits))
-            cir.insert(S(scaling, x, qubits))
-
-        # (L+1)'th unitary
-        cir.insert(W(weights[-1], qubits))
-        prog = pq.QProg()
-        prog.insert(cir)
-
-        exp_vals = []
-        for position in range(num_qubits):
-            pauli_str = {"Z" + str(position): 1.0}
-            exp2 = expval(machine, prog, pauli_str, qubits)
-            exp_vals.append(exp2)
-
-        return exp_vals
-
-    r = 1
-    weights = 2 * np.pi * np.random.random(size=(r+1, 3))  # some random initial weights
-
-    x = np.linspace(-6, 6, 70)
-    random_quantum_model_y = [serial_quantum_model(weights, x_, 1, 1) for x_ in x]
-
-    plt.plot(x, target_y, c='black', label="true")
-    plt.scatter(x, target_y, facecolor='white', edgecolor='black')
-    plt.plot(x, random_quantum_model_y, c='blue', label="predict")
-    plt.ylim(-1, 1)
-    plt.legend(loc="upper right")
-    plt.show()
-
-
-不训练的量子线路运行结果为：
-
-.. image:: ./images/single_qubit_model_result_no_train.png
-   :width: 600 px
-   :align: center
-
-|
-
-
-制作输入数据，定义串行量子模型，并结合VQNet框架的QuantumLayer层构建训练模型。
-
-.. code-block::
-
-    """
-    Quantum Fourier Series Serial
-    """
-    import numpy as np
-    from pyvqnet.nn.module import Module
-    from pyvqnet.nn.loss import MeanSquaredError
-    from pyvqnet.optim.adam import Adam
-    from pyvqnet.tensor.tensor import QTensor
-    import pyqpanda as pq
-    from pyvqnet.qnn.measure import expval
-    from pyvqnet.qnn.quantumlayer import QuantumLayer
-    import matplotlib.pyplot as plt
-    import matplotlib
-    try:
-        matplotlib.use("TkAgg")
-    except:  # pylint:disable=bare-except
-        print("Can not use matplot TkAgg")
-        pass
-
-    np.random.seed(42)
-
-    degree = 1  # degree of the target function
-    scaling = 1  # scaling of the data
-    coeffs = [0.15 + 0.15j]*degree  # coefficients of non-zero frequencies
-    coeff0 = 0.1  # coefficient of zero frequency
-
-    def target_function(x):
-        """Generate a truncated Fourier series, where the data gets re-scaled."""
-        res = coeff0
-        for idx, coeff in enumerate(coeffs):
-            exponent = np.complex128(scaling * (idx+1) * x * 1j)
-            conj_coeff = np.conjugate(coeff)
-            res += coeff * np.exp(exponent) + conj_coeff * np.exp(-exponent)
-        return np.real(res)
-
-    x = np.linspace(-6, 6, 70)
-    target_y = np.array([target_function(xx) for xx in x])
-
-    plt.plot(x, target_y, c='black')
-    plt.scatter(x, target_y, facecolor='white', edgecolor='black')
-    plt.ylim(-1, 1)
-    plt.show()
-
-
-    def S(x, qubits):
-        cir = pq.QCircuit()
-        cir.insert(pq.RX(qubits[0], x))
-        return cir
-
-    def W(theta, qubits):
-        cir = pq.QCircuit()
-        cir.insert(pq.RZ(qubits[0], theta[0]))
-        cir.insert(pq.RY(qubits[0], theta[1]))
-        cir.insert(pq.RZ(qubits[0], theta[2]))
-        return cir
-
-
-    r = 1
-    weights = 2 * np.pi * np.random.random(size=(r+1, 3))  # some random initial weights
-
-    x = np.linspace(-6, 6, 70)
-
-
-    def q_circuits_loop(x, weights, qubits, clist, machine):
-
-        result = []
-        for xx in x:
-            cir = pq.QCircuit()
-            weights = weights.reshape([2, 3])
-
-            for theta in weights[:-1]:
-                cir.insert(W(theta, qubits))
-                cir.insert(S(xx, qubits))
-
-            cir.insert(W(weights[-1], qubits))
-            prog = pq.QProg()
-            prog.insert(cir)
-
-            exp_vals = []
-            for position in range(1):
-                pauli_str = {"Z" + str(position): 1.0}
-                exp2 = expval(machine, prog, pauli_str, qubits)
-                exp_vals.append(exp2)
-                result.append(exp2)
-        return result
-
-    class Model(Module):
-        def __init__(self):
-            super(Model, self).__init__()
-            self.q_fourier_series = QuantumLayer(q_circuits_loop, 6, "CPU", 1)
-
-        def forward(self, x):
-            return self.q_fourier_series(x)
-
-    def run():
-        model = Model()
-
-        optimizer = Adam(model.parameters(), lr=0.5)
-        batch_size = 2
-        epoch = 5
-        loss = MeanSquaredError()
-        print("start training..............")
-        model.train()
-        max_steps = 50
-        for i in range(epoch):
-            sum_loss = 0
-            count = 0
-            for step in range(max_steps):
-                optimizer.zero_grad()
-                # Select batch of data
-                batch_index = np.random.randint(0, len(x), (batch_size,))
-                x_batch = x[batch_index]
-                y_batch = target_y[batch_index]
-                data, label = QTensor([x_batch]), QTensor([y_batch])
-                result = model(data)
-                loss_b = loss(label, result)
-                loss_b.backward()
-                optimizer._step()
-                sum_loss += loss_b.item()
-                count += batch_size
-            print(f"epoch:{i}, #### loss:{sum_loss/count} ")
-
-            model.eval()
-            predictions = []
-            for xx in x:
-                data = QTensor([[xx]])
-                result = model(data)
-                predictions.append(result.pdata[0])
-
-            plt.plot(x, target_y, c='black', label="true")
-            plt.scatter(x, target_y, facecolor='white', edgecolor='black')
-            plt.plot(x, predictions, c='blue', label="predict")
-            plt.ylim(-1, 1)
-            plt.legend(loc="upper right")
-            plt.show()
-
-    if __name__ == "__main__":
-        run()
-
-其中量子模型为：
-
-.. image:: ./images/single_qubit_model_circuit.png
-   :width: 600 px
-   :align: center
-
-|
-
-网络训练结果为：
-
-.. image:: ./images/single_qubit_model_result.png
-   :width: 600 px
-   :align: center
-
-|
-
-网络训练损失为：
-
-.. code-block::
-
-    start training..............
-    epoch:0, #### loss:0.04852807720773853
-    epoch:1, #### loss:0.012945819365559146
-    epoch:2, #### loss:0.0009359727291666786
-    epoch:3, #### loss:0.00015995280153333625
-    epoch:4, #### loss:3.988249877352246e-05
-
-
-1.2用并行Pauli旋转编码拟合傅里叶级数
-"""""""""""""""""""""""""""""""""""""""""""
-
-根据论文所示，我们期望与串行模型相似的结果：只有在量子模型中编码门至少有r个重复时，才能拟合r阶的傅立叶级数。量子比特电路：
-
-.. image:: ./images/parallel_model.png
-   :width: 600 px
-   :align: center
-
-|
-
-制作输入数据，定义并行量子模型，不进行模型训练结果。
-
-.. code-block::
-
-    """
-    Quantum Fourier Series
-    """
-    import numpy as np
-    import pyqpanda as pq
-    from pyvqnet.qnn.measure import expval
-    import matplotlib.pyplot as plt
-    import matplotlib
-    try:
-        matplotlib.use("TkAgg")
-    except:  # pylint:disable=bare-except
-        print("Can not use matplot TkAgg")
-        pass
-
-    np.random.seed(42)
-
-    degree = 1  # degree of the target function
-    scaling = 1  # scaling of the data
-    coeffs = [0.15 + 0.15j] * degree  # coefficients of non-zero frequencies
-    coeff0 = 0.1  # coefficient of zero frequency
-
-    def target_function(x):
-        """Generate a truncated Fourier series, where the data gets re-scaled."""
-        res = coeff0
-        for idx, coeff in enumerate(coeffs):
-            exponent = np.complex128(scaling * (idx + 1) * x * 1j)
-            conj_coeff = np.conjugate(coeff)
-            res += coeff * np.exp(exponent) + conj_coeff * np.exp(-exponent)
-        return np.real(res)
-
-    x = np.linspace(-6, 6, 70)
-    target_y = np.array([target_function(xx) for xx in x])
-
-
-    def S1(x, qubits):
-        cir = pq.QCircuit()
-        for q in qubits:
-            cir.insert(pq.RX(q, x))
-        return cir
-
-    def W1(theta, qubits):
-        cir = pq.QCircuit()
-        for i in range(len(qubits)):
-            cir.insert(pq.RZ(qubits[i], theta[0][i][0]))
-            cir.insert(pq.RY(qubits[i], theta[0][i][1]))
-            cir.insert(pq.RZ(qubits[i], theta[0][i][2]))
-
-        for i in range(len(qubits) - 1):
-            cir.insert(pq.CNOT(qubits[i], qubits[i + 1]))
-        cir.insert(pq.CNOT(qubits[len(qubits) - 1], qubits[0]))
-
-        for i in range(len(qubits)):
-            cir.insert(pq.RZ(qubits[i], theta[1][i][0]))
-            cir.insert(pq.RY(qubits[i], theta[1][i][1]))
-            cir.insert(pq.RZ(qubits[i], theta[1][i][2]))
-
-        cir.insert(pq.CNOT(qubits[0], qubits[len(qubits) - 1]))
-        for i in range(len(qubits) - 1):
-            cir.insert(pq.CNOT(qubits[i + 1], qubits[i]))
-
-        for i in range(len(qubits)):
-            cir.insert(pq.RZ(qubits[i], theta[2][i][0]))
-            cir.insert(pq.RY(qubits[i], theta[2][i][1]))
-            cir.insert(pq.RZ(qubits[i], theta[2][i][2]))
-
-        for i in range(len(qubits) - 1):
-            cir.insert(pq.CNOT(qubits[i], qubits[i + 1]))
-        cir.insert(pq.CNOT(qubits[len(qubits) - 1], qubits[0]))
-
-        return cir
-
-    def parallel_quantum_model(weights, x, num_qubits):
-        cir = pq.QCircuit()
-        machine = pq.CPUQVM()  
-        machine.init_qvm()  
-        qubits = machine.qAlloc_many(num_qubits)
-
-        cir.insert(W1(weights[0], qubits))
-        cir.insert(S1(x, qubits))
-
-        cir.insert(W1(weights[1], qubits))
-        prog = pq.QProg()
-        prog.insert(cir)
-
-        exp_vals = []
-        for position in range(1):
-            pauli_str = {"Z" + str(position): 1.0}
-            exp2 = expval(machine, prog, pauli_str, qubits)
-            exp_vals.append(exp2)
-
-        return exp_vals
-
-    r = 3
-
-    trainable_block_layers = 3
-    weights = 2 * np.pi * np.random.random(size=(2, trainable_block_layers, r, 3))
-    # print(weights)
-    x = np.linspace(-6, 6, 70)
-    random_quantum_model_y = [parallel_quantum_model(weights, xx, r) for xx in x]
-
-    plt.plot(x, target_y, c='black', label="true")
-    plt.scatter(x, target_y, facecolor='white', edgecolor='black')
-    plt.plot(x, random_quantum_model_y, c='blue', label="predict")
-    plt.ylim(-1, 1)
-    plt.legend(loc="upper right")
-    plt.show()
-
-不训练的量子线路运行结果为：
-
-.. image:: ./images/parallel_model_result_no_train.png
-   :width: 600 px
-   :align: center
-
-|
-
-
-制作输入数据，定义并行量子模型，并结合VQNet框架的QuantumLayer层构建训练模型。
-
-.. code-block::
-
-    """
-    Quantum Fourier Series
-    """
-    import numpy as np
-
-    from pyvqnet.nn.module import Module
-    from pyvqnet.nn.loss import MeanSquaredError
-    from pyvqnet.optim.adam import Adam
-    from pyvqnet.tensor.tensor import QTensor
-    import pyqpanda as pq
-    from pyvqnet.qnn.measure import expval
-    from pyvqnet.qnn.quantumlayer import QuantumLayer, QuantumLayerMultiProcess
-    import matplotlib.pyplot as plt
-    import matplotlib
-    try:
-        matplotlib.use("TkAgg")
-    except:  # pylint:disable=bare-except
-        print("Can not use matplot TkAgg")
-        pass
-
-    np.random.seed(42)
-
-    degree = 1  # degree of the target function
-    scaling = 1  # scaling of the data
-    coeffs = [0.15 + 0.15j] * degree  # coefficients of non-zero frequencies
-    coeff0 = 0.1  # coefficient of zero frequency
-
-    def target_function(x):
-        """Generate a truncated Fourier series, where the data gets re-scaled."""
-        res = coeff0
-        for idx, coeff in enumerate(coeffs):
-            exponent = np.complex128(scaling * (idx + 1) * x * 1j)
-            conj_coeff = np.conjugate(coeff)
-            res += coeff * np.exp(exponent) + conj_coeff * np.exp(-exponent)
-        return np.real(res)
-
-    x = np.linspace(-6, 6, 70)
-    target_y = np.array([target_function(xx) for xx in x])
-
-    plt.plot(x, target_y, c='black')
-    plt.scatter(x, target_y, facecolor='white', edgecolor='black')
-    plt.ylim(-1, 1)
-    plt.show()
-
-    def S1(x, qubits):
-        cir = pq.QCircuit()
-        for q in qubits:
-            cir.insert(pq.RX(q, x))
-        return cir
-
-    def W1(theta, qubits):
-        cir = pq.QCircuit()
-        for i in range(len(qubits)):
-            cir.insert(pq.RZ(qubits[i], theta[0][i][0]))
-            cir.insert(pq.RY(qubits[i], theta[0][i][1]))
-            cir.insert(pq.RZ(qubits[i], theta[0][i][2]))
-
-        for i in range(len(qubits) - 1):
-            cir.insert(pq.CNOT(qubits[i], qubits[i + 1]))
-        cir.insert(pq.CNOT(qubits[len(qubits) - 1], qubits[0]))
-
-        for i in range(len(qubits)):
-            cir.insert(pq.RZ(qubits[i], theta[1][i][0]))
-            cir.insert(pq.RY(qubits[i], theta[1][i][1]))
-            cir.insert(pq.RZ(qubits[i], theta[1][i][2]))
-
-        cir.insert(pq.CNOT(qubits[0], qubits[len(qubits) - 1]))
-        for i in range(len(qubits) - 1):
-            cir.insert(pq.CNOT(qubits[i + 1], qubits[i]))
-
-        for i in range(len(qubits)):
-            cir.insert(pq.RZ(qubits[i], theta[2][i][0]))
-            cir.insert(pq.RY(qubits[i], theta[2][i][1]))
-            cir.insert(pq.RZ(qubits[i], theta[2][i][2]))
-
-        for i in range(len(qubits) - 1):
-            cir.insert(pq.CNOT(qubits[i], qubits[i + 1]))
-        cir.insert(pq.CNOT(qubits[len(qubits) - 1], qubits[0]))
-
-        return cir
-
-    def q_circuits_loop(x, weights, qubits, clist, machine):
-
-        result = []
-        for xx in x:
-            cir = pq.QCircuit()
-            weights = weights.reshape([2, 3, 3, 3])
-
-            cir.insert(W1(weights[0], qubits))
-            cir.insert(S1(xx, qubits))
-
-            cir.insert(W1(weights[1], qubits))
-            prog = pq.QProg()
-            prog.insert(cir)
-
-            exp_vals = []
-            for position in range(1):
-                pauli_str = {"Z" + str(position): 1.0}
-                exp2 = expval(machine, prog, pauli_str, qubits)
-                exp_vals.append(exp2)
-                result.append(exp2)
-        return result
-
-
-    class Model(Module):
-        def __init__(self):
-            super(Model, self).__init__()
-
-            self.q_fourier_series = QuantumLayer(q_circuits_loop, 2 * 3 * 3 * 3, "CPU", 1)
-
-        def forward(self, x):
-            return self.q_fourier_series(x)
-
-    def run():
-        model = Model()
-
-        optimizer = Adam(model.parameters(), lr=0.01)
-        batch_size = 2
-        epoch = 5
-        loss = MeanSquaredError()
-        print("start training..............")
-        model.train()
-        max_steps = 50
-        for i in range(epoch):
-            sum_loss = 0
-            count = 0
-            for step in range(max_steps):
-                optimizer.zero_grad()
-                # Select batch of data
-                batch_index = np.random.randint(0, len(x), (batch_size,))
-                x_batch = x[batch_index]
-                y_batch = target_y[batch_index]
-                data, label = QTensor([x_batch]), QTensor([y_batch])
-                result = model(data)
-                loss_b = loss(label, result)
-                loss_b.backward()
-                optimizer._step()
-                sum_loss += loss_b.item()
-                count += batch_size
-
-            loss_cout = sum_loss / count
-            print(f"epoch:{i}, #### loss:{loss_cout} ")
-
-            if loss_cout < 0.002:
-                model.eval()
-                predictions = []
-                for xx in x:
-                    data = QTensor([[xx]])
-                    result = model(data)
-                    predictions.append(result.pdata[0])
-
-                plt.plot(x, target_y, c='black', label="true")
-                plt.scatter(x, target_y, facecolor='white', edgecolor='black')
-                plt.plot(x, predictions, c='blue', label="predict")
-                plt.ylim(-1, 1)
-                plt.legend(loc="upper right")
-                plt.show()
-
-
-
-    if __name__ == "__main__":
-        run()
-
-其中量子模型为：
-
-.. image:: ./images/parallel_model_circuit.png
-   :width: 600 px
-   :align: center
-
-|
-
-网络训练结果为：
-
-.. image:: ./images/parallel_model_result.png
-   :width: 600 px
-   :align: center
-
-|
-
-网络训练损失为：
-
-.. code-block::
-
-    start training..............
-    epoch:0, #### loss:0.0037272341538482578
-    epoch:1, #### loss:5.271130586635309e-05
-    epoch:2, #### loss:4.714951917250687e-07
-    epoch:3, #### loss:1.0968826371082763e-08
-    epoch:4, #### loss:2.1258629738507562e-10
 
 
 
