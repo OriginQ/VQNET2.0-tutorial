@@ -61,7 +61,7 @@ VQNet是由本源量子开发的量子机器学习计算框架，它可以用于
     rst/qnn.rst
     rst/utils.rst
     rst/CHANGELOG.rst
-   
+    rst/FAQ.rst
 
 
 

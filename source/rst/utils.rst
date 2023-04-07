@@ -117,7 +117,7 @@ VQNet2ONNX模块 支持将 VQNet 模型以及参数转化到 ONNX 模型格式�
 
     当前不支持QPanda量子线路模块转换为ONNX，仅支持纯经典算子构成的模型。
 
-使用 ``export_model`` 函数导出ONNX 模型。该函数需要两个以上的参数: 包括VQNet构建的模型 ``model`` ， 模型单输入 ``x`` 或多输入 ``*argc``。
+使用 ``export_model`` 函数导出ONNX 模型。该函数需要两个以上的参数: 包括VQNet构建的模型 ``model`` ， 模型单输入 ``x`` 或多输入 ``*args``。
 
 以下是对 `ResNet` 模型的ONNX导出的示例代码，并使用 onnxruntime 进行验证.
 
