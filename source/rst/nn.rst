@@ -137,6 +137,11 @@ state_dict
         #odict_keys(['weights', 'bias'])
 
 
+模型参数保存和载入
+-------------------------------
+
+以下接口可以进行模型参数保存到文件中，或从文件中读取参数文件。但请注意，文件中不保存模型结构，需要用户手动构建模型结构。
+
 save_parameters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -194,10 +199,76 @@ load_parameters
         model_para =  pyvqnet.utils.storage.load_parameters("tmp.model")
         model1.load_state_dict(model_para)
 
+ModuleList
+--------------------------------------------------------------------------------
+
+.. py:class:: pyvqnet.nn.module.ModuleList([pyvqnet.nn.module.Module])
+
+
+    将子模块保存在列表中。 ModuleList 可以像普通的 Python 列表一样被索引， 它包含的Module的内部参数等可以被保存起来。
+
+    :param modules: nn.Modules 列表
+
+    :return: 一个模块列表
+
+    Example::
+    
+        from pyvqnet.tensor import *
+        from pyvqnet.nn import Module,Linear,ModuleList
+        from pyvqnet.qnn import ProbsMeasure,QuantumLayer
+        import pyqpanda as pq
+        def pqctest (input,param,qubits,cubits,m_machine):
+            circuit = pq.QCircuit()
+            circuit.insert(pq.H(qubits[0]))
+            circuit.insert(pq.H(qubits[1]))
+            circuit.insert(pq.H(qubits[2]))
+            circuit.insert(pq.H(qubits[3]))
+
+            circuit.insert(pq.RZ(qubits[0],input[0]))
+            circuit.insert(pq.RZ(qubits[1],input[1]))
+            circuit.insert(pq.RZ(qubits[2],input[2]))
+            circuit.insert(pq.RZ(qubits[3],input[3]))
+
+            circuit.insert(pq.CNOT(qubits[0],qubits[1]))
+            circuit.insert(pq.RZ(qubits[1],param[0]))
+            circuit.insert(pq.CNOT(qubits[0],qubits[1]))
+
+            circuit.insert(pq.CNOT(qubits[1],qubits[2]))
+            circuit.insert(pq.RZ(qubits[2],param[1]))
+            circuit.insert(pq.CNOT(qubits[1],qubits[2]))
+
+            circuit.insert(pq.CNOT(qubits[2],qubits[3]))
+            circuit.insert(pq.RZ(qubits[3],param[2]))
+            circuit.insert(pq.CNOT(qubits[2],qubits[3]))
+            #print(circuit)
+
+            prog = pq.QProg()
+            prog.insert(circuit)
+
+            rlt_prob = ProbsMeasure([0,2],prog,m_machine,qubits)
+            return rlt_prob
+
+
+        class M(Module):
+            def __init__(self):
+                super(M, self).__init__()
+                self.pqc2 = ModuleList([QuantumLayer(pqctest,3,"cpu",4,1), Linear(4,1)
+                ])
+
+            def forward(self, x, *args, **kwargs):
+                y = self.pqc2[0](x)  + self.pqc2[1](x)
+                return y
+
+        mm = M()
+        print(mm.state_dict().keys())
+        #odict_keys(['pqc2.0.m_para', 'pqc2.1.weights', 'pqc2.1.bias'])
 
 
 经典神经网络层
 -------------------------------
+
+以下实现了一些经典神经网络层：卷积，转置卷积，池化，归一化，循环神经网络等。
+
 
 Conv1D
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -1419,6 +1490,12 @@ Dynamic_LSTM
 损失函数层
 ----------------------------------
 
+以下为神经网络常用的损失层。
+
+    .. note::
+
+            请注意，跟pytorch不同等框架不同的是，以下loss函数的前向函数中，第一个参数为标签，第二个参数为预测值。
+
 MeanSquaredError
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -1442,9 +1519,14 @@ MeanSquaredError
 
     均方根误差前向计算函数的所需参数:
 
-        x: :math:`(N, *)` 输入值,其中 :math:`*` 表示任意维度。
+        x: :math:`(N, *)` 预测值,其中 :math:`*` 表示任意维度。
 
         y: :math:`(N, *)`, 目标值, 和输入一样维度的 QTensor 。
+
+
+    .. note::
+
+            请注意，跟pytorch不同等框架不同的是，以下MeanSquaredError函数的前向函数中，第一个参数为目标值，第二个参数为预测值。
 
     Example::
 
@@ -1483,9 +1565,13 @@ BinaryCrossEntropy
 
     平均二元交叉熵误差前向计算函数的所需参数:
 
-        x: :math:`(N, *)` 输入值,其中 :math:`*` 表示任意维度。
+        x: :math:`(N, *)` 预测值,其中 :math:`*` 表示任意维度。
 
         y: :math:`(N, *)`, 目标值,和输入一样维度的 QTensor 。
+
+    .. note::
+
+            请注意，跟pytorch不同等框架不同的是，BinaryCrossEntropy函数的前向函数中，第一个参数为目标值，第二个参数为预测值。
 
     Example::
 
@@ -1519,10 +1605,13 @@ CategoricalCrossEntropy
 
     误差前向计算函数的所需参数:
 
-        x: :math:`(N, *)` 输入值,其中 :math:`*` 表示任意维度。
+        x: :math:`(N, *)` 预测值,其中 :math:`*` 表示任意维度。
 
         y: :math:`(N, *)`, 目标值,和输入一样维度的 QTensor 。
 
+    .. note::
+
+            请注意，跟pytorch不同等框架不同的是，CategoricalCrossEntropy函数的前向函数中，第一个参数为目标值，第二个参数为预测值。
 
     Example::
 
@@ -1555,9 +1644,13 @@ SoftmaxCrossEntropy
 
     误差前向计算函数的所需参数:
 
-        x: :math:`(N, *)` 输入值,其中 :math:`*` 表示任意维度。
+        x: :math:`(N, *)`预测值,其中 :math:`*` 表示任意维度。
 
         y: :math:`(N, *)`, 目标值,和输入一样维度的 QTensor 。
+
+    .. note::
+
+            请注意，跟pytorch不同等框架不同的是，SoftmaxCrossEntropy函数的前向函数中，第一个参数为目标值，第二个参数为预测值。
 
     Example::
 
@@ -1593,9 +1686,13 @@ NLL_Loss
 
     误差前向计算函数的所需参数:
 
-        x: :math:`(N, *)`,损失函数的输出，可以为多维变量。
+        x: :math:`(N, *)`,损失函数的输出预测值，可以为多维变量。
 
-        y: :math:`(N, *)`,损失函数期望的真值。
+        y: :math:`(N, *)`,损失函数目标值。
+
+    .. note::
+
+            请注意，跟pytorch不同等框架不同的是，NLL_Loss函数的前向函数中，第一个参数为目标值，第二个参数为预测值。
 
     Example::
 
@@ -1641,6 +1738,10 @@ CrossEntropyLoss
 
         y: :math:`(N, *)`,损失函数期望的真值。
 
+    .. note::
+
+            请注意，跟pytorch不同等框架不同的是，CrossEntropyLoss函数的前向函数中，第一个参数为目标值，第二个参数为预测值。
+
     Example::
 
         import numpy as np
@@ -1659,6 +1760,7 @@ CrossEntropyLoss
         result = loss_result(y, x)
         print(result)
         #[1.1508200]
+
 
 激活函数
 ----------------------------------

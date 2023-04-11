@@ -51,15 +51,17 @@ QuantumLayer是一个支持量子含参线路作为参数的自动求导模块�
 
         qprog_with_measure (input,param,qubits,cbits,machine)
         
-            `input`: 输入一维经典数据。
+            `input`: 输入一维经典数据。如果没有输入可以输入 None。
             
-            `param`: 输入一维量子线路的参数。
+            `param`: 输入一维的变分量子线路的待训练参数。
             
-            `qubits`: 量子层分配的量子比特。
+            `qubits`: 该QuantumLayer分配的量子比特,类型为pyQpanda.Qubits。
             
-            `cbits`: cbits由QuantumLayer分配。如果线路不使用cbits，也应保留此参数。
+            `cbits`: 由QuantumLayer分配的经典比特，用来辅助测量函数，类型为 pyQpanda.ClassicalCondition。如果线路不使用cbits，也应保留此参数。
             
-            `machine`: QuantumLayer创建的模拟器。
+            `machine`: 由QuantumLayer创建的模拟器，例如CPUQVM,GPUQVM,QCloud等。
+
+        使用QuantumLayer的 `m_para` 属性获取变分量子线路的训练参数。该参数为QTensor类，可使用to_numpy()接口转化为numpy数组。
 
     Example::
 
@@ -135,15 +137,15 @@ QuantumLayerV2
         
         此函数必须包含以下参数作为函数入参（即使某个参数未实际使用），否则无法在QuantumLayerV2中正常运行。
 
-        与QuantumLayer相比。应该分配量子比特和模拟器: https://pyqpanda-toturial.readthedocs.io/zh/latest/QuantumMachine.html,
+        与QuantumLayer相比。该接口传入的变分线路运行函数中，用户应该手动创建量子比特和模拟器: https://pyqpanda-toturial.readthedocs.io/zh/latest/QuantumMachine.html,
 
-        如果qprog_with_measure需要quantum measure，您可能还需要分配cbits: https://pyqpanda-toturial.readthedocs.io/zh/latest/Measure.html
+        如果qprog_with_measure需要quantum measure，用户还需要手动创建需要分配cbits: https://pyqpanda-toturial.readthedocs.io/zh/latest/Measure.html
         
         qprog_with_measure (input,param)
         
-        `input`: 输入一维经典数据。
+        `input`: 输入一维经典数据。如果没有输入可以输入 None。
         
-        `param`: 输入一维量子线路的参数。
+        `param`: 输入一维的变分量子线路的待训练参数。
         
 
     Example::
@@ -219,7 +221,7 @@ QuantumLayerMultiProcess
 
 .. py:class:: pyvqnet.qnn.quantumlayer.QuantumLayerMultiProcess(qprog_with_measure,para_num,machine_type_or_cloud_token,num_of_qubits: int,num_of_cbits: int = 1,diff_method:str = "parameter_shift",delta:float = 0.01)
 
-	变分量子层的抽象计算模块。使用多进程技术对量子线路进行加速。
+    变分量子层的抽象计算模块。使用多进程技术对量子线路进行加速。
     
     该层对一个参数化的量子线路进行仿真，得到测量结果。该变分量子层继承了VQNet框架的梯度计算模块，可以计算线路参数的梯度，训练变分量子线路模型或将变分量子线路嵌入混合量子和经典模型。
 
@@ -237,9 +239,9 @@ QuantumLayerMultiProcess
 
         此函数应包含以下参数，否则无法在QuantumLayerMultiProcess中正常运行。
 
-        与QuantumLayer相比。应该分配量子比特和模拟器: https://pyqpanda-toturial.readthedocs.io/zh/latest/QuantumMachine.html,
+        与QuantumLayerV2类似,该接口传入的变分线路运行函数中，用户应该手动创建量子比特和模拟器: https://pyqpanda-toturial.readthedocs.io/zh/latest/QuantumMachine.html,
 
-        如果qprog_with_measure需要quantum measure，您可能还需要分配cbits: https://pyqpanda-toturial.readthedocs.io/zh/latest/Measure.html
+        如果qprog_with_measure需要quantum measure，用户应该手动创建cbits: https://pyqpanda-toturial.readthedocs.io/zh/latest/Measure.html
 
         qprog_with_measure (input,param)
 
@@ -335,19 +337,19 @@ NoiseQuantumLayer
     .. note::
         qprog_with_measure是pyQPanda中定义的量子线路函数 :https://pyqpanda-toturial.readthedocs.io/zh/latest/QCircuit.html。
         
-        此函数应包含以下参数，否则无法在NoiseQuantumLayer中正常运行。
+        此函数必须包含以下参数作为函数入参（即使某个参数未实际使用），否则无法在NoiseQuantumLayer中正常运行。
         
         qprog_with_measure (input,param,qubits,cbits,machine)
         
-            `input`: 输入一维经典数据。
+            `input`: 输入一维经典数据。如果没有输入可以输入 None。
             
-            `param`: 输入一维量子线路的参数。
+            `param`: 输入一维的变分量子线路的待训练参数。
             
-            `qubits`: 量子层分配的量子比特。
+            `qubits`: 该NoiseQuantumLayer分配的量子比特,类型为pyQpanda.Qubits。
             
-            `cbits`: cbits由QuantumLayer分配。如果线路不使用cbits，也应保留此参数。
+            `cbits`: cbits由NoiseQuantumLayer分配的经典比特，用来辅助测量函数，类型为 pyQpanda.ClassicalCondition。如果线路不使用cbits，也应保留此参数。
             
-            `machine`: QuantumLayer创建的模拟器。
+            `machine`: 由NoiseQuantumLayer创建的模拟器。
 
 
     Example::
