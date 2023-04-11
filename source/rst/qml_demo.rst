@@ -245,11 +245,11 @@ VQC在测试数据上准确率变化情况：
 
 |
 
-2. data re-uploading模型
+2. Data Re-uploading模型
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 在神经网络中，每一个神经元都接受来自上层所有神经元的信息（图a）。与之相对的，单比特量子分类器接受上一个的信息处理单元和输入（图b）。
 通俗地来说，对于传统的量子线路来说，当数据上传完成，可以直接通过若干幺正变换 :math:`U(\theta_1,\theta_2,\theta_3)` 直接得到结果。
-但是在量子数据重上传（Quantum Data Re upLoading，QDRL）任务中，数据在幺正变换之前需要进行重新上传操作。
+但是在量子数据重上传（Quantum Data Re-upLoading，QDRL）任务中，数据在幺正变换之前需要进行重新上传操作。
 
                                             .. centered:: QDRL与经典神经网络原理图对比
 
@@ -6774,7 +6774,7 @@ vqe_func_analytic()函数是使用参数偏移计算理论梯度，vqe_func_shot
         F1.close()
         F2.close()
 		
-对比含噪量子线路与理想量子线路的机器学习模型分类结果，其loss变化情况以及acc变化情况如下：
+对比含噪量子线路与理想量子线路的机器学习模型分类结果，其loss变化情况以及accuary变化情况如下：
 
 .. code-block::
 

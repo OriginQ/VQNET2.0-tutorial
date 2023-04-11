@@ -18,11 +18,6 @@ VQNet可以使用梯度下降法对这类量子机器学习模型进行训练。
 VQNet提供的 ``QuantumLayer`` 以及 ``QuantumLayerV2`` 类已经封装了量子变分线路的自动微分，用户仅需按一定格式定义量子变分线路作为参数构建以上类即可。
 具体可参考本文档相关接口以及示例代码。
 
-**问: 为什么我定义的模型参数在训练时候不更新**
-
-答: 构建VQNet的模型需要保证其中所使用的所有模块是可微分。当模型某个模块无法计算梯度，则会导致该模块以及之前的模块无法使用链式法则计算梯度。
-若用户自定义一个量子变分线路，请使用VQNet提供的 ``QuantumLayer`` 以及 ``QuantumLayerV2`` 接口。对于经典机器学习模块，需要使用 :doc:`./QTensor` 以及 :doc:`./nn` 定义的接口，这些接口封装了梯度计算的函数，VQNet可以进行自动微分。
-
 **问: 在Windows中，安装VQNet遇到错误：“importError: DLL load failed while importing _core: 找不到指定的模块。”**
 
 答: 用户在Windows上可能需要安装VC++ 运行时库。
@@ -36,9 +31,12 @@ VQNet提供的 ``QuantumLayer`` 以及 ``QuantumLayerV2`` 类已经封装了量�
 若用户使用 ``QuantumLayer`` 构建变分量子线路模块，使用 `machine_type_or_cloud_token` 参数输入申请的QCloud token,该模块可内部构建一个云端虚拟机。
 
 
-**问: 使用python List 构建Module为何参数无法训练**
+**问: 为什么我定义的模型参数在训练时候不更新**
 
-答：若用户想在 `Module` 中使用包含多个模块的列表作为子模块，需要使用 pyvqnet.nn.module.ModuleList 代替 List。这样，子模块的训练参数可以被注册到整个模型中，可以进行自动微分训练。以下是例子：
+答: 构建VQNet的模型需要保证其中所使用的所有模块是可微分。当模型某个模块无法计算梯度，则会导致该模块以及之前的模块无法使用链式法则计算梯度。
+若用户自定义一个量子变分线路，请使用VQNet提供的 ``QuantumLayer`` 以及 ``QuantumLayerV2`` 接口。对于经典机器学习模块，需要使用 :doc:`./QTensor` 以及 :doc:`./nn` 定义的接口，这些接口封装了梯度计算的函数，VQNet可以进行自动微分。
+
+若用户想在 `Module` 中使用包含多个模块的列表作为子模块，请不要使用python自带的List，需要使用 pyvqnet.nn.module.ModuleList 代替 List。这样，子模块的训练参数可以被注册到整个模型中，可以进行自动微分训练。以下是例子：
 
     Example::
 
