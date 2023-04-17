@@ -929,7 +929,7 @@ BasicEmbeddingCircuit
         import pyqpanda as pq
         from pyvqnet.qnn.template import BasicEmbeddingCircuit
         input_feat = np.array([0,1,1]).reshape([3])
-        machine = pq.init_quantumachine(pq.QMachineType.CPU)
+        machine = pq.init_quantum_machine(pq.QMachineType.CPU)
 
         qlist = machine.qAlloc_many(3)
         circuit = BasicEmbeddingCircuit(input_feat,qlist)
@@ -968,7 +968,7 @@ AngleEmbeddingCircuit
         import numpy as np
         import pyqpanda as pq
         from pyvqnet.qnn.template import AngleEmbeddingCircuit
-        machine = pq.init_quantumachine(pq.QMachineType.CPU)
+        machine = pq.init_quantum_machine(pq.QMachineType.CPU)
         m_qlist = machine.qAlloc_many(2)
         m_clist = machine.cAlloc_many(2)
         m_prog = pq.QProg()
@@ -980,7 +980,7 @@ AngleEmbeddingCircuit
         print(C)
         C = AngleEmbeddingCircuit(input_feat,m_qlist,'Z')
         print(C)
-        pq.destroy_quantumachine(machine)
+        pq.destroy_quantum_machine(machine)
 
         #           ┌────────────┐
         # q_0:  |0>─┤RX(2.200000)├
@@ -1021,13 +1021,13 @@ AmplitudeEmbeddingCircuit
         import pyqpanda as pq
         from pyvqnet.qnn.template import AmplitudeEmbeddingCircuit
         input_feat = np.array([2.2, 1, 4.5, 3.7])
-        machine = pq.init_quantumachine(pq.QMachineType.CPU)
+        machine = pq.init_quantum_machine(pq.QMachineType.CPU)
         m_qlist = machine.qAlloc_many(2)
         m_clist = machine.cAlloc_many(2)
         m_prog = pq.QProg()
         cir = AmplitudeEmbeddingCircuit(input_feat,m_qlist)
         print(cir)
-        pq.destroy_quantumachine(machine)
+        pq.destroy_quantum_machine(machine)
 
         #                              ┌────────────┐     ┌────────────┐
         # q_0:  |0>─────────────── ─── ┤RY(0.853255)├ ─── ┤RY(1.376290)├
@@ -1056,7 +1056,7 @@ IQPEmbeddingCircuits
         import numpy as np
         import pyqpanda as pq
         from pyvqnet.qnn.template import IQPEmbeddingCircuits
-        machine = pq.init_quantumachine(pq.QMachineType.CPU)
+        machine = pq.init_quantum_machine(pq.QMachineType.CPU)
         input_feat = np.arange(1,100)
         qlist = machine.qAlloc_many(3)
         circuit = IQPEmbeddingCircuits(input_feat,qlist,rep = 1)
@@ -1096,14 +1096,14 @@ RotCircuit
         import pyqpanda as pq
         from pyvqnet.tensor import QTensor
         from pyvqnet.qnn.template import RotCircuit
-        machine = pq.init_quantumachine(pq.QMachineType.CPU)
+        machine = pq.init_quantum_machine(pq.QMachineType.CPU)
         m_clist = machine.cAlloc_many(2)
         m_prog = pq.QProg()
         m_qlist = machine.qAlloc_many(1)
         param = np.array([3,4,5])
         c = RotCircuit(QTensor(param),m_qlist)
         print(c)
-        pq.destroy_quantumachine(machine)
+        pq.destroy_quantum_machine(machine)
 
         #           ┌────────────┐ ┌────────────┐ ┌────────────┐
         # q_0:  |0>─┤RZ(5.000000)├ ┤RY(4.000000)├ ┤RZ(3.000000)├
@@ -1135,7 +1135,7 @@ CRotCircuit
         import pyqpanda as pq
         from pyvqnet.tensor import QTensor
         from pyvqnet.qnn.template import CRotCircuit
-        machine = pq.init_quantumachine(pq.QMachineType.CPU)
+        machine = pq.init_quantum_machine(pq.QMachineType.CPU)
         m_clist = machine.cAlloc_many(2)
         m_prog = pq.QProg()
         m_qlist = machine.qAlloc_many(1)
@@ -1143,7 +1143,7 @@ CRotCircuit
         control_qlist = machine.qAlloc_many(1)
         c = CRotCircuit(QTensor(param),control_qlist,m_qlist)
         print(c)
-        pq.destroy_quantumachine(machine)
+        pq.destroy_quantum_machine(machine)
 
         #           ┌────────────┐ ┌────────────┐ ┌────────────┐
         # q_0:  |0>─┤RZ(5.000000)├ ┤RY(4.000000)├ ┤RZ(3.000000)├
@@ -1178,13 +1178,13 @@ CSWAPcircuit
 
         from pyvqnet.qnn.template import CSWAPcircuit
         import pyqpanda as pq
-        machine = pq.init_quantumachine(pq.QMachineType.CPU)
+        machine = pq.init_quantum_machine(pq.QMachineType.CPU)
 
         m_qlist = machine.qAlloc_many(3)
 
         c = CSWAPcircuit([m_qlist[1],m_qlist[2],m_qlist[0]])
         print(c)
-        pq.destroy_quantumachine(machine)
+        pq.destroy_quantum_machine(machine)
 
         # q_0:  |0>─X─
         #           │
@@ -1719,7 +1719,7 @@ expval
         import pyqpanda as pq
         from pyvqnet.qnn.measure import expval
         input = [0.56, 0.1]
-        machine = pq.init_quantumachine(pq.QMachineType.CPU)
+        machine = pq.init_quantum_machine(pq.QMachineType.CPU)
         m_prog = pq.QProg()
         m_qlist = machine.qAlloc_many(3)
         cir = pq.QCircuit()
@@ -1731,7 +1731,7 @@ expval
         pauli_dict  = {'Z0 X1':10,'Y2':-0.543}
         exp2 = expval(machine,m_prog,pauli_dict,m_qlist)
         print(exp2)
-        pq.destroy_quantumachine(machine)
+        pq.destroy_quantum_machine(machine)
         #0.9983341664682731
 
 QuantumMeasure
@@ -1758,7 +1758,7 @@ QuantumMeasure
         import pyqpanda as pq
         input = [0.56,0.1]
         measure_qubits = [0,2]
-        machine = pq.init_quantumachine(pq.QMachineType.CPU)
+        machine = pq.init_quantum_machine(pq.QMachineType.CPU)
         m_prog = pq.QProg()
         m_qlist = machine.qAlloc_many(3)
 
@@ -1801,7 +1801,7 @@ ProbsMeasure
 
         input = [0.56,0.1]
         measure_qubits = [0,2]
-        machine = pq.init_quantumachine(pq.QMachineType.CPU)
+        machine = pq.init_quantum_machine(pq.QMachineType.CPU)
         m_prog = pq.QProg()
         m_qlist = machine.qAlloc_many(3)
 
