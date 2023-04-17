@@ -1504,7 +1504,7 @@ HardwareEfficientAnsatz
 
         import pyqpanda as pq
         from pyvqnet.tensor import QTensor,tensor
-        from pyvqnet.qnn import HardwareEfficientAnsatz
+        from pyvqnet.qnn.ansatz import HardwareEfficientAnsatz
         machine = pq.CPUQVM()
         machine.init_qvm()
         qlist = machine.qAlloc_many(4)
