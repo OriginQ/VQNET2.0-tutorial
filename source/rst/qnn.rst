@@ -1430,9 +1430,8 @@ QuantumPoolingCircuit
 .. py:function:: pyvqnet.qnn.template.QuantumPoolingCircuit(sources_wires, sinks_wires, params,qubits)
 
     对数据进行降采样的量子电路。
-    为了减少我们电路中的量子位数量，我们首先在我们的系统中创建成对的量子位。
-    在最初配对所有量子位之后，我们将我们的广义 2 量子位酉元应用于每一对。
-    在应用这两个量子位酉元之后，我们会在神经网络的其余部分忽略每对量子位中的一个量子位。
+
+    为了减少电路中的量子位数量，首先在系统中创建成对的量子位。在最初配对所有量子位之后，将广义2量子位酉元应用于每一对量子位上。并在应用这两个量子位酉元之后，在神经网络的其余部分忽略每对量子位中的一个量子位。
 
     :param sources_wires: 将被忽略的源量子位索引。
     :param sinks_wires: 将保留的目标量子位索引。
