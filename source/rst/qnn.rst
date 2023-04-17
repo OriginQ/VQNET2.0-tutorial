@@ -51,15 +51,17 @@ QuantumLayer是一个支持量子含参线路作为参数的自动求导模块�
 
         qprog_with_measure (input,param,qubits,cbits,machine)
         
-            `input`: 输入一维经典数据。
+            `input`: 输入一维经典数据。如果没有输入可以输入 None。
             
-            `param`: 输入一维量子线路的参数。
+            `param`: 输入一维的变分量子线路的待训练参数。
             
-            `qubits`: 量子层分配的量子比特。
+            `qubits`: 该QuantumLayer分配的量子比特,类型为pyQpanda.Qubits。
             
-            `cbits`: cbits由QuantumLayer分配。如果线路不使用cbits，也应保留此参数。
+            `cbits`: 由QuantumLayer分配的经典比特，用来辅助测量函数，类型为 pyQpanda.ClassicalCondition。如果线路不使用cbits，也应保留此参数。
             
-            `machine`: QuantumLayer创建的模拟器。
+            `machine`: 由QuantumLayer创建的模拟器，例如CPUQVM,GPUQVM,QCloud等。
+
+        使用QuantumLayer的 `m_para` 属性获取变分量子线路的训练参数。该参数为QTensor类，可使用to_numpy()接口转化为numpy数组。
 
     Example::
 
@@ -135,15 +137,15 @@ QuantumLayerV2
         
         此函数必须包含以下参数作为函数入参（即使某个参数未实际使用），否则无法在QuantumLayerV2中正常运行。
 
-        与QuantumLayer相比。应该分配量子比特和模拟器: https://pyqpanda-toturial.readthedocs.io/zh/latest/QuantumMachine.html,
+        与QuantumLayer相比。该接口传入的变分线路运行函数中，用户应该手动创建量子比特和模拟器: https://pyqpanda-toturial.readthedocs.io/zh/latest/QuantumMachine.html,
 
-        如果qprog_with_measure需要quantum measure，您可能还需要分配cbits: https://pyqpanda-toturial.readthedocs.io/zh/latest/Measure.html
+        如果qprog_with_measure需要quantum measure，用户还需要手动创建需要分配cbits: https://pyqpanda-toturial.readthedocs.io/zh/latest/Measure.html
         
         qprog_with_measure (input,param)
         
-        `input`: 输入一维经典数据。
+        `input`: 输入一维经典数据。如果没有输入可以输入 None。
         
-        `param`: 输入一维量子线路的参数。
+        `param`: 输入一维的变分量子线路的待训练参数。
         
 
     Example::
@@ -219,7 +221,7 @@ QuantumLayerMultiProcess
 
 .. py:class:: pyvqnet.qnn.quantumlayer.QuantumLayerMultiProcess(qprog_with_measure,para_num,machine_type_or_cloud_token,num_of_qubits: int,num_of_cbits: int = 1,diff_method:str = "parameter_shift",delta:float = 0.01)
 
-	变分量子层的抽象计算模块。使用多进程技术对量子线路进行加速。
+    变分量子层的抽象计算模块。使用多进程技术对量子线路进行加速。
     
     该层对一个参数化的量子线路进行仿真，得到测量结果。该变分量子层继承了VQNet框架的梯度计算模块，可以计算线路参数的梯度，训练变分量子线路模型或将变分量子线路嵌入混合量子和经典模型。
 
@@ -237,9 +239,9 @@ QuantumLayerMultiProcess
 
         此函数应包含以下参数，否则无法在QuantumLayerMultiProcess中正常运行。
 
-        与QuantumLayer相比。应该分配量子比特和模拟器: https://pyqpanda-toturial.readthedocs.io/zh/latest/QuantumMachine.html,
+        与QuantumLayerV2类似,该接口传入的变分线路运行函数中，用户应该手动创建量子比特和模拟器: https://pyqpanda-toturial.readthedocs.io/zh/latest/QuantumMachine.html,
 
-        如果qprog_with_measure需要quantum measure，您可能还需要分配cbits: https://pyqpanda-toturial.readthedocs.io/zh/latest/Measure.html
+        如果qprog_with_measure需要quantum measure，用户应该手动创建cbits: https://pyqpanda-toturial.readthedocs.io/zh/latest/Measure.html
 
         qprog_with_measure (input,param)
 
@@ -335,19 +337,19 @@ NoiseQuantumLayer
     .. note::
         qprog_with_measure是pyQPanda中定义的量子线路函数 :https://pyqpanda-toturial.readthedocs.io/zh/latest/QCircuit.html。
         
-        此函数应包含以下参数，否则无法在NoiseQuantumLayer中正常运行。
+        此函数必须包含以下参数作为函数入参（即使某个参数未实际使用），否则无法在NoiseQuantumLayer中正常运行。
         
         qprog_with_measure (input,param,qubits,cbits,machine)
         
-            `input`: 输入一维经典数据。
+            `input`: 输入一维经典数据。如果没有输入可以输入 None。
             
-            `param`: 输入一维量子线路的参数。
+            `param`: 输入一维的变分量子线路的待训练参数。
             
-            `qubits`: 量子层分配的量子比特。
+            `qubits`: 该NoiseQuantumLayer分配的量子比特,类型为pyQpanda.Qubits。
             
-            `cbits`: cbits由QuantumLayer分配。如果线路不使用cbits，也应保留此参数。
+            `cbits`: cbits由NoiseQuantumLayer分配的经典比特，用来辅助测量函数，类型为 pyQpanda.ClassicalCondition。如果线路不使用cbits，也应保留此参数。
             
-            `machine`: QuantumLayer创建的模拟器。
+            `machine`: 由NoiseQuantumLayer创建的模拟器。
 
 
     Example::
@@ -927,7 +929,7 @@ BasicEmbeddingCircuit
         import pyqpanda as pq
         from pyvqnet.qnn.template import BasicEmbeddingCircuit
         input_feat = np.array([0,1,1]).reshape([3])
-        machine = pq.init_quantumachine(pq.QMachineType.CPU)
+        machine = pq.init_quantum_machine(pq.QMachineType.CPU)
 
         qlist = machine.qAlloc_many(3)
         circuit = BasicEmbeddingCircuit(input_feat,qlist)
@@ -966,7 +968,7 @@ AngleEmbeddingCircuit
         import numpy as np
         import pyqpanda as pq
         from pyvqnet.qnn.template import AngleEmbeddingCircuit
-        machine = pq.init_quantumachine(pq.QMachineType.CPU)
+        machine = pq.init_quantum_machine(pq.QMachineType.CPU)
         m_qlist = machine.qAlloc_many(2)
         m_clist = machine.cAlloc_many(2)
         m_prog = pq.QProg()
@@ -978,7 +980,7 @@ AngleEmbeddingCircuit
         print(C)
         C = AngleEmbeddingCircuit(input_feat,m_qlist,'Z')
         print(C)
-        pq.destroy_quantumachine(machine)
+        pq.destroy_quantum_machine(machine)
 
         #           ┌────────────┐
         # q_0:  |0>─┤RX(2.200000)├
@@ -1019,13 +1021,13 @@ AmplitudeEmbeddingCircuit
         import pyqpanda as pq
         from pyvqnet.qnn.template import AmplitudeEmbeddingCircuit
         input_feat = np.array([2.2, 1, 4.5, 3.7])
-        machine = pq.init_quantumachine(pq.QMachineType.CPU)
+        machine = pq.init_quantum_machine(pq.QMachineType.CPU)
         m_qlist = machine.qAlloc_many(2)
         m_clist = machine.cAlloc_many(2)
         m_prog = pq.QProg()
         cir = AmplitudeEmbeddingCircuit(input_feat,m_qlist)
         print(cir)
-        pq.destroy_quantumachine(machine)
+        pq.destroy_quantum_machine(machine)
 
         #                              ┌────────────┐     ┌────────────┐
         # q_0:  |0>─────────────── ─── ┤RY(0.853255)├ ─── ┤RY(1.376290)├
@@ -1054,7 +1056,7 @@ IQPEmbeddingCircuits
         import numpy as np
         import pyqpanda as pq
         from pyvqnet.qnn.template import IQPEmbeddingCircuits
-        machine = pq.init_quantumachine(pq.QMachineType.CPU)
+        machine = pq.init_quantum_machine(pq.QMachineType.CPU)
         input_feat = np.arange(1,100)
         qlist = machine.qAlloc_many(3)
         circuit = IQPEmbeddingCircuits(input_feat,qlist,rep = 1)
@@ -1094,14 +1096,14 @@ RotCircuit
         import pyqpanda as pq
         from pyvqnet.tensor import QTensor
         from pyvqnet.qnn.template import RotCircuit
-        machine = pq.init_quantumachine(pq.QMachineType.CPU)
+        machine = pq.init_quantum_machine(pq.QMachineType.CPU)
         m_clist = machine.cAlloc_many(2)
         m_prog = pq.QProg()
         m_qlist = machine.qAlloc_many(1)
         param = np.array([3,4,5])
         c = RotCircuit(QTensor(param),m_qlist)
         print(c)
-        pq.destroy_quantumachine(machine)
+        pq.destroy_quantum_machine(machine)
 
         #           ┌────────────┐ ┌────────────┐ ┌────────────┐
         # q_0:  |0>─┤RZ(5.000000)├ ┤RY(4.000000)├ ┤RZ(3.000000)├
@@ -1133,7 +1135,7 @@ CRotCircuit
         import pyqpanda as pq
         from pyvqnet.tensor import QTensor
         from pyvqnet.qnn.template import CRotCircuit
-        machine = pq.init_quantumachine(pq.QMachineType.CPU)
+        machine = pq.init_quantum_machine(pq.QMachineType.CPU)
         m_clist = machine.cAlloc_many(2)
         m_prog = pq.QProg()
         m_qlist = machine.qAlloc_many(1)
@@ -1141,7 +1143,7 @@ CRotCircuit
         control_qlist = machine.qAlloc_many(1)
         c = CRotCircuit(QTensor(param),control_qlist,m_qlist)
         print(c)
-        pq.destroy_quantumachine(machine)
+        pq.destroy_quantum_machine(machine)
 
         #           ┌────────────┐ ┌────────────┐ ┌────────────┐
         # q_0:  |0>─┤RZ(5.000000)├ ┤RY(4.000000)├ ┤RZ(3.000000)├
@@ -1176,13 +1178,13 @@ CSWAPcircuit
 
         from pyvqnet.qnn.template import CSWAPcircuit
         import pyqpanda as pq
-        machine = pq.init_quantumachine(pq.QMachineType.CPU)
+        machine = pq.init_quantum_machine(pq.QMachineType.CPU)
 
         m_qlist = machine.qAlloc_many(3)
 
         c = CSWAPcircuit([m_qlist[1],m_qlist[2],m_qlist[0]])
         print(c)
-        pq.destroy_quantumachine(machine)
+        pq.destroy_quantum_machine(machine)
 
         # q_0:  |0>─X─
         #           │
@@ -1428,9 +1430,8 @@ QuantumPoolingCircuit
 .. py:function:: pyvqnet.qnn.template.QuantumPoolingCircuit(sources_wires, sinks_wires, params,qubits)
 
     对数据进行降采样的量子电路。
-    为了减少我们电路中的量子位数量，我们首先在我们的系统中创建成对的量子位。
-    在最初配对所有量子位之后，我们将我们的广义 2 量子位酉元应用于每一对。
-    在应用这两个量子位酉元之后，我们会在神经网络的其余部分忽略每对量子位中的一个量子位。
+
+    为了减少电路中的量子位数量，首先在系统中创建成对的量子位。在最初配对所有量子位之后，将广义2量子位酉元应用于每一对量子位上。并在应用这两个量子位酉元之后，在神经网络的其余部分忽略每对量子位中的一个量子位。
 
     :param sources_wires: 将被忽略的源量子位索引。
     :param sinks_wires: 将保留的目标量子位索引。
@@ -1503,7 +1504,7 @@ HardwareEfficientAnsatz
 
         import pyqpanda as pq
         from pyvqnet.tensor import QTensor,tensor
-        from pyvqnet.qnn import HardwareEfficientAnsatz
+        from pyvqnet.qnn.ansatz import HardwareEfficientAnsatz
         machine = pq.CPUQVM()
         machine.init_qvm()
         qlist = machine.qAlloc_many(4)
@@ -1717,7 +1718,7 @@ expval
         import pyqpanda as pq
         from pyvqnet.qnn.measure import expval
         input = [0.56, 0.1]
-        machine = pq.init_quantumachine(pq.QMachineType.CPU)
+        machine = pq.init_quantum_machine(pq.QMachineType.CPU)
         m_prog = pq.QProg()
         m_qlist = machine.qAlloc_many(3)
         cir = pq.QCircuit()
@@ -1729,7 +1730,7 @@ expval
         pauli_dict  = {'Z0 X1':10,'Y2':-0.543}
         exp2 = expval(machine,m_prog,pauli_dict,m_qlist)
         print(exp2)
-        pq.destroy_quantumachine(machine)
+        pq.destroy_quantum_machine(machine)
         #0.9983341664682731
 
 QuantumMeasure
@@ -1756,7 +1757,7 @@ QuantumMeasure
         import pyqpanda as pq
         input = [0.56,0.1]
         measure_qubits = [0,2]
-        machine = pq.init_quantumachine(pq.QMachineType.CPU)
+        machine = pq.init_quantum_machine(pq.QMachineType.CPU)
         m_prog = pq.QProg()
         m_qlist = machine.qAlloc_many(3)
 
@@ -1799,7 +1800,7 @@ ProbsMeasure
 
         input = [0.56,0.1]
         measure_qubits = [0,2]
-        machine = pq.init_quantumachine(pq.QMachineType.CPU)
+        machine = pq.init_quantum_machine(pq.QMachineType.CPU)
         m_prog = pq.QProg()
         m_qlist = machine.qAlloc_many(3)
 

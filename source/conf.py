@@ -78,7 +78,7 @@ pdf_documents = [
   ('index',u'HanLP Handbook',u'hankcs'),]
  
 # A comma-separated list of custom stylesheets. Example:
-pdf_stylesheets = ['a3','zh_CN']
+pdf_stylesheets = ['a3']
  
 # Create a compressed PDF
 # Use True/False or 1/0
@@ -88,8 +88,7 @@ pdf_stylesheets = ['a3','zh_CN']
 # A colon-separated list of folders to search for fonts. Example:
 pdf_font_path = ['C:\\Windows\\Fonts']
  
-# Language to be used for hyphenation support
-pdf_language = "zh_CN"
+
  
 # Mode for literal blocks wider than the frame. Can be
 # overflow,shrink or truncate

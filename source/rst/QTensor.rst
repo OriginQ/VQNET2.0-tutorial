@@ -1,7 +1,7 @@
 QTensor 模块
 ==============
 
-VQNet量子机器学习所使用的数据结构QTensor的python接口文档。QTensor支持常用的多维矩阵的操作包括创建函数，数学函数，逻辑函数，矩阵变换等。
+VQNet量子机器学习所使用的数据结构QTensor的python接口介绍。QTensor支持常用的多维张量的操作，例如创建函数，数学函数，逻辑函数，矩阵变换等。
 
 
 
@@ -66,7 +66,7 @@ __init__
 ndim
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:method:: QTensor.ndim
+.. py:attribute:: QTensor.ndim
 
     返回张量的维度的个数。
         
@@ -85,7 +85,7 @@ ndim
 shape
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:method:: QTensor.shape
+.. py:attribute:: QTensor.shape
 
     返回张量的维度
     
@@ -104,7 +104,7 @@ shape
 size
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:method:: QTensor.size
+.. py:attribute:: QTensor.size
 
     返回张量的元素个数。
     
@@ -2850,6 +2850,58 @@ not_equal
 
 矩阵操作
 --------------------------
+
+broadcast
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:function:: pyvqnet.tensor.broadcast(t1: pyvqnet.tensor.QTensor, t2: pyvqnet.tensor.QTensor)
+
+    受到某些限制，较小的阵列在整个更大的阵列，以便它们具有兼容的形状。该接口可对入参张量进行自动微分。
+
+    参考https://numpy.org/doc/stable/user/basics.broadcasting.html
+
+    :param t1: 输入 QTensor 1
+    :param t2: 输入 QTensor 2
+
+    :return t11: 具有新的广播形状 t1。
+    :return t22: 具有新广播形状的 t2。
+
+    Example::
+
+        from pyvqnet.tensor import *
+        t1 = ones([5,4])
+        t2 = ones([4])
+
+        t11, t22 = tensor.broadcast(t1, t2)
+
+        print(t11.shape)
+        print(t22.shape)
+
+
+        t1 = ones([5,4])
+        t2 = ones([1])
+
+        t11, t22 = tensor.broadcast(t1, t2)
+
+        print(t11.shape)
+        print(t22.shape)
+
+
+        t1 = ones([5,4])
+        t2 = ones([2,1,4])
+
+        t11, t22 = tensor.broadcast(t1, t2)
+
+        print(t11.shape)
+        print(t22.shape)
+
+
+        # [5, 4]
+        # [5, 4]
+        # [5, 4]
+        # [5, 4]
+        # [2, 5, 4]
+        # [2, 5, 4]
 
 select
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
