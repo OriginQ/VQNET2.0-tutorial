@@ -141,12 +141,11 @@ QuantumLayerV2
 
         如果qprog_with_measure需要quantum measure，用户还需要手动创建需要分配cbits: https://pyqpanda-toturial.readthedocs.io/zh/latest/Measure.html
         
-        qprog_with_measure (input,param)
+        量子线路函数 qprog_with_measure (input,param,nqubits,ncubits)的使用可参考下面的例子。
         
-        `input`: 输入一维经典数据。如果没有输入可以输入 None。
+        `input`: 输入一维经典数据。如果没有，输入 None。
         
         `param`: 输入一维的变分量子线路的待训练参数。
-        
 
     Example::
 
@@ -221,13 +220,13 @@ QuantumLayerMultiProcess
 
 .. py:class:: pyvqnet.qnn.quantumlayer.QuantumLayerMultiProcess(qprog_with_measure,para_num,machine_type_or_cloud_token,num_of_qubits: int,num_of_cbits: int = 1,diff_method:str = "parameter_shift",delta:float = 0.01)
 
-    变分量子层的抽象计算模块。使用多进程技术对量子线路进行加速。
+    变分量子层的抽象计算模块。使用多进程技术对一个批次数据计算梯度时候的量子线路进行加速。对于线路深度较少的线路，该层的多线程加速效果并不明显。
     
     该层对一个参数化的量子线路进行仿真，得到测量结果。该变分量子层继承了VQNet框架的梯度计算模块，可以计算线路参数的梯度，训练变分量子线路模型或将变分量子线路嵌入混合量子和经典模型。
 
     :param qprog_with_measure: 用pyQPanda构建的量子线路运行和测量函数。
     :param para_num: `int` - 参数个数。
-    :param machine_type_or_cloud_token: qpanda量子虚拟机类型或pyQPanda 量子云令牌 : https://pyqpanda-toturial.readthedocs.io/zh/latest/Realchip.html。
+    :param machine_type_or_cloud_token: qpanda量子虚拟机类型,当前仅支持 `'cpu'` 。
     :param num_of_qubits: 量子比特数。
     :param num_of_cbits: 经典比特数，默认为1。
     :param diff_method: 求解量子线路参数梯度的方法，“参数位移”或“有限差分”，默认参数偏移。
@@ -243,12 +242,15 @@ QuantumLayerMultiProcess
 
         如果qprog_with_measure需要quantum measure，用户应该手动创建cbits: https://pyqpanda-toturial.readthedocs.io/zh/latest/Measure.html
 
-        qprog_with_measure (input,param)
+        量子线路函数 qprog_with_measure (input,param,nqubits,ncubits)的使用可参考下面的例子。对于线路深度较少的线路，该层的多线程加速效果并不明显。
 
         `input`: 输入一维经典数据。
 
         `param`: 输入一维量子线路的参数。
 
+        `nqubits`: 预先设定的量子比特数量。如果没有，输入 0。
+
+        `ncubits`: 预先设定的经典比特数量。如果没有，输入 0。
 
     Example::
 
@@ -257,6 +259,7 @@ QuantumLayerMultiProcess
         from pyvqnet.qnn.quantumlayer import QuantumLayerMultiProcess
         import numpy as np
         from pyvqnet.tensor import QTensor
+
         def pqctest (input,param,nqubits,ncubits):
             machine = pq.CPUQVM()
             machine.init_qvm()
