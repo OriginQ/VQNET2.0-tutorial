@@ -94,6 +94,7 @@ Model中使用 :ref:`QuantumLayer` 类这个可进行自动微分的量子计算
     from pyvqnet.optim.sgd import SGD
     from pyvqnet.nn.loss import CategoricalCrossEntropy
     from pyvqnet.tensor.tensor import QTensor
+    from pyvqnet.data import data_generator as dataloader
     import pyqpanda as pq
     from pyvqnet.qnn.quantumlayer import QuantumLayer
     from pyqpanda import *
@@ -130,14 +131,6 @@ Model中使用 :ref:`QuantumLayer` 类这个可进行自动微分的量子计算
     0, 0, 0, 1, 1,
     0, 0, 1, 0, 1,
     0, 0, 1, 1, 0]
-    def dataloader(data,label,batch_size, shuffle = True)->np:
-        if shuffle:
-            for _ in range(len(data)//batch_size):
-                random_index = np.random.randint(0, len(data), (batch_size, 1))
-                yield data[random_index].reshape(batch_size,-1),label[random_index].reshape(batch_size,-1)
-        else:
-            for i in range(0,len(data)-batch_size+1,batch_size):
-                yield data[i:i+batch_size], label[i:i+batch_size]
 
     def get_data(dataset_str):
         if dataset_str == "train":
@@ -263,59 +256,59 @@ VQC在测试数据上准确率变化情况：
 
     """
     Parameterized quantum circuit for Quantum Data Re-upLoading
-
-    
     """
-    import os
+
     import sys
+    sys.path.insert(0, "../")
+    import numpy as np
     from pyvqnet.nn.linear import Linear
     from pyvqnet.qnn.qdrl.vqnet_model import vmodel
-    from pyvqnet import _core as vcore
     from pyvqnet.optim import sgd
-    from pyvqnet.nn import loss
     from pyvqnet.nn.loss import CategoricalCrossEntropy
-    #hyperparameters
     from pyvqnet.tensor.tensor import QTensor
-    from pyvqnet.tensor import tensor
-    import matplotlib
-    matplotlib.use('TkAgg')
-    import matplotlib.pyplot as plt
-    import numpy as np
-    np.random.seed(42)
     from pyvqnet.nn.module import Module
-    num_layers =  3
-    params = np.random.uniform(size=(num_layers, 3))
-    class Model(Module):
+    import matplotlib.pyplot as plt
+    import matplotlib
+    from pyvqnet.data import data_generator as get_minibatch_data
+    try:
+        matplotlib.use("TkAgg")
+    except:  #pylint:disable=bare-except
+        print("Can not use matplot TkAgg")
+        pass
 
+    np.random.seed(42)
+
+    num_layers = 3
+    params = np.random.uniform(size=(num_layers, 3))
+
+
+    class Model(Module):
         def __init__(self):
 
             super(Model, self).__init__()
             self.pqc = vmodel(params.shape)
+            self.fc2 = Linear(2, 2)
+
         def forward(self, x):
             x = self.pqc(x)
             return x
 
 
-    def circle(samples:int,  reps =  np.sqrt(1/2)) :
+    def circle(samples: int, reps=np.sqrt(1 / 2)):
         data_x, data_y = [], []
-        for i in range(samples):
+        for _ in range(samples):
             x = np.random.rand(2)
-            y = [0,1]
+            y = [0, 1]
             if np.linalg.norm(x) < reps:
-                y = [1,0]
+                y = [1, 0]
             data_x.append(x)
             data_y.append(y)
         return np.array(data_x), np.array(data_y)
 
-    def plot_data(x, y, fig=None, ax=None):
-        """
-        Plot data with red/blue values for a binary classification.
 
-        Args:
-            x (array[tuple]): array of data points as tuples
-            y (array[int]): array of data points as tuples
-        """
-        if fig == None:
+    def plot_data(x, y, fig=None, ax=None):
+
+        if fig is None:
             fig, ax = plt.subplots(1, 1, figsize=(5, 5))
         reds = y == 0
         blues = y == 1
@@ -324,66 +317,76 @@ VQC在测试数据上准确率变化情况：
         ax.set_xlabel("$x_1$")
         ax.set_ylabel("$x_2$")
 
-    def get_minibatch_data(x_data, label, batch_size):
-        for i in range(0,x_data.data.shape[0]-batch_size+1,batch_size):
-            yield x_data.data.select(["{}:{}".format(i,i+batch_size)]), label.data.select(["{}:{}".format(i,i+batch_size)]).reshape([batch_size,2])
-
 
     def get_score(pred, label):
         pred, label = np.array(pred.data), np.array(label.data)
-        score = np.sum(np.argmax(pred,axis=1) == np.argmax(label,1))
+        score = np.sum(np.argmax(pred, axis=1) == np.argmax(label, 1))
         return score
 
-    model = Model()
-    optimizer = sgd.SGD(model.parameters(),lr =1)
 
-    batch_size = 5
+    model = Model()
+    optimizer = sgd.SGD(model.parameters(), lr=1)
+
+
     def train():
+        """
+        Main function for train qdrl model
+        """
+        batch_size = 5
         model.train()
         x_train, y_train = circle(500)
         x_train = np.hstack((x_train, np.ones((x_train.shape[0], 1))))  # 500*3
-        x_train, y_train = QTensor(x_train),QTensor(y_train)
+
         epoch = 10
         print("start training...........")
         for i in range(epoch):
             accuracy = 0
             count = 0
             loss = 0
-            for data, label in get_minibatch_data(x_train, y_train,batch_size):
+            for data, label in get_minibatch_data(x_train, y_train, batch_size):
                 optimizer.zero_grad()
 
-                data,label = QTensor(data), QTensor(label)
+                data, label = QTensor(data), QTensor(label)
+
                 output = model(data)
-                Closs = CategoricalCrossEntropy()
-                losss = Closs(label, output)
+
+                loss_fun = CategoricalCrossEntropy()
+                losss = loss_fun(label, output)
+
                 losss.backward()
+
                 optimizer._step()
-                accuracy += get_score(output,label)
+                accuracy += get_score(output, label)
+
                 loss += losss.item()
-                print(f"epoch:{i}, train_accuracy:{accuracy}")
-                print(f"epoch:{i}, train_loss:{losss.data.getdata()}")
+                # print(f"epoch:{i}, train_accuracy:{accuracy}")
+                # print(f"epoch:{i}, train_loss:{losss}")
                 count += batch_size
 
             print(f"epoch:{i}, train_accuracy_for_each_batch:{accuracy/count}")
             print(f"epoch:{i}, train_loss_for_each_batch:{loss/count}")
 
+
     def test():
+        batch_size = 5
         model.eval()
         print("start eval...................")
         x_test, y_test = circle(500)
         test_accuracy = 0
         count = 0
         x_test = np.hstack((x_test, np.ones((x_test.shape[0], 1))))
-        x_test, y_test = QTensor(x_test), QTensor(y_test)
-        for test_data, test_label in get_minibatch_data(x_test,y_test, batch_size):
 
-            test_data, test_label = QTensor(test_data),QTensor(test_label)
+        for test_data, test_label in get_minibatch_data(x_test, y_test,
+                                                        batch_size):
+
+            test_data, test_label = QTensor(test_data), QTensor(test_label)
             output = model(test_data)
             test_accuracy += get_score(output, test_label)
             count += batch_size
         print(f"test_accuracy:{test_accuracy/count}")
 
-    if __name__=="__main__":
+
+    if __name__ == "__main__":
         train()
         test()
 
@@ -429,387 +432,315 @@ VSQL中各个量子比特上的局部量子线路图如下：
 
     """
 
-    import os
-    import sys
-    sys.path.insert(0,'../')
-    from pyvqnet.nn.module import Module
-    from pyvqnet.nn.loss import CategoricalCrossEntropy
-    from pyvqnet.optim.adam import Adam
-    from pyvqnet.data.data import data_generator
-    from pyvqnet.tensor import tensor
-    import numpy as np
+        import sys
+        sys.path.insert(0, "../")
+        import os
+        import os.path
+        import struct
+        import gzip
+        from pyvqnet.nn.module import Module
+        from pyvqnet.nn.loss import CategoricalCrossEntropy
+        from pyvqnet.optim.adam import Adam
+        from pyvqnet.data.data import data_generator
+        from pyvqnet.tensor import tensor
+        from pyvqnet.qnn.measure import expval
+        from pyvqnet.qnn.quantumlayer import QuantumLayer
+        from pyvqnet.qnn.template import AmplitudeEmbeddingCircuit
+        from pyvqnet.nn.linear import Linear
+        import numpy as np
+        import pyqpanda as pq
+        import matplotlib.pyplot as plt
+        import matplotlib
+        try:
+            matplotlib.use("TkAgg")
+        except:  #pylint:disable=bare-except
+            print("Can not use matplot TkAgg")
+            pass
 
-    import pyqpanda as pq
-    import matplotlib
-    try:
-        matplotlib.use('TkAgg')
-    except:
-        pass
-    import matplotlib.pyplot as plt
+        try:
+            import urllib.request
+        except ImportError:
+            raise ImportError("You should use Python 3.x")
 
-    from pyvqnet.qnn.measure import expval
-    from pyvqnet.qnn.quantumlayer import QuantumLayer
-    from pyvqnet.qnn.template import AmplitudeEmbeddingCircuit
-    from pyvqnet.nn.linear import Linear
-
-    try:
-        import urllib.request
-    except ImportError:
-        raise ImportError('You should use Python 3.x')
-    import os.path
-    import gzip
-
-    url_base = 'http://yann.lecun.com/exdb/mnist/'
-    key_file = {
-        'train_img':'train-images-idx3-ubyte.gz',
-        'train_label':'train-labels-idx1-ubyte.gz',
-        'test_img':'t10k-images-idx3-ubyte.gz',
-        'test_label':'t10k-labels-idx1-ubyte.gz'
-    }
+        url_base = "http://yann.lecun.com/exdb/mnist/"
+        key_file = {
+            "train_img": "train-images-idx3-ubyte.gz",
+            "train_label": "train-labels-idx1-ubyte.gz",
+            "test_img": "t10k-images-idx3-ubyte.gz",
+            "test_label": "t10k-labels-idx1-ubyte.gz"
+        }
 
 
+        def _download(dataset_dir, file_name):
+            """
+            Download function for mnist dataset file
+            """
+            file_path = dataset_dir + "/" + file_name
 
-    def _download(dataset_dir,file_name):
-        file_path = dataset_dir + "/" + file_name
-        
-        if os.path.exists(file_path):
-            with gzip.GzipFile(file_path) as f:
-                file_path_ungz = file_path[:-3].replace('\\', '/')
-                if not os.path.exists(file_path_ungz):
-                    open(file_path_ungz,"wb").write(f.read())
-            return
-
-        print("Downloading " + file_name + " ... ")
-        urllib.request.urlretrieve(url_base + file_name, file_path)
-        if os.path.exists(file_path):
-                with gzip.GzipFile(file_path) as f:
-                    file_path_ungz = file_path[:-3].replace('\\', '/')
-                    file_path_ungz = file_path_ungz.replace('-idx', '.idx')
+            if os.path.exists(file_path):
+                with gzip.GzipFile(file_path) as file:
+                    file_path_ungz = file_path[:-3].replace("\\", "/")
                     if not os.path.exists(file_path_ungz):
-                        open(file_path_ungz,"wb").write(f.read())
-        print("Done")
-        
-    def download_mnist(dataset_dir):
-        for v in key_file.values():
-            _download(dataset_dir,v)
+                        open(file_path_ungz, "wb").write(file.read())
+                return
 
-    if not os.path.exists("./result"):
-        os.makedirs("./result")
-    else:
-        pass
+            print("Downloading " + file_name + " ... ")
+            urllib.request.urlretrieve(url_base + file_name, file_path)
+            if os.path.exists(file_path):
+                with gzip.GzipFile(file_path) as file:
+                    file_path_ungz = file_path[:-3].replace("\\", "/")
+                    file_path_ungz = file_path_ungz.replace("-idx", ".idx")
+                    if not os.path.exists(file_path_ungz):
+                        open(file_path_ungz, "wb").write(file.read())
+            print("Done")
 
-    def circuits_of_vsql(input,weights,qlist,clist,machine):
-        
-        n = 10
-        n_qsc=2
-        depth=1
-        weights = weights.reshape([depth + 1, 3, n_qsc])
-        
-        def subcir(weights,qlist,depth,n_qsc,n_start):
-            cir = pq.QCircuit()
 
-            for i in range(n_qsc):
-                cir.insert(pq.RX(qlist[n_start + i],weights[0][0][i] ))
-                cir.insert(pq.RY(qlist[n_start + i],weights[0][1][i]))
-                cir.insert(pq.RX(qlist[n_start + i],weights[0][2][i]))
-            for repeat in range(1, depth + 1):
-                for i in range(n_qsc - 1):
-                    cir.insert(pq.CNOT(qlist[n_start + i], qlist[n_start + i + 1]))
-                cir.insert(pq.CNOT(qlist[n_start + n_qsc - 1],qlist[ n_start]))
-                for i in range(n_qsc):
-                    cir.insert(pq.RY(qlist[ n_start + i], weights[repeat][1][i]))
+        def download_mnist(dataset_dir):
+            for v in key_file.values():
+                _download(dataset_dir, v)
 
-            return cir
-        def get_pauli_str(n_start, n_qsc=2):
-            pauli_str = ','.join('X' + str(i) for i in range(n_start, n_start + n_qsc))
-            return {pauli_str:1.0}
-        
-        f_i = []
 
-        for st in range(n - n_qsc + 1):
-            psd = get_pauli_str(st,n_qsc)
-            cir = pq.QCircuit()
-            cir.insert(AmplitudeEmbeddingCircuit(input,qlist))
-            cir.insert(subcir(weights,qlist,depth,n_qsc,st))
-            prog = pq.QProg()
-            prog.insert(cir)
-            
-            f_ij = expval(machine,prog,psd,qlist)
-            f_i.append(f_ij)
-        f_i = np.array(f_i)
-        return f_i
-
-    #GLOBAL VAR    
-    n = 10
-    n_qsc = 2
-    depth = 1
-    class QModel(Module):
-        def __init__(self):
-            super().__init__()
-            self.vq = QuantumLayer(circuits_of_vsql,(depth + 1)*3* n_qsc,"cpu",10)
-            self.fc = Linear(n - n_qsc + 1, 2)
-        def forward(self, x):
-            x = self.vq(x)
-            x = self.fc(x)
-
-            return x
-            
-    class Model(Module):
-
-        def __init__(self):
-            super().__init__()
-            self.fc1 = Linear(input_channels=28*28,output_channels=2)
-            
-        def forward(self, x):
-
-            x = tensor.flatten(x,1)
-            x = self.fc1(x)
-            return x
-
-    def load_mnist(dataset="training_data", digits=np.arange(2), path="./"):         # 下载数据
-        import os, struct
-        from array import array as pyarray
-        download_mnist(path)
-        if dataset == "training_data":
-            fname_image = os.path.join(path, 'train-images.idx3-ubyte').replace('\\', '/')
-            fname_label = os.path.join(path, 'train-labels.idx1-ubyte').replace('\\', '/')
-        elif dataset == "testing_data":
-            fname_image = os.path.join(path, 't10k-images.idx3-ubyte').replace('\\', '/')
-            fname_label = os.path.join(path, 't10k-labels.idx1-ubyte').replace('\\', '/')
+        if not os.path.exists("./result"):
+            os.makedirs("./result")
         else:
-            raise ValueError("dataset must be 'training_data' or 'testing_data'")
-
-        flbl = open(fname_label, 'rb')
-        magic_nr, size = struct.unpack(">II", flbl.read(8))
-
-        lbl = pyarray("b", flbl.read())
-        flbl.close()
-
-        fimg = open(fname_image, 'rb')
-        magic_nr, size, rows, cols = struct.unpack(">IIII", fimg.read(16))
-        img = pyarray("B", fimg.read())
-        fimg.close()
-
-        ind = [k for k in range(size) if lbl[k] in digits]
-        N = len(ind)
-        images = np.zeros((N, rows, cols))
-
-        labels = np.zeros((N, 1), dtype=int)
-        for i in range(len(ind)):
-            images[i] = np.array(img[ind[i] * rows * cols: (ind[i] + 1) * rows * cols]).reshape((rows, cols))
-            labels[i] = lbl[ind[i]]
-
-        return images, labels
-
-    def show_image():
-        image, label = load_mnist()
-        for img in range(len(image)):
-            plt.imshow(image[img])
-            plt.show()
-
-    """
-    compared classic fc model
-    """
-    def run_fc01():
-
-        digits = [0,1]
-        x_train, y_train = load_mnist("training_data",digits)                     
-        x_train = x_train / 255                                             
+            pass
 
 
-        y_train = y_train.reshape(-1, 1)      
-        y_train = np.eye(len(digits))[y_train].reshape(-1, len(digits)) 
-                    
-        x_test, y_test = load_mnist("testing_data",digits)    
-        x_test = x_test / 255
-        y_test = y_test.reshape(-1, 1)  
-        y_test = np.eye(len(digits))[y_test].reshape(-1, len(digits)) 
-        
+        def circuits_of_vsql(x, weights, qlist, clist, machine):  #pylint:disable=unused-argument
+            """
+            VSQL model of quantum circuits
+            """
+            weights = weights.reshape([depth + 1, 3, n_qsc])
 
-        x_train = x_train[:500]        
-        y_train = y_train[:500] 
-                    
-        x_test = x_test[:100]                       
-        y_test = y_test[:100]                       
-        print("model start")
-        model = Model()
+            def subcir(weights, qlist, depth, n_qsc, n_start):  #pylint:disable=redefined-outer-name
+                cir = pq.QCircuit()
 
-        optimizer = Adam(model.parameters(),lr=0.01)                        
+                for i in range(n_qsc):
+                    cir.insert(pq.RX(qlist[n_start + i], weights[0][0][i]))
+                    cir.insert(pq.RY(qlist[n_start + i], weights[0][1][i]))
+                    cir.insert(pq.RX(qlist[n_start + i], weights[0][2][i]))
+                for repeat in range(1, depth + 1):
+                    for i in range(n_qsc - 1):
+                        cir.insert(pq.CNOT(qlist[n_start + i], qlist[n_start + i + 1]))
+                    cir.insert(pq.CNOT(qlist[n_start + n_qsc - 1], qlist[n_start]))
+                    for i in range(n_qsc):
+                        cir.insert(pq.RY(qlist[n_start + i], weights[repeat][1][i]))
 
-        model.train()
-        F1 = open("./result/qfcrlt.txt","w")
-        for epoch in range(1,20):
+                return cir
 
-            model.train()
-            full_loss = 0
-            n_loss = 0
-            n_eval =0
-            batch_size = 128
-            correct = 0
-            iter = 0
-            for x, y in data_generator(x_train, y_train, batch_size=batch_size, shuffle=True):#shuffle batch rather than data
-                
-                optimizer.zero_grad()
-                
-                try:
-                    x = x.reshape(batch_size, 1, 28, 28)
-                except:
-                    x = x.reshape(-1,1,28,28) 
+            def get_pauli_str(n_start, n_qsc):  #pylint:disable=redefined-outer-name
+                pauli_str = ",".join("X" + str(i)
+                                    for i in range(n_start, n_start + n_qsc))
+                return {pauli_str: 1.0}
 
-                output = model(x)
-                iter +=1
-                
-                CCEloss = CategoricalCrossEntropy()
-                loss = CCEloss( y,output)    
-                loss.backward()
-                optimizer._step()
+            f_i = []
+            origin_in = AmplitudeEmbeddingCircuit(x, qlist)
+            for st in range(n - n_qsc + 1):
+                psd = get_pauli_str(st, n_qsc)
+                cir = pq.QCircuit()
+                cir.insert(origin_in)
+                cir.insert(subcir(weights, qlist, depth, n_qsc, st))
+                prog = pq.QProg()
+                prog.insert(cir)
 
-                full_loss += loss.item()
-                n_loss += batch_size
-                np_output = np.array(output.data,copy=False)
-                mask  = np_output.argmax(1) == y.argmax(1)
-                correct += sum(mask)
+                f_ij = expval(machine, prog, psd, qlist)
+                f_i.append(f_ij)
+            f_i = np.array(f_i)
+            return f_i
 
 
-            print(f"Train Accuracy: {correct/n_loss}%")
-            print(f"Epoch: {epoch}, Loss: {full_loss / n_loss}")
-            F1.write(f"{epoch}\t{full_loss / n_loss:.4f}\t{correct/n_loss:.4f}\t")
-            
-        # Evaluation
-            model.eval()
-            print("eval")
-            correct = 0
-            full_loss = 0
-            n_loss = 0
-            n_eval = 0
-            batch_size = 1
-            for x, y in data_generator(x_test, y_test, batch_size=batch_size, shuffle=True):
-                x = x.reshape(1, 1, 28, 28)
-                output = model(x)
+        #GLOBAL VAR
+        n = 10
+        n_qsc = 2
+        depth = 1
 
-                CCEloss = CategoricalCrossEntropy()
-                
-                loss = CCEloss( y,output)
 
-                full_loss += loss.item()
-                np_output = np.array(output.data,copy=False)
-                mask  = np_output.argmax(1) == y.argmax(1)
-                correct += sum(mask)
-                n_eval += 1
-                n_loss += 1
+        class QModel(Module):
+            """
+            Model of VSQL
+            """
+            def __init__(self):
+                super().__init__()
+                self.vq = QuantumLayer(circuits_of_vsql, (depth + 1) * 3 * n_qsc,
+                                    "cpu", 10)
+                self.fc = Linear(n - n_qsc + 1, 2)
 
-            print(f"Eval Accuracy: {correct/n_eval}")
-            F1.write(f"{full_loss / n_loss:.4f}\t{correct/n_eval:.4f}\n")
-                
-        F1.close()
-        del model
-        print("\ndone\n")
+            def forward(self, x):
+                x = self.vq(x)
+                x = self.fc(x)
 
-    """
-    VQSL MODEL
-    """
-    def run_VSQL():
-        digits = [0,1]
-        x_train, y_train = load_mnist("training_data",digits)                     
-        x_train = x_train / 255                                             
-        y_train = y_train.reshape(-1, 1)         
-        y_train = np.eye(len(digits))[y_train].reshape(-1, len(digits))          
-        x_test, y_test = load_mnist("testing_data",digits)    
-        x_test = x_test / 255
-        y_test = y_test.reshape(-1, 1)  
-        y_test = np.eye(len(digits))[y_test].reshape(-1, len(digits))    
-        
-        x_train_list =[]
-        x_test_list = []
-        for i in range(x_train.shape[0]):
-            x_train_list.append(np.pad(x_train[i,:,:].flatten(),(0, 240), constant_values=(0, 0)))
-        x_train = np.array(x_train_list)
-        
-        for i in range(x_test.shape[0]):
-            x_test_list.append(np.pad(x_test[i,:,:].flatten(),(0, 240), constant_values=(0, 0)))
+                return x
 
-        x_test = np.array(x_test_list)
 
-        x_train = x_train[:500]        
-        y_train = y_train[:500] 
-                    
-        x_test = x_test[:100]                       
-        y_test = y_test[:100]                       
-        print("model start")
-        model = QModel()
+        class Model(Module):
+            def __init__(self):
+                super().__init__()
+                self.fc1 = Linear(input_channels=28 * 28, output_channels=2)
 
-        optimizer = Adam(model.parameters(),lr=0.1)                        
+            def forward(self, x):
 
-        model.train()
-        F1 = open("./result/vqslrlt.txt","w")
-        for epoch in range(1,20):
+                x = tensor.flatten(x, 1)
+                x = self.fc1(x)
+                return x
+
+
+        def load_mnist(dataset="training_data", digits=np.arange(2), path="./"):
+            """
+            load mnist data
+            """
+            from array import array as pyarray
+            download_mnist(path)
+            if dataset == "training_data":
+                fname_image = os.path.join(path, "train-images.idx3-ubyte").replace(
+                    "\\", "/")
+                fname_label = os.path.join(path, "train-labels.idx1-ubyte").replace(
+                    "\\", "/")
+            elif dataset == "testing_data":
+                fname_image = os.path.join(path, "t10k-images.idx3-ubyte").replace(
+                    "\\", "/")
+                fname_label = os.path.join(path, "t10k-labels.idx1-ubyte").replace(
+                    "\\", "/")
+            else:
+                raise ValueError("dataset must be 'training_data' or 'testing_data'")
+
+            flbl = open(fname_label, "rb")
+            _, size = struct.unpack(">II", flbl.read(8))
+
+            lbl = pyarray("b", flbl.read())
+            flbl.close()
+
+            fimg = open(fname_image, "rb")
+            _, size, rows, cols = struct.unpack(">IIII", fimg.read(16))
+            img = pyarray("B", fimg.read())
+            fimg.close()
+
+            ind = [k for k in range(size) if lbl[k] in digits]
+            num = len(ind)
+            images = np.zeros((num, rows, cols), dtype=np.float32)
+
+            labels = np.zeros((num, 1), dtype=int)
+            for i in range(len(ind)):
+                images[i] = np.array(img[ind[i] * rows * cols:(ind[i] + 1) * rows *
+                                        cols]).reshape((rows, cols))
+                labels[i] = lbl[ind[i]]
+
+            return images, labels
+
+
+        def run_vsql():
+            """
+            VQSL MODEL
+            """
+            digits = [0, 1]
+            x_train, y_train = load_mnist("training_data", digits)
+            x_train = x_train / 255
+            y_train = y_train.reshape(-1, 1)
+            y_train = np.eye(len(digits))[y_train].reshape(-1, len(digits)).astype(
+                np.int64)
+            x_test, y_test = load_mnist("testing_data", digits)
+            x_test = x_test / 255
+            y_test = y_test.reshape(-1, 1)
+            y_test = np.eye(len(digits))[y_test].reshape(-1,
+                                                        len(digits)).astype(np.int64)
+
+            x_train_list = []
+            x_test_list = []
+            for i in range(x_train.shape[0]):
+                x_train_list.append(
+                    np.pad(x_train[i, :, :].flatten(), (0, 240),
+                        constant_values=(0, 0)))
+            x_train = np.array(x_train_list)
+
+            for i in range(x_test.shape[0]):
+                x_test_list.append(
+                    np.pad(x_test[i, :, :].flatten(), (0, 240),
+                        constant_values=(0, 0)))
+
+            x_test = np.array(x_test_list)
+
+            x_train = x_train[:500]
+            y_train = y_train[:500]
+
+            x_test = x_test[:100]
+            y_test = y_test[:100]
+            print("model start")
+            model = QModel()
+
+            optimizer = Adam(model.parameters(), lr=0.1)
 
             model.train()
-            full_loss = 0
-            n_loss = 0
-            n_eval =0
-            batch_size = 1
-            correct = 0
-            iter = 0
-            for x, y in data_generator(x_train, y_train, batch_size=batch_size, shuffle=True):
-                optimizer.zero_grad()
-                try:
-                    x = x.reshape(batch_size, 1024)
-                except:
-                    x = x.reshape(-1,1024) 
+            result_file = open("./result/vqslrlt.txt", "w")
+            for epoch in range(1, 3):
 
-                output = model(x)
-                iter +=1
-                
-                CCEloss = CategoricalCrossEntropy()
-                loss = CCEloss( y,output)
-                loss.backward()
-                optimizer._step()
+                model.train()
+                full_loss = 0
+                n_loss = 0
+                n_eval = 0
+                batch_size = 1
+                correct = 0
+                for x, y in data_generator(x_train,
+                                        y_train,
+                                        batch_size=batch_size,
+                                        shuffle=True):
+                    optimizer.zero_grad()
+                    try:
+                        x = x.reshape(batch_size, 1024)
+                    except:  #pylint:disable=bare-except
+                        x = x.reshape(-1, 1024)
 
-                full_loss += loss.item()
-                n_loss += batch_size
-                np_output = np.array(output.data,copy=False)
-                mask  = np_output.argmax(1) == y.argmax(1)
-                correct += sum(mask)
-                print(f"{iter}")
-            print(f"Train Accuracy: {correct/n_loss}%")
-            print(f"Epoch: {epoch}, Loss: {full_loss / n_loss}")
-            F1.write(f"{epoch}\t{full_loss / n_loss}\t{correct/n_loss}\t")
-            
-        # Evaluation
-            model.eval()
-            print("eval")
-            correct = 0
-            full_loss = 0
-            n_loss = 0
-            n_eval = 0
-            batch_size = 1
-            for x, y in data_generator(x_test, y_test, batch_size=batch_size, shuffle=True):
-                x = x.reshape(1, 1024)
-                output = model(x)
+                    output = model(x)
+                    cceloss = CategoricalCrossEntropy()
+                    loss = cceloss(y, output)
+                    loss.backward()
+                    optimizer._step()
 
-                CCEloss = CategoricalCrossEntropy()
-                loss = CCEloss( y,output)
-                full_loss += loss.item()
+                    full_loss += loss.item()
+                    n_loss += batch_size
+                    np_output = np.array(output.data, copy=False)
+                    mask = np_output.argmax(1) == y.argmax(1)
+                    correct += sum(mask)
+                    print(f" n_loss {n_loss} Train Accuracy: {correct/n_loss} ")
+                print(f"Train Accuracy: {correct/n_loss} ")
+                print(f"Epoch: {epoch}, Loss: {full_loss / n_loss}")
+                result_file.write(f"{epoch}\t{full_loss / n_loss}\t{correct/n_loss}\t")
 
-                np_output = np.array(output.data,copy=False)
-                mask  = np_output.argmax(1) == y.argmax(1)
-                correct += sum(mask)
-                n_eval += 1
-                n_loss += 1
-                
-            print(f"Eval Accuracy: {correct/n_eval}")
-            F1.write(f"{full_loss / n_loss}\t{correct/n_eval}\n")
-            
-        
-        F1.close()
-        del model
-        print("\ndone vqsl\n")
+                # Evaluation
+                model.eval()
+                print("eval")
+                correct = 0
+                full_loss = 0
+                n_loss = 0
+                n_eval = 0
+                batch_size = 1
+                for x, y in data_generator(x_test,
+                                        y_test,
+                                        batch_size=batch_size,
+                                        shuffle=True):
+                    x = x.reshape(1, 1024)
+                    output = model(x)
+
+                    cceloss = CategoricalCrossEntropy()
+                    loss = cceloss(y, output)
+                    full_loss += loss.item()
+
+                    np_output = np.array(output.data, copy=False)
+                    mask = np_output.argmax(1) == y.argmax(1)
+                    correct += sum(mask)
+                    n_eval += 1
+                    n_loss += 1
+
+                print(f"Eval Accuracy: {correct/n_eval}")
+                result_file.write(f"{full_loss / n_loss}\t{correct/n_eval}\n")
+
+            result_file.close()
+            del model
+            print("\ndone vqsl\n")
 
 
-    if __name__ == '__main__':
-        
-        run_VSQL()
+        if __name__ == "__main__":
+
+            run_vsql()
+
 
 VSQL在测试数据上准确率变化情况：
 
@@ -970,13 +901,6 @@ Mnist数据集定义
 
         return images, labels
 
-
-    def show_image():
-        image, _ = load_mnist()
-        for img in range(len(image)):
-            plt.imshow(image[img])
-            plt.show()
-
 模型定义与运行函数定义
 
 .. code-block::
@@ -1056,8 +980,6 @@ Mnist数据集定义
                 n_loss += batch_size
                 np_output = np.array(output.data, copy=False)
                 mask = np_output.argmax(1) == y
-                print(np_output.argmax(1))
-                print(y)
 
                 correct += sum(mask)
                 print(f"correct {correct}")
@@ -1252,7 +1174,6 @@ QAE量子线路：
 
     def run2():
         ##load dataset
-        #x_train,x_test,y_train,y_test = load_mnist("training_data")                      # 下载训练数据
 
         x_train, y_train = load_mnist("training_data")                      # 下载训练数据
         x_train = x_train / 255                                             # 将数据进行归一化处理[0,1]
@@ -1322,7 +1243,6 @@ QAE量子线路：
             print(f"Epoch: {epoch}, Loss: {loss_output}")
             loss_list.append(loss_output)
 
-            # F1.write(f"{epoch}\t{full_loss / n_loss}\t{correct/n_loss}\t")
 
             # Evaluation
             model.eval()
@@ -1390,31 +1310,37 @@ Quantum circuit structure learning任务的核心目标就是找到最优的带�
     """
     Quantum Circuits Strcture Learning Demo
 
-    
     """
 
-    import os
     import sys
-    
+    sys.path.insert(0,"../")
+
+    import copy
     import pyqpanda as pq
     from pyvqnet.tensor.tensor import QTensor
-    from pyvqnet.nn.module import Module
-    import numpy as np
-    from pyvqnet._core import Tensor as CoreTensor
-    import copy
     from pyvqnet.qnn.measure import expval
+    import numpy as np
+    import matplotlib.pyplot as plt
+    import matplotlib
+    try:
+        matplotlib.use("TkAgg")
+    except:  #pylint:disable=bare-except
+        print("Can not use matplot TkAgg")
+        pass
+
     machine = pq.CPUQVM()
     machine.init_qvm()
     nqbits = machine.qAlloc_many(2)
 
-    def gen(param:CoreTensor,generators,qbits,circuit):
+    def gen(param, generators, qbits, circuit):
         if generators == "X":
-            circuit.insert(pq.RX(qbits,param))
-        elif generators =="Y":
-            circuit.insert(pq.RY(qbits,param))
+            circuit.insert(pq.RX(qbits, param))
+        elif generators == "Y":
+            circuit.insert(pq.RY(qbits, param))
         else:
-            circuit.insert(pq.RZ(qbits,param))
-    def circuits(params,generators,circuit):
+            circuit.insert(pq.RZ(qbits, param))
+
+    def circuits(params, generators, circuit):
         gen(params[0], generators[0], nqbits[0], circuit)
         gen(params[1], generators[1], nqbits[1], circuit)
         circuit.insert(pq.CNOT(nqbits[0], nqbits[1]))
@@ -1422,69 +1348,80 @@ Quantum circuit structure learning任务的核心目标就是找到最优的带�
         prog.insert(circuit)
         return prog
 
-    def ansatz1(params:QTensor,generators):
+    def ansatz1(params: QTensor, generators):
         circuit = pq.QCircuit()
-        params = params.data.getdata()
-        prog = circuits(params,generators,circuit)
-        return expval(machine,prog,{"Z0":1},nqbits), expval(machine,prog,{"Y1":1},nqbits)
-
-    def ansatz2(params:QTensor,generators):
-        circuit = pq.QCircuit()
-        params = params.data.getdata()
+        params = params.to_numpy()
         prog = circuits(params, generators, circuit)
-        return expval(machine,prog,{"X0":1},nqbits)
+        return expval(machine, prog, {"Z0": 1},
+                    nqbits), expval(machine, prog, {"Y1": 1}, nqbits)
 
-    def loss(params,generators):
-        Z, Y = ansatz1(params,generators)
-        X = ansatz2(params,generators)
-        return 0.5 * Y + 0.8 * Z - 0.2 * X
 
-    def rotosolve(d, params, generators, cost, M_0):  # M_0 only calculated once
+    def ansatz2(params: QTensor, generators):
+        circuit = pq.QCircuit()
+        params = params.to_numpy()
+        prog = circuits(params, generators, circuit)
+        return expval(machine, prog, {"X0": 1}, nqbits)
+
+
+    def loss(params, generators):
+        z, y = ansatz1(params, generators)
+        x = ansatz2(params, generators)
+        return 0.5 * y + 0.8 * z - 0.2 * x
+
+
+    def rotosolve(d, params, generators, cost, M_0):#pylint:disable=invalid-name
+        """
+        rotosolve algorithm implementation
+        """
         params[d] = np.pi / 2.0
-        M_0_plus = cost(QTensor(params), generators)
+        m0_plus = cost(QTensor(params), generators)
         params[d] = -np.pi / 2.0
-        M_0_minus = cost(QTensor(params), generators)
-        a = np.arctan2(
-            2.0 * M_0 - M_0_plus - M_0_minus, M_0_plus - M_0_minus
-        )  # returns value in (-pi,pi]
+        m0_minus = cost(QTensor(params), generators)
+        a = np.arctan2(2.0 * M_0 - m0_plus - m0_minus,
+                    m0_plus - m0_minus)  # returns value in (-pi,pi]
         params[d] = -np.pi / 2.0 - a
         if params[d] <= -np.pi:
             params[d] += 2 * np.pi
         return cost(QTensor(params), generators)
 
-    def optimal_theta_and_gen_helper(index,params,generators):
+
+    def optimal_theta_and_gen_helper(index, params, generators):
+        """
+        find optimal varaibles
+        """
         params[index] = 0.
-        M_0 = loss(QTensor(params),generators)#init value
-        for kind in ["X","Y","Z"]:
+        m0 = loss(QTensor(params), generators)  #init value
+        for kind in ["X", "Y", "Z"]:
             generators[index] = kind
-            params_cost = rotosolve(index, params, generators, loss, M_0)
+            params_cost = rotosolve(index, params, generators, loss, m0)
             if kind == "X" or params_cost <= params_opt_cost:
                 params_opt_d = params[index]
                 params_opt_cost = params_cost
                 generators_opt_d = kind
         return params_opt_d, generators_opt_d
 
-    def rotoselect_cycle(params:np,generators):
-        for index in range(params.shape[0]):
-            params[index], generators[index] = optimal_theta_and_gen_helper(index,params,generators)
-        return params,generators
 
-    params = QTensor(np.array([0.3,0.25]))
-    params = params.data.getdata()
-    generator = ["X","Y"]
+    def rotoselect_cycle(params: np, generators):
+        for index in range(params.shape[0]):
+            params[index], generators[index] = optimal_theta_and_gen_helper(
+                index, params, generators)
+        return params, generators
+
+
+    params = QTensor(np.array([0.3, 0.25]))
+    params = params.to_numpy()
+    generator = ["X", "Y"]
     generators = copy.deepcopy(generator)
     epoch = 20
     state_save = []
     for i in range(epoch):
         state_save.append(loss(QTensor(params), generators))
-        params, generators = rotoselect_cycle(params,generators)
+        params, generators = rotoselect_cycle(params, generators)
 
     print("Optimal generators are: {}".format(generators))
+    print("Optimal params are: {}".format(params))
     steps = np.arange(0, epoch)
 
-    import matplotlib
-    matplotlib.use('TkAgg')
-    import matplotlib.pyplot as plt
 
     plt.plot(steps, state_save, "o-")
     plt.title("rotoselect")
@@ -1493,6 +1430,7 @@ Quantum circuit structure learning任务的核心目标就是找到最优的带�
     plt.yticks(np.arange(-1.25, 0.80, 0.25))
     plt.tight_layout()
     plt.show()
+
 
 运行上述代码得到的量子线路结构。可见为一个 :math:`RX`,一个 :math:`RY`
 
@@ -1960,77 +1898,76 @@ Quantum circuit structure learning任务的核心目标就是找到最优的带�
     """
 
     import os
-    import sys
-    sys.path.insert(0,'../')
+    import os.path
+    import gzip
+    import struct
     import numpy as np
-    import matplotlib.pyplot as plt
-
+    import sys
+    sys.path.insert(0,"../")
     from pyvqnet.nn.module import Module
     from pyvqnet.nn.linear import Linear
     from pyvqnet.nn.conv import Conv2D
     from pyvqnet.utils.storage import load_parameters, save_parameters
-
     from pyvqnet.nn import activation as F
     from pyvqnet.nn.pooling import MaxPool2D
 
-    from pyvqnet.nn.batch_norm import BatchNorm2d
     from pyvqnet.nn.loss import SoftmaxCrossEntropy
-
     from pyvqnet.optim.sgd import SGD
     from pyvqnet.optim.adam import Adam
     from pyvqnet.data.data import data_generator
     from pyvqnet.tensor import tensor
     from pyvqnet.tensor.tensor import QTensor
-    import pyqpanda as pq
-    from pyqpanda import *
-    import matplotlib
-    from pyvqnet.nn.module import *
-    from pyvqnet.utils.initializer import *
     from pyvqnet.qnn.quantumlayer import QuantumLayer
-
+    import pyqpanda as pq
+    import matplotlib.pyplot as plt
+    import matplotlib
     try:
-        matplotlib.use('TkAgg')
-    except:
+        matplotlib.use("TkAgg")
+    except:  #pylint:disable=bare-except
+        print("Can not use matplot TkAgg")
         pass
 
     try:
         import urllib.request
     except ImportError:
-        raise ImportError('You should use Python 3.x')
-    import os.path
-    import gzip
+        raise ImportError("You should use Python 3.x")
 
-    url_base = 'http://yann.lecun.com/exdb/mnist/'
+    url_base = "http://yann.lecun.com/exdb/mnist/"
     key_file = {
-        'train_img':'train-images-idx3-ubyte.gz',
-        'train_label':'train-labels-idx1-ubyte.gz',
-        'test_img':'t10k-images-idx3-ubyte.gz',
-        'test_label':'t10k-labels-idx1-ubyte.gz'
+        "train_img": "train-images-idx3-ubyte.gz",
+        "train_label": "train-labels-idx1-ubyte.gz",
+        "test_img": "t10k-images-idx3-ubyte.gz",
+        "test_label": "t10k-labels-idx1-ubyte.gz"
     }
 
-    def _download(dataset_dir,file_name):
+
+    def _download(dataset_dir, file_name):
+        """
+        Download dataset
+        """
         file_path = dataset_dir + "/" + file_name
-        
+
         if os.path.exists(file_path):
-            with gzip.GzipFile(file_path) as f:
-                file_path_ungz = file_path[:-3].replace('\\', '/')
+            with gzip.GzipFile(file_path) as file:
+                file_path_ungz = file_path[:-3].replace("\\", "/")
                 if not os.path.exists(file_path_ungz):
-                    open(file_path_ungz,"wb").write(f.read())
+                    open(file_path_ungz, "wb").write(file.read())
             return
 
         print("Downloading " + file_name + " ... ")
         urllib.request.urlretrieve(url_base + file_name, file_path)
         if os.path.exists(file_path):
-                with gzip.GzipFile(file_path) as f:
-                    file_path_ungz = file_path[:-3].replace('\\', '/')
-                    file_path_ungz = file_path_ungz.replace('-idx', '.idx')
-                    if not os.path.exists(file_path_ungz):
-                        open(file_path_ungz,"wb").write(f.read())
+            with gzip.GzipFile(file_path) as file:
+                file_path_ungz = file_path[:-3].replace("\\", "/")
+                file_path_ungz = file_path_ungz.replace("-idx", ".idx")
+                if not os.path.exists(file_path_ungz):
+                    open(file_path_ungz, "wb").write(file.read())
         print("Done")
-        
+
+
     def download_mnist(dataset_dir):
         for v in key_file.values():
-            _download(dataset_dir,v)
+            _download(dataset_dir, v)
 
 
     IF_PLOT = False
@@ -2038,27 +1975,43 @@ Quantum circuit structure learning任务的核心目标就是找到最优的带�
         os.makedirs("./result")
     else:
         pass
-    # classical CNN
+
     class CNN(Module):
+        """
+        Classical CNN
+        """
         def __init__(self):
             super(CNN, self).__init__()
 
-            self.conv1 = Conv2D(input_channels=1, output_channels=16, kernel_size=(3, 3), stride=(1, 1), padding="valid")
-            self.BatchNorm2d1 = BatchNorm2d(16)
-            self.Relu1 = F.ReLu()
+            self.conv1 = Conv2D(input_channels=1,
+                                output_channels=16,
+                                kernel_size=(3, 3),
+                                stride=(1, 1),
+                                padding="valid")
+            self.relu1 = F.ReLu()
 
-            self.conv2 = Conv2D(input_channels=16, output_channels=32, kernel_size=(3, 3), stride=(1, 1), padding="valid")
-            self.BatchNorm2d2 = BatchNorm2d(32)
-            self.Relu2 = F.ReLu()
+            self.conv2 = Conv2D(input_channels=16,
+                                output_channels=32,
+                                kernel_size=(3, 3),
+                                stride=(1, 1),
+                                padding="valid")
+            self.relu2 = F.ReLu()
             self.maxpool2 = MaxPool2D([2, 2], [2, 2], padding="valid")
 
-            self.conv3 = Conv2D(input_channels=32, output_channels=64, kernel_size=(3, 3), stride=(1, 1), padding="valid")
-            self.BatchNorm2d3 = BatchNorm2d(64)
-            self.Relu3 = F.ReLu()
+            self.conv3 = Conv2D(input_channels=32,
+                                output_channels=64,
+                                kernel_size=(3, 3),
+                                stride=(1, 1),
+                                padding="valid")
+            self.relu3 = F.ReLu()
 
-            self.conv4 = Conv2D(input_channels=64, output_channels=128, kernel_size=(3, 3), stride=(1, 1), padding="valid")
-            self.BatchNorm2d4 = BatchNorm2d(128)
-            self.Relu4 = F.ReLu()
+            self.conv4 = Conv2D(input_channels=64,
+                                output_channels=128,
+                                kernel_size=(3, 3),
+                                stride=(1, 1),
+                                padding="valid")
+
+            self.relu4 = F.ReLu()
             self.maxpool4 = MaxPool2D([2, 2], [2, 2], padding="valid")
 
             self.fc1 = Linear(input_channels=128 * 4 * 4, output_channels=1024)
@@ -2067,59 +2020,77 @@ Quantum circuit structure learning任务的核心目标就是找到最优的带�
 
         def forward(self, x):
 
-            x = self.Relu1(self.conv1(x))
-            x = self.maxpool2(self.Relu2(self.conv2(x)))
-            x = self.Relu3(self.conv3(x))
-            x = self.maxpool4(self.Relu4(self.conv4(x)))
-            x = tensor.flatten(x, 1)  
-            x = F.ReLu()(self.fc1(x))  # 1 64
-            x = F.ReLu()(self.fc2(x))  # 1 64
-            x = self.fc3(x)  # 1 1
+            x = self.relu1(self.conv1(x))
+
+            x = self.maxpool2(self.relu2(self.conv2(x)))
+
+            x = self.relu3(self.conv3(x))
+
+            x = self.maxpool4(self.relu4(self.conv4(x)))
+
+            x = tensor.flatten(x, 1)
+            x = F.ReLu()(self.fc1(x))
+
+            x = F.ReLu()(self.fc2(x))
+
+            x = self.fc3(x)
+
             return x
 
-    def load_mnist(dataset="training_data", digits=np.arange(2), path="./"):         # 下载数据
-        import os, struct
+
+    def load_mnist(dataset="training_data",
+                digits=np.arange(2),
+                path="./"):
+        """
+        Load mnist data
+        """
         from array import array as pyarray
         download_mnist(path)
         if dataset == "training_data":
-            fname_image = os.path.join(path, 'train-images.idx3-ubyte').replace('\\', '/')
-            fname_label = os.path.join(path, 'train-labels.idx1-ubyte').replace('\\', '/')
+            fname_image = os.path.join(path, "train-images.idx3-ubyte").replace(
+                "\\", "/")
+            fname_label = os.path.join(path, "train-labels.idx1-ubyte").replace(
+                "\\", "/")
         elif dataset == "testing_data":
-            fname_image = os.path.join(path, 't10k-images.idx3-ubyte').replace('\\', '/')
-            fname_label = os.path.join(path, 't10k-labels.idx1-ubyte').replace('\\', '/')
+            fname_image = os.path.join(path, "t10k-images.idx3-ubyte").replace(
+                "\\", "/")
+            fname_label = os.path.join(path, "t10k-labels.idx1-ubyte").replace(
+                "\\", "/")
         else:
             raise ValueError("dataset must be 'training_data' or 'testing_data'")
 
-        flbl = open(fname_label, 'rb')
-        magic_nr, size = struct.unpack(">II", flbl.read(8))
+        flbl = open(fname_label, "rb")
+        _, size = struct.unpack(">II", flbl.read(8))
         lbl = pyarray("b", flbl.read())
         flbl.close()
 
-        fimg = open(fname_image, 'rb')
-        magic_nr, size, rows, cols = struct.unpack(">IIII", fimg.read(16))
+        fimg = open(fname_image, "rb")
+        _, size, rows, cols = struct.unpack(">IIII", fimg.read(16))
         img = pyarray("B", fimg.read())
         fimg.close()
 
         ind = [k for k in range(size) if lbl[k] in digits]
-        N = len(ind)
-        images = np.zeros((N, rows, cols))
-        labels = np.zeros((N, 1), dtype=int)
+        num = len(ind)
+        images = np.zeros((num, rows, cols))
+        labels = np.zeros((num, 1), dtype=int)
         for i in range(len(ind)):
-            images[i] = np.array(img[ind[i] * rows * cols: (ind[i] + 1) * rows * cols]).reshape((rows, cols))
+            images[i] = np.array(img[ind[i] * rows * cols:(ind[i] + 1) * rows *
+                                    cols]).reshape((rows, cols))
             labels[i] = lbl[ind[i]]
 
         return images, labels
 
 
-    """
-    to get cnn model parameters for transfer learning
-    """
+    train_size = 50
+    eval_size = 2
+    EPOCHES = 10
 
-    train_size = 10000
-    eval_size = 1000
-    EPOCHES = 100
-    def classcal_cnn_model_making():
-        # load train data
+
+    def classcal_cnn_model_training():
+        """
+        load train data
+        """
+
         x_train, y_train = load_mnist("training_data", digits=np.arange(10))
         x_test, y_test = load_mnist("testing_data", digits=np.arange(10))
 
@@ -2142,11 +2113,14 @@ Quantum circuit structure learning任务的核心目标就是找到最优的带�
         loss_list = []
         model.train()
 
-        SAVE_FLAG = True
+        save_flag = True
         temp_loss = 0
         for epoch in range(1, epochs):
             total_loss = []
-            for x, y in data_generator(x_train, y_train, batch_size=4, shuffle=True):
+            for x, y in data_generator(x_train,
+                                    y_train,
+                                    batch_size=4,
+                                    shuffle=True):
 
                 x = x.reshape(-1, 1, 28, 28)
                 optimizer.zero_grad()
@@ -2166,15 +2140,14 @@ Quantum circuit structure learning任务的核心目标就是找到最优的带�
             loss_list.append(np.sum(total_loss) / len(total_loss))
             print("{:.0f} loss is : {:.10f}".format(epoch, loss_list[-1]))
 
-            if SAVE_FLAG:
+            if save_flag:
                 temp_loss = loss_list[-1]
                 save_parameters(model.state_dict(), "./result/QCNN_TL_1.model")
-                SAVE_FLAG = False
+                save_flag = False
             else:
                 if temp_loss > loss_list[-1]:
                     temp_loss = loss_list[-1]
                     save_parameters(model.state_dict(), "./result/QCNN_TL_1.model")
-
 
         model.eval()
         correct = 0
@@ -2192,28 +2165,35 @@ Quantum circuit structure learning任务的核心目标就是找到最优的带�
 
         n_samples_show = 6
         count = 0
-        fig, axes = plt.subplots(nrows=1, ncols=n_samples_show, figsize=(10, 3))
+        _, axes = plt.subplots(nrows=1, ncols=n_samples_show, figsize=(10, 3))
         model.eval()
         for x, y in data_generator(x_test, y_test, batch_size=1, shuffle=True):
             if count == n_samples_show:
                 break
             x = x.reshape(-1, 1, 28, 28)
             output = model(x)
-            pred = QTensor.argmax(output, [1])
-            axes[count].imshow(x[0].squeeze(), cmap='gray')
+            pred = QTensor.argmax(output, 1)
+            axes[count].imshow(x[0].squeeze(), cmap="gray")
             axes[count].set_xticks([])
             axes[count].set_yticks([])
-            axes[count].set_title('Predicted {}'.format(np.array(pred.data)))
+            axes[count].set_title("Predicted {}".format(np.array(pred.data)))
             count += 1
         plt.show()
 
-    def classical_cnn_TransferLearning_predict():
+
+    def classical_cnn_transferlearning_predict():
+        """
+        Use test data to eval classic NN model
+        """
         x_test, y_test = load_mnist("testing_data", digits=np.arange(10))
 
         x_test = x_test[:eval_size]
         y_test = y_test[:eval_size]
+
         x_test = x_test / 255
+
         y_test = np.eye(10)[y_test].reshape(-1, 10)
+
         model = CNN()
 
         model_parameter = load_parameters("./result/QCNN_TL_1.model")
@@ -2235,94 +2215,104 @@ Quantum circuit structure learning任务的核心目标就是找到最优的带�
 
         n_samples_show = 6
         count = 0
-        fig, axes = plt.subplots(nrows=1, ncols=n_samples_show, figsize=(10, 3))
+        _, axes = plt.subplots(nrows=1, ncols=n_samples_show, figsize=(10, 3))
         model.eval()
         for x, y in data_generator(x_test, y_test, batch_size=1, shuffle=True):
             if count == n_samples_show:
                 break
             x = x.reshape(-1, 1, 28, 28)
             output = model(x)
-            pred = QTensor.argmax(output, [1])
-            axes[count].imshow(x[0].squeeze(), cmap='gray')
+            pred = QTensor.argmax(output, 1)
+            axes[count].imshow(x[0].squeeze(), cmap="gray")
             axes[count].set_xticks([])
             axes[count].set_yticks([])
-            axes[count].set_title('Predicted {}'.format(np.array(pred.data)))
+            axes[count].set_title("Predicted {}".format(np.array(pred.data)))
             count += 1
         plt.show()
 
-    def quantum_cnn_TransferLearning():
+    n_qubits = 4  # Number of qubits
+    q_depth = 6  # Depth of the quantum circuit (number of variational layers)
 
-        n_qubits = 4  # Number of qubits
-        q_depth = 6  # Depth of the quantum circuit (number of variational layers)
+    def Q_H_layer(qubits, nqubits):#pylint:disable=invalid-name
+        """Layer of single-qubit Hadamard gates.
+        """
+        circuit = pq.QCircuit()
+        for idx in range(nqubits):
+            circuit.insert(pq.H(qubits[idx]))
+        return circuit
 
-        def Q_H_layer(qubits, nqubits):
-            """Layer of single-qubit Hadamard gates.
+    def Q_RY_layer(qubits, w):#pylint:disable=invalid-name
+        """
+        Layer of parametrized qubit rotations around the y axis.
+        """
+        circuit = pq.QCircuit()
+        for idx, element in enumerate(w):
+            circuit.insert(pq.RY(qubits[idx], element))
+        return circuit
+
+    def Q_entangling_layer(qubits, nqubits):#pylint:disable=invalid-name
+        """
+        Layer of CNOTs followed by another shifted layer of CNOT.
+        """
+        # In other words it should apply something like :
+        # CNOT  CNOT  CNOT  CNOT...  CNOT
+        #   CNOT  CNOT  CNOT...  CNOT
+        circuit = pq.QCircuit()
+        for i in range(0, nqubits - 1,
+                        2):  # Loop over even indices: i=0,2,...N-2
+            circuit.insert(pq.CNOT(qubits[i], qubits[i + 1]))
+        for i in range(1, nqubits - 1,
+                        2):  # Loop over odd indices:  i=1,3,...N-3
+            circuit.insert(pq.CNOT(qubits[i], qubits[i + 1]))
+        return circuit
+
+    def quantum_net(q_input_features, q_weights_flat, qubits, cubits,#pylint:disable=unused-argument
+                    machine):
+        """
+        The variational quantum circuit.
+        """
+        machine = pq.CPUQVM()
+        machine.init_qvm()
+        qubits = machine.qAlloc_many(n_qubits)
+        circuit = pq.QCircuit()
+
+        # Reshape weights
+        q_weights = q_weights_flat.reshape([q_depth, n_qubits])
+
+        # Start from state |+> , unbiased w.r.t. |0> and |1>
+        circuit.insert(Q_H_layer(qubits, n_qubits))
+
+        # Embed features in the quantum node
+        circuit.insert(Q_RY_layer(qubits, q_input_features))
+
+        # Sequence of trainable variational layers
+        for k in range(q_depth):
+            circuit.insert(Q_entangling_layer(qubits, n_qubits))
+            circuit.insert(Q_RY_layer(qubits, q_weights[k]))
+
+        # Expectation values in the Z basis
+        prog = pq.QProg()
+        prog.insert(circuit)
+
+        exp_vals = []
+        for position in range(n_qubits):
+            pauli_str = "Z" + str(position)
+            pauli_map = pq.PauliOperator(pauli_str, 1)
+            hamiltion = pauli_map.toHamiltonian(True)
+            exp = machine.get_expectation(prog, hamiltion, qubits)
+            exp_vals.append(exp)
+
+        return exp_vals
+    def quantum_cnn_transferlearning():
+        """
+        The quantum cnn transferLearning model main function
+        """
+
+
+        class Q_DressedQuantumNet(Module):#pylint:disable=invalid-name
             """
-            circuit = pq.QCircuit()
-            for idx in range(nqubits):
-                circuit.insert(pq.H(qubits[idx]))
-            return circuit
-
-        def Q_RY_layer(qubits, w):
-            """Layer of parametrized qubit rotations around the y axis.
+            module implementing the *dressed* quantum net.
             """
-            circuit = pq.QCircuit()
-            for idx, element in enumerate(w):
-                circuit.insert(pq.RY(qubits[idx], element))
-            return circuit
-
-        def Q_entangling_layer(qubits, nqubits):
-            """Layer of CNOTs followed by another shifted layer of CNOT.
-            """
-            # In other words it should apply something like :
-            # CNOT  CNOT  CNOT  CNOT...  CNOT
-            #   CNOT  CNOT  CNOT...  CNOT
-            circuit = pq.QCircuit()
-            for i in range(0, nqubits - 1, 2):  # Loop over even indices: i=0,2,...N-2
-                circuit.insert(pq.CNOT(qubits[i], qubits[i + 1]))
-            for i in range(1, nqubits - 1, 2):  # Loop over odd indices:  i=1,3,...N-3
-                circuit.insert(pq.CNOT(qubits[i], qubits[i + 1]))
-            return circuit
-
-        def Q_quantum_net(q_input_features, q_weights_flat, qubits, cubits, machine):
-            """
-            The variational quantum circuit.
-            """
-            machine = pq.CPUQVM()
-            machine.init_qvm()
-            qubits = machine.qAlloc_many(n_qubits)
-            circuit = pq.QCircuit()
-
-            # Reshape weights
-            q_weights = q_weights_flat.reshape([q_depth, n_qubits])
-
-            # Start from state |+> , unbiased w.r.t. |0> and |1>
-            circuit.insert(Q_H_layer(qubits, n_qubits))
-
-            # Embed features in the quantum node
-            circuit.insert(Q_RY_layer(qubits, q_input_features))
-
-            # Sequence of trainable variational layers
-            for k in range(q_depth):
-                circuit.insert(Q_entangling_layer(qubits, n_qubits))
-                circuit.insert(Q_RY_layer(qubits, q_weights[k]))
-
-            # Expectation values in the Z basis
-            prog = pq.QProg()
-            prog.insert(circuit)
-
-            exp_vals = []
-            for position in range(n_qubits):
-                pauli_str = "Z" + str(position)
-                pauli_map = pq.PauliOperator(pauli_str, 1)
-                hamiltion = pauli_map.toHamiltonian(True)
-                exp = machine.get_expectation(prog, hamiltion, qubits)
-                exp_vals.append(exp)
-
-            return exp_vals
-
-        class Q_DressedQuantumNet(Module):
-
             def __init__(self):
                 """
                 Definition of the *dressed* layout.
@@ -2331,7 +2321,8 @@ Quantum circuit structure learning任务的核心目标就是找到最优的带�
                 super().__init__()
                 self.pre_net = Linear(128, n_qubits)
                 self.post_net = Linear(n_qubits, 10)
-                self.temp_Q = QuantumLayer(Q_quantum_net, q_depth * n_qubits, "cpu", n_qubits, n_qubits)
+                self.qlayer = QuantumLayer(quantum_net, q_depth * n_qubits,
+                                        "cpu", n_qubits, n_qubits)
 
             def forward(self, input_features):
                 """
@@ -2343,13 +2334,14 @@ Quantum circuit structure learning任务的核心目标就是找到最优的带�
                 # by reducing the feature dimension from 512 to 4
                 pre_out = self.pre_net(input_features)
                 q_in = tensor.tanh(pre_out) * np.pi / 2.0
-                q_out_elem = self.temp_Q(q_in)
+                q_out_elem = self.qlayer(q_in)
 
                 result = q_out_elem
                 # return the two-dimensional prediction from the postprocessing layer
                 return self.post_net(result)
 
-        x_train, y_train = load_mnist("training_data", digits=np.arange(10))  # 下载训练数据
+        x_train, y_train = load_mnist("training_data",
+                                    digits=np.arange(10))  # 下载训练数据
         x_test, y_test = load_mnist("testing_data", digits=np.arange(10))
         x_train = x_train[:train_size]
         y_train = y_train[:train_size]
@@ -2369,6 +2361,7 @@ Quantum circuit structure learning任务的核心目标就是找到最优的带�
 
         epochs = EPOCHES
         loss_list = []
+
         eval_losses = []
 
         model_hybrid = model
@@ -2376,17 +2369,20 @@ Quantum circuit structure learning任务的核心目标就是找到最优的带�
 
         for param in model_hybrid.parameters():
             param.requires_grad = False
-        #替换经典神经网络层为量子层
+
         model_hybrid.fc3 = Q_DressedQuantumNet()
-        #优化器只训练量子层
+
         optimizer_hybrid = Adam(model_hybrid.fc3.parameters(), lr=0.001)
         model_hybrid.train()
 
-        SAVE_FLAG = True
+        save_flag = True
         temp_loss = 0
         for epoch in range(1, epochs):
             total_loss = []
-            for x, y in data_generator(x_train, y_train, batch_size=4, shuffle=True):
+            for x, y in data_generator(x_train,
+                                    y_train,
+                                    batch_size=4,
+                                    shuffle=True):
                 x = x.reshape(-1, 1, 28, 28)
                 optimizer_hybrid.zero_grad()
                 # Forward pass
@@ -2402,21 +2398,28 @@ Quantum circuit structure learning任务的核心目标就是找到最优的带�
 
             loss_list.append(np.sum(total_loss) / len(total_loss))
             print("{:.0f} loss is : {:.10f}".format(epoch, loss_list[-1]))
-            if SAVE_FLAG:
+            if save_flag:
                 temp_loss = loss_list[-1]
-                save_parameters(model_hybrid.fc3.state_dict(), "./result/QCNN_TL_FC3.model")
-                save_parameters(model_hybrid.state_dict(), "./result/QCNN_TL_ALL.model")
-                SAVE_FLAG = False
+                save_parameters(model_hybrid.fc3.state_dict(),
+                                "./result/QCNN_TL_FC3.model")
+                save_parameters(model_hybrid.state_dict(),
+                                "./result/QCNN_TL_ALL.model")
+                save_flag = False
             else:
                 if temp_loss > loss_list[-1]:
                     temp_loss = loss_list[-1]
-                    save_parameters(model_hybrid.fc3.state_dict(), "./result/QCNN_TL_FC3.model")
-                    save_parameters(model_hybrid.state_dict(), "./result/QCNN_TL_ALL.model")
+                    save_parameters(model_hybrid.fc3.state_dict(),
+                                    "./result/QCNN_TL_FC3.model")
+                    save_parameters(model_hybrid.state_dict(),
+                                    "./result/QCNN_TL_ALL.model")
 
             correct = 0
             n_eval = 0
-            loss_temp =[]
-            for x1, y1 in data_generator(x_test, y_test, batch_size=4, shuffle=True):
+            loss_temp = []
+            for x1, y1 in data_generator(x_test,
+                                        y_test,
+                                        batch_size=4,
+                                        shuffle=True):
                 x1 = x1.reshape(-1, 1, 28, 28)
                 output = model_hybrid(x1)
                 loss = loss_func(y1, output)
@@ -2429,11 +2432,10 @@ Quantum circuit structure learning任务的核心目标就是找到最优的带�
             eval_losses.append(np.sum(loss_temp) / n_eval)
             print("{:.0f} eval loss is : {:.10f}".format(epoch, eval_losses[-1]))
 
-
-        plt.title('model loss')
-        plt.plot(loss_list, color='green', label='train_losses')
-        plt.plot(eval_losses, color='red', label='eval_losses')
-        plt.ylabel('loss')
+        plt.title("model loss")
+        plt.plot(loss_list, color="green", label="train_losses")
+        plt.plot(eval_losses, color="red", label="eval_losses")
+        plt.ylabel("loss")
         plt.legend(["train_losses", "eval_losses"])
         plt.savefig("qcnn_transfer_learning_classical")
         plt.show()
@@ -2441,27 +2443,30 @@ Quantum circuit structure learning任务的核心目标就是找到最优的带�
 
         n_samples_show = 6
         count = 0
-        fig, axes = plt.subplots(nrows=1, ncols=n_samples_show, figsize=(10, 3))
+        _, axes = plt.subplots(nrows=1, ncols=n_samples_show, figsize=(10, 3))
         model_hybrid.eval()
         for x, y in data_generator(x_test, y_test, batch_size=1, shuffle=True):
             if count == n_samples_show:
                 break
             x = x.reshape(-1, 1, 28, 28)
             output = model_hybrid(x)
-            pred = QTensor.argmax(output, [1])
-            axes[count].imshow(x[0].squeeze(), cmap='gray')
+            pred = QTensor.argmax(output, 1)
+            axes[count].imshow(x[0].squeeze(), cmap="gray")
             axes[count].set_xticks([])
             axes[count].set_yticks([])
-            axes[count].set_title('Predicted {}'.format(np.array(pred.data)))
+            axes[count].set_title("Predicted {}".format(np.array(pred.data)))
             count += 1
         plt.show()
 
-    def quantum_cnn_TransferLearning_predict():
 
+    def quantum_cnn_transferlearning_predict():
+        """
+        Eval quantum cnn transferlearning model on test data
+        """
         n_qubits = 4  # Number of qubits
         q_depth = 6  # Depth of the quantum circuit (number of variational layers)
 
-        def Q_H_layer(qubits, nqubits):
+        def Q_H_layer(qubits, nqubits):#pylint:disable=invalid-name
             """Layer of single-qubit Hadamard gates.
             """
             circuit = pq.QCircuit()
@@ -2469,7 +2474,7 @@ Quantum circuit structure learning任务的核心目标就是找到最优的带�
                 circuit.insert(pq.H(qubits[idx]))
             return circuit
 
-        def Q_RY_layer(qubits, w):
+        def Q_RY_layer(qubits, w):#pylint:disable=invalid-name
             """Layer of parametrized qubit rotations around the y axis.
             """
             circuit = pq.QCircuit()
@@ -2477,20 +2482,23 @@ Quantum circuit structure learning任务的核心目标就是找到最优的带�
                 circuit.insert(pq.RY(qubits[idx], element))
             return circuit
 
-        def Q_entangling_layer(qubits, nqubits):
+        def Q_entangling_layer(qubits, nqubits):#pylint:disable=invalid-name
             """Layer of CNOTs followed by another shifted layer of CNOT.
             """
             # In other words it should apply something like :
             # CNOT  CNOT  CNOT  CNOT...  CNOT
             #   CNOT  CNOT  CNOT...  CNOT
             circuit = pq.QCircuit()
-            for i in range(0, nqubits - 1, 2):  # Loop over even indices: i=0,2,...N-2
+            for i in range(0, nqubits - 1,
+                        2):  # Loop over even indices: i=0,2,...N-2
                 circuit.insert(pq.CNOT(qubits[i], qubits[i + 1]))
-            for i in range(1, nqubits - 1, 2):  # Loop over odd indices:  i=1,3,...N-3
+            for i in range(1, nqubits - 1,
+                        2):  # Loop over odd indices:  i=1,3,...N-3
                 circuit.insert(pq.CNOT(qubits[i], qubits[i + 1]))
             return circuit
 
-        def Q_quantum_net(q_input_features, q_weights_flat, qubits, cubits, machine):
+        def quantum_net(q_input_features, q_weights_flat, qubits, cubits,#pylint:disable=unused-argument
+                        machine):
             """
             The variational quantum circuit.
             """
@@ -2527,7 +2535,9 @@ Quantum circuit structure learning任务的核心目标就是找到最优的带�
             return exp_vals
 
         class Q_DressedQuantumNet(Module):
-
+            """
+            module implementing the *dressed* quantum net.
+            """
             def __init__(self):
                 """
                 Definition of the *dressed* layout.
@@ -2536,7 +2546,8 @@ Quantum circuit structure learning任务的核心目标就是找到最优的带�
                 super().__init__()
                 self.pre_net = Linear(128, n_qubits)
                 self.post_net = Linear(n_qubits, 10)
-                self.temp_Q = QuantumLayer(Q_quantum_net, q_depth * n_qubits, "cpu", n_qubits, n_qubits)
+                self.qlayer = QuantumLayer(quantum_net, q_depth * n_qubits,
+                                        "cpu", n_qubits, n_qubits)
 
             def forward(self, input_features):
                 """
@@ -2548,14 +2559,14 @@ Quantum circuit structure learning任务的核心目标就是找到最优的带�
                 # by reducing the feature dimension from 512 to 4
                 pre_out = self.pre_net(input_features)
                 q_in = tensor.tanh(pre_out) * np.pi / 2.0
-                q_out_elem = self.temp_Q(q_in)
+                q_out_elem = self.qlayer(q_in)
 
                 result = q_out_elem
                 # return the two-dimensional prediction from the postprocessing layer
                 return self.post_net(result)
 
-
-        x_train, y_train = load_mnist("training_data", digits=np.arange(10))  # 下载训练数据
+        x_train, y_train = load_mnist("training_data",
+                                    digits=np.arange(10))
         x_test, y_test = load_mnist("testing_data", digits=np.arange(10))
         x_train = x_train[:2000]
         y_train = y_train[:2000]
@@ -2566,7 +2577,6 @@ Quantum circuit structure learning任务的核心目标就是找到最优的带�
         x_test = x_test / 255
         y_train = np.eye(10)[y_train].reshape(-1, 10)
         y_test = np.eye(10)[y_test].reshape(-1, 10)
-
 
         # The second method: unified storage and unified reading
         model = CNN()
@@ -2584,9 +2594,12 @@ Quantum circuit structure learning任务的核心目标就是找到最优的带�
 
         correct = 0
         n_eval = 0
-        loss_temp =[]
+        loss_temp = []
         eval_batch_size = 4
-        for x1, y1 in data_generator(x_test, y_test, batch_size=eval_batch_size, shuffle=True):
+        for x1, y1 in data_generator(x_test,
+                                    y_test,
+                                    batch_size=eval_batch_size,
+                                    shuffle=True):
             x1 = x1.reshape(-1, 1, 28, 28)
             output = model_hybrid(x1)
             loss = loss_func(y1, output)
@@ -2603,31 +2616,33 @@ Quantum circuit structure learning任务的核心目标就是找到最优的带�
 
         n_samples_show = 6
         count = 0
-        fig, axes = plt.subplots(nrows=1, ncols=n_samples_show, figsize=(10, 3))
+        _, axes = plt.subplots(nrows=1, ncols=n_samples_show, figsize=(10, 3))
         model_hybrid.eval()
-        for x, y in data_generator(x_test, y_test, batch_size=1, shuffle=True):
+        for x, _ in data_generator(x_test, y_test, batch_size=1, shuffle=True):
             if count == n_samples_show:
                 break
             x = x.reshape(-1, 1, 28, 28)
             output = model_hybrid(x)
-            pred = QTensor.argmax(output, [1])
-            axes[count].imshow(x[0].squeeze(), cmap='gray')
+            pred = QTensor.argmax(output, 1)
+            axes[count].imshow(x[0].squeeze(), cmap="gray")
             axes[count].set_xticks([])
             axes[count].set_yticks([])
-            axes[count].set_title('Predicted {}'.format(np.array(pred.data)))
+            axes[count].set_title("Predicted {}".format(np.array(pred.data)))
             count += 1
         plt.show()
 
+
     if __name__ == "__main__":
-        # save classic model parameters
-        if not os.path.exists('./result/QCNN_TL_1.model'):
-            classcal_cnn_model_making()
-            classical_cnn_TransferLearning_predict()
+
+        if not os.path.exists("./result/QCNN_TL_1.model"):
+            classcal_cnn_model_training()
+            classical_cnn_transferlearning_predict()
         #train quantum circuits.
-        print("use exist cnn model param to train quantum parameters.")
-        quantum_cnn_TransferLearning()
+
+        quantum_cnn_transferlearning()
         #eval quantum circuits.
-        quantum_cnn_TransferLearning_predict()
+        quantum_cnn_transferlearning_predict()
+
 
 
 训练集上Loss情况
@@ -2726,14 +2741,14 @@ QUnet主要是用于解决图像分割的技术。
                 temp_data = cv2.imread(self.path+"/images" + '/' + list_path[i], cv2.IMREAD_COLOR)
                 temp_data = cv2.resize(temp_data, (128, 128))
                 grayimg = cv2.cvtColor(temp_data, cv2.COLOR_BGR2GRAY)
-                temp_data = grayimg.reshape(temp_data.shape[0], temp_data.shape[0], 1)
+                temp_data = grayimg.reshape(temp_data.shape[0], temp_data.shape[0], 1).astype(np.float32)
                 self.x_data.append(temp_data)
 
                 label_data = cv2.imread(self.path+"/labels" + '/' +list_path[i].split(".")[0] + ".png", cv2.IMREAD_COLOR)
                 label_data = cv2.resize(label_data, (128, 128))
 
                 label_data = cv2.cvtColor(label_data, cv2.COLOR_BGR2GRAY)
-                label_data = label_data.reshape(label_data.shape[0], label_data.shape[0], 1)
+                label_data = label_data.reshape(label_data.shape[0], label_data.shape[0], 1).astype(np.int64)
                 self.y_label.append(label_data)
 
             return self.x_data, self.y_label
@@ -2843,7 +2858,7 @@ QUnet主要是用于解决图像分割的技术。
             self.BatchNorm2d2 = BatchNorm2d(out_ch)
             self.Relu2 = F.ReLu()
             self.conv3 = Conv2D(input_channels=out_ch, output_channels=out_ch, kernel_size=(3, 3), stride=(2, 2),
-                                padding="same")
+                                padding=(1,1))
             self.BatchNorm2d3 = BatchNorm2d(out_ch)
             self.Relu3 = F.ReLu()
 
@@ -2878,7 +2893,7 @@ QUnet主要是用于解决图像分割的技术。
             self.Relu2 = F.ReLu()
 
             self.conv3 = ConvT2D(input_channels=out_ch * 2, output_channels=out_ch, kernel_size=(3, 3), stride=(2, 2),
-                                 padding="same")
+                                 padding=(1,1))
             self.BatchNorm2d3 = BatchNorm2d(out_ch)
             self.Relu3 = F.ReLu()
 
@@ -2935,13 +2950,21 @@ QUnet主要是用于解决图像分割的技术。
             out_4, out4 = self.d4(out3)
 
             out5 = self.u1(out4)
-            cat_out5 = tensor.concatenate([out5, out_4], axis=1)
+            out5_pad_out4 = tensor.pad2d(out5, (1, 0, 1, 0), 0)
+            cat_out5 = tensor.concatenate([out5_pad_out4, out_4], axis=1)
+
             out6 = self.u2(cat_out5)
-            cat_out6 = tensor.concatenate([out6, out_3], axis=1)
+            out6_pad_out_3 = tensor.pad2d(out6, (1, 0, 1, 0), 0)
+            cat_out6 = tensor.concatenate([out6_pad_out_3, out_3], axis=1)
+
             out7 = self.u3(cat_out6)
-            cat_out7 = tensor.concatenate([out7, out_2], axis=1)
+            out7_pad_out_2 = tensor.pad2d(out7, (1, 0, 1, 0), 0)
+            cat_out7 = tensor.concatenate([out7_pad_out_2, out_2], axis=1)
+
             out8 = self.u4(cat_out7)
-            cat_out8 = tensor.concatenate([out8, out_1], axis=1)
+            out8_pad_out_1 = tensor.pad2d(out8, (1, 0, 1, 0), 0)
+            cat_out8 = tensor.concatenate([out8_pad_out_1, out_1], axis=1)
+
             out = self.conv1(cat_out8)
             out = self.BatchNorm2d1(out)
             out = self.Relu1(out)
@@ -3050,9 +3073,9 @@ QUnet主要是用于解决图像分割的技术。
         total_loss = []
         model.train()
         for i, (x, y) in enumerate(trainset):
-            x_img = QTensor(x)
+            x_img = QTensor(x, dtype=kfloat32)
             x_img_Qtensor = tensor.unsqueeze(x_img, 0)
-            y_img = QTensor(y)
+            y_img = QTensor(y, dtype=kfloat32)
             y_img_Qtensor = tensor.unsqueeze(y_img, 0)
             optimizer.zero_grad()
             img_out = model(x_img_Qtensor)
@@ -3128,9 +3151,9 @@ QUnet主要是用于解决图像分割的技术。
     model.eval()
 
     for i, (x1, y1) in enumerate(testset):
-        x_img = QTensor(x1)
+        x_img = QTensor(x1, dtype=kfloat32)
         x_img_Qtensor = tensor.unsqueeze(x_img, 0)
-        y_img = QTensor(y1)
+        y_img = QTensor(y1, dtype=kfloat32)
         y_img_Qtensor = tensor.unsqueeze(y_img, 0)
         img_out = model(x_img_Qtensor)
         loss = loss_func(y_img_Qtensor, img_out)
@@ -3909,7 +3932,7 @@ QUnet主要是用于解决图像分割的技术。
             super(QMLPModel, self).__init__()
             self.ave_pool2d = AvgPool2D([7, 7], [7, 7], "valid")
             # self.quantum_circuit = QuantumLayer(build_qmlp_circuit, 128, "CPU", 16, diff_method="finite_diff")
-            self.quantum_circuit = QuantumLayerMultiProcess(build_multiprocess_qmlp_circuit, 128, "CPU",
+            self.quantum_circuit = QuantumLayerMultiProcess(build_multiprocess_qmlp_circuit, 128, 
                                                             16, 1, diff_method="finite_diff")
             self.linear = Linear(16, 10)
 
@@ -4021,6 +4044,7 @@ QUnet主要是用于解决图像分割的技术。
 
 .. code-block::
 
+
     import numpy as np
     import random
     import gym
@@ -4030,7 +4054,7 @@ QUnet主要是用于解决图像分割的技术。
     from pyvqnet.nn.module import Module
     from pyvqnet.nn.loss import MeanSquaredError
     from pyvqnet.optim.adam import Adam
-    from pyvqnet.tensor.tensor import QTensor
+    from pyvqnet.tensor.tensor import QTensor,kfloat32
     from pyvqnet.qnn.quantumlayer import QuantumLayerMultiProcess
     from pyvqnet.tensor import tensor
     from pyvqnet.qnn.measure import expval
@@ -4134,7 +4158,7 @@ QUnet主要是用于解决图像分割的技术。
     class DRLModel(Module):
         def __init__(self):
             super(DRLModel, self).__init__()
-            self.quantum_circuit = QuantumLayerMultiProcess(build_qc, 24, "CPU",
+            self.quantum_circuit = QuantumLayerMultiProcess(build_qc, 24,  
                                                             4, 1, diff_method="finite_diff")
         def forward(self, x):
             quanutum_result = self.quantum_circuit(x)
@@ -4163,7 +4187,7 @@ QUnet主要是用于解决图像分割的技术。
         for t in range(MAX_STEPS):
             frames.append(env.render(mode='rgb_array'))
             time.sleep(0.1)
-            input_x = QTensor([[state_t]])
+            input_x = QTensor([[state_t]],dtype=kfloat32)
             acts = model(input_x) + bias
             # print(f'type of acts: {type(acts)}')
             act_t = tensor.QTensor.argmax(acts)
@@ -4172,7 +4196,7 @@ QUnet主要是用于解决图像分割的技术。
             print(f'Episode: {i}, Steps: {t}, act: {act_t_np}')
             state_nt, reward, done, info = env.step(action=act_t_np)
             targ_counter += 1
-            input_state_nt = QTensor([[state_nt]])
+            input_state_nt = QTensor([[state_nt]],dtype=kfloat32)
             act_nt = QTensor.argmax(model(input_state_nt)+bias)
             act_nt_np = int(act_nt.pdata[0])
             memory[i, t] = (state_t, act_t, reward, state_nt, done)
@@ -4184,13 +4208,13 @@ QUnet主要是用于解决图像分割的技术。
                     if s[DONE]:
                         target_temp.append(QTensor(s[REWARD]).reshape([1, -1]))
                     else:
-                        input_s = QTensor([[s[STATE_NT]]])
+                        input_s = QTensor([[s[STATE_NT]]],dtype=kfloat32)
                         out_temp = s[REWARD] + GAMMA * tensor.max(model(input_s) + bias_targ)
                         out_temp = out_temp.reshape([1, -1])
                         target_temp.append(out_temp)
                 target_out = []
                 for b in sampled_vs:
-                    input_b = QTensor([[b[STATE_T]]], requires_grad=True)
+                    input_b = QTensor([[b[STATE_T]]], requires_grad=True,dtype=kfloat32)
                     out_result = model(input_b) + bias
                     index = int(b[ACTION].pdata[0])
                     out_result_temp = out_result[0][index].reshape([1, -1])
@@ -4285,10 +4309,12 @@ QUnet主要是用于解决图像分割的技术。
 
 .. code-block::
 
+    import sys
+    sys.path.insert(0, "../")
     import math
     import numpy as np
-    from pyvqnet.tensor import QTensor, zeros
-    import pyvqnet.tensor as tensor
+    from pyvqnet.tensor.tensor import QTensor, zeros
+    import pyvqnet.tensor.tensor as tensor
     import pyqpanda as pq
     from sklearn.datasets import make_blobs
     import matplotlib.pyplot as plt
@@ -4300,10 +4326,15 @@ QUnet主要是用于解决图像分割的技术。
         pass
     # 根据数据的数据量n，聚类中心k和数据标准差std返回对应数据点和聚类中心点
     def get_data(n, k, std):
-        data = make_blobs(n_samples=n, n_features=2, centers=k, cluster_std=std, random_state=100)
+        data = make_blobs(n_samples=n,
+                        n_features=2,
+                        centers=k,
+                        cluster_std=std,
+                        random_state=100)
         points = data[0]
         centers = data[1]
         return points, centers
+
 
 1.3.3 量子线路
 *********************
@@ -4321,7 +4352,9 @@ QUnet主要是用于解决图像分割的技术。
 
     # 根据输入的量子数据点构建量子线路
     def qkmeans_circuits(x, y):
-
+        """
+        Quantum Circuit for kmeans
+        """
         theta_1 = get_theta(x)
         theta_2 = get_theta(y)
 
@@ -4345,7 +4378,7 @@ QUnet主要是用于解决图像分割的技术。
 
         prog = pq.QProg()
         prog.insert(circuit)
-        prog << pq.Measure(qubits[0], cbits[0])
+        prog << pq.Measure(qubits[0], cbits[0])  #pylint:disable=expression-not-assigned
         prog.insert(pq.Reset(qubits[0]))
         prog.insert(pq.Reset(qubits[1]))
         prog.insert(pq.Reset(qubits[2]))
@@ -4357,7 +4390,7 @@ QUnet主要是用于解决图像分割的技术。
         if len(data) == 1:
             return 0.0
         else:
-            return data['001'] / 1024.0
+            return data["001"] / 1024.0
 
 1.3.4 数据可视化
 *********************
@@ -4370,10 +4403,10 @@ QUnet主要是用于解决图像分割的技术。
     def draw_plot(points, centers, label=True):
         points = np.array(points)
         centers = np.array(centers)
-        if label==False:
-            plt.scatter(points[:,0], points[:,1])
+        if label is False:
+            plt.scatter(points[:, 0], points[:, 1])
         else:
-            plt.scatter(points[:,0], points[:,1], c=centers, cmap='viridis')
+            plt.scatter(points[:, 0], points[:, 1], c=centers, cmap="viridis")
         plt.xlim(0, 1)
         plt.ylim(0, 1)
         plt.show()
@@ -4391,10 +4424,13 @@ QUnet主要是用于解决图像分割的技术。
 
 
     def find_nearest_neighbour(points, centroids):
+        """
+        Find nearest neighbour
+        """
         n = points.shape[0]
         k = centroids.shape[0]
 
-        centers = zeros([n])
+        centers = zeros([n], dtype=points.dtype)
 
         for i in range(n):
             min_dis = 10000
@@ -4402,7 +4438,6 @@ QUnet主要是用于解决图像分割的技术。
             for j in range(k):
 
                 temp_dis = qkmeans_circuits(points[i, :], centroids[j, :])
-
                 if temp_dis < min_dis:
                     min_dis = temp_dis
                     ind = j
@@ -4410,17 +4445,20 @@ QUnet主要是用于解决图像分割的技术。
 
         return centers
 
-    def find_centroids(points, centers):
 
+    def find_centroids(points, centers):
+        """
+        find centroids
+        """
         k = int(tensor.max(centers).item()) + 1
-        centroids = tensor.zeros([k, 2])
+        centroids = tensor.zeros([k, 2], dtype=points.dtype)
+
         for i in range(k):
 
             cur_i = centers == i
-
-            x = points[:,0]
+            x = points[:, 0]
             x = x[cur_i]
-            y = points[:,1]
+            y = points[:, 1]
             y = y[cur_i]
             centroids[i, 0] = tensor.mean(x)
             centroids[i, 1] = tensor.mean(y)
@@ -4437,7 +4475,10 @@ QUnet主要是用于解决图像分割的技术。
         return points
 
 
-    def qkmean_run():
+    def qkmeans_run():
+        """
+        Main function for run qkmeans algorithm
+        """
         n = 100  # number of data points
         k = 3  # Number of centers
         std = 2  # std of datapoints
@@ -4448,18 +4489,22 @@ QUnet主要是用于解决图像分割的技术。
 
         centroids = initialize_centers(points, k)  # Intialize centroids
 
-        epoch = 9
+        epoch = 5
         points = QTensor(points)
         centroids = QTensor(centroids)
         plt.figure()
-        draw_plot(points.data, o_centers,label=False)
+        plt.title("origin")
+        draw_plot(points.data, o_centers, label=False)
 
-        # 运行算法
+        # run k-means algorithm
         for i in range(epoch):
-                centers = find_nearest_neighbour(points, centroids)  # find nearest centers
-                centroids = find_centroids(points, centers)  # find centroids
+            print(f"iteration {i}")
+            centers = find_nearest_neighbour(points,
+                                            centroids)  # find nearest centers
+            centroids = find_centroids(points, centers)  # find centroids
 
         plt.figure()
+        plt.title(f"result after iteration {epoch}")
         draw_plot(points.data, centers.data)
 
     # 运行程序入口
@@ -5022,7 +5067,7 @@ QUnet主要是用于解决图像分割的技术。
         def __init__(self):
             super(Model, self).__init__()
 
-            self.q_fourier_series = QuantumLayer(q_circuits_loop, 2 * 3 * 3 * 3, "CPU", 1)
+            self.q_fourier_series = QuantumLayer(q_circuits_loop, 2 * 3 * 3 * 3, "CPU", 3)
 
         def forward(self, x):
             return self.q_fourier_series(x)
@@ -5324,7 +5369,6 @@ QUnet主要是用于解决图像分割的技术。
 通过运行，读者不难发现，随着量子比特数增加，量子参数的梯度的方差越来越小，均值越来越接近0。
 
 .. code-block::
-
 
         """
         贫瘠高原
@@ -5704,7 +5748,7 @@ VQNet提供了 ``QuantumNeuron`` 模块实现该算法。首先初始化一个�
 
     for i in range(steps):
         opti.zero_grad()
-        loss = qlayer(QTensor([[1]]))
+        loss = qlayer(QTensor([[1.0]]))
         print(f'step {i}')
         print(f'q param before {qlayer.m_para}')
         loss.backward()
@@ -5736,7 +5780,7 @@ VQNet提供了 ``QuantumNeuron`` 模块实现该算法。首先初始化一个�
 但是，由于增加了电路复杂性或梯度值中的潜在误差，这两种替代方案都可能存在缺陷。
 Banchi 和 Crooks 1 发现一种可以适用在任一酉矩阵量子逻辑门上的 `随机参数偏移算法(Stochastic Parameter-Shift Rule) <https://arxiv.org/abs/2005.10299>`_ 。
 
-下面展示适用VQNet对一个量子变分线路使用随机参数偏移法计算梯度的示例。其中，pyqpanda建议版本为3.7.12。示例线路定义如下：
+下面展示适用VQNet对一个量子变分线路使用随机参数偏移法计算梯度的示例。其中， **pyqpanda建议版本为3.7.12** 。示例线路定义如下：
 
 .. code-block::
 
@@ -5991,7 +6035,7 @@ vqe_func_analytic()函数是使用参数偏移计算理论梯度，vqe_func_shot
 
     for i in range(steps):
         opti_ana.zero_grad()
-        loss = qlayer_ana(QTensor([[1]]))
+        loss = qlayer_ana(QTensor([[1.0]]))
 
         loss.backward()
         cost_sgd.append(loss.item())
@@ -5999,7 +6043,7 @@ vqe_func_analytic()函数是使用参数偏移计算理论梯度，vqe_func_shot
 
     for i in range(steps+50):
         opti_shots.zero_grad()
-        loss = qlayer_shots(QTensor([[1]]))
+        loss = qlayer_shots(QTensor([[1.0]]))
 
         loss.backward()
         cost_dsgd.append(loss.item())
@@ -6069,7 +6113,8 @@ vqe_func_analytic()函数是使用参数偏移计算理论梯度，vqe_func_shot
     import random
     import numpy as np
     import pyqpanda as pq
-
+    
+    from pyvqnet.data import data_generator as dataloader
     from pyvqnet.nn.module import Module
     from pyvqnet.optim import sgd
     from pyvqnet.qnn.quantumlayer import QuantumLayer
@@ -6167,7 +6212,6 @@ vqe_func_analytic()函数是使用参数偏移计算理论梯度，vqe_func_shot
         def __init__(self):
             super(Model, self).__init__()
             self.qvc = QuantumLayer(qvc_circuits, 24, "cpu", 4)
-            #self.qvc2 = QuantumLayer(qvc_circuits2, 3, "cpu", 4)
 
         def forward(self, x):
             y = self.qvc(x)
@@ -6190,19 +6234,6 @@ vqe_func_analytic()函数是使用参数偏移计算理论梯度，vqe_func_shot
         label = datasets[:, -1].astype(int)
         label = np.eye(2)[label].reshape(-1, 2)
         return data, label
-
-
-    def dataloader(data, label, batch_size, shuffle=True) -> np:
-        if shuffle:
-            for _ in range(len(data) // batch_size):
-                random_index = np.random.randint(0, len(data), (batch_size, 1))
-                yield data[random_index].reshape(batch_size,
-                                                -1), label[random_index].reshape(
-                                                    batch_size, -1)
-        else:
-            for i in range(0, len(data) - batch_size + 1, batch_size):
-                yield data[i:i + batch_size], label[i:i + batch_size]
-
 
     def get_accuary(result, label):
         result, label = np.array(result.data), np.array(label.data)
@@ -6311,12 +6342,11 @@ vqe_func_analytic()函数是使用参数偏移计算理论梯度，vqe_func_shot
 
 .. code-block::
 
-    import sys,os
     from pyvqnet.nn.module import Module
     from pyvqnet.optim import sgd
     import numpy as np
     import os
-    from pyvqnet.nn.linear import Linear
+    from pyvqnet.data import data_generator as dataloader
     from pyvqnet.nn.loss import CategoricalCrossEntropy
 
     from pyvqnet.tensor.tensor import QTensor
@@ -6401,14 +6431,6 @@ vqe_func_analytic()函数是使用参数偏移计算理论梯度，vqe_func_shot
         def forward(self, x):
             return self.qvc(x)
 
-    def dataloader(data,label,batch_size, shuffle = True)->np:
-        if shuffle:
-            for _ in range(len(data)//batch_size):
-                random_index = np.random.randint(0, len(data), (batch_size, 1))
-                yield data[random_index].reshape(batch_size,-1),label[random_index].reshape(batch_size,-1)
-        else:
-            for i in range(0,len(data)-batch_size+1,batch_size):
-                yield data[i:i+batch_size], label[i:i+batch_size]
 
     def get_data(dataset_str):
         if dataset_str == "train":
@@ -6842,13 +6864,13 @@ VQNet提供了封装类 ``VQC_wrapper`` ，用户使用普通逻辑门在函数 
     import sys,os
     import time
 
+    from pyvqnet.data import data_generator as dataloader
     from pyvqnet.nn.module import Module
     from pyvqnet.optim import sgd
     import numpy as np
-    import os
     from pyvqnet.nn.loss import CategoricalCrossEntropy
 
-    from pyvqnet.tensor.tensor import QTensor
+    from pyvqnet.tensor import QTensor
     import random
 
     from pyvqnet.qnn.quantumlayer import VQCLayer,VQC_wrapper,_array2var
@@ -6948,14 +6970,7 @@ VQNet提供了封装类 ``VQC_wrapper`` ，用户使用普通逻辑门在函数 
         label = np.eye(2)[label].reshape(-1, 2)
         return data, label
 
-    def dataloader(data,label,batch_size, shuffle = True)->np:
-        if shuffle:
-            for _ in range(len(data)//batch_size):
-                random_index = np.random.randint(0, len(data), (batch_size, 1))
-                yield data[random_index].reshape(batch_size,-1),label[random_index].reshape(batch_size,-1)
-        else:
-            for i in range(0,len(data)-batch_size+1,batch_size):
-                yield data[i:i+batch_size], label[i:i+batch_size]
+
 
     def get_accuary(result,label):
         result,label = np.array(result.data), np.array(label.data)

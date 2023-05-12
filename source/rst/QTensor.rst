@@ -12,55 +12,40 @@ QTensor's 函数与属性
 __init__
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:function:: QTensor.__init__(data, requires_grad=False, nodes=None, device=0)
+.. py:function:: QTensor.__init__(data, requires_grad=False, nodes=None, device=0, dtype = None, name = "")
 
     具有动态计算图构造和自动微分的张量。
 
     :param data: 输入数据，可以是 _core.Tensor 或numpy 数组。
     :param requires_grad: 是否应该跟踪张量的梯度，默认为 False。
     :param nodes: 计算图中的后继者列表，默认为无。
-    :param device: 当前保存 QTensor 的设备，默认 = 0。
-
+    :param device: 储存在哪个设备上，默认0，在CPU上。
+    :param dtype: 参数的数据类型，defaults：None，使用默认数据类型:kfloat32,代表32位浮点数。
+    :param name: QTensor的名字,default:""。
     :return: 输出 QTensor。
 
     .. note::
-            QTensor 内部数据以单精度浮点数保存，最多支持 7 个有效数字。
+            QTensor 内部数据类型dtype支持kbool,kuint8,kint8,kint16,kint32,kint64,kfloat32,kfloat64,kcomplex64,kcomplex128.
+
+            分别代表C++的 bool,uint8_t,int8_t,int16_t,int32_t,int64_t,float,double,complex<float>,complex<double>.
 
     Example::
 
-
-        from pyvqnet.tensor import tensor
         from pyvqnet.tensor import QTensor
+        from pyvqnet.dtype import *
         import numpy as np
-        from pyvqnet._core import Tensor as CoreTensor
+
         t1 = QTensor(np.ones([2,3]))
-        t2 = QTensor(CoreTensor.ones([2,3]))
-        t3 =  QTensor([2,3,4,5])
-        t4 =  QTensor([[[2,3,4,5],[2,3,4,5]]])
+        t2 =  QTensor([2,3,4j,5])
+        t3 =  QTensor([[[2,3,4,5],[2,3,4,5]]],dtype=kbool)
         print(t1)
-
-        # [
-        # [1.0000000, 1.0000000, 1.0000000],
-        # [1.0000000, 1.0000000, 1.0000000]
-        # ]
-
         print(t2)
-
-        # [
-        # [1.0000000, 1.0000000, 1.0000000],
-        # [1.0000000, 1.0000000, 1.0000000]
-        # ]
-
         print(t3)
-
-        #[2.0000000, 3.0000000, 4.0000000, 5.0000000]
-
-        print(t4)
-
-        # [
-        # [[2.0000000, 3.0000000, 4.0000000, 5.0000000],
-        #  [2.0000000, 3.0000000, 4.0000000, 5.0000000]]
-        # ]
+        # [[1. 1. 1.]
+        #  [1. 1. 1.]]
+        # [2.+0.j 3.+0.j 0.+4.j 5.+0.j]
+        # [[[ True  True  True  True]
+        #   [ True  True  True  True]]]
 
 
 ndim
@@ -74,7 +59,6 @@ ndim
 
     Example::
 
-        from pyvqnet.tensor import tensor
         from pyvqnet.tensor import QTensor
 
         a = QTensor([2, 3, 4, 5], requires_grad=True)
@@ -93,7 +77,6 @@ shape
 
     Example::
 
-        from pyvqnet.tensor import tensor
         from pyvqnet.tensor import QTensor
 
         a = QTensor([2, 3, 4, 5], requires_grad=True)
@@ -112,7 +95,6 @@ size
 
     Example::
 
-        from pyvqnet.tensor import tensor
         from pyvqnet.tensor import QTensor
 
         a = QTensor([2, 3, 4, 5], requires_grad=True)
@@ -131,13 +113,33 @@ numel
 
     Example::
 
-        from pyvqnet.tensor import tensor
         from pyvqnet.tensor import QTensor
 
         a = QTensor([2, 3, 4, 5], requires_grad=True)
         print(a.numel())
 
         # 4
+
+
+dtype
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:attribute:: QTensor.dtype
+
+    返回张量的数据类型。
+
+    QTensor 内部数据类型dtype支持kbool=0,kuint8=1,kint8=2,kint16=3,kint32=4,kint64=5,kfloat32=6,kfloat64=7,kcomplex64=8,kcomplex128=9.
+
+    :return: 张量的数据类型。
+
+    Example::
+
+        from pyvqnet.tensor import QTensor
+
+        a = QTensor([2, 3, 4, 5])
+        print(a.dtype)
+        # 4
+
 
 zero_grad
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -150,7 +152,6 @@ zero_grad
 
     Example::
 
-        from pyvqnet.tensor import tensor
         from pyvqnet.tensor import QTensor
         t3 = QTensor([2, 3, 4, 5], requires_grad=True)
         t3.zero_grad()
@@ -169,16 +170,13 @@ backward
 
     Example::
 
-        from pyvqnet.tensor import tensor
         from pyvqnet.tensor import QTensor
 
-        target = QTensor([[0, 0, 1, 0, 0, 0, 0, 0, 0, 0]], requires_grad=True)
+        target = QTensor([[0, 0, 1, 0, 0, 0, 0, 0, 0, 0.2]], requires_grad=True)
         y = 2*target + 3
         y.backward()
         print(target.grad)
-        # [
-        # [2.0000000, 2.0000000, 2.0000000, 2.0000000, 2.0000000, 2.0000000, 2.0000000, 2.0000000, 2.0000000, 2.0000000]
-        # ]
+        #[[2. 2. 2. 2. 2. 2. 2. 2. 2. 2.]]
 
 to_numpy
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -211,7 +209,6 @@ item
     Example::
 
         from pyvqnet.tensor import tensor
-        from pyvqnet.tensor import QTensor
 
         t = tensor.ones([1])
         print(t.item())
@@ -338,7 +335,7 @@ all
     Example::
 
         from pyvqnet.tensor import tensor
-        from pyvqnet.tensor import QTensor
+
         shape = [2, 3]
         t = tensor.zeros(shape)
         t.fill_(1.0)
@@ -359,7 +356,7 @@ any
     Example::
 
         from pyvqnet.tensor import tensor
-        from pyvqnet.tensor import QTensor
+
         shape = [2, 3]
         t = tensor.ones(shape)
         t.fill_(1.0)
@@ -880,19 +877,20 @@ __setitem__
 ones
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:function:: pyvqnet.tensor.ones(shape,device=0)
+.. py:function:: pyvqnet.tensor.ones(shape,device=0,dtype-None)
 
     创建元素全一的 QTensor 。
 
     :param shape: 数据的形状。
     :param device: 储存在哪个设备上，默认0，在CPU上。
+    :param dtype: 参数的数据类型，defaults：None，使用默认数据类型:kfloat32,代表32位浮点数。
 
     :return: 返回新的 QTensor 。
 
     Example::
 
         from pyvqnet.tensor import tensor
-        from pyvqnet.tensor import QTensor
+
         x = tensor.ones([2, 3])
         print(x)
 
@@ -904,11 +902,13 @@ ones
 ones_like
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:function:: pyvqnet.tensor.ones_like(t: pyvqnet.tensor.QTensor)
+.. py:function:: pyvqnet.tensor.ones_like(t: pyvqnet.tensor.QTensor,device=0,dtype=None)
 
     创建元素全一的 QTensor ,形状和输入的 QTensor 一样。
 
     :param t: 输入 QTensor 。
+    :param device: 储存在哪个设备上，默认0，在CPU上。
+    :param dtype: 参数的数据类型，defaults：None,跟输入的dtype一样。
 
     :return: 新的全一  QTensor 。
 
@@ -926,13 +926,14 @@ ones_like
 full
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:function:: pyvqnet.tensor.full(shape, value, device: int = 0)
+.. py:function:: pyvqnet.tensor.full(shape, value, device: int = 0,dtype=None)
 
     创建一个指定形状的 QTensor 并用特定值填充它。
 
     :param shape: 要创建的张量形状。
     :param value: 填充的值。
     :param device: 储存在哪个设备上，默认0，在CPU上。
+    :param dtype: 参数的数据类型，defaults：None，使用默认数据类型:kfloat32,代表32位浮点数。
 
     :return: 输出新 QTensor 。 
 
@@ -953,12 +954,14 @@ full
 full_like
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:function:: pyvqnet.tensor.full_like(t, value)
+.. py:function:: pyvqnet.tensor.full_like(t, value, device: int = 0,dtype=None)
 
     创建一个形状和输入一样的 QTensor,所有元素填充 value 。
 
     :param t: 输入 QTensor 。
     :param value: 填充 QTensor 的值。
+    :param device: 储存在哪个设备上，默认0，在CPU上。
+    :param dtype: 参数的数据类型，defaults：None,跟输入的dtype一样。
 
     :return: 输出 QTensor。
 
@@ -980,12 +983,13 @@ full_like
 zeros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:function:: pyvqnet.tensor.zeros(shape,device=0)
+.. py:function:: pyvqnet.tensor.zeros(shape, device: int = 0,dtype=None)
 
     创建输入形状大小的全零 QTensor 。
 
     :param shape: 输入形状。
     :param device: 储存在哪个设备上，默认0，在CPU上。
+    :param dtype: 参数的数据类型，defaults：None，使用默认数据类型:kfloat32,代表32位浮点数。
 
     :return: 输出 QTensor 。
 
@@ -1008,11 +1012,14 @@ zeros
 zeros_like
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:function:: pyvqnet.tensor.zeros_like(t: pyvqnet.tensor.QTensor)
+.. py:function:: pyvqnet.tensor.zeros_like(t: pyvqnet.tensor.QTensor, device: int = 0,dtype=None)
 
     创建一个形状和输入一样的 QTensor,所有元素为0 。
 
     :param t: 输入参考 QTensor 。
+    :param device: 储存在哪个设备上，默认0，在CPU上。
+    :param dtype: 参数的数据类型，defaults：None,跟输入的dtype一样。
+
     :return: 输出 QTensor 。
 
     Example::
@@ -1030,7 +1037,7 @@ zeros_like
 arange
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:function:: pyvqnet.tensor.arange(start, end, step=1, device: int = 0,requires_grad=False)
+.. py:function:: pyvqnet.tensor.arange(start, end, step=1, device: int = 0,dtype=None,requires_grad=False)
 
     创建一个在给定间隔内具有均匀间隔值的一维 QTensor 。
 
@@ -1038,6 +1045,7 @@ arange
     :param end: 间隔结束。
     :param step: 值之间的间距，默认为1。
     :param device: 要使用的设备，默认 = 0 ，使用 CPU 设备。
+    :param dtype: 参数的数据类型，defaults：None，使用默认数据类型:kfloat32,代表32位浮点数。
     :param requires_grad: 是否计算梯度，默认为False。
 
     :return: 输出 QTensor 。
@@ -1055,7 +1063,7 @@ arange
 linspace
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:function:: pyvqnet.tensor.linspace(start, end, num, device: int = 0, requires_grad= False)
+.. py:function:: pyvqnet.tensor.linspace(start, end, num, device: int = 0,dtype=None,requires_grad= False)
 
     创建一维 QTensor ，其中的元素为区间 start 和 end 上均匀间隔的共 num 个值。
 
@@ -1063,6 +1071,7 @@ linspace
     :param end: 间隔结束。
     :param num: 间隔的个数。
     :param device: 要使用的设备，默认 = 0 ，使用 CPU 设备。
+    :param dtype: 参数的数据类型，defaults：None，使用默认数据类型:kfloat32,代表32位浮点数。
     :param requires_grad: 是否计算梯度，默认为False。
 
     :return: 输出 QTensor 。
@@ -1079,7 +1088,7 @@ linspace
 logspace
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:function:: pyvqnet.tensor.logspace(start, end, num, base, device: int = 0, requires_grad)
+.. py:function:: pyvqnet.tensor.logspace(start, end, num, base, device: int = 0,dtype=None, requires_grad)
 
     在对数刻度上创建具有均匀间隔值的一维 QTensor。
 
@@ -1088,7 +1097,9 @@ logspace
     :param num: 要生成的样本数
     :param base: 对数刻度的基数
     :param device: 要使用的设备，默认 = 0 ，使用 CPU 设备。
+    :param dtype: 参数的数据类型，defaults：None，使用默认数据类型:kfloat32,代表32位浮点数。
     :param requires_grad: 是否计算梯度，默认为False。
+
     :return: 输出 QTensor 。
 
     Example::
@@ -1105,13 +1116,14 @@ logspace
 eye
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:function:: pyvqnet.tensor.eye(size, offset: int = 0, device: int = 0)
+.. py:function:: pyvqnet.tensor.eye(size, offset: int = 0, device: int = 0,dtype=None)
 
     创建一个 size x size 的 QTensor，对角线上为 1，其他地方为 0。
 
     :param size: 要创建的（正方形）QTensor 的大小。
     :param offset: 对角线的索引：0（默认）表示主对角线，正值表示上对角线，负值表示下对角线。
     :param device: 要使用的设备，默认 = 0 ，使用 CPU 设备。
+    :param dtype: 参数的数据类型，defaults：None，使用默认数据类型:kfloat32,代表32位浮点数。
 
     :return: 输出 QTensor 。
 
@@ -1133,7 +1145,7 @@ eye
 diag
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:function:: pyvqnet.tensor.diag(t, k: int = 0)
+.. py:function:: pyvqnet.tensor.diag(t, k: int = 0,requires_grad=False)
 
     构造对角矩阵。
 
@@ -1142,6 +1154,8 @@ diag
 
     :param t: 输入 QTensor。
     :param k: 偏移量（主对角线为 0，正数为向上偏移，负数为向下偏移），默认为0。
+    :param requires_grad: 是否计算梯度，默认为False。
+
     :return: 输出 QTensor。
 
     Example::
@@ -1155,65 +1169,51 @@ diag
             u = tensor.diag(t,k=k)
             print(u)
 
-        # [
-        # [0.0000000, 0.0000000, 0.0000000, 0.0000000],
-        # [0.0000000, 0.0000000, 0.0000000, 0.0000000],
-        # [0.0000000, 0.0000000, 0.0000000, 0.0000000],
-        # [12.0000000, 0.0000000, 0.0000000, 0.0000000]
-        # ]
 
-        # [
-        # [0.0000000, 0.0000000, 0.0000000, 0.0000000],
-        # [0.0000000, 0.0000000, 0.0000000, 0.0000000],
-        # [8.0000000, 0.0000000, 0.0000000, 0.0000000],
-        # [0.0000000, 13.0000000, 0.0000000, 0.0000000]
-        # ]
-
-        # [
-        # [0.0000000, 0.0000000, 0.0000000, 0.0000000],
-        # [4.0000000, 0.0000000, 0.0000000, 0.0000000],
-        # [0.0000000, 9.0000000, 0.0000000, 0.0000000],
-        # [0.0000000, 0.0000000, 14.0000000, 0.0000000]
-        # ]
-
-        # [
-        # [0.0000000, 0.0000000, 0.0000000, 0.0000000],
-        # [0.0000000, 5.0000000, 0.0000000, 0.0000000],
-        # [0.0000000, 0.0000000, 10.0000000, 0.0000000],
-        # [0.0000000, 0.0000000, 0.0000000, 15.0000000]
-        # ]
-
-        # [
-        # [0.0000000, 1.0000000, 0.0000000, 0.0000000],
-        # [0.0000000, 0.0000000, 6.0000000, 0.0000000],
-        # [0.0000000, 0.0000000, 0.0000000, 11.0000000],
-        # [0.0000000, 0.0000000, 0.0000000, 0.0000000]
-        # ]
-
-        # [
-        # [0.0000000, 0.0000000, 2.0000000, 0.0000000],
-        # [0.0000000, 0.0000000, 0.0000000, 7.0000000],
-        # [0.0000000, 0.0000000, 0.0000000, 0.0000000],
-        # [0.0000000, 0.0000000, 0.0000000, 0.0000000]
-        # ]
-
-        # [
-        # [0.0000000, 0.0000000, 0.0000000, 3.0000000],
-        # [0.0000000, 0.0000000, 0.0000000, 0.0000000],
-        # [0.0000000, 0.0000000, 0.0000000, 0.0000000],
-        # [0.0000000, 0.0000000, 0.0000000, 0.0000000]
-        # ]
+        # [[ 0.  0.  0.  0.]
+        #  [ 0.  0.  0.  0.]
+        #  [ 0.  0.  0.  0.]
+        #  [12.  0.  0.  0.]]
+        # [[ 0.  0.  0.  0.]
+        #  [ 0.  0.  0.  0.]
+        #  [ 8.  0.  0.  0.]
+        #  [ 0. 13.  0.  0.]]
+        # [[ 0.  0.  0.  0.]
+        #  [ 4.  0.  0.  0.]
+        #  [ 0.  9.  0.  0.]
+        #  [ 0.  0. 14.  0.]]
+        # [[ 0.  0.  0.  0.]
+        #  [ 0.  5.  0.  0.]
+        #  [ 0.  0. 10.  0.]
+        #  [ 0.  0.  0. 15.]]
+        # [[ 0.  1.  0.  0.]
+        #  [ 0.  0.  6.  0.]
+        #  [ 0.  0.  0. 11.]
+        #  [ 0.  0.  0.  0.]]
+        # [[0. 0. 2. 0.]
+        #  [0. 0. 0. 7.]
+        #  [0. 0. 0. 0.]
+        #  [0. 0. 0. 0.]]
+        # [[0. 0. 0. 3.]
+        #  [0. 0. 0. 0.]
+        #  [0. 0. 0. 0.]
+        #  [0. 0. 0. 0.]]
 
 
 randu
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:function:: pyvqnet.tensor.randu(shape, device: int = 0)
+.. py:function:: pyvqnet.tensor.randu(shape, min=0.0,max=1.0, device: int = 0, dtype=None, requires_grad=False)
 
     创建一个具有均匀分布随机值的 QTensor 。
 
     :param shape: 要创建的 QTensor 的形状。
+    :param min: 分布的下限，默认: 0。
+    :param max: 分布的上线，默认: 1。
     :param device: 要使用的设备，默认 = 0 ，使用 CPU 设备。
+    :param dtype: 参数的数据类型，defaults：None，使用默认数据类型:kfloat32,代表32位浮点数。
+    :param requires_grad: 是否计算梯度，默认为False。
+
     :return: 输出 QTensor 。
 
     Example::
@@ -1233,12 +1233,17 @@ randu
 randn
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:function:: pyvqnet.tensor.randn(shape, device: int = 0)
+.. py:function:: pyvqnet.tensor.randn(shape, mean=0.0,std=1.0, device: int = 0, dtype=None, requires_grad=False)
 
     创建一个具有正态分布随机值的 QTensor 。
 
     :param shape: 要创建的 QTensor 的形状。
+    :param mean: 分布的均值，默认: 0。
+    :param max: 分布的方差，默认: 1。
     :param device: 要使用的设备，默认 = 0 ，使用 CPU 设备。
+    :param dtype: 参数的数据类型，defaults：None，使用默认数据类型:kfloat32,代表32位浮点数。
+    :param requires_grad: 是否计算梯度，默认为False。
+
     :return: 输出 QTensor 。
 
     Example::
@@ -1262,7 +1267,7 @@ multinomial
 
     返回一个张量，其中每行包含 num_samples 个索引采样，来自位于张量输入的相应行中的多项式概率分布。
     
-    :param t: 输入概率分布。
+    :param t: 输入概率分布,仅支持浮点数。
     :param num_samples: 采样样本。
 
     :return:
@@ -1271,16 +1276,17 @@ multinomial
     Examples::
 
         from pyvqnet import tensor
-        weights = tensor.QTensor([0,10, 3, 1]) 
+        weights = tensor.QTensor([0.1,10, 3, 1]) 
         idx = tensor.multinomial(weights,3)
         print(idx)
 
         from pyvqnet import tensor
-        weights = tensor.QTensor([0,10, 3, 0]) 
+        weights = tensor.QTensor([0,10, 3, 2.2,0.0]) 
         idx = tensor.multinomial(weights,3)
         print(idx)
-        #[2.0000000, 1.0000000, 3.0000000]
-        #[1.0000000, 2.0000000, 0.0000000]
+
+        # [1 0 3]
+        # [1 3 2]
 
 triu
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -1550,7 +1556,7 @@ add
 
 .. py:function:: pyvqnet.tensor.add(t1: pyvqnet.tensor.QTensor, t2: pyvqnet.tensor.QTensor)
 
-    两个 QTensor 按元素相加。
+    两个 QTensor 按元素相加。等价于t1 + t2。
 
     :param t1: 第一个 QTensor 。
     :param t2: 第二个 QTensor 。
@@ -1572,7 +1578,7 @@ sub
 
 .. py:function:: pyvqnet.tensor.sub(t1: pyvqnet.tensor.QTensor, t2: pyvqnet.tensor.QTensor)
 
-    两个 QTensor 按元素相减。
+    两个 QTensor 按元素相减。等价于t1 - t2。
 
     :param t1: 第一个 QTensor 。
     :param t2: 第二个 QTensor 。
@@ -1594,7 +1600,7 @@ mul
 
 .. py:function:: pyvqnet.tensor.mul(t1: pyvqnet.tensor.QTensor, t2: pyvqnet.tensor.QTensor)
 
-    两个 QTensor 按元素相乘。
+    两个 QTensor 按元素相乘。等价于t1 * t2。
 
     :param t1: 第一个 QTensor 。
     :param t2: 第二个 QTensor 。
@@ -1616,7 +1622,7 @@ divide
 
 .. py:function:: pyvqnet.tensor.divide(t1: pyvqnet.tensor.QTensor, t2: pyvqnet.tensor.QTensor)
 
-    两个 QTensor 按元素相除。
+    两个 QTensor 按元素相除。等价于t1 / t2。
 
     :param t1: 第一个 QTensor 。
     :param t2: 第二个 QTensor 。
@@ -1686,7 +1692,7 @@ mean
 
     对输入的 QTensor 按 axis 设定的轴计算元素的平均，如果 axis 是None，则返回所有元素平均。
 
-    :param t: 输入 QTensor 。
+    :param t: 输入 QTensor ,需要是浮点数或者复数。
     :param axis: 用于求平均的轴，默认为None。
     :param keepdims: 输出张量是否保留了减小的维度。默认为False。
     :return: 输出 QTensor 或 均值。
@@ -1695,11 +1701,11 @@ mean
 
         from pyvqnet.tensor import tensor
         from pyvqnet.tensor import QTensor
-        t = QTensor([[1, 2, 3], [4, 5, 6]])
+        t = QTensor([[1, 2, 3], [4, 5, 6.0]])
         x = tensor.mean(t, axis=1)
         print(x)
 
-        # [2.0000000, 5.0000000]
+        # [2. 5.]
 
 median
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -1728,7 +1734,7 @@ median
                     [0.3180, -0.6993,  1.0436,  0.0438,  0.2270],
                     [-0.2751,  0.7303,  0.2192,  0.3321,  0.2488],
                     [1.0778, -1.9510,  0.7048,  0.4742, -0.7125]])
-        median_b = tensor.median(b,[1], False)
+        median_b = tensor.median(b,1, False)
         print(median_b)
 
         # [-0.3982000, 0.2269999, 0.2487999, 0.4742000]
@@ -1825,6 +1831,114 @@ matmul
         #  [2.0000000, 2.0000000, 2.0000000, 2.0000000]
         # ]
 
+kron
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+    计算 :attr:`input` 和 :attr:`other` 的 Kronecker 积，用 :math:`\otimes` 表示。
+
+    如果 :attr:`input` 是一个 :math:`(a_0 \times a_1 \times \dots \times a_n)` 张量并且 :attr:`other` 是一个
+     :math:`(b_0 \times b_1 \times \dots \times b_n)` 张量，结果将是
+     :math:`(a_0*b_0 \times a_1*b_1 \times \dots \times a_n*b_n)` 张量，包含以下条目：
+
+     .. math::
+         (\text{input} \otimes \text{other})_{k_0, k_1, \dots, k_n} =
+             \text{input}_{i_0, i_1, \dots, i_n} * \text{other}_{j_0, j_1, \dots, j_n},
+
+     其中 :math:`k_t = i_t * b_t + j_t` 为 :math:`0 \leq t \leq n`。
+     如果一个张量的维数少于另一个，它将被解压缩，直到它具有相同的维数。
+
+    :param t1: 第一个 QTensor 。
+    :param t2: 第二个 QTensor 。
+    :return:  输出 QTensor 。
+
+    Example::
+
+        from pyvqnet import tensor
+        a = tensor.arange(1,1+ 24).reshape([2,1,2,3,2])
+        b = tensor.arange(1,1+ 24).reshape([6,4])
+
+
+        c = tensor.kron(a,b)
+        print(c)
+
+        # [[[[[  1.   2.   3.   4.   2.   4.   6.   8.]
+        #     [  5.   6.   7.   8.  10.  12.  14.  16.]
+        #     [  9.  10.  11.  12.  18.  20.  22.  24.]
+        #     [ 13.  14.  15.  16.  26.  28.  30.  32.]
+        #     [ 17.  18.  19.  20.  34.  36.  38.  40.]
+        #     [ 21.  22.  23.  24.  42.  44.  46.  48.]
+        #     [  3.   6.   9.  12.   4.   8.  12.  16.]
+        #     [ 15.  18.  21.  24.  20.  24.  28.  32.]
+        #     [ 27.  30.  33.  36.  36.  40.  44.  48.]
+        #     [ 39.  42.  45.  48.  52.  56.  60.  64.]
+        #     [ 51.  54.  57.  60.  68.  72.  76.  80.]
+        #     [ 63.  66.  69.  72.  84.  88.  92.  96.]
+        #     [  5.  10.  15.  20.   6.  12.  18.  24.]
+        #     [ 25.  30.  35.  40.  30.  36.  42.  48.]
+        #     [ 45.  50.  55.  60.  54.  60.  66.  72.]
+        #     [ 65.  70.  75.  80.  78.  84.  90.  96.]
+        #     [ 85.  90.  95. 100. 102. 108. 114. 120.]
+        #     [105. 110. 115. 120. 126. 132. 138. 144.]]
+
+        #    [[  7.  14.  21.  28.   8.  16.  24.  32.]
+        #     [ 35.  42.  49.  56.  40.  48.  56.  64.]
+        #     [ 63.  70.  77.  84.  72.  80.  88.  96.]
+        #     [ 91.  98. 105. 112. 104. 112. 120. 128.]
+        #     [119. 126. 133. 140. 136. 144. 152. 160.]
+        #     [147. 154. 161. 168. 168. 176. 184. 192.]
+        #     [  9.  18.  27.  36.  10.  20.  30.  40.]
+        #     [ 45.  54.  63.  72.  50.  60.  70.  80.]
+        #     [ 81.  90.  99. 108.  90. 100. 110. 120.]
+        #     [117. 126. 135. 144. 130. 140. 150. 160.]
+        #     [153. 162. 171. 180. 170. 180. 190. 200.]
+        #     [189. 198. 207. 216. 210. 220. 230. 240.]
+        #     [ 11.  22.  33.  44.  12.  24.  36.  48.]
+        #     [ 55.  66.  77.  88.  60.  72.  84.  96.]
+        #     [ 99. 110. 121. 132. 108. 120. 132. 144.]
+        #     [143. 154. 165. 176. 156. 168. 180. 192.]
+        #     [187. 198. 209. 220. 204. 216. 228. 240.]
+        #     [231. 242. 253. 264. 252. 264. 276. 288.]]]]
+
+
+
+        #  [[[[ 13.  26.  39.  52.  14.  28.  42.  56.]
+        #     [ 65.  78.  91. 104.  70.  84.  98. 112.]
+        #     [117. 130. 143. 156. 126. 140. 154. 168.]
+        #     [169. 182. 195. 208. 182. 196. 210. 224.]
+        #     [221. 234. 247. 260. 238. 252. 266. 280.]
+        #     [273. 286. 299. 312. 294. 308. 322. 336.]
+        #     [ 15.  30.  45.  60.  16.  32.  48.  64.]
+        #     [ 75.  90. 105. 120.  80.  96. 112. 128.]
+        #     [135. 150. 165. 180. 144. 160. 176. 192.]
+        #     [195. 210. 225. 240. 208. 224. 240. 256.]
+        #     [255. 270. 285. 300. 272. 288. 304. 320.]
+        #     [315. 330. 345. 360. 336. 352. 368. 384.]
+        #     [ 17.  34.  51.  68.  18.  36.  54.  72.]
+        #     [ 85. 102. 119. 136.  90. 108. 126. 144.]
+        #     [153. 170. 187. 204. 162. 180. 198. 216.]
+        #     [221. 238. 255. 272. 234. 252. 270. 288.]
+        #     [289. 306. 323. 340. 306. 324. 342. 360.]
+        #     [357. 374. 391. 408. 378. 396. 414. 432.]]
+
+        #    [[ 19.  38.  57.  76.  20.  40.  60.  80.]
+        #     [ 95. 114. 133. 152. 100. 120. 140. 160.]
+        #     [171. 190. 209. 228. 180. 200. 220. 240.]
+        #     [247. 266. 285. 304. 260. 280. 300. 320.]
+        #     [323. 342. 361. 380. 340. 360. 380. 400.]
+        #     [399. 418. 437. 456. 420. 440. 460. 480.]
+        #     [ 21.  42.  63.  84.  22.  44.  66.  88.]
+        #     [105. 126. 147. 168. 110. 132. 154. 176.]
+        #     [189. 210. 231. 252. 198. 220. 242. 264.]
+        #     [273. 294. 315. 336. 286. 308. 330. 352.]
+        #     [357. 378. 399. 420. 374. 396. 418. 440.]
+        #     [441. 462. 483. 504. 462. 484. 506. 528.]
+        #     [ 23.  46.  69.  92.  24.  48.  72.  96.]
+        #     [115. 138. 161. 184. 120. 144. 168. 192.]
+        #     [207. 230. 253. 276. 216. 240. 264. 288.]
+        #     [299. 322. 345. 368. 312. 336. 360. 384.]
+        #     [391. 414. 437. 460. 408. 432. 456. 480.]
+        #     [483. 506. 529. 552. 504. 528. 552. 576.]]]]]
+
 
 reciprocal
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -1840,7 +1954,6 @@ reciprocal
     Example::
 
         from pyvqnet.tensor import tensor
-        from pyvqnet.tensor import QTensor
 
         t = tensor.arange(1, 10, 1)
         u = tensor.reciprocal(t)
@@ -2016,7 +2129,6 @@ atan
     Example::
 
         from pyvqnet.tensor import tensor
-        from pyvqnet.tensor import QTensor
 
         t = tensor.arange(-1, 1, .5)
         u = tensor.atan(t)
@@ -2298,7 +2410,7 @@ frobenius_norm
 
     Example::
 
-        from pyvqnet import tensor,QTensor
+        from pyvqnet.tensor import tensor,QTensor
         t = QTensor([[[1., 2., 3.], [4., 5., 6.]], [[7., 8., 9.], [10., 11., 12.]],
                     [[13., 14., 15.], [16., 17., 18.]]])
         t.requires_grad = True
@@ -2444,7 +2556,7 @@ where
 
     根据条件返回从 t1 或 t2 中选择的元素。
 
-    :param condition: 判断条件 QTensor 。
+    :param condition: 判断条件 QTensor,需要是kbool数据类型 。
     :param t1: 如果满足条件，则从中获取元素。
     :param t2: 如果条件不满足，则从中获取元素。
 
@@ -2496,7 +2608,7 @@ isfinite
     逐元素判断输入是否为Finite （既非 +/-INF 也非 +/-NaN ）。
 
     :param t: 输入 QTensor 。
-    :return: 输出 QTensor , 其中对应位置元素满足条件时返回1，否则返回0。
+    :return: 输出 QTensor , 其中对应位置元素满足条件时返回True，否则返回False。
 
     Example::
 
@@ -2507,7 +2619,7 @@ isfinite
         flag = tensor.isfinite(t)
         print(flag)
 
-        # [1.0000000, 0.0000000, 1.0000000, 0.0000000, 0.0000000]
+        #[ True False  True False False]
 
 isinf
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -2517,7 +2629,7 @@ isinf
     逐元素判断输入的每一个值是否为 +/-INF 。
 
     :param t: 输入 QTensor 。
-    :return: 输出 QTensor , 其中对应位置元素满足条件时返回1，否则返回0。
+    :return: 输出 QTensor , 其中对应位置元素满足条件时返回True，否则返回False。
 
     Example::
 
@@ -2528,7 +2640,7 @@ isinf
         flag = tensor.isinf(t)
         print(flag)
 
-        # [0.0000000, 1.0000000, 0.0000000, 1.0000000, 0.0000000]
+        # [False  True False  True False]
 
 isnan
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -2538,7 +2650,7 @@ isnan
     逐元素判断输入的每一个值是否为 +/-NaN 。
 
     :param t: 输入 QTensor 。
-    :return: 输出 QTensor , 其中对应位置元素满足条件时返回1，否则返回0。
+    :return: 输出 QTensor , 其中对应位置元素满足条件时返回True，否则返回False。
 
     Example::
 
@@ -2549,7 +2661,7 @@ isnan
         flag = tensor.isnan(t)
         print(flag)
 
-        # [0.0000000, 0.0000000, 0.0000000, 0.0000000, 1.0000000]
+        # [False False False False  True]
 
 isneginf
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -2559,7 +2671,7 @@ isneginf
     逐元素判断输入的每一个值是否为 -INF 。
 
     :param t: 输入 QTensor 。
-    :return: 输出 QTensor , 其中对应位置元素满足条件时返回1，否则返回0。
+    :return: 输出 QTensor , 其中对应位置元素满足条件时返回True，否则返回False。
 
     Example::
 
@@ -2570,7 +2682,7 @@ isneginf
         flag = tensor.isneginf(t)
         print(flag)
 
-        # [0.0000000, 0.0000000, 0.0000000, 1.0000000, 0.0000000]
+        # [[False False False  True False]
 
 isposinf
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -2580,7 +2692,7 @@ isposinf
     逐元素判断输入的每一个值是否为 +INF 。
 
     :param t: 输入 QTensor 。
-    :return: 输出 QTensor , 其中对应位置元素满足条件时返回1，否则返回0。
+    :return: 输出 QTensor , 其中对应位置元素满足条件时返回True，否则返回False。
 
     Example::
 
@@ -2591,14 +2703,14 @@ isposinf
         flag = tensor.isposinf(t)
         print(flag)
 
-        # [0.0000000, 1.0000000, 0.0000000, 0.0000000, 0.0000000]
+        # [False  True False False False]
 
 logical_and
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:function:: pyvqnet.tensor.logical_and(t1, t2)
 
-    对两个输入进行逐元素逻辑与操作，对应位置元素满足条件时返回1，否则返回0。
+    对两个输入进行逐元素逻辑与操作，其中对应位置元素满足条件时返回True，否则返回False。
 
     :param t1: 输入 QTensor 。
     :param t2: 输入 QTensor 。
@@ -2615,14 +2727,14 @@ logical_and
         flag = tensor.logical_and(a,b)
         print(flag)
 
-        # [0.0000000, 0.0000000, 1.0000000, 0.0000000]
+        # [False False  True False]
 
 logical_or
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:function:: pyvqnet.tensor.logical_or(t1, t2)
 
-    对两个输入进行逐元素逻辑或操作，对应位置元素满足条件时返回1，否则返回0。
+    对两个输入进行逐元素逻辑或操作，其中对应位置元素满足条件时返回True，否则返回False。
 
     :param t1: 输入 QTensor 。
     :param t2: 输入 QTensor 。
@@ -2639,14 +2751,14 @@ logical_or
         flag = tensor.logical_or(a,b)
         print(flag)
 
-        # [1.0000000, 1.0000000, 1.0000000, 0.0000000]
+        # [ True  True  True False]
 
 logical_not
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:function:: pyvqnet.tensor.logical_not(t)
 
-    对输入进行逐元素逻辑非操作，对应位置元素满足条件时返回1，否则返回0。
+    对输入进行逐元素逻辑非操作，其中对应位置元素满足条件时返回True，否则返回False。
 
     :param t: 输入 QTensor 。
     :return: 输出 QTensor 。
@@ -2660,14 +2772,14 @@ logical_not
         flag = tensor.logical_not(a)
         print(flag)
 
-        # [1.0000000, 0.0000000, 0.0000000, 1.0000000]
+        # [ True False False  True]
 
 logical_xor
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:function:: pyvqnet.tensor.logical_xor(t1, t2)
 
-    对两个输入进行逐元素逻辑异或操作，对应位置元素满足条件时返回1，否则返回0。
+    对两个输入进行逐元素逻辑异或操作，其中对应位置元素满足条件时返回True，否则返回False。
 
     :param t1: 输入 QTensor 。
     :param t2: 输入 QTensor 。
@@ -2684,14 +2796,14 @@ logical_xor
         flag = tensor.logical_xor(a,b)
         print(flag)
 
-        # [1.0000000, 1.0000000, 0.0000000, 0.0000000]
+        # [ True  True False False]
 
 greater
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:function:: pyvqnet.tensor.greater(t1, t2)
 
-    逐元素比较 t1 是否大于 t2 ，满足条件则返回1，否则返回0。
+    逐元素比较 t1 是否大于 t2 ，其中对应位置元素满足条件时返回True，否则返回False。
 
     :param t1: 输入 QTensor 。
     :param t2: 输入 QTensor 。
@@ -2708,17 +2820,15 @@ greater
         flag = tensor.greater(a,b)
         print(flag)
 
-        # [
-        # [0.0000000, 1.0000000],
-        #  [0.0000000, 0.0000000]
-        # ]
+        # [[False  True]
+        #  [False False]]
 
 greater_equal
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:function:: pyvqnet.tensor.greater_equal(t1, t2)
 
-    逐元素比较 t1 是否大于等于 t2 ，满足条件则返回1，否则返回0。
+    逐元素比较 t1 是否大于等于 t2 ，其中对应位置元素满足条件时返回True，否则返回False。
 
     :param t1: 输入 QTensor 。
     :param t2: 输入 QTensor 。
@@ -2735,17 +2845,15 @@ greater_equal
         flag = tensor.greater_equal(a,b)
         print(flag)
 
-        # [
-        # [1.0000000, 1.0000000],
-        #  [0.0000000, 1.0000000]
-        # ]
+        #[[ True  True]
+        # [False  True]]
 
 less
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:function:: pyvqnet.tensor.less(t1, t2)
 
-    逐元素比较 t1 是否小于 t2 ，满足条件则返回1，否则返回0。
+    逐元素比较 t1 是否小于 t2 ，其中对应位置元素满足条件时返回True，否则返回False。
 
     :param t1: 输入 QTensor 。
     :param t2: 输入 QTensor 。
@@ -2762,17 +2870,15 @@ less
         flag = tensor.less(a,b)
         print(flag)
 
-        # [
-        # [0.0000000, 0.0000000],
-        #  [1.0000000, 0.0000000]
-        # ]
+        #[[False False]
+        # [ True False]]
 
 less_equal
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:function:: pyvqnet.tensor.less_equal(t1, t2)
 
-    逐元素比较 t1 是否小于等于 t2 ，满足条件则返回1，否则返回0。
+    逐元素比较 t1 是否小于等于 t2 ，其中对应位置元素满足条件时返回True，否则返回False。
 
     :param t1: 输入 QTensor 。
     :param t2: 输入 QTensor 。
@@ -2789,17 +2895,16 @@ less_equal
         flag = tensor.less_equal(a,b)
         print(flag)
 
-        # [
-        # [1.0000000, 0.0000000],
-        #  [1.0000000, 1.0000000]
-        # ]
+
+        # [[ True False]
+        #  [ True  True]]
 
 equal
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:function:: pyvqnet.tensor.equal(t1, t2)
 
-    逐元素比较 t1 是否等于 t2 ，满足条件则返回1，否则返回0。
+    逐元素比较 t1 是否等于 t2 ，其中对应位置元素满足条件时返回True，否则返回False。
 
     :param t1: 输入 QTensor 。
     :param t2: 输入 QTensor 。
@@ -2816,17 +2921,15 @@ equal
         flag = tensor.equal(a,b)
         print(flag)
 
-        # [
-        # [1.0000000, 0.0000000],
-        #  [0.0000000, 1.0000000]
-        # ]
+        #[[ True False]
+        # [False  True]]
 
 not_equal
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:function:: pyvqnet.tensor.not_equal(t1, t2)
 
-    逐元素比较 t1 是否不等于 t2 ，满足条件则返回1，否则返回0。
+    逐元素比较 t1 是否不等于 t2 ，其中对应位置元素满足条件时返回True，否则返回False。
 
     :param t1: 输入 QTensor 。
     :param t2: 输入 QTensor 。
@@ -2843,10 +2946,8 @@ not_equal
         flag = tensor.not_equal(a,b)
         print(flag)
 
-        # [
-        # [0.0000000, 1.0000000],
-        #  [1.0000000, 0.0000000]
-        # ]
+        #[[False  True]
+        # [ True False]]
 
 矩阵操作
 --------------------------
@@ -2925,7 +3026,7 @@ select
         t.requires_grad = True
         t.zero_grad()
         ts = tensor.select(t,indx)
-        ts.backward(tensor.ones(ts.shape))
+        
         print(ts)  
         # [
         # [[1.0000000, 2.0000000, 3.0000000, 4.0000000]],
@@ -3111,10 +3212,10 @@ squeeze
 
 .. py:function:: pyvqnet.tensor.squeeze(t: pyvqnet.tensor.QTensor, axis: int = - 1)
 
-    删除 axis 指定的轴，该轴的维度为1。如果 axis = -1 ，则将输入所有长度为1的维度删除。
+    删除 axis 指定的轴，该轴的维度为1。如果 axis = None ，则将输入所有长度为1的维度删除。
 
     :param t: 输入 QTensor 。
-    :param axis: 要压缩的轴，默认为-1。 
+    :param axis: 要压缩的轴，默认为None。 
     :return: 输出 QTensor 。
 
     Example::
@@ -3213,7 +3314,7 @@ masked_fill
     mask的形状必须与输入的 QTensor 的形状是可广播的。
 
     :param t: 输入 QTensor。
-    :param mask: 掩码 QTensor。
+    :param mask: 掩码 QTensor,必须是kbool。
     :param value: 填充值。
     :return: 一个 QTensor。
 
@@ -3223,7 +3324,7 @@ masked_fill
         import numpy as np
         a = tensor.ones([2, 2, 2, 2])
         mask = np.random.randint(0, 2, size=4).reshape([2, 2])
-        b = tensor.QTensor(mask)
+        b = tensor.QTensor(mask==1)
         c = tensor.masked_fill(a, b, 13)
         print(c)
         # [
@@ -3323,6 +3424,140 @@ flip
         #  [8.0000000, 7.0000000]]]   
         # ]
 
+gather
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:function:: pyvqnet.tensor.gather(t, dim, index)
+
+    沿由“dim”指定的轴收集值。
+
+    对于 3-D 张量，输出由以下指定：
+
+         out[i][j][k] = t[index[i][j][k]][j][k] # 如果 dim == 0
+         out[i][j][k] = t[i][index[i][j][k]][k] # 如果 dim == 1
+         out[i][j][k] = t[i][j][index[i][j][k]] # 如果 dim == 2
+
+    :param t: 输入 QTensor。
+    :param dim: 聚集轴。
+    :param index: 索引QTensor，应该与输入具有相同的维度大小。
+
+    :return: 聚集的结果
+
+    Example::
+
+        from pyvqnet.tensor import gather,QTensor,tensor
+        import numpy as np
+        np.random.seed(25)
+        npx = np.random.randn( 3, 4,6)
+        npindex = np.array([2,3,1,2,1,2,3,0,2,3,1,2,3,2,0,1]).reshape([2,2,4]).astype(np.int64)
+
+        x1 = QTensor(npx)
+        indices1 =  QTensor(npindex)
+        x1.requires_grad = True
+        y1 = gather(x1,1,indices1)
+        y1.backward(tensor.arange(0,y1.numel()).reshape(y1.shape))
+
+        print(y1)
+        # [
+        # [[2.1523438, -0.4196777, -2.0527344, -1.2460938],
+        #  [-0.6201172, -1.3349609, 2.2949219, -0.5913086]],
+        # [[0.2170410, -0.7055664, 1.6074219, -1.9394531],
+        #  [0.2430420, -0.6333008, 0.5332031, 0.3881836]]
+        # ]
+
+
+scatter
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:function:: pyvqnet.tensor.scatter(input, dim, index,src)
+
+
+    将张量 src 中的所有值写入 indices 张量中指定的索引处的 input 中。
+
+    对于 3-D 张量，输出由以下指定：
+
+    input[indices[i][j][k]][j][k] = src[i][j][k] # 如果 dim == 0
+    input[i][indices[i][j][k]][k] = src[i][j][k] # 如果 dim == 1
+    input[i][j][indices[i][j][k]] = src[i][j][k] # 如果 dim == 2
+
+    :param input: 输入QTensor。
+    :param dim: 散点轴。
+    :param indices: 索引QTensor，应该和输入有相同的维度大小。
+    :param src: 要散布的源张量。
+
+    Example::
+
+        from pyvqnet.tensor import scatter, QTensor
+        import numpy as np
+        np.random.seed(25)
+        npx = np.random.randn(3, 2, 4, 2)
+        npindex = np.array([2, 3, 1, 2, 1, 2, 3, 0, 2, 3, 1, 2, 3, 2, 0,
+                            1]).reshape([2, 2, 4, 1]).astype(np.int64)
+        x1 = QTensor(npx)
+        npsrc = QTensor(np.full_like(npindex, 200), dtype=x1.dtype)
+        npsrc.requires_grad = True
+        indices1 = QTensor(npindex)
+        y1 = scatter(x1, 2, indices1, npsrc)
+        print(y1)
+
+        # [[[[  0.2282731   1.0268903]
+        #    [200.         -0.5911815]
+        #    [200.         -0.2223257]
+        #    [200.          1.8379046]]
+
+        #   [[200.          0.8685831]
+        #    [200.         -0.2323119]
+        #    [200.         -1.3346615]
+        #    [200.         -1.2460893]]]
+
+
+        #  [[[  1.2022723  -1.0499416]
+        #    [200.         -0.4196777]
+        #    [200.         -2.5944874]
+        #    [200.          0.6808889]]
+
+        #   [[200.         -1.9762536]
+        #    [200.         -0.2908697]
+        #    [200.          1.9826261]
+        #    [200.         -1.839905 ]]]
+
+
+        #  [[[  1.6076708   0.3882919]
+        #    [  0.3997321   0.4054766]
+        #    [  0.2170018  -0.6334391]
+        #    [  0.2466215  -1.9395455]]
+
+        #   [[  0.1140596  -1.8853414]
+        #    [  0.2430805  -0.7054807]
+        #    [  0.3646276  -0.5029522]
+        #    [ -0.2257515  -0.5655377]]]]
+
+broadcast_to
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:function:: pyvqnet.tensor.broadcast_to(t, ref)
+
+    受到某些约束，数组 t 被“广播”到参考形状，以便它们具有兼容的形状。
+
+    https://numpy.org/doc/stable/user/basics.broadcasting.html
+
+    :param t: 输入QTensor
+    :param ref: 参考形状。
+    
+    :return : 新广播的 t 的 QTensor。
+
+    Example::
+
+        from pyvqnet.tensor.tensor import QTensor
+        from pyvqnet.tensor import *
+        ref = [2,3,4]
+        a = ones([4])
+        b = tensor.broadcast_to(a,ref)
+        print(b.shape)
+        #[2, 3, 4]
+
+
+
 实用函数
 -----------------------------
 
@@ -3334,7 +3569,7 @@ to_tensor
 
     将输入数值或 numpy.ndarray 等转换为 QTensor 。
 
-    :param x: 整数、浮点数或 numpy.ndarray
+    :param x: 整数、浮点数、布尔数、复数、或 numpy.ndarray
     :return: 输出 QTensor
 
     Example::
@@ -3490,7 +3725,7 @@ pack_pad_sequence
         data = tensor.pack_pad_sequence(y,
                                 seq_len,
                                 batch_first=True,
-                                enforce_sorted=True)
+                                enforce_sorted=False)
         print(data.data)
         print(data.batch_sizes)
         print(data.sort_indice)

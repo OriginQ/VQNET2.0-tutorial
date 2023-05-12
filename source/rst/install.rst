@@ -148,7 +148,7 @@ VQNet支持将量子计算模块与经典计算模块（例如：卷积，池化
                 y = [1,0]
             data_x.append(x)
             data_y.append(y)
-        return np.array(data_x), np.array(data_y)
+        return np.array(data_x,dtype=np.float32), np.array(data_y,np.int64)
 
     # 数据载入函数
     def get_minibatch_data(x_data, label, batch_size):
@@ -183,7 +183,7 @@ VQNet遵循机器学习一般的训练测试流程: 迭代进行载入数据，�
         
         # 随机产生待训练数据        
         x_train, y_train = circle(500)
-        x_train = np.hstack((x_train, np.zeros((x_train.shape[0], 1))))  
+        x_train = np.hstack((x_train, np.zeros((x_train.shape[0], 1),dtype=np.float32)))
         # 定义每个批次训练的数据个数
         batch_size = 32
         # 最大训练迭代次数
@@ -226,8 +226,8 @@ VQNet遵循机器学习一般的训练测试流程: 迭代进行载入数据，�
         xtest, y_test = circle(500)
         test_accuracy = 0
         count = 0
-        x_test = np.hstack((xtest, np.zeros((xtest.shape[0], 1))))
-        predicted_test = []
+        x_test = np.hstack((xtest, np.zeros((xtest.shape[0], 1),dtype=np.float32)))
+
         for test_data, test_label in get_minibatch_data(x_test,y_test, batch_size):
 
             test_data, test_label = QTensor(test_data),QTensor(test_label)
