@@ -223,7 +223,7 @@ QuantumLayerMultiProcess
 
 如您更加熟悉pyQPanda语法，可以使用QuantumLayerMultiProcess，自定义量子比特 ``qubits`` ,经典比特 ``cbits`` ,后端模拟器 ``machine`` 加入QuantumLayerMultiProcess的参数 ``qprog_with_measure`` 函数中。
 
-.. py:class:: pyvqnet.qnn.quantumlayer.QuantumLayerMultiProcess(qprog_with_measure,para_num,machine_type_or_cloud_token,num_of_qubits: int,num_of_cbits: int = 1,diff_method:str = "parameter_shift",delta:float = 0.01, dtype=None,name="")
+.. py:class:: pyvqnet.qnn.quantumlayer.QuantumLayerMultiProcess(qprog_with_measure,para_num,num_of_qubits: int,num_of_cbits: int = 1,diff_method:str = "parameter_shift",delta:float = 0.01, dtype=None,name="")
 
     变分量子层的抽象计算模块。使用多进程技术对一个批次数据计算梯度时候的量子线路进行加速。对于线路深度较少的线路，该层的多线程加速效果并不明显。
     
@@ -1293,7 +1293,13 @@ CCZ
 BlockEncode
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+.. py:function:: pyvqnet.qnn.template.BlockEncode(A,qlists)
+
     构建一个单一的 pyqpanda 电路 :math:`U(A)` 使得任意矩阵 :math:`A` 被编码在左上角的块中。
+
+    :param A: 在电路中编码的输入矩阵。
+    :param qlists: 要编码的量子位列表。
+    :return: 一个 pyqpanda QCircuit。
 
     .. math::
 
@@ -1305,9 +1311,7 @@ BlockEncode
             \end{bmatrix}.
         \end{align}
 
-    :param A: 在电路中编码的输入矩阵。
-    :param qlists: 要编码的量子位列表。
-    :return: 一个 pyqpanda QCircuit。
+
 
     Example::
 
@@ -1336,6 +1340,8 @@ BlockEncode
 
 Random_Init_Quantum_State
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:function:: pyvqnet.qnn.template.Random_Init_Quantum_State(qlists)
 
     使用振幅编码产生任意的量子初态编码到线路上。注意线路的深度由于振幅编码会产生很大的变化。
 

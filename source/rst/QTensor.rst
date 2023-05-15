@@ -3433,9 +3433,13 @@ gather
 
     对于 3-D 张量，输出由以下指定：
 
-         out[i][j][k] = t[index[i][j][k]][j][k] # 如果 dim == 0
-         out[i][j][k] = t[i][index[i][j][k]][k] # 如果 dim == 1
-         out[i][j][k] = t[i][j][index[i][j][k]] # 如果 dim == 2
+    .. math::
+
+         out[i][j][k] = t[index[i][j][k]][j][k] , 如果 dim == 0 \\
+
+         out[i][j][k] = t[i][index[i][j][k]][k] , 如果 dim == 1 \\
+
+         out[i][j][k] = t[i][j][index[i][j][k]] , 如果 dim == 2 \\
 
     :param t: 输入 QTensor。
     :param dim: 聚集轴。
@@ -3476,9 +3480,11 @@ scatter
 
     对于 3-D 张量，输出由以下指定：
 
-    input[indices[i][j][k]][j][k] = src[i][j][k] # 如果 dim == 0
-    input[i][indices[i][j][k]][k] = src[i][j][k] # 如果 dim == 1
-    input[i][j][indices[i][j][k]] = src[i][j][k] # 如果 dim == 2
+    .. math::
+
+        input[indices[i][j][k]][j][k] = src[i][j][k] , 如果 dim == 0 \\
+        input[i][indices[i][j][k]][k] = src[i][j][k] , 如果 dim == 1 \\
+        input[i][j][indices[i][j][k]] = src[i][j][k] , 如果 dim == 2 \\
 
     :param input: 输入QTensor。
     :param dim: 散点轴。
@@ -3544,7 +3550,7 @@ broadcast_to
     :param t: 输入QTensor
     :param ref: 参考形状。
     
-    :return : 新广播的 t 的 QTensor。
+    :return: 新广播的 t 的 QTensor。
 
     Example::
 
