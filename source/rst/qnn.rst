@@ -415,11 +415,11 @@ NoiseQuantumLayer
 
         qvc = NoiseQuantumLayer(circuit,24,"noise",1,1,diff_method= "parameter_shift", delta=0.01,noise_set_config = default_noise_config)
         input = QTensor([
-            [0.0000000, 1.0000000, 1.0000000, 1.0000000],
+            [0., 1., 1., 1.],
 
-            [0.0000000, 0.0000000, 1.0000000, 1.0000000],
+            [0., 0., 1., 1.],
 
-            [1.0000000, 0.0000000, 1.0000000, 1.0000000]
+            [1., 0., 1., 1.]
             ] )
         rlt = qvc(input)
         grad =  QTensor(np.ones(rlt.data.shape)*1000)
@@ -427,12 +427,12 @@ NoiseQuantumLayer
         rlt.backward(grad)
         print(qvc.m_para.grad)
 
-        #[1195.0000000, 105.0000000, 70.0000000, 0.0000000, 
-        # 45.0000000, -45.0000000, 50.0000000, 15.0000000, 
-        # -80.0000000, 50.0000000, 10.0000000, -30.0000000, 
-        # 10.0000000, 60.0000000, 75.0000000, -110.0000000, 
-        # 55.0000000, 45.0000000, 25.0000000, 5.0000000, 
-        # 5.0000000, 50.0000000, -25.0000000, -15.0000000]
+        #[1195., 105., 70., 0., 
+        # 45., -45., 50., 15., 
+        # -80., 50., 10., -30., 
+        # 10., 60., 75., -110., 
+        # 55., 45., 25., 5., 
+        # 5., 50., -25., -15.]
 
 下面给出一个 ``noise_set_config`` 的例子，这里使得 ``RX`` , ``RY`` , ``RZ`` , ``X`` , ``Y`` , ``Z`` , ``H`` 等逻辑门加入了 p = 0.01 的 BITFLIP_KRAUS_OPERATOR噪声模型。
 
@@ -1413,7 +1413,7 @@ FermionicSingleExcitation
         pauli_dict = {'Z0': 1}
         exp2 = expval(machine, prog, pauli_dict, qlists)
         print(f"vqnet {exp2}")
-        #vqnet 1.0000000000000013
+        #vqnet 1.13
 
 
 FermionicDoubleExcitation
@@ -1469,7 +1469,7 @@ FermionicDoubleExcitation
         pauli_dict = {'Z0': 1}
         exp2 = expval(machine, prog, pauli_dict, qlists)
         print(f"vqnet {exp2}")
-        #vqnet 1.0000000000000058
+        #vqnet 1.58
 
 UCCSD
 ^^^^^^^^^^^^^
@@ -1529,7 +1529,7 @@ UCCSD
         pauli_dict = {'Z0': 1}
         exp2 = expval(machine, prog, pauli_dict, qlists)
         print(f"vqnet {exp2}")
-        #vqnet -1.0000000000000004
+        #vqnet -1.04
 
 
 QuantumPoolingCircuit
@@ -2184,7 +2184,7 @@ MeasurePauliSum
         result = MeasurePauliSum(m_machine, m_prog, obs_list, m_qlist)
         print(result)
         m_machine.finalize()
-        # [0.40000000000000013, 0.3980016661112104]
+        # [0.413, 0.3980016661112104]
 
 
 VarMeasure

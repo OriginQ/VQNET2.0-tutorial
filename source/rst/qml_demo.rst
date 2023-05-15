@@ -1969,8 +1969,6 @@ Quantum circuit structure learning任务的核心目标就是找到最优的带�
         for v in key_file.values():
             _download(dataset_dir, v)
 
-
-    IF_PLOT = False
     if not os.path.exists("./result"):
         os.makedirs("./result")
     else:
