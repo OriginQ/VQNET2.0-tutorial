@@ -2386,9 +2386,7 @@ QGAN使用经典的GAN模型结构，分为Generator生成器与Discriminator鉴
 
     .. code-block::
 
-        """
-        VQC QSVM
-        """
+
         from pyvqnet.qnn.svm import vqc_qsvm, gen_vqc_qsvm_data
         import matplotlib.pyplot as plt
         import numpy as np

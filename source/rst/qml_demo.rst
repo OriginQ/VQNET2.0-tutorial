@@ -6,7 +6,7 @@
 带参量子线路在分类任务的应用
 ----------------------------------
 
-1. VQC示例
+1. QVC示例
 ^^^^^^^^^^^^^^^^^^
 
 这个例子使用VQNet实现了论文 `Circuit-centric quantum classifiers <https://arxiv.org/pdf/1804.00633.pdf>`_ 中可变量子线路进行二分类任务。
@@ -230,7 +230,7 @@ Model中使用 :ref:`QuantumLayer` 类这个可进行自动微分的量子计算
     [0.3412148654]
     test:--------------->loss:QTensor(None, requires_grad=True) #####accuray:1.0
 
-VQC在测试数据上准确率变化情况：
+模型在测试数据上准确率变化情况：
 
 .. image:: ./images/qvc_accuracy.png
    :width: 600 px
@@ -2981,8 +2981,11 @@ QUnet主要是用于解决图像分割的技术。
 并在反向计算中自动计算出各个待训练参数的梯度，并使用优化器进行参数优化，直到迭代次数满足预设值。
 我们这里使用前面下载的VOC2012数据中选取100张作为训练集，10张作为测试集。训练集目录指定为 `path0`,测试集目录指定为 `path1`。
 其中，图像以及其对应的标签图像都经过了量子卷积模块 ``quantum_data_preprocessing`` 进行预处理，我们Unet的训练目标是使得同时经过量子线路预处理的图像和标签尽可能贴近。
+如果已经进行了量子化数据预处理，可以设置 ``PREPROCESS`` 为False。
 
 .. code-block::
+
+    PREPROCESS = True
 
     class MyDataset():
         def __init__(self, x_data, x_label):
@@ -3022,8 +3025,8 @@ QUnet主要是用于解决图像分割的技术。
     test_images = test_images / 255
 
     # use quantum encoder to preprocess data
-    # PREPROCESS = True
-    PREPROCESS = True
+
+    
     
     if PREPROCESS == True:
         print("Quantum pre-processing of train images:")
@@ -6104,7 +6107,7 @@ vqe_func_analytic()函数是使用参数偏移计算理论梯度，vqe_func_shot
 
 剪枝比例 :math:`r` ,累积窗口宽度 :math:`\omega_a` 和剪枝窗口宽度 :math:`\omega_p` 分别决定了梯度趋势评估的可靠性。
 因此，我们的概率梯度修剪方法节省的时间百分比是 :math:`r\tfrac{\omega_p}{\omega_a +\omega_p}\times 100\%`。
-以下是运用梯度剪枝方法在VQC分类任务的示例。
+以下是运用梯度剪枝方法在QVC分类任务的示例。
 
 .. code-block::
 
