@@ -2,6 +2,19 @@
 VQNet Changelog
 ================
 
+[v2.0.7] - 2023-07-03
+----------------------
+
+Added
+^^^^^^^^^^^
+- 经典神经网络，增加kron，gather,scatter,broadcast_to接口。
+- 增加对不同数据精度支持：数据类型dtype支持kbool,kuint8,kint8,kint16,kint32,kint64,kfloat32,kfloat64,kcomplex64,kcomplex128.分别代表C++的 bool,uint8_t,int8_t,int16_t,int32_t,int64_t,float,double,complex<float>,complex<double>.
+- 支持python 3.8，3.9，3.10三个版本。
+
+Changed
+^^^^^^^^^^^
+- QTenor 以及Module类的init函数增加 `dtype` 参数。对QTenor索引、 部分神经网络层的输入进行了类型限制。
+- 量子神经网络，由于MacOS兼容性问题，去掉了Mnist_Dataset，CIFAR10_Dataset接口。
 
 [v2.0.6] - 2023-02-22
 ----------------------
