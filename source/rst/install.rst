@@ -4,7 +4,7 @@ VQNet 安装步骤
 VQNet python包安装
 ----------------------------------
 
-我们提供了Linux,Windows,MacOS上的python预编译包供安装，需要 **python==3.8** 。还需要numpy>=1.18.5,pyqpanda>=3.7.8。
+我们提供了Linux,Windows,MacOS上的python预编译包供安装，需要 **python==3.8, 3.9 或 3.10** 。还需要numpy>=1.18.5,pyqpanda>=3.7.8。
 
 
 .. code-block::
