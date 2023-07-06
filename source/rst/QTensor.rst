@@ -128,7 +128,8 @@ dtype
 
     返回张量的数据类型。
 
-    QTensor 内部数据类型dtype支持kbool=0,kuint8=1,kint8=2,kint16=3,kint32=4,kint64=5,kfloat32=6,kfloat64=7,kcomplex64=8,kcomplex128=9.
+    QTensor 内部数据类型dtype支持kbool = 0, kuint8 = 1, kint8 = 2,kint16 = 3,kint32 = 4,kint64 = 5, 
+    kfloat32 = 6, kfloat64 = 7, kcomplex64 = 8, kcomplex128 = 9 .
 
     :return: 张量的数据类型。
 

@@ -22,7 +22,7 @@ VQNet提供的 ``QuantumLayer`` 以及 ``QuantumLayerV2`` 类已经封装了量�
 
 答: 用户在Windows上可能需要安装VC++ 运行时库。
 可参考 https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170 安装合适的运行库。
-此外，VQNet当前仅支持python3.8版本，故请确认你的python版本。
+此外，VQNet当前仅支持python3.8, 3.9, 3.10 版本，故请确认你的python版本。
 
 **问: 如何调用本源量子云以及量子芯片进行计算**
 
@@ -84,7 +84,7 @@ VQNet提供的 ``QuantumLayer`` 以及 ``QuantumLayerV2`` 类已经封装了量�
                 ])
                 #直接使用list 是无法保存pqc3中的参数的。
                 #self.pqc3 = [QuantumLayer(pqctest,3,"cpu",4,1), Linear(4,1)
-                ]
+                #]
             def forward(self, x, *args, **kwargs):
                 y = self.pqc2[0](x)  + self.pqc2[1](x)
                 return y
