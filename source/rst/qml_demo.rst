@@ -228,7 +228,7 @@ Model中使用 :ref:`QuantumLayer` 类这个可进行自动微分的量子计算
     epoch:18, #### loss:0.1171633576353391 #####accuray:1.0
     epoch:19, #### loss:0.11482855677604675 #####accuray:1.0
     [0.3412148654]
-    test:--------------->loss:QTensor(None, requires_grad=True) #####accuray:1.0
+    test:--------------->loss:QTensor(0.3412148654, requires_grad=True) #####accuray:1.0
 
 模型在测试数据上准确率变化情况：
 
@@ -1861,7 +1861,7 @@ Quantum circuit structure learning任务的核心目标就是找到最优的带�
             break
         x = x.reshape(-1, 1, 28, 28)
         output = model(x)
-        pred = QTensor.argmax(output, [1])
+        pred = QTensor.argmax(output, [1],False)
         axes[count].imshow(x[0].squeeze(), cmap='gray')
         axes[count].set_xticks([])
         axes[count].set_yticks([])
@@ -2170,7 +2170,7 @@ Quantum circuit structure learning任务的核心目标就是找到最优的带�
                 break
             x = x.reshape(-1, 1, 28, 28)
             output = model(x)
-            pred = QTensor.argmax(output, 1)
+            pred = QTensor.argmax(output, [1],False)
             axes[count].imshow(x[0].squeeze(), cmap="gray")
             axes[count].set_xticks([])
             axes[count].set_yticks([])
@@ -2220,7 +2220,7 @@ Quantum circuit structure learning任务的核心目标就是找到最优的带�
                 break
             x = x.reshape(-1, 1, 28, 28)
             output = model(x)
-            pred = QTensor.argmax(output, 1)
+            pred = QTensor.argmax(output, [1],False)
             axes[count].imshow(x[0].squeeze(), cmap="gray")
             axes[count].set_xticks([])
             axes[count].set_yticks([])
@@ -2448,7 +2448,7 @@ Quantum circuit structure learning任务的核心目标就是找到最优的带�
                 break
             x = x.reshape(-1, 1, 28, 28)
             output = model_hybrid(x)
-            pred = QTensor.argmax(output, 1)
+            pred = QTensor.argmax(output, [1],False)
             axes[count].imshow(x[0].squeeze(), cmap="gray")
             axes[count].set_xticks([])
             axes[count].set_yticks([])
@@ -2621,7 +2621,7 @@ Quantum circuit structure learning任务的核心目标就是找到最优的带�
                 break
             x = x.reshape(-1, 1, 28, 28)
             output = model_hybrid(x)
-            pred = QTensor.argmax(output, 1)
+            pred = QTensor.argmax(output, [1],False)
             axes[count].imshow(x[0].squeeze(), cmap="gray")
             axes[count].set_xticks([])
             axes[count].set_yticks([])
@@ -2704,7 +2704,7 @@ QUnet主要是用于解决图像分割的技术。
     from pyvqnet.nn.batch_norm import BatchNorm2d
     from pyvqnet.nn.loss import BinaryCrossEntropy
     from pyvqnet.optim.adam import Adam
-
+    from pyvqnet.dtype import *
     from pyvqnet.tensor import tensor
     from pyvqnet.tensor.tensor import QTensor
     import pyqpanda as pq
@@ -4510,7 +4510,7 @@ QUnet主要是用于解决图像分割的技术。
 
     # 运行程序入口
     if __name__ == "__main__":
-        qkmean_run()
+        qkmeans_run()
 
 
 1.3.6 聚类前数据分布
@@ -6532,7 +6532,7 @@ vqe_func_analytic()函数是使用参数偏移计算理论梯度，vqe_func_shot
 
 	start testing..............
 	[0.3132616580]
-	test:--------------->loss:QTensor(None, requires_grad=True) #####accuray:1.0
+	test:--------------->loss:QTensor(0.3132616580, requires_grad=True) #####accuray:1.0
 
 在VQNet中使用NoiseQuantumLayer进行模型训练
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -7053,7 +7053,7 @@ VQNet提供了封装类 ``VQC_wrapper`` ，用户使用普通逻辑门在函数 
     epoch:19, #### loss:0.10442055265108745 #####accuray:1.0
     start testing..............
     [0.3132616580]
-    test:--------------->loss:QTensor(None, requires_grad=True) #####accuray:1.0
+    test:--------------->loss:QTensor(0.3132616580, requires_grad=True) #####accuray:1.0
 
 
 
