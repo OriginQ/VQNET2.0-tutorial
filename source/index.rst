@@ -10,7 +10,7 @@ VQNet
 **一种功能齐全，运行高效的量子软件开发工具包**
 
 VQNet是由本源量子开发的量子机器学习计算框架，它可以用于构建、运行和优化量子算法。
-本使用文档是VQNet的api以及示例文档.
+本使用文档是VQNet的api以及示例文档。英文版本可见： `VQNet API DOC. <https://vqnet20-tutorial-en.readthedocs.io/en/latest/>`_ 
 
 
 **什么是量子机器学习？**
@@ -60,8 +60,9 @@ VQNet是由本源量子开发的量子机器学习计算框架，它可以用于
     rst/nn.rst
     rst/qnn.rst
     rst/utils.rst
-    rst/CHANGELOG.rst
     rst/FAQ.rst
+    rst/CHANGELOG.rst
+
 
 
 

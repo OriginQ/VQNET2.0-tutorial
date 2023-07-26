@@ -22,7 +22,7 @@ VQNet提供的 ``QuantumLayer`` 以及 ``QuantumLayerV2`` 类已经封装了量�
 
 答: 用户在Windows上可能需要安装VC++ 运行时库。
 可参考 https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170 安装合适的运行库。
-此外，VQNet当前仅支持python3.8版本，故请确认你的python版本。
+此外，VQNet当前仅支持python3.8, 3.9, 3.10 版本，故请确认你的python版本。
 
 **问: 如何调用本源量子云以及量子芯片进行计算**
 
@@ -84,7 +84,7 @@ VQNet提供的 ``QuantumLayer`` 以及 ``QuantumLayerV2`` 类已经封装了量�
                 ])
                 #直接使用list 是无法保存pqc3中的参数的。
                 #self.pqc3 = [QuantumLayer(pqctest,3,"cpu",4,1), Linear(4,1)
-                ]
+                #]
             def forward(self, x, *args, **kwargs):
                 y = self.pqc2[0](x)  + self.pqc2[1](x)
                 return y
@@ -92,4 +92,7 @@ VQNet提供的 ``QuantumLayer`` 以及 ``QuantumLayerV2`` 类已经封装了量�
         mm = M()
         print(mm.state_dict().keys())
 
+**问: 为什么原先的代码在2.0.7版本无法运行**
 
+答: v2.0.7版本中，我们为QTensor增加了不同数据类型，dtype属性，并参照pytorch对输入进行了限制。例如： Emedding层输入需要为kint64，CategoricalCrossEntropy, SoftmaxCrossEntropy, NLL_Loss, CrossEntropyLoss 的标签需要为kint64。
+你可以使用 `astype()` 接口进行类型转化为指定数据类型，或使用对应的数据类型numpy数组初始化QTensor。
