@@ -19,7 +19,7 @@ __init__
     :param data: 输入数据，可以是 _core.Tensor 或numpy 数组。
     :param requires_grad: 是否应该跟踪张量的梯度，默认为 False。
     :param nodes: 计算图中的后继者列表，默认为无。
-    :param device: 储存在哪个设备上，默认0，在CPU上。
+    :param device: 储存在哪个设备上，默认: pyvqnet.DEV_CPU，在CPU上。
     :param dtype: 参数的数据类型，defaults：None，使用默认数据类型:kfloat32,代表32位浮点数。
     :param name: QTensor的名字,default:""。
     :return: 输出 QTensor。
@@ -869,6 +869,7 @@ __setitem__
         #  [1., 3001.]
         # ]
 
+
 GPU
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -876,13 +877,16 @@ GPU
 
     克隆QTensor到指定的GPU设备
 
-    device 指定存储其内部数据的设备。 当device = 0时，数据存储在CPU上，当device >= DEV_GPU_0时，数据存储在GPU上。 如果您的计算机有多个 GPU，您可以指定不同的设备来存储数据。 例如，device = 1001, 1002, 1003, ... 表示存储在具有不同序列号的GPU上。
+    device 指定存储其内部数据的设备。 当device >= DEV_GPU_0时，数据存储在GPU上。 
+    如果您的计算机有多个 GPU，您可以指定不同的设备来存储数据。 例如，device = DEV_GPU_1, DEV_GPU_2, DEV_GPU_3, ... 表示存储在具有不同序列号的GPU上。
 
     .. note::
         QTensor在不同GPU上无法进行计算。
-        如果您尝试在 ID 超过验证 GPU 最大数量的 GPU 上创建 QTensor，将引发 Cuda 错误。新的 Tensor 将删除其 GraphNode。
+        如果您尝试在 ID 超过验证 GPU 最大数量的 GPU 上创建 QTensor，将引发 Cuda 错误。
 
-    :param device: 当前保存QTensor的设备，默认=0，保存在cpu中。 device= pyvqnet.DEV_GPU_0，存储在第一个 GPU 中，devcie = 1001，存储在第二个 GPU 中，依此类推。
+    :param device: 当前保存QTensor的设备，默认=DEV_GPU_0，
+     device = pyvqnet.DEV_GPU_0，存储在第一个 GPU 中，devcie = DEV_GPU_1，
+     存储在第二个 GPU 中，依此类推。
 
     :return: QTensor 克隆到 GPU 设备。
 
@@ -899,13 +903,9 @@ CPU
 
 .. py:function:: QTensor.CPU()
 
-    移动QTensor到特定的CPU设备
+    克隆QTensor到特定的CPU设备
 
-    device 指定存储其内部数据的设备。 当device = 0时，数据存储在CPU上，当device >= DEV_GPU时，数据存储在GPU上。 如果您的计算机有多个 CPU，您可以指定不同的设备来存储数据。 例如，device = 1001, 1002, 1003, ... 表示存储在具有不同序列号的GPU上。
-
-    CPU() 的输出将删除当前的 GraphNode。
-
-    :return: QTensor 移动到 CPU 设备。
+    :return: QTensor 克隆到 CPU 设备。
 
     Examples::
 
@@ -922,13 +922,15 @@ toGPU
 
     移动QTensor到指定的GPU设备
 
-    device 指定存储其内部数据的设备。 当device = 0时，数据存储在CPU上，当device >= DEV_GPU时，数据存储在GPU上。 如果您的计算机有多个 GPU，您可以指定不同的设备来存储数据。 例如，device = 1001, 1002, 1003, ... 表示存储在具有不同序列号的GPU上。
+    device 指定存储其内部数据的设备。 当device >= DEV_GPU时，数据存储在GPU上。
+     如果您的计算机有多个 GPU，您可以指定不同的设备来存储数据。 
+     例如，device = DEV_GPU_1, DEV_GPU_2, DEV_GPU_3, ... 表示存储在具有不同序列号的GPU上。
 
     .. note::
         QTensor在不同GPU上无法进行计算。
-        如果您尝试在 ID 超过验证 GPU 最大数量的 GPU 上创建 QTensor，将引发 Cuda 错误。新的 Tensor 将删除其 GraphNode。
+        如果您尝试在 ID 超过验证 GPU 最大数量的 GPU 上创建 QTensor，将引发 Cuda 错误。
 
-    :param device: 当前保存QTensor的设备，默认=0，保存在cpu中。 device= pyvqnet.DEV_GPU_0，存储在第一个 GPU 中，devcie = 1001，存储在第二个 GPU 中，依此类推。
+    :param device: 当前保存QTensor的设备，默认=DEV_GPU_0。device = pyvqnet.DEV_GPU_0，存储在第一个 GPU 中，devcie = DEV_GPU_1，存储在第二个 GPU 中，依此类推。
     :return: QTensor 移动到 GPU 设备。
 
     Examples::
@@ -946,8 +948,6 @@ toCPU
 .. py:function:: QTensor.toCPU()
 
     移动QTensor到特定的GPU设备
-
-    device 指定存储其内部数据的设备。 当device = 0时，数据存储在CPU上，当device >= DEV_GPU时，数据存储在GPU上。 如果您的计算机有多个 GPU，您可以指定不同的设备来存储数据。 例如，device = 1001, 1002, 1003, ... 表示存储在具有不同序列号的GPU上。
 
     :return: QTensor 移动到 CPU 设备。
 
@@ -970,6 +970,7 @@ isGPU
     :return: 该 QTensor 的数据是否存储在 GPU 主机内存上。
 
     Examples::
+    
         from pyvqnet.tensor import QTensor
         a = QTensor([2])
         a = a.isGPU()
@@ -986,6 +987,7 @@ isCPU
     :return: 该 QTensor 的数据是否存储在 CPU 主机内存上。
 
     Examples::
+    
         from pyvqnet.tensor import QTensor
         a = QTensor([2])
         a = a.isCPU()
@@ -1001,12 +1003,12 @@ isCPU
 ones
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:function:: pyvqnet.tensor.ones(shape,device=0,dtype-None)
+.. py:function:: pyvqnet.tensor.ones(shape,device=pyvqnet.DEV_CPU,dtype-None)
 
     创建元素全一的 QTensor 。
 
     :param shape: 数据的形状。
-    :param device: 储存在哪个设备上，默认0，在CPU上。
+    :param device: 储存在哪个设备上，默认: pyvqnet.DEV_CPU，在CPU上。
     :param dtype: 参数的数据类型，defaults：None，使用默认数据类型:kfloat32,代表32位浮点数。
 
     :return: 返回新的 QTensor 。
@@ -1026,12 +1028,12 @@ ones
 ones_like
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:function:: pyvqnet.tensor.ones_like(t: pyvqnet.tensor.QTensor,device=0,dtype=None)
+.. py:function:: pyvqnet.tensor.ones_like(t: pyvqnet.tensor.QTensor,device=pyvqnet.DEV_CPU,dtype=None)
 
     创建元素全一的 QTensor ,形状和输入的 QTensor 一样。
 
     :param t: 输入 QTensor 。
-    :param device: 储存在哪个设备上，默认0，在CPU上。
+    :param device: 储存在哪个设备上，默认: pyvqnet.DEV_CPU，在CPU上。
     :param dtype: 参数的数据类型，defaults：None,跟输入的dtype一样。
 
     :return: 新的全一  QTensor 。
@@ -1050,13 +1052,13 @@ ones_like
 full
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:function:: pyvqnet.tensor.full(shape, value, device: int = 0, dtype=None)
+.. py:function:: pyvqnet.tensor.full(shape, value, device=pyvqnet.DEV_CPU, dtype=None)
 
     创建一个指定形状的 QTensor 并用特定值填充它。
 
     :param shape: 要创建的张量形状。
     :param value: 填充的值。
-    :param device: 储存在哪个设备上，默认0，在CPU上。
+    :param device: 储存在哪个设备上，默认: pyvqnet.DEV_CPU，在CPU上。
     :param dtype: 参数的数据类型，defaults：None，使用默认数据类型:kfloat32,代表32位浮点数。
 
     :return: 输出新 QTensor 。 
@@ -1078,13 +1080,13 @@ full
 full_like
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:function:: pyvqnet.tensor.full_like(t, value, device: int = 0,dtype=None)
+.. py:function:: pyvqnet.tensor.full_like(t, value, device=pyvqnet.DEV_CPU,dtype=None)
 
     创建一个形状和输入一样的 QTensor,所有元素填充 value 。
 
     :param t: 输入 QTensor 。
     :param value: 填充 QTensor 的值。
-    :param device: 储存在哪个设备上，默认0，在CPU上。
+    :param device: 储存在哪个设备上，默认: pyvqnet.DEV_CPU，在CPU上。
     :param dtype: 参数的数据类型，defaults：None,跟输入的dtype一样。
 
     :return: 输出 QTensor。
@@ -1107,12 +1109,12 @@ full_like
 zeros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:function:: pyvqnet.tensor.zeros(shape, device: int = 0,dtype=None)
+.. py:function:: pyvqnet.tensor.zeros(shape, device=pyvqnet.DEV_CPU,dtype=None)
 
     创建输入形状大小的全零 QTensor 。
 
     :param shape: 输入形状。
-    :param device: 储存在哪个设备上，默认0，在CPU上。
+    :param device: 储存在哪个设备上，默认: pyvqnet.DEV_CPU，在CPU上。
     :param dtype: 参数的数据类型，defaults：None，使用默认数据类型:kfloat32,代表32位浮点数。
 
     :return: 输出 QTensor 。
@@ -1136,12 +1138,12 @@ zeros
 zeros_like
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:function:: pyvqnet.tensor.zeros_like(t: pyvqnet.tensor.QTensor, device: int = 0,dtype=None)
+.. py:function:: pyvqnet.tensor.zeros_like(t: pyvqnet.tensor.QTensor, device=pyvqnet.DEV_CPU,dtype=None)
 
     创建一个形状和输入一样的 QTensor,所有元素为0 。
 
     :param t: 输入参考 QTensor 。
-    :param device: 储存在哪个设备上，默认0，在CPU上。
+    :param device: 储存在哪个设备上，默认: pyvqnet.DEV_CPU，在CPU上。
     :param dtype: 参数的数据类型，defaults：None,跟输入的dtype一样。
 
     :return: 输出 QTensor 。
@@ -1161,14 +1163,14 @@ zeros_like
 arange
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:function:: pyvqnet.tensor.arange(start, end, step=1, device: int = 0,dtype=None,requires_grad=False)
+.. py:function:: pyvqnet.tensor.arange(start, end, step=1, device=pyvqnet.DEV_CPU,dtype=None,requires_grad=False)
 
     创建一个在给定间隔内具有均匀间隔值的一维 QTensor 。
 
     :param start: 间隔开始。
     :param end: 间隔结束。
     :param step: 值之间的间距，默认为1。
-    :param device: 要使用的设备，默认 = 0 ，使用 CPU 设备。
+    :param device: 要使用的设备，默认 = pyvqnet.DEV_CPU，使用 CPU 设备。
     :param dtype: 参数的数据类型，defaults：None，使用默认数据类型:kfloat32,代表32位浮点数。
     :param requires_grad: 是否计算梯度，默认为False。
 
@@ -1187,14 +1189,14 @@ arange
 linspace
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:function:: pyvqnet.tensor.linspace(start, end, num, device: int = 0,dtype=None,requires_grad= False)
+.. py:function:: pyvqnet.tensor.linspace(start, end, num, device=pyvqnet.DEV_CPU,dtype=None,requires_grad= False)
 
     创建一维 QTensor ，其中的元素为区间 start 和 end 上均匀间隔的共 num 个值。
 
     :param start: 间隔开始。
     :param end: 间隔结束。
     :param num: 间隔的个数。
-    :param device: 要使用的设备，默认 = 0 ，使用 CPU 设备。
+    :param device: 要使用的设备，默认 = pyvqnet.DEV_CPU ，使用 CPU 设备。
     :param dtype: 参数的数据类型，defaults：None，使用默认数据类型:kfloat32,代表32位浮点数。
     :param requires_grad: 是否计算梯度，默认为False。
 
@@ -1212,7 +1214,7 @@ linspace
 logspace
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:function:: pyvqnet.tensor.logspace(start, end, num, base, device: int = 0,dtype=None, requires_grad)
+.. py:function:: pyvqnet.tensor.logspace(start, end, num, base, device=pyvqnet.DEV_CPU,dtype=None, requires_grad)
 
     在对数刻度上创建具有均匀间隔值的一维 QTensor。
 
@@ -1220,7 +1222,7 @@ logspace
     :param end: ``base ** end`` 是序列的最终值
     :param num: 要生成的样本数
     :param base: 对数刻度的基数
-    :param device: 要使用的设备，默认 = 0 ，使用 CPU 设备。
+    :param device: 要使用的设备，默认 = pyvqnet.DEV_CPU ，使用 CPU 设备。
     :param dtype: 参数的数据类型，defaults：None，使用默认数据类型:kfloat32,代表32位浮点数。
     :param requires_grad: 是否计算梯度，默认为False。
 
@@ -1240,13 +1242,13 @@ logspace
 eye
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:function:: pyvqnet.tensor.eye(size, offset: int = 0, device: int = 0,dtype=None)
+.. py:function:: pyvqnet.tensor.eye(size, offset: int = 0, device=pyvqnet.DEV_CPU,dtype=None)
 
     创建一个 size x size 的 QTensor，对角线上为 1，其他地方为 0。
 
     :param size: 要创建的（正方形）QTensor 的大小。
     :param offset: 对角线的索引：0（默认）表示主对角线，正值表示上对角线，负值表示下对角线。
-    :param device: 要使用的设备，默认 = 0 ，使用 CPU 设备。
+    :param device: 要使用的设备，默认 =pyvqnet.DEV_CPU ，使用 CPU 设备。
     :param dtype: 参数的数据类型，defaults：None，使用默认数据类型:kfloat32,代表32位浮点数。
 
     :return: 输出 QTensor 。
@@ -1327,14 +1329,14 @@ diag
 randu
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:function:: pyvqnet.tensor.randu(shape, min=0.0,max=1.0, device: int = 0, dtype=None, requires_grad=False)
+.. py:function:: pyvqnet.tensor.randu(shape, min=0.0,max=1.0, device=pyvqnet.DEV_CPU, dtype=None, requires_grad=False)
 
     创建一个具有均匀分布随机值的 QTensor 。
 
     :param shape: 要创建的 QTensor 的形状。
     :param min: 分布的下限，默认: 0。
     :param max: 分布的上线，默认: 1。
-    :param device: 要使用的设备，默认 = 0 ，使用 CPU 设备。
+    :param device: 要使用的设备，默认 =pyvqnet.DEV_CPU ，使用 CPU 设备。
     :param dtype: 参数的数据类型，defaults：None，使用默认数据类型:kfloat32,代表32位浮点数。
     :param requires_grad: 是否计算梯度，默认为False。
 
@@ -1357,14 +1359,14 @@ randu
 randn
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:function:: pyvqnet.tensor.randn(shape, mean=0.0,std=1.0, device: int = 0, dtype=None, requires_grad=False)
+.. py:function:: pyvqnet.tensor.randn(shape, mean=0.0,std=1.0, device=pyvqnet.DEV_CPU, dtype=None, requires_grad=False)
 
     创建一个具有正态分布随机值的 QTensor 。
 
     :param shape: 要创建的 QTensor 的形状。
     :param mean: 分布的均值，默认: 0。
     :param max: 分布的方差，默认: 1。
-    :param device: 要使用的设备，默认 = 0 ，使用 CPU 设备。
+    :param device: 要使用的设备，默认 = pyvqnet.DEV_CPU ，使用 CPU 设备。
     :param dtype: 参数的数据类型，defaults：None，使用默认数据类型:kfloat32,代表32位浮点数。
     :param requires_grad: 是否计算梯度，默认为False。
 

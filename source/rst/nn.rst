@@ -146,15 +146,16 @@ toGPU
 
 .. py:function:: pyvqnet.nn.module.Module.toGPU(device: int = DEV_GPU_0)
 
-    将模块及其参数和缓冲区移动到指定的 GPU 设备中。
+    将模块和其子模块的参数和缓冲数据移动到指定的 GPU 设备中。
 
-    device 指定存储其内部数据的设备。 当device = 0时，数据存储在CPU上，当device >= DEV_GPU_0时，数据存储在GPU上。如果您的计算机有多个GPU，则可以指定不同的设备来存储数据。例如device = 1001 , 1002, 1003, ... 表示存储在不同序列号的GPU上。
+    device 指定存储其内部数据的设备。 当device >= DEV_GPU_0时，数据存储在GPU上。如果您的计算机有多个GPU，
+    则可以指定不同的设备来存储数据。例如device = DEV_GPU_1 , DEV_GPU_2, DEV_GPU_3, ... 表示存储在不同序列号的GPU上。
     
     .. note::
         Module在不同GPU上无法进行计算。
-        如果您尝试在 ID 超过验证 GPU 最大数量的 GPU 上创建 QTensor，将引发 Cuda 错误。新的 Tensor 将删除其 GraphNode。
+        如果您尝试在 ID 超过验证 GPU 最大数量的 GPU 上创建 QTensor，将引发 Cuda 错误。
 
-    :param device: 当前保存QTensor的设备，默认=0，保存在cpu中。 device= pyvqnet.DEV_GPU_0，存储在第一个 GPU 中，devcie = 1001，存储在第二个 GPU 中，依此类推
+    :param device: 当前保存QTensor的设备，默认=DEV_GPU_0。device= pyvqnet.DEV_GPU_0，存储在第一个 GPU 中，devcie = DEV_GPU_1，存储在第二个 GPU 中，依此类推
     :return: Module 移动到 GPU 设备。
 
     Examples::
@@ -171,7 +172,7 @@ toCPU
 
 .. py:function:: pyvqnet.nn.module.Module.toCPU()
 
-    将模块及其参数和缓冲区移动到特定的 CPU 设备中。
+    将模块和其子模块的参数和缓冲数据移动到特定的 CPU 设备中。
 
     :return: Module 移动到 CPU 设备。
 

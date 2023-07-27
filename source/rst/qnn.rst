@@ -2433,14 +2433,46 @@ QGAN使用经典的GAN模型结构，分为Generator生成器与Discriminator鉴
 基于VQC的量子方法
 ----------------------------------
 
-VQNet自行构建以及封装一些量子逻辑门、量子线路以及测量方法，不基于QPanda实现这些方法。
+VQNet基于自动微分算子构建以及一些常用量子逻辑门、量子线路以及测量方法，可使用自动微分代替量子线路parameter-shift方法计算梯度。
 
-I
+QMachine
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:class:: pyvqnet.qnn.vqc.QMachine(num_wires, dtype=pyvqnet.kcomplex64)
+
+    变分量子计算的模拟器类，包含states属性为量子线路的statevectors。
+
+    :param num_wires:  量子比特的个数。
+    :param dtype: 计算数据的数据类型，默认pyvqnet.kcomplex64,对应参数精度为pyvqnet.kfloat32。
+
+    :return: 输出QMachine。
+
+    Example::
+        
+        from pyvqnet.qnn.vqc import QMachine
+        qm  = QMachine(4)
+
+        print(qm.states)
+
+        # [[[[[1.+0.j 0.+0.j]
+        #     [0.+0.j 0.+0.j]]
+
+        #    [[0.+0.j 0.+0.j]
+        #     [0.+0.j 0.+0.j]]]
+
+
+        #   [[[0.+0.j 0.+0.j]
+        #     [0.+0.j 0.+0.j]]
+
+        #    [[0.+0.j 0.+0.j]
+        #     [0.+0.j 0.+0.j]]]]]
+
+i
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:function:: pyvqnet.qnn.vqc.i(q_machine, wires, params=None, num_wires=None, use_dagger=False)
 
-    量子逻辑门 I。
+    对q_machine中的态矢作用量子逻辑门 I 。
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
@@ -2469,12 +2501,12 @@ I
         #    [[0.+0.j 0.+0.j]
         #     [0.+0.j 0.+0.j]]]]]
 
-Hadamard
+hadamard
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:function:: pyvqnet.qnn.vqc.hadamard(q_machine, wires, params=None, num_wires=None, use_dagger=False)
     
-    量子逻辑门 Hadamard。
+    对q_machine中的态矢作用量子逻辑门 hadamard 。
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
@@ -2504,12 +2536,12 @@ Hadamard
         #     [0.       +0.j 0.       +0.j]]]]]
 
 
-T
+t
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:function:: pyvqnet.qnn.vqc.t(q_machine, wires, params=None, num_wires=None, use_dagger=False)
     
-    量子逻辑门 T。
+    对q_machine中的态矢作用量子逻辑门 t 。
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
@@ -2539,12 +2571,12 @@ T
         #     [0.+0.j 0.+0.j]]]]]
 
 
-S
+s
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:function:: pyvqnet.qnn.vqc.s(q_machine, wires, params=None, num_wires=None, use_dagger=False)
     
-    量子逻辑门 S。
+    对q_machine中的态矢作用量子逻辑门 s 。
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
@@ -2574,12 +2606,12 @@ S
         #     [0.+0.j 0.+0.j]]]]]
 
 
-PauliX
+paulix
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:function:: pyvqnet.qnn.vqc.paulix(q_machine, wires, params=None, num_wires=None, use_dagger=False)
     
-    量子逻辑门 PauliX。
+    对q_machine中的态矢作用量子逻辑门 paulix 。
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
@@ -2609,12 +2641,12 @@ PauliX
         #     [0.+0.j 0.+0.j]]]]]
 
 
-PauliY
+pauliy
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:function:: pyvqnet.qnn.vqc.pauliy(q_machine, wires, params=None, num_wires=None, use_dagger=False)
     
-    量子逻辑门 PauliY.
+    对q_machine中的态矢作用量子逻辑门 pauliy 。
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
@@ -2643,12 +2675,12 @@ PauliY
         #    [[0.+0.j 0.+0.j]
         #     [0.+0.j 0.+0.j]]]]]
 
-PauliZ
+pauliz
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:function:: pyvqnet.qnn.vqc.pauliz(q_machine, wires, params=None, num_wires=None, use_dagger=False)
     
-    量子逻辑门 PauliZ.
+    对q_machine中的态矢作用量子逻辑门 pauliz 。
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
@@ -2677,12 +2709,12 @@ PauliZ
         #    [[0.+0.j 0.+0.j]
         #     [0.+0.j 0.+0.j]]]]]
 
-X1
+x1
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:function:: pyvqnet.qnn.vqc.x1(q_machine, wires, params=None, num_wires=None, use_dagger=False)
     
-    量子逻辑门 X1.
+    对q_machine中的态矢作用量子逻辑门 x1 。
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
@@ -2711,12 +2743,12 @@ X1
         #    [[0.       +0.j        0.       +0.j       ]
         #     [0.       +0.j        0.       +0.j       ]]]]]
 
-Y1
+y1
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:function:: pyvqnet.qnn.vqc.y1(q_machine, wires, params=None, num_wires=None, use_dagger=False)
     
-    量子逻辑门 Y1.
+    对q_machine中的态矢作用量子逻辑门 y1 。
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
@@ -2746,12 +2778,12 @@ Y1
         #     [0.       +0.j 0.       +0.j]]]]]
 
 
-Z1
+z1
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:function:: pyvqnet.qnn.vqc.z1(q_machine, wires, params=None, num_wires=None, use_dagger=False)
     
-    量子逻辑门 Z1.
+    对q_machine中的态矢作用量子逻辑门 z1 。
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
@@ -2780,12 +2812,12 @@ Z1
         #    [[0.       +0.j        0.       +0.j       ]
         #     [0.       +0.j        0.       +0.j       ]]]]]
 
-RX
+rx
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:function:: pyvqnet.qnn.vqc.rx(q_machine, wires, params=None, num_wires=None, use_dagger=False)
     
-    量子逻辑门 RX.
+    对q_machine中的态矢作用量子逻辑门 rx 。
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
@@ -2816,12 +2848,12 @@ RX
         #     [0.       +0.j       0.       +0.j      ]]]]]
 
 
-RY
+ry
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:function:: pyvqnet.qnn.vqc.ry(q_machine, wires, params=None, num_wires=None, use_dagger=False)
     
-    量子逻辑门 RY.
+    对q_machine中的态矢作用量子逻辑门 ry 。
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
@@ -2852,12 +2884,12 @@ RY
         #     [0.       +0.j 0.       +0.j]]]]]
 
 
-RZ
+rz
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:function:: pyvqnet.qnn.vqc.rz(q_machine, wires, params=None, num_wires=None, use_dagger=False)
     
-    量子逻辑门 RZ.
+    对q_machine中的态矢作用量子逻辑门 rz 。
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
@@ -2888,12 +2920,12 @@ RZ
         #     [0.       +0.j       0.       +0.j      ]]]]]
 
 
-P
+p
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:function:: pyvqnet.qnn.vqc.p(q_machine, wires, params=None, num_wires=None, use_dagger=False)
     
-    量子逻辑门 P.
+    对q_machine中的态矢作用量子逻辑门 p 。
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
@@ -2923,12 +2955,12 @@ P
         #    [[0.+0.j 0.+0.j]
         #     [0.+0.j 0.+0.j]]]]]
 
-U1
+u1
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:function:: pyvqnet.qnn.vqc.u1(q_machine, wires, params=None, num_wires=None, use_dagger=False)
     
-    量子逻辑门 U1.
+    对q_machine中的态矢作用量子逻辑门 u1 。
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
@@ -2959,12 +2991,12 @@ U1
         #     [0.+0.j 0.+0.j]]]]
 
 
-U2
+u2
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:function:: pyvqnet.qnn.vqc.u2(q_machine, wires, params=None, num_wires=None, use_dagger=False)
     
-    量子逻辑门 U2.
+    对q_machine中的态矢作用量子逻辑门 u2 。
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
@@ -2994,12 +3026,12 @@ U2
         #    [[0.       +0.j        0.       +0.j       ]
         #     [0.       +0.j        0.       +0.j       ]]]]]
 
-U3
+u3
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:function:: pyvqnet.qnn.vqc.u3(q_machine, wires, params=None, num_wires=None, use_dagger=False)
     
-    量子逻辑门 U3.
+    对q_machine中的态矢作用量子逻辑门 u3 。
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
@@ -3029,12 +3061,12 @@ U3
         #    [[0.       +0.j        0.       +0.j       ]
         #     [0.       +0.j        0.       +0.j       ]]]]]
 
-CNOT
+cnot
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:function:: pyvqnet.qnn.vqc.cnot(q_machine, wires, params=None, num_wires=None, use_dagger=False)
     
-    量子逻辑门 CNOT.
+    对q_machine中的态矢作用量子逻辑门 cnot 。
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
@@ -3063,12 +3095,12 @@ CNOT
         #    [[0.+0.j 0.+0.j]
         #     [0.+0.j 0.+0.j]]]]]
 
-CR
+cr
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:function:: pyvqnet.qnn.vqc.cr(q_machine, wires, params=None, num_wires=None, use_dagger=False)
     
-    量子逻辑门 CR.
+    对q_machine中的态矢作用量子逻辑门 cr 。
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
@@ -3099,12 +3131,12 @@ CR
         #     [0.+0.j 0.+0.j]]]]]
 
 
-iSWAP
+iswap
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:function:: pyvqnet.qnn.vqc.iswap(q_machine, wires, params=None, num_wires=None, use_dagger=False)
     
-    量子逻辑门 iSWAP.
+    对q_machine中的态矢作用量子逻辑门 iswap 。
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
@@ -3134,12 +3166,12 @@ iSWAP
         #    [[0.+0.j 0.+0.j]
         #     [0.+0.j 0.+0.j]]]]]
 
-SWAP
+swap
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:function:: pyvqnet.qnn.vqc.swap(q_machine, wires, params=None, num_wires=None, use_dagger=False)
     
-    量子逻辑门 SWAP.
+    对q_machine中的态矢作用量子逻辑门 swap 。
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
@@ -3169,12 +3201,12 @@ SWAP
         #     [0.+0.j 0.+0.j]]]]]
 
 
-CZ
+cz
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:function:: pyvqnet.qnn.vqc.cz(q_machine, wires, params=None, num_wires=None, use_dagger=False)
     
-    量子逻辑门 CZ.
+    对q_machine中的态矢作用量子逻辑门 cz 。
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
@@ -3204,12 +3236,12 @@ CZ
         #     [0.+0.j 0.+0.j]]]]]
 
 
-RXX
+rxx
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:function:: pyvqnet.qnn.vqc.rxx(q_machine, wires, params=None, num_wires=None, use_dagger=False)
     
-    量子逻辑门 RXX.
+    对q_machine中的态矢作用量子逻辑门 rxx 。
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
@@ -3240,12 +3272,12 @@ RXX
         #     [0.       +0.j        0.       +0.j       ]]]]]
 
 
-RYY
+ryy
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:function:: pyvqnet.qnn.vqc.ryy(q_machine, wires, params=None, num_wires=None, use_dagger=False)
     
-    量子逻辑门 RYY.
+    对q_machine中的态矢作用量子逻辑门 ryy 。
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
@@ -3276,12 +3308,12 @@ RYY
         #     [0.       +0.j        0.       +0.j       ]]]]]
 
 
-RZZ
+rzz
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:function:: pyvqnet.qnn.vqc.rzz(q_machine, wires, params=None, num_wires=None, use_dagger=False)
     
-    量子逻辑门 RZZ.
+    对q_machine中的态矢作用量子逻辑门 rzz 。
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
@@ -3316,7 +3348,7 @@ RZX
 
 .. py:function:: pyvqnet.qnn.vqc.rzx(q_machine, wires, params=None, num_wires=None, use_dagger=False)
     
-    量子逻辑门 RZX.
+    对q_machine中的态矢作用量子逻辑门 RZX 。
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
@@ -3347,12 +3379,12 @@ RZX
         #     [0.       +0.j        0.       +0.j       ]]]]]
 
 
-Toffoli
+toffoli
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:function:: pyvqnet.qnn.vqc.toffoli(q_machine, wires, params=None, num_wires=None, use_dagger=False)
     
-    量子逻辑门 Toffoli.
+    对q_machine中的态矢作用量子逻辑门 toffoli 。
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
@@ -4237,7 +4269,14 @@ MeasureAll
 
 .. py:class:: pyvqnet.qnn.vqc.MeasureAll(obs)
 
-    计算量子态在一组特定量子比特上的密度矩阵。
+    计算量子线路的测量结果，支持输入obs为多个或单个泡利算子或这哈密顿量。
+    例如：
+
+    {\'wires\': [0,  1], \'observables\': [\'x\', \'i\'],\'coefficient\':[0.23,-3.5]}
+    或：
+    {\'X0\': 0.23}
+    或：
+    [{\'wires\': [0, 2, 3],\'observables\': [\'X\', \'Y\', \'Z\'],\'coefficient\': [1, 0.5, 0.4]}, {\'wires\': [0, 1, 2],\'observables\': [\'X\', \'Y\', \'Z\'],\'coefficient\': [1, 0.5, 0.4]}]
 
     :param obs: observable。
 
