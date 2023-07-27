@@ -869,6 +869,129 @@ __setitem__
         #  [1., 3001.]
         # ]
 
+GPU
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:function:: QTensor.GPU(device: int = DEV_GPU_0)
+
+    克隆QTensor到指定的GPU设备
+
+    device 指定存储其内部数据的设备。 当device = 0时，数据存储在CPU上，当device >= DEV_GPU_0时，数据存储在GPU上。 如果您的计算机有多个 GPU，您可以指定不同的设备来存储数据。 例如，device = 1001, 1002, 1003, ... 表示存储在具有不同序列号的GPU上。
+
+    .. note::
+        QTensor在不同GPU上无法进行计算。
+        如果您尝试在 ID 超过验证 GPU 最大数量的 GPU 上创建 QTensor，将引发 Cuda 错误。新的 Tensor 将删除其 GraphNode。
+
+    :param device: 当前保存QTensor的设备，默认=0，保存在cpu中。 device= pyvqnet.DEV_GPU_0，存储在第一个 GPU 中，devcie = 1001，存储在第二个 GPU 中，依此类推。
+
+    :return: QTensor 克隆到 GPU 设备。
+
+    Examples::
+
+        from pyvqnet.tensor import QTensor
+        a = QTensor([2])
+        b = a.GPU()
+        print(b.device)
+        #1000
+
+CPU
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:function:: QTensor.CPU()
+
+    移动QTensor到特定的CPU设备
+
+    device 指定存储其内部数据的设备。 当device = 0时，数据存储在CPU上，当device >= DEV_GPU时，数据存储在GPU上。 如果您的计算机有多个 CPU，您可以指定不同的设备来存储数据。 例如，device = 1001, 1002, 1003, ... 表示存储在具有不同序列号的GPU上。
+
+    CPU() 的输出将删除当前的 GraphNode。
+
+    :return: QTensor 移动到 CPU 设备。
+
+    Examples::
+
+        from pyvqnet.tensor import QTensor
+        a = QTensor([2])
+        b = a.CPU()
+        print(b.device)
+        # 0
+
+toGPU
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:function:: QTensor.toGPU(device: int = DEV_GPU_0)
+
+    移动QTensor到指定的GPU设备
+
+    device 指定存储其内部数据的设备。 当device = 0时，数据存储在CPU上，当device >= DEV_GPU时，数据存储在GPU上。 如果您的计算机有多个 GPU，您可以指定不同的设备来存储数据。 例如，device = 1001, 1002, 1003, ... 表示存储在具有不同序列号的GPU上。
+
+    .. note::
+        QTensor在不同GPU上无法进行计算。
+        如果您尝试在 ID 超过验证 GPU 最大数量的 GPU 上创建 QTensor，将引发 Cuda 错误。新的 Tensor 将删除其 GraphNode。
+
+    :param device: 当前保存QTensor的设备，默认=0，保存在cpu中。 device= pyvqnet.DEV_GPU_0，存储在第一个 GPU 中，devcie = 1001，存储在第二个 GPU 中，依此类推。
+    :return: QTensor 移动到 GPU 设备。
+
+    Examples::
+
+        from pyvqnet.tensor import QTensor
+        a = QTensor([2])
+        a = a.toGPU()
+        print(a.device)
+        #1000
+
+
+toCPU
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:function:: QTensor.toCPU()
+
+    移动QTensor到特定的GPU设备
+
+    device 指定存储其内部数据的设备。 当device = 0时，数据存储在CPU上，当device >= DEV_GPU时，数据存储在GPU上。 如果您的计算机有多个 GPU，您可以指定不同的设备来存储数据。 例如，device = 1001, 1002, 1003, ... 表示存储在具有不同序列号的GPU上。
+
+    :return: QTensor 移动到 CPU 设备。
+
+    Examples::
+
+        from pyvqnet.tensor import QTensor
+        a = QTensor([2])
+        b = a.toCPU()
+        print(b.device)
+        # 0
+
+
+isGPU
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:function:: QTensor.isGPU()
+
+    该 QTensor 的数据是否存储在 GPU 主机内存上。
+
+    :return: 该 QTensor 的数据是否存储在 GPU 主机内存上。
+
+    Examples::
+        from pyvqnet.tensor import QTensor
+        a = QTensor([2])
+        a = a.isGPU()
+        print(a)
+        # False
+
+isCPU
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:function:: QTensor.isCPU()
+
+    该 QTensor 的数据是否存储在 CPU 主机内存上。
+
+    :return: 该 QTensor 的数据是否存储在 CPU 主机内存上。
+
+    Examples::
+        from pyvqnet.tensor import QTensor
+        a = QTensor([2])
+        a = a.isCPU()
+        print(a)
+        # True
+
 
 创建函数
 -----------------------------
