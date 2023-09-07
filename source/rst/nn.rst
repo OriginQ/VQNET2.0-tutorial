@@ -67,8 +67,8 @@ Module
         class Model(Module):
             def __init__(self):
                 super(Model, self).__init__()
-                self.conv1 = pyvqnet.nn.Conv2D(1, 20, (5,5))
-                self.conv2 = pyvqnet.nn.Conv2D(20, 20, (5,5))
+                self.conv1 = pyvqnet.nn.Conv2d(1, 20, (5,5))
+                self.conv2 = pyvqnet.nn.Conv2d(20, 20, (5,5))
             def forward(self, x):
                 x = pyvqnet.nn.activation.relu(self.conv1(x))
                 return pyvqnet.nn.activation.relu(self.conv2(x))
