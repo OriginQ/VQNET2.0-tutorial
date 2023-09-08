@@ -869,7 +869,7 @@ LayerNormNd
 LayerNorm2d
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:class:: pyvqnet.xtensor.layer_norm.LayerNorm2d(norm_size:int, epsilon:float = 1e-5,  affine: bool = True, dtype=None, name="")
+.. py:class:: pyvqnet.xtensor.LayerNorm2d(norm_size:int, epsilon:float = 1e-5,  affine: bool = True, dtype=None, name="")
 
     在 4D 输入上进行层归一化。具体方式如论文所述:
     `Layer Normalization <https://arxiv.org/abs/1607.06450>`__。
@@ -1053,13 +1053,12 @@ Dropout
 
 Pixel_Shuffle 
 ^^^^^^^^^^^^^^^^^^^^^^^^^
-.. py:class:: pyvqnet.xtensor.Pixel_Shuffle(upscale_factors, name="")
+.. py:class:: pyvqnet.xtensor.Pixel_Shuffle(upscale_factors)
 
     重新排列形状为：(\*, C * r^2, H, W)  的张量
     到形状为 (\*, C, H * r, W * r) 的张量，其中 r 是尺度变换因子。
 
     :param upscale_factors: 增加尺度变换的因子
-    :param name: 这个模块的名字， 默认为""。
 
     :return:
             Pixel_Shuffle 模块
@@ -1077,12 +1076,11 @@ Pixel_Shuffle
 
 Pixel_Unshuffle 
 ^^^^^^^^^^^^^^^^^^^^^^^^^
-.. py:class:: pyvqnet.xtensor.pixel_shuffle.Pixel_Unshuffle(downscale_factors, name="")
+.. py:class:: pyvqnet.xtensor.Pixel_Unshuffle(downscale_factors)
 
     通过重新排列元素来反转 Pixel_Shuffle 操作. 将 (*, C, H * r, W * r) 形状的张量变化为 (*, C * r^2, H, W) ，其中 r 是缩小因子。
 
     :param downscale_factors: 增加尺度变换的因子
-    :param name: 这个模块的名字， 默认为""。
 
     :return:
             Pixel_Unshuffle 模块
@@ -2110,7 +2108,7 @@ hard_sigmoid
 
 relu
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-.. py:class:: pyvqnet.xtensor.relu(name:str="")
+.. py:class:: pyvqnet.xtensor.relu(x)
 
     ReLu 整流线性单元激活函数层。
 
@@ -2152,7 +2150,7 @@ leaky_relu
 
     :param x: 输入。
     :param alpha: LeakyRelu 系数,默认:0.01。
-    :param name: 激活函数层的命名,默认为""。
+
 
     :return: LeakyReLu 激活函数层结果。
 

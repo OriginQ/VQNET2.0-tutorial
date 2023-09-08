@@ -417,7 +417,7 @@ fill_rand_uniform\_
 fill_rand_normal\_
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:method:: XTensor.fill_rand_normal_(m=0, s=1, fast_math=True)
+.. py:method:: XTensor.fill_rand_normal_(m=0, s=1)
 
     生成均值为 m 和方差 s 产生正态分布元素，并填充到张量中。
 
