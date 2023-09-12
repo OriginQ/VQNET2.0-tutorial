@@ -282,7 +282,7 @@ VQNet2ONNX模块 支持将 VQNet 模型以及参数转化到 ONNX 模型格式�
    :file: ./images/onnxsupport.csv
 
 
-VQNet分布式计算模块
+VQNet 分布式计算模块
 ----------------------------------
 
 VQNet分布式计算模块支持将VQNet量子机器学习模型通过分布式计算模块相应接口，实现对数据的切分，模型参数在多进程间的通信，模型参数的更新，基于分布式计算实现对VQNet模型的加速。
@@ -296,63 +296,71 @@ VQNet分布式计算模块支持将VQNet量子机器学习模型通过分布式�
 **分布式计算单节点环境部署**
 
     完成mpich通信库的编译安装，编译前检测gcc、gfortran编译器是否安装。
-    .. code-block::
+
+.. code-block::
         
-        which gcc 
-        which gfortran
+    which gcc 
+    which gfortran
 
-    当显示了gcc和gfortran的路径，即可进行下一步的安装，若没有相应的编译器，请先安装编译器。当检查完编译器之后，使用wget命令下载。
-    .. code-block::
+当显示了gcc和gfortran的路径，即可进行下一步的安装，若没有相应的编译器，请先安装编译器。当检查完编译器之后，使用wget命令下载。
+
+.. code-block::
         
-        wget http://www.mpich.org/static/downloads/3.3.2/mpich-3.3.2.tar.gz 
-        tar -zxvf mpich-3.3.2.tar.gz 
-        cd mpich-3.3.2 
-        ./configure --prefix=/usr/local/mpich-3.3.2 
-        make 
-        make install 
+    wget http://www.mpich.org/static/downloads/3.3.2/mpich-3.3.2.tar.gz 
+    tar -zxvf mpich-3.3.2.tar.gz 
+    cd mpich-3.3.2 
+    ./configure --prefix=/usr/local/mpich-3.3.2 
+    make 
+    make install 
 
-    完成mpich的编译安装后，需要配置其环境变量。
-    .. code-block::
+完成mpich的编译安装后，需要配置其环境变量。
+
+.. code-block::
         
-        vim ~/.bashrc
+    vim ~/.bashrc
 
-    通过vim打开当前用户下所对应的.bashrc文件，在其中加入一行（建议添加在最下面一行）
+通过vim打开当前用户下所对应的.bashrc文件，在其中加入一行（建议添加在最下面一行）
 
-    .. code-block::
-        export PATH="/usr/local/mpich-3.3.2/bin:$PATH"
+.. code-block::
+    export PATH="/usr/local/mpich-3.3.2/bin:$PATH"
 
-    保存退出之后 ，使用source这一命令执行一下就把新加的命令执行了。
+保存退出之后 ，使用source这一命令执行一下就把新加的命令执行了。
 
-    .. code-block::
-        source ~/.bashrc
+.. code-block::
+    source ~/.bashrc
 
-    之后，用which来检验下配置的环境变量是否正确。如果显示了其路径，则说明安装顺利完成了。
+之后，用which来检验下配置的环境变量是否正确。如果显示了其路径，则说明安装顺利完成了。
 
 **分布式计算多节点环境部署**
 
     在多节点上实现分布式计算，首先需要保证多节点上mpich环境的一致，python环境一致，其次，需要设置节点间的免密通信。
-    假设需要设置10.10.8.107、10.10.8.108、10.10.8.109三个节点的免密通信
+    假设需要设置10.10.8.107、10.10.8.108、10.10.8.109三个节点的免密通信。
 
     .. code-block::
+
         在每个节点上执行
-
-        ssh-keygen
         
-        之后一直回车 在.ssh文件夹下生成一个公钥（id_rsa.pub）一个私钥（id_rsa）
+        ssh-keygen 
+        
+        之后一直回车，在.ssh文件夹下生成一个公钥（id_rsa.pub）一个私钥（id_rsa）
 
-        将其另外两个节点的公钥都添加到第一个节点的authorized_keys文件中，其次再将第一个节点authorized_keys文件传到另外两个节点便可以实现节点间的免密通信
+        将其另外两个节点的公钥都添加到第一个节点的authorized_keys文件中，
+        再将第一个节点authorized_keys文件传到另外两个节点便可以实现节点间的免密通信
         在10.10.7.108上执行
+
         cat ~/.ssh/id_dsa.pub >> 10.10.7.107：~/.ssh/authorized_keys
 
         在10.10.7.109上执行
+
         cat ~/.ssh/id_dsa.pub >> 10.10.7.107：~/.ssh/authorized_keys
         
-        先删除从108、109上的中的authorized_keys文件后，在10.10.7.107上执行
+        先删除108、109中的authorized_keys文件后，在10.10.7.107上执行
 
         scp ~/.ssh/authorized_keys  10.10.7.108：~/.ssh/authorized_keys
         scp ~/.ssh/authorized_keys  10.10.7.109：~/.ssh/authorized_keys
 
-        使三个节点的authorized_keys文件一致，实现节点间的免密通信，保证三个不同节点生成的公钥都在authorized_keys文件中即可
+        使三个节点的authorized_keys文件一致，即可实现节点间的免密通信，
+        保证三个不同节点生成的公钥都在authorized_keys文件中即可
 
     除此外，最好还设置一个共享目录，使得改变共享目录下的文件时，不同节点中文件也会进行更改，预防多节点运行模型时不同节点中的文件不同步的问题。
 
@@ -619,8 +627,9 @@ VQNet分布式计算模块支持将VQNet量子机器学习模型通过分布式�
             return x
 
 
-测试代码
+以上均未用到分布式计算接口，而仅需要在训练时引用DataSplit、parallel_model、init_p即可实现数据并行的分布式计算。
 
+使用方法如下
 .. code-block::
 
     def run(args):
@@ -732,48 +741,161 @@ VQNet分布式计算模块支持将VQNet量子机器学习模型通过分布式�
 
 .. code-block::
 
+    python test_mdis.py --init true
+
+    0
+    1 loss is : 0.8230862300
+    Eval Accuracy: 0.5
+    2 loss is : 0.6979023616
+    Eval Accuracy: 0.5
+    3 loss is : 0.5718536377
+    Eval Accuracy: 0.47
+    4 loss is : 0.5429712931
+    Eval Accuracy: 0.51
+    5 loss is : 0.5333395640
+    Eval Accuracy: 0.52
+    6 loss is : 0.5185367266
+    Eval Accuracy: 0.65
+    7 loss is : 0.5187034607
+    Eval Accuracy: 0.6
+    8 loss is : 0.5176532110
+    Eval Accuracy: 0.43
+    9 loss is : 0.5660219193
+    Eval Accuracy: 0.46
+    time: {} 15.132369756698608
+
+
     python test_mdis.py --init true --np 2
 
     得到结果
 
-    0
-    1 loss is : 1.4110415141
-    Eval Accuracy: 0.5
-    2 loss is : 0.7032407761
-    Eval Accuracy: 0.5
-    3 loss is : 0.6629219055
-    Eval Accuracy: 0.5
-    4 loss is : 0.6010023753
-    Eval Accuracy: 0.5
-    5 loss is : 0.5792429606
-    Eval Accuracy: 0.5
-    6 loss is : 0.5142317136
-    Eval Accuracy: 0.5
-    7 loss is : 0.5373977661
-    Eval Accuracy: 0.93
-    8 loss is : 0.4411191940
-    Eval Accuracy: 0.5
-    9 loss is : 0.4504583041
-    Eval Accuracy: 0.98
-    time: {} 5.499964714050293
     1
-    1 loss is : 1.3464846293
+    1 loss is : 0.0316730281
     Eval Accuracy: 0.5
-    2 loss is : 0.0298027515
+    2 loss is : 0.0082226296
     Eval Accuracy: 0.5
-    3 loss is : 0.0214027007
+    3 loss is : 0.0041910132
     Eval Accuracy: 0.5
-    4 loss is : 0.0208610694
+    4 loss is : 0.0026126946
     Eval Accuracy: 0.5
-    5 loss is : 0.0162552824
+    5 loss is : 0.0018102199
     Eval Accuracy: 0.5
-    6 loss is : 0.0182823300
+    6 loss is : 0.0013386756
     Eval Accuracy: 0.5
-    7 loss is : 0.0118855496
-    Eval Accuracy: 0.95
-    8 loss is : 0.0167147080
+    7 loss is : 0.0010348094
     Eval Accuracy: 0.5
-    9 loss is : 0.0095623523
-    Eval Accuracy: 0.98
+    8 loss is : 0.0008260541
+    Eval Accuracy: 0.5
+    9 loss is : 0.0006756162
+    Eval Accuracy: 0.5
+    0
+    1 loss is : 0.0072183679
+    Eval Accuracy: 0.85
+    2 loss is : 0.0014325128
+    Eval Accuracy: 0.84
+    3 loss is : 0.0009416074
+    Eval Accuracy: 0.86
+    4 loss is : 0.0006576005
+    Eval Accuracy: 0.84
+    5 loss is : 0.0004843485
+    Eval Accuracy: 0.82
+    6 loss is : 0.0003716738
+    Eval Accuracy: 0.82
+    7 loss is : 0.0002943836
+    Eval Accuracy: 0.82
+    8 loss is : 0.0002390019
+    Eval Accuracy: 0.82
+    9 loss is : 0.0001979264
+    Eval Accuracy: 0.82
+    time: {} 9.132536888122559
+
+以上是在单节点上多进程模型训练，可以明显看出训练时间缩短
+
+在多节点上训练，命令如下
+
+.. code-block::
+
+    python3 test_mdis.py --init true --np 4 --hostpath ~/workspace/hao/vqnet/pyVQNet/examples/host.txt
+
+    0
+    1 loss is : 0.8609524409
+    Eval Accuracy: 0.5
+    2 loss is : 0.7399766286
+    Eval Accuracy: 0.5
+    3 loss is : 0.6829307556
+    Eval Accuracy: 0.5
+    4 loss is : 0.6301216125
+    Eval Accuracy: 0.49
+    5 loss is : 0.5815347036
+    Eval Accuracy: 0.38
+    6 loss is : 0.5370124817
+    Eval Accuracy: 0.24
+    7 loss is : 0.4962680499
+    Eval Accuracy: 0.06
+    8 loss is : 0.4590748787
+    Eval Accuracy: 0.44
+    9 loss is : 0.4251357079
+    Eval Accuracy: 0.5
+    time: {} 6.5950517654418945
+    Can not use matplot TkAgg
+    3
+    1 loss is : 0.0034498004
+    Eval Accuracy: 0.5
+    2 loss is : 0.0007666681
+    Eval Accuracy: 0.5
+    3 loss is : 0.0005568531
+    Eval Accuracy: 0.5
+    4 loss is : 0.0004169762
+    Eval Accuracy: 0.5
+    5 loss is : 0.0003228062
+    Eval Accuracy: 0.5
+    6 loss is : 0.0002573317
+    Eval Accuracy: 0.5
+    7 loss is : 0.0002102273
+    Eval Accuracy: 0.5
+    8 loss is : 0.0001751528
+    Eval Accuracy: 0.5
+    9 loss is : 0.0001483827
+    Eval Accuracy: 0.5
+    Can not use matplot TkAgg
+    1
+    1 loss is : 0.0990966797
+    Eval Accuracy: 0.5
+    2 loss is : 0.0346243183
+    Eval Accuracy: 0.5
+    3 loss is : 0.0194720447
+    Eval Accuracy: 0.5
+    4 loss is : 0.0128109713
+    Eval Accuracy: 0.5
+    5 loss is : 0.0092022886
+    Eval Accuracy: 0.5
+    6 loss is : 0.0069948425
+    Eval Accuracy: 0.5
+    7 loss is : 0.0055302560
+    Eval Accuracy: 0.5
+    8 loss is : 0.0045029074
+    Eval Accuracy: 0.5
+    9 loss is : 0.0037492002
+    Eval Accuracy: 0.5
+    Can not use matplot TkAgg
+    2
+    1 loss is : 0.8468652089
+    Eval Accuracy: 0.5
+    2 loss is : 0.7299760183
+    Eval Accuracy: 0.5
+    3 loss is : 0.6732901891
+    Eval Accuracy: 0.5
+    4 loss is : 0.6209689458
+    Eval Accuracy: 0.5
+    5 loss is : 0.5729962667
+    Eval Accuracy: 0.5
+    6 loss is : 0.5289377848
+    Eval Accuracy: 0.5
+    7 loss is : 0.4887968381
+    Eval Accuracy: 0.5
+    8 loss is : 0.4520395279
+    Eval Accuracy: 0.53
+    9 loss is : 0.4186156909
+    Eval Accuracy: 0.52
 
 
