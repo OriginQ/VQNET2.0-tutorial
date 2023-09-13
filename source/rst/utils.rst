@@ -297,75 +297,94 @@ VQNet分布式计算模块支持将VQNet量子机器学习模型通过分布式�
 
     完成mpich通信库的编译安装，编译前检测gcc、gfortran编译器是否安装。
 
-.. code-block::
-        
-    which gcc 
-    which gfortran
-
-当显示了gcc和gfortran的路径，即可进行下一步的安装，若没有相应的编译器，请先安装编译器。当检查完编译器之后，使用wget命令下载。
-
-.. code-block::
-        
-    wget http://www.mpich.org/static/downloads/3.3.2/mpich-3.3.2.tar.gz 
-    tar -zxvf mpich-3.3.2.tar.gz 
-    cd mpich-3.3.2 
-    ./configure --prefix=/usr/local/mpich-3.3.2 
-    make 
-    make install 
-
-完成mpich的编译安装后，需要配置其环境变量。
-
-.. code-block::
-        
-    vim ~/.bashrc
-
-通过vim打开当前用户下所对应的.bashrc文件，在其中加入一行（建议添加在最下面一行）
-
-.. code-block::
-    export PATH="/usr/local/mpich-3.3.2/bin:$PATH"
-
-保存退出之后 ，使用source这一命令执行一下就把新加的命令执行了。
-
-.. code-block::
-    source ~/.bashrc
-
-之后，用which来检验下配置的环境变量是否正确。如果显示了其路径，则说明安装顺利完成了。
+    .. code-block::
+            
+        which gcc 
+        which gfortran
+    
+    当显示了gcc和gfortran的路径，即可进行下一步的安装，若没有相应的编译器，请先安装编译器。当检查完编译器之后，使用wget命令下载。
+    
+    .. code-block::
+            
+        wget http://www.mpich.org/static/downloads/3.3.2/mpich-3.3.2.tar.gz 
+        tar -zxvf mpich-3.3.2.tar.gz 
+        cd mpich-3.3.2 
+        ./configure --prefix=/usr/local/mpich-3.3.2 
+        make 
+        make install 
+    
+    完成mpich的编译安装后，需要配置其环境变量。
+    
+    .. code-block::
+            
+        vim ~/.bashrc
+    
+    通过vim打开当前用户下所对应的.bashrc文件，在其中加入一行（建议添加在最下面一行）
+    
+    .. code-block::
+    
+        export PATH="/usr/local/mpich-3.3.2/bin:$PATH"
+    
+    保存退出之后 ，使用source这一命令执行一下就把新加的命令执行了。
+    
+    .. code-block::
+    
+        source ~/.bashrc
+    
+    之后，用which来检验下配置的环境变量是否正确。如果显示了其路径，则说明安装顺利完成了。
 
 **分布式计算多节点环境部署**
 
     在多节点上实现分布式计算，首先需要保证多节点上mpich环境的一致，python环境一致，其次，需要设置节点间的免密通信。
-    假设需要设置10.10.8.107、10.10.8.108、10.10.8.109三个节点的免密通信。
+    假设需要设置node0（主节点）、node1、node2三个节点的免密通信。
 
     .. code-block::
 
         在每个节点上执行
-        
+
         ssh-keygen 
         
         之后一直回车，在.ssh文件夹下生成一个公钥（id_rsa.pub）一个私钥（id_rsa）
 
         将其另外两个节点的公钥都添加到第一个节点的authorized_keys文件中，
         再将第一个节点authorized_keys文件传到另外两个节点便可以实现节点间的免密通信
-        在10.10.7.108上执行
+        在子节点node1上执行
 
-        cat ~/.ssh/id_dsa.pub >> 10.10.7.107：~/.ssh/authorized_keys
+        cat ~/.ssh/id_dsa.pub >> node1：~/.ssh/authorized_keys
 
-        在10.10.7.109上执行
+        在子节点node2上执行
 
-        cat ~/.ssh/id_dsa.pub >> 10.10.7.107：~/.ssh/authorized_keys
+        cat ~/.ssh/id_dsa.pub >> node2：~/.ssh/authorized_keys
         
-        先删除108、109中的authorized_keys文件后，在10.10.7.107上执行
+        先删除node1、node2中的authorized_keys文件后，在node0上执行
 
-        scp ~/.ssh/authorized_keys  10.10.7.108：~/.ssh/authorized_keys
-        scp ~/.ssh/authorized_keys  10.10.7.109：~/.ssh/authorized_keys
+        scp ~/.ssh/authorized_keys  node1：~/.ssh/authorized_keys
+        scp ~/.ssh/authorized_keys  node2：~/.ssh/authorized_keys
 
-        使三个节点的authorized_keys文件一致，即可实现节点间的免密通信，
-        保证三个不同节点生成的公钥都在authorized_keys文件中即可
+        保证三个不同节点生成的公钥都在authorized_keys文件中,即可实现节点间的免密通信，
 
     除此外，最好还设置一个共享目录，使得改变共享目录下的文件时，不同节点中文件也会进行更改，预防多节点运行模型时不同节点中的文件不同步的问题。
+    使用nfs-utils和rpcbind实现共享目录。
+
+    .. code-block::
+
+        # 安装软件包
+        yum -y install nfs* rpcbind  
+
+        # 编辑主节点上配置文件
+        vim /etc/exports  
+        /data/mpi *(rw,sync,no_all_squash,no_subtree_check)
+
+        # 主节点上启动服务
+        systemctl start rpcbind
+        systemctl start nfs
+
+        # 在所有子结点node1,node2上mount要共享的目录
+        mount node1:/data/mpi/ /data/mpi
+        mount node2:/data/mpi/ /data/mpi
 
 
-本块介绍如何在cpu硬件平台上，利用VQNet分布式计算模型接口实现数据并行训练模型，用例为example目录下的test_mdis.py文件
+本块介绍如何在cpu硬件平台上，利用VQNet分布式计算接口实现数据并行训练模型，用例为example目录下的test_mdis.py文件
 
 导入相关库
 
@@ -630,6 +649,7 @@ VQNet分布式计算模块支持将VQNet量子机器学习模型通过分布式�
 以上均未用到分布式计算接口，而仅需要在训练时引用DataSplit、parallel_model、init_p即可实现数据并行的分布式计算。
 
 使用方法如下
+
 .. code-block::
 
     def run(args):
@@ -731,10 +751,9 @@ VQNet分布式计算模块支持将VQNet量子机器学习模型通过分布式�
 
 .. code-block::
 
-    10.10.8.32:1
-    10.10.8.33:1
-    10.10.8.34:1
-    10.10.8.35:1
+    node0:1
+    node1:1
+    node2:1
 
 
 在命令行输入
