@@ -1679,7 +1679,7 @@ Quantum circuit structure learning任务的核心目标就是找到最优的带�
             self.input = input
             expectation_z = circuit(np.array(input.data))
             result = [[expectation_z]]
-            requires_grad = input.requires_grad and not QTensor.NO_GRAD
+            requires_grad = input.requires_grad
             def _backward(g, input):
                 """ Backward pass computation """
                 input_list = np.array(input.data)

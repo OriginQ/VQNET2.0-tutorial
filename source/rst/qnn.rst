@@ -2478,7 +2478,7 @@ i
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
     :param num_wires: 量子比特数，默认为None。
-    :param num_wires: 是否共轭转置，默认为False。
+    :param use_dagger: 是否共轭转置，默认为False。
     :return: 输出QTensor。
 
     Example::
@@ -2512,7 +2512,7 @@ hadamard
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
     :param num_wires: 量子比特数，默认为None。
-    :param num_wires: 是否共轭转置，默认为False。
+    :param use_dagger: 是否共轭转置，默认为False。
     :return: 输出QTensor。
 
     Example::
@@ -2547,7 +2547,7 @@ t
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
     :param num_wires: 量子比特数，默认为None。
-    :param num_wires: 是否共轭转置，默认为False。
+    :param use_dagger: 是否共轭转置，默认为False。
     :return: 输出QTensor。
 
     Example::
@@ -2582,7 +2582,7 @@ s
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
     :param num_wires: 量子比特数，默认为None。
-    :param num_wires: 是否共轭转置，默认为False。
+    :param use_dagger: 是否共轭转置，默认为False。
     :return: 输出QTensor。
 
     Example::
@@ -2617,7 +2617,7 @@ paulix
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
     :param num_wires: 量子比特数，默认为None。
-    :param num_wires: 是否共轭转置，默认为False。
+    :param use_dagger: 是否共轭转置，默认为False。
     :return: 输出QTensor。
 
     Example::
@@ -2652,7 +2652,7 @@ pauliy
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
     :param num_wires: 量子比特数，默认为None。
-    :param num_wires: 是否共轭转置，默认为False。
+    :param use_dagger: 是否共轭转置，默认为False。
     :return: 输出QTensor。
 
     Example::
@@ -2686,7 +2686,7 @@ pauliz
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
     :param num_wires: 量子比特数，默认为None。
-    :param num_wires: 是否共轭转置，默认为False。
+    :param use_dagger: 是否共轭转置，默认为False。
     :return: 输出QTensor。
 
     Example::
@@ -2720,7 +2720,7 @@ x1
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
     :param num_wires: 量子比特数，默认为None。
-    :param num_wires: 是否共轭转置，默认为False。
+    :param use_dagger: 是否共轭转置，默认为False。
     :return: 输出QTensor。
 
     Example::
@@ -2754,7 +2754,7 @@ y1
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
     :param num_wires: 量子比特数，默认为None。
-    :param num_wires: 是否共轭转置，默认为False。
+    :param use_dagger: 是否共轭转置，默认为False。
     :return: 输出QTensor。
 
     Example::
@@ -2789,7 +2789,7 @@ z1
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
     :param num_wires: 量子比特数，默认为None。
-    :param num_wires: 是否共轭转置，默认为False。
+    :param use_dagger: 是否共轭转置，默认为False。
     :return: 输出QTensor。
 
     Example::
@@ -2823,7 +2823,7 @@ rx
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
     :param num_wires: 量子比特数，默认为None。
-    :param num_wires: 是否共轭转置，默认为False。
+    :param use_dagger: 是否共轭转置，默认为False。
     :return: 输出QTensor。
 
     Example::
@@ -2859,7 +2859,7 @@ ry
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
     :param num_wires: 量子比特数，默认为None。
-    :param num_wires: 是否共轭转置，默认为False。
+    :param use_dagger: 是否共轭转置，默认为False。
     :return: 输出QTensor。
 
     Example::
@@ -2895,7 +2895,7 @@ rz
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
     :param num_wires: 量子比特数，默认为None。
-    :param num_wires: 是否共轭转置，默认为False。
+    :param use_dagger: 是否共轭转置，默认为False。
     :return: 输出QTensor。
 
     Example::
@@ -2931,7 +2931,7 @@ p
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
     :param num_wires: 量子比特数，默认为None。
-    :param num_wires: 是否共轭转置，默认为False。
+    :param use_dagger: 是否共轭转置，默认为False。
     :return: 输出QTensor。
 
     Example::
@@ -2966,7 +2966,7 @@ u1
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
     :param num_wires: 量子比特数，默认为None。
-    :param num_wires: 是否共轭转置，默认为False。
+    :param use_dagger: 是否共轭转置，默认为False。
     :return: 输出QTensor。
 
     Example::
@@ -3002,7 +3002,7 @@ u2
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
     :param num_wires: 量子比特数，默认为None。
-    :param num_wires: 是否共轭转置，默认为False。
+    :param use_dagger: 是否共轭转置，默认为False。
     :return: 输出QTensor。
 
     Example::
@@ -3037,7 +3037,7 @@ u3
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
     :param num_wires: 量子比特数，默认为None。
-    :param num_wires: 是否共轭转置，默认为False。
+    :param use_dagger: 是否共轭转置，默认为False。
     :return: 输出QTensor。
 
     Example::
@@ -3072,7 +3072,7 @@ cnot
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
     :param num_wires: 量子比特数，默认为None。
-    :param num_wires: 是否共轭转置，默认为False。
+    :param use_dagger: 是否共轭转置，默认为False。
     :return: 输出QTensor。
 
     Example::
@@ -3106,7 +3106,7 @@ cr
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
     :param num_wires: 量子比特数，默认为None。
-    :param num_wires: 是否共轭转置，默认为False。
+    :param use_dagger: 是否共轭转置，默认为False。
     :return: 输出QTensor。
 
     Example::
@@ -3142,7 +3142,7 @@ iswap
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
     :param num_wires: 量子比特数，默认为None。
-    :param num_wires: 是否共轭转置，默认为False。
+    :param use_dagger: 是否共轭转置，默认为False。
     :return: 输出QTensor。
 
     Example::
@@ -3177,7 +3177,7 @@ swap
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
     :param num_wires: 量子比特数，默认为None。
-    :param num_wires: 是否共轭转置，默认为False。
+    :param use_dagger: 是否共轭转置，默认为False。
     :return: 输出QTensor。
 
     Example::
@@ -3212,7 +3212,7 @@ cz
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
     :param num_wires: 量子比特数，默认为None。
-    :param num_wires: 是否共轭转置，默认为False。
+    :param use_dagger: 是否共轭转置，默认为False。
     :return: 输出QTensor。
 
     Example::
@@ -3247,7 +3247,7 @@ rxx
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
     :param num_wires: 量子比特数，默认为None。
-    :param num_wires: 是否共轭转置，默认为False。
+    :param use_dagger: 是否共轭转置，默认为False。
     :return: 输出QTensor。
 
     Example::
@@ -3283,7 +3283,7 @@ ryy
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
     :param num_wires: 量子比特数，默认为None。
-    :param num_wires: 是否共轭转置，默认为False。
+    :param use_dagger: 是否共轭转置，默认为False。
     :return: 输出QTensor。
 
     Example::
@@ -3319,7 +3319,7 @@ rzz
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
     :param num_wires: 量子比特数，默认为None。
-    :param num_wires: 是否共轭转置，默认为False。
+    :param use_dagger: 是否共轭转置，默认为False。
     :return: 输出QTensor。
 
     Example::
@@ -3354,7 +3354,7 @@ RZX
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
     :param num_wires: 量子比特数，默认为None。
-    :param num_wires: 是否共轭转置，默认为False。
+    :param use_dagger: 是否共轭转置，默认为False。
     :return: 输出QTensor。
 
     Example::
@@ -3390,7 +3390,7 @@ toffoli
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
     :param num_wires: 量子比特数，默认为None。
-    :param num_wires: 是否共轭转置，默认为False。
+    :param use_dagger: 是否共轭转置，默认为False。
     :return: 输出QTensor。
 
     Example::
