@@ -281,3 +281,640 @@ VQNet2ONNX模块 支持将 VQNet 模型以及参数转化到 ONNX 模型格式�
 .. csv-table:: 已支持VQNet接口列表
    :file: ./images/onnxsupport.csv
 
+
+VQNet 分布式计算模块
+----------------------------------
+
+VQNet分布式计算模块支持将VQNet量子机器学习模型通过分布式计算模块相应接口，实现对数据的切分，模型参数在多进程间的通信，模型参数的更新，基于分布式计算实现对VQNet模型的加速。
+
+环境依赖:mpich，mpi4py
+
+.. note::
+
+    当前仅支持cpu的分布式计算，不支持以gloo、nccl为通信库的分布式计算。
+
+**分布式计算单节点环境部署**
+
+    完成mpich通信库的编译安装，编译前检测gcc、gfortran编译器是否安装。
+
+    .. code-block::
+            
+        which gcc 
+        which gfortran
+    
+    当显示了gcc和gfortran的路径，即可进行下一步的安装，若没有相应的编译器，请先安装编译器。当检查完编译器之后，使用wget命令下载。
+    
+    .. code-block::
+            
+        wget http://www.mpich.org/static/downloads/3.3.2/mpich-3.3.2.tar.gz 
+        tar -zxvf mpich-3.3.2.tar.gz 
+        cd mpich-3.3.2 
+        ./configure --prefix=/usr/local/mpich-3.3.2 
+        make 
+        make install 
+    
+    完成mpich的编译安装后，需要配置其环境变量。
+    
+    .. code-block::
+            
+        vim ~/.bashrc
+    
+    通过vim打开当前用户下所对应的.bashrc文件，在其中加入一行（建议添加在最下面一行）
+    
+    .. code-block::
+    
+        export PATH="/usr/local/mpich-3.3.2/bin:$PATH"
+    
+    保存退出之后 ，使用source这一命令执行一下就把新加的命令执行了。
+    
+    .. code-block::
+    
+        source ~/.bashrc
+    
+    之后，用which来检验下配置的环境变量是否正确。如果显示了其路径，则说明安装顺利完成了。
+
+**分布式计算多节点环境部署**
+
+    在多节点上实现分布式计算，首先需要保证多节点上mpich环境的一致，python环境一致，其次，需要设置节点间的免密通信。
+    假设需要设置node0（主节点）、node1、node2三个节点的免密通信。
+
+    .. code-block::
+
+        在每个节点上执行
+
+        ssh-keygen 
+        
+        之后一直回车，在.ssh文件夹下生成一个公钥（id_rsa.pub）一个私钥（id_rsa）
+
+        将其另外两个节点的公钥都添加到第一个节点的authorized_keys文件中，
+        再将第一个节点authorized_keys文件传到另外两个节点便可以实现节点间的免密通信
+        在子节点node1上执行
+
+        cat ~/.ssh/id_dsa.pub >> node1：~/.ssh/authorized_keys
+
+        在子节点node2上执行
+
+        cat ~/.ssh/id_dsa.pub >> node2：~/.ssh/authorized_keys
+        
+        先删除node1、node2中的authorized_keys文件后，在node0上执行
+
+        scp ~/.ssh/authorized_keys  node1：~/.ssh/authorized_keys
+        scp ~/.ssh/authorized_keys  node2：~/.ssh/authorized_keys
+
+        保证三个不同节点生成的公钥都在authorized_keys文件中,即可实现节点间的免密通信，
+
+    除此外，最好还设置一个共享目录，使得改变共享目录下的文件时，不同节点中文件也会进行更改，预防多节点运行模型时不同节点中的文件不同步的问题。
+    使用nfs-utils和rpcbind实现共享目录。
+
+    .. code-block::
+
+        # 安装软件包
+        yum -y install nfs* rpcbind  
+
+        # 编辑主节点上配置文件
+        vim /etc/exports  
+        /data/mpi *(rw,sync,no_all_squash,no_subtree_check)
+
+        # 主节点上启动服务
+        systemctl start rpcbind
+        systemctl start nfs
+
+        # 在所有子结点node1,node2上mount要共享的目录
+        mount node1:/data/mpi/ /data/mpi
+        mount node2:/data/mpi/ /data/mpi
+
+
+本块介绍如何在cpu硬件平台上，利用VQNet分布式计算接口实现数据并行训练模型，用例为example目录下的test_mdis.py文件
+
+导入相关库
+
+.. code-block::
+
+    import sys
+    sys.path.insert(0,"../")
+    import time
+    import os
+    import struct
+    import gzip
+    from pyvqnet.nn.module import Module
+    from pyvqnet.nn.linear import Linear
+    from pyvqnet.nn.conv import Conv2D
+
+    from pyvqnet.nn import activation as F
+    from pyvqnet.nn.pooling import MaxPool2D
+    from pyvqnet.nn.loss import CategoricalCrossEntropy
+    from pyvqnet.optim.adam import Adam
+    from pyvqnet.data.data import data_generator
+    from pyvqnet.tensor import tensor
+    from pyvqnet.tensor.tensor import QTensor
+    import pyqpanda as pq
+    import time
+    import numpy as np
+    import matplotlib
+    from pyvqnet.distributed import *  # 分布式计算模块
+    import argparse 
+
+数据获取
+
+.. code-block::
+
+    url_base = "http://yann.lecun.com/exdb/mnist/"
+    key_file = {
+        "train_img": "train-images-idx3-ubyte.gz",
+        "train_label": "train-labels-idx1-ubyte.gz",
+        "test_img": "t10k-images-idx3-ubyte.gz",
+        "test_label": "t10k-labels-idx1-ubyte.gz"
+    }
+    if_show_sample = 0
+    grad_time = []
+    forward_time = []
+    forward_time_sum = []
+
+    def _download(dataset_dir, file_name):
+        """
+        Download mnist data if needed.
+        """
+        file_path = dataset_dir + "/" + file_name
+
+        if os.path.exists(file_path):
+            with gzip.GzipFile(file_path) as file:
+                file_path_ungz = file_path[:-3].replace("\\", "/")
+                if not os.path.exists(file_path_ungz):
+                    open(file_path_ungz, "wb").write(file.read())
+            return
+
+        print("Downloading " + file_name + " ... ")
+        urllib.request.urlretrieve(url_base + file_name, file_path)
+        if os.path.exists(file_path):
+            with gzip.GzipFile(file_path) as file:
+                file_path_ungz = file_path[:-3].replace("\\", "/")
+                file_path_ungz = file_path_ungz.replace("-idx", ".idx")
+                if not os.path.exists(file_path_ungz):
+                    open(file_path_ungz, "wb").write(file.read())
+        print("Done")
+
+
+    def download_mnist(dataset_dir):
+        for v in key_file.values():
+            _download(dataset_dir, v)
+
+    def load_mnist(dataset="training_data", digits=np.arange(2), path="./"):
+        """
+        load mnist data
+        """
+        from array import array as pyarray
+        download_mnist(path)
+        if dataset == "training_data":
+            fname_image = os.path.join(path, "train-images.idx3-ubyte").replace(
+                "\\", "/")
+            fname_label = os.path.join(path, "train-labels.idx1-ubyte").replace(
+                "\\", "/")
+        elif dataset == "testing_data":
+            fname_image = os.path.join(path, "t10k-images.idx3-ubyte").replace(
+                "\\", "/")
+            fname_label = os.path.join(path, "t10k-labels.idx1-ubyte").replace(
+                "\\", "/")
+        else:
+            raise ValueError("dataset must be 'training_data' or 'testing_data'")
+
+        flbl = open(fname_label, "rb")
+        _, size = struct.unpack(">II", flbl.read(8))
+        lbl = pyarray("b", flbl.read())
+        flbl.close()
+
+        fimg = open(fname_image, "rb")
+        _, size, rows, cols = struct.unpack(">IIII", fimg.read(16))
+        img = pyarray("B", fimg.read())
+        fimg.close()
+
+        ind = [k for k in range(size) if lbl[k] in digits]
+        num = len(ind)
+        images = np.zeros((num, rows, cols))
+        labels = np.zeros((num, 1), dtype=int)
+        for i in range(len(ind)):
+            images[i] = np.array(img[ind[i] * rows * cols:(ind[i] + 1) * rows *
+                                     cols]).reshape((rows, cols))
+            labels[i] = lbl[ind[i]]
+
+        return images, labels
+
+
+    def data_select(train_num, test_num):
+        """
+        Select data from mnist dataset.
+        """
+
+        x_train, y_train = load_mnist("training_data")  # 下载训练数据
+        x_test, y_test = load_mnist("testing_data")
+        idx_train = np.append(
+                np.where(y_train == 0)[0][0:train_num],
+                np.where(y_train == 1)[0][0:train_num])
+        x_train = x_train[idx_train]
+        y_train = y_train[idx_train]
+        x_train = x_train / 255
+        y_train = np.eye(2)[y_train].reshape(-1, 2)
+
+        idx_test = np.append(
+                np.where(y_test == 0)[0][:test_num],
+                np.where(y_test == 1)[0][:test_num])
+        x_test = x_test[idx_test]
+        y_test = y_test[idx_test]
+        x_test = x_test / 255
+        y_test = np.eye(2)[y_test].reshape(-1, 2)
+
+        return x_train, y_train, x_test, y_test
+
+模型定义
+
+.. code-block::
+
+    def circuit_func(weights):
+        """
+        A function using QPanda to create quantum circuits and run.
+        """
+        num_qubits = 1
+        machine = pq.CPUQVM()
+        machine.init_qvm()
+        qubits = machine.qAlloc_many(num_qubits)
+        cbits = machine.cAlloc_many(num_qubits)
+        circuit = pq.QCircuit()
+        circuit.insert(pq.H(qubits[0]))
+        circuit.insert(pq.RY(qubits[0], weights[0]))
+        prog = pq.QProg()
+        prog.insert(circuit)
+        prog << pq.measure_all(qubits, cbits)  #pylint:disable=expression-not-assigned
+
+        result = machine.run_with_configuration(prog, cbits, 1000)
+
+        counts = np.array(list(result.values()))
+        states = np.array(list(result.keys())).astype(float)
+        # Compute probabilities for each state
+        probabilities = counts / 100
+        # Get state expectation
+        expectation = np.sum(states * probabilities)
+        return expectation
+
+    class Hybrid(Module):
+        """ Hybrid quantum - Quantum layer definition """
+        def __init__(self, shift):
+            super(Hybrid, self).__init__()
+            self.shift = shift
+            self.input = None
+
+        def forward(self, x):
+            self.input = x
+            expectation_z = circuit_func(np.array(x.data))
+            result = [[expectation_z]]
+            # requires_grad = x.requires_grad and not QTensor.NO_GRAD
+            requires_grad = x.requires_grad
+            def _backward_mnist(g, x):
+                """ Backward pass computation """
+                start_grad_time = time.time()
+                input_list = np.array(x.data)
+                shift_right = input_list + np.ones(input_list.shape) * self.shift
+                shift_left = input_list - np.ones(input_list.shape) * self.shift
+
+                gradients = []
+                for i in range(len(input_list)):
+                    expectation_right = circuit_func(shift_right[i])
+                    expectation_left = circuit_func(shift_left[i])
+                    gradient = expectation_right - expectation_left
+                    gradients.append(gradient)
+                gradients = np.array([gradients]).T
+
+                end_grad_time = time.time()
+                grad_time.append(end_grad_time - start_grad_time)
+                in_g = gradients * np.array(g)
+                return in_g
+
+            nodes = []
+            if x.requires_grad:
+                nodes.append(
+                    QTensor.GraphNode(tensor=x,
+                                      df=lambda g: _backward_mnist(g, x)))
+            return QTensor(data=result, requires_grad=requires_grad, nodes=nodes)
+
+
+    class Net(Module):
+        """
+        Hybird Quantum Classci Neural Network Module
+        """
+        def __init__(self):
+            super(Net, self).__init__()
+            self.conv1 = Conv2D(input_channels=1,
+                                output_channels=6,
+                                kernel_size=(5, 5),
+                                stride=(1, 1),
+                                padding="valid")
+            self.maxpool1 = MaxPool2D([2, 2], [2, 2], padding="valid")
+            self.conv2 = Conv2D(input_channels=6,
+                                output_channels=16,
+                                kernel_size=(5, 5),
+                                stride=(1, 1),
+                                padding="valid")
+            self.maxpool2 = MaxPool2D([2, 2], [2, 2], padding="valid")
+
+            self.fc1 = Linear(input_channels=256, output_channels=64)
+            self.fc2 = Linear(input_channels=64, output_channels=1)
+
+            self.hybrid = Hybrid(np.pi / 2)
+            self.fc3 = Linear(input_channels=1, output_channels=2)
+
+        def forward(self, x):
+            start_time_forward = time.time()
+            x = F.ReLu()(self.conv1(x))
+
+            x = self.maxpool1(x)
+            x = F.ReLu()(self.conv2(x))
+
+            x = self.maxpool2(x)
+            x = tensor.flatten(x, 1)
+
+            x = F.ReLu()(self.fc1(x))
+            x = self.fc2(x)
+
+            start_time_hybrid = time.time()
+            x = self.hybrid(x)
+
+            end_time_hybrid = time.time()
+
+            forward_time.append(end_time_hybrid - start_time_hybrid)
+
+            x = self.fc3(x)
+            end_time_forward = time.time()
+            forward_time_sum.append(end_time_forward - start_time_forward)
+            return x
+
+
+以上均未用到分布式计算接口，而仅需要在训练时引用DataSplit、parallel_model、init_p即可实现数据并行的分布式计算。
+
+使用方法如下
+
+.. code-block::
+
+    def run(args):
+        """
+        Run mnist train function
+        """
+        x_train, y_train, x_test, y_test = data_select(args.train_size, args.test_size)
+
+        Data = DataSplit(args.shuffle)  # 分布式模块接口对数据切分
+        x_train, y_train= Data.split_data(x_train, y_train) # 分布式模块接口对数据切分
+        print(get_rank())
+        model = Net()
+        optimizer = Adam(model.parameters(), lr=0.001)
+        loss_func = CategoricalCrossEntropy()
+
+        epochs = 10
+        train_loss_list = []
+        val_loss_list = []
+        train_acc_list = []
+        val_acc_list = []
+        model.train()
+
+        for epoch in range(1, epochs):
+            total_loss = []
+            model.train()
+            batch_size = 1
+            correct = 0
+            n_train = 0
+
+            for x, y in data_generator(x_train,
+                                       y_train,
+                                       batch_size=1,
+                                       shuffle=False):
+
+                x = x.reshape(-1, 1, 28, 28)
+
+                optimizer.zero_grad()
+                output = model(x)
+                loss = loss_func(y, output)
+                loss_np = np.array(loss.data)
+
+                np_output = np.array(output.data, copy=False)
+                mask = (np_output.argmax(1) == y.argmax(1))
+                correct += np.sum(np.array(mask))
+                n_train += batch_size
+
+                loss.backward()
+                optimizer._step()
+
+                total_loss.append(loss_np)
+            model = parallel_model(model) # 对不同rank的模型参数梯度进行allreduce通信
+
+
+            train_loss_list.append(np.sum(total_loss) / len(total_loss))
+            train_acc_list.append(np.sum(correct) / n_train)
+            print("{:.0f} loss is : {:.10f}".format(epoch, train_loss_list[-1]))
+
+            model.eval()
+            correct = 0
+            n_eval = 0
+
+            for x, y in data_generator(x_test, y_test, batch_size=1, shuffle=True):
+                x = x.reshape(-1, 1, 28, 28)
+                output = model(x)
+                loss = loss_func(y, output)
+                loss_np = np.array(loss.data)
+                np_output = np.array(output.data, copy=False)
+                mask = (np_output.argmax(1) == y.argmax(1))
+                correct += np.sum(np.array(mask))
+                n_eval += 1
+
+                total_loss.append(loss_np)
+            print(f"Eval Accuracy: {correct / n_eval}")
+            val_loss_list.append(np.sum(total_loss) / len(total_loss))
+            val_acc_list.append(np.sum(correct) / n_eval)
+
+    if __name__ == "__main__":
+
+        parser = argparse.ArgumentParser(description='parser example')
+        parser.add_argument('--init', default=False, type=bool, help='whether to use multiprocessing')
+        parser.add_argument('--np', default=1, type=int, help='number of processes')
+        parser.add_argument('--hostpath', default=None, type=str, help='hosts absolute path')
+        parser.add_argument('--shuffle', default=False, type=bool, help='shuffle')
+        parser.add_argument('--train_size', default=120, type=int, help='train_size')
+        parser.add_argument('--test_size', default=50, type=int, help='test_size')
+        args = parser.parse_args()
+        # p_path = os.path.realpath (__file__)
+
+        if(args.init):
+            init_p(args.np, os.path.realpath(__file__), args.hostpath, args.train_size,args.test_size, args.shuffle)
+        else:
+            a = time.time()
+            run(args)
+            b=time.time()
+            if(get_rank()==0):
+                print("time: {}",format(b-a))
+                
+其中init代表是否基于分布式训练模型，np代表进程数，另外hostpath文件代码在多节点上运行模型时的配置文件的绝对路径，配置文件内容包括多节点的ip以及进程分配情况,如下
+
+.. code-block::
+
+    node0:1
+    node1:1
+    node2:1
+
+
+在命令行输入
+
+.. code-block::
+
+    python test_mdis.py --init true
+
+    0
+    1 loss is : 0.8230862300
+    Eval Accuracy: 0.5
+    2 loss is : 0.6979023616
+    Eval Accuracy: 0.5
+    3 loss is : 0.5718536377
+    Eval Accuracy: 0.47
+    4 loss is : 0.5429712931
+    Eval Accuracy: 0.51
+    5 loss is : 0.5333395640
+    Eval Accuracy: 0.52
+    6 loss is : 0.5185367266
+    Eval Accuracy: 0.65
+    7 loss is : 0.5187034607
+    Eval Accuracy: 0.6
+    8 loss is : 0.5176532110
+    Eval Accuracy: 0.43
+    9 loss is : 0.5660219193
+    Eval Accuracy: 0.46
+    time: {} 15.132369756698608
+
+
+    python test_mdis.py --init true --np 2
+
+    得到结果
+
+    1
+    1 loss is : 0.0316730281
+    Eval Accuracy: 0.5
+    2 loss is : 0.0082226296
+    Eval Accuracy: 0.5
+    3 loss is : 0.0041910132
+    Eval Accuracy: 0.5
+    4 loss is : 0.0026126946
+    Eval Accuracy: 0.5
+    5 loss is : 0.0018102199
+    Eval Accuracy: 0.5
+    6 loss is : 0.0013386756
+    Eval Accuracy: 0.5
+    7 loss is : 0.0010348094
+    Eval Accuracy: 0.5
+    8 loss is : 0.0008260541
+    Eval Accuracy: 0.5
+    9 loss is : 0.0006756162
+    Eval Accuracy: 0.5
+    0
+    1 loss is : 0.0072183679
+    Eval Accuracy: 0.85
+    2 loss is : 0.0014325128
+    Eval Accuracy: 0.84
+    3 loss is : 0.0009416074
+    Eval Accuracy: 0.86
+    4 loss is : 0.0006576005
+    Eval Accuracy: 0.84
+    5 loss is : 0.0004843485
+    Eval Accuracy: 0.82
+    6 loss is : 0.0003716738
+    Eval Accuracy: 0.82
+    7 loss is : 0.0002943836
+    Eval Accuracy: 0.82
+    8 loss is : 0.0002390019
+    Eval Accuracy: 0.82
+    9 loss is : 0.0001979264
+    Eval Accuracy: 0.82
+    time: {} 9.132536888122559
+
+以上是在单节点上多进程模型训练，可以明显看出训练时间缩短
+
+在多节点上训练，命令如下
+
+.. code-block::
+
+    python3 test_mdis.py --init true --np 4 --hostpath ~/workspace/hao/vqnet/pyVQNet/examples/host.txt
+
+    0
+    1 loss is : 0.8609524409
+    Eval Accuracy: 0.5
+    2 loss is : 0.7399766286
+    Eval Accuracy: 0.5
+    3 loss is : 0.6829307556
+    Eval Accuracy: 0.5
+    4 loss is : 0.6301216125
+    Eval Accuracy: 0.49
+    5 loss is : 0.5815347036
+    Eval Accuracy: 0.38
+    6 loss is : 0.5370124817
+    Eval Accuracy: 0.24
+    7 loss is : 0.4962680499
+    Eval Accuracy: 0.06
+    8 loss is : 0.4590748787
+    Eval Accuracy: 0.44
+    9 loss is : 0.4251357079
+    Eval Accuracy: 0.5
+    time: {} 6.5950517654418945
+    Can not use matplot TkAgg
+    3
+    1 loss is : 0.0034498004
+    Eval Accuracy: 0.5
+    2 loss is : 0.0007666681
+    Eval Accuracy: 0.5
+    3 loss is : 0.0005568531
+    Eval Accuracy: 0.5
+    4 loss is : 0.0004169762
+    Eval Accuracy: 0.5
+    5 loss is : 0.0003228062
+    Eval Accuracy: 0.5
+    6 loss is : 0.0002573317
+    Eval Accuracy: 0.5
+    7 loss is : 0.0002102273
+    Eval Accuracy: 0.5
+    8 loss is : 0.0001751528
+    Eval Accuracy: 0.5
+    9 loss is : 0.0001483827
+    Eval Accuracy: 0.5
+    Can not use matplot TkAgg
+    1
+    1 loss is : 0.0990966797
+    Eval Accuracy: 0.5
+    2 loss is : 0.0346243183
+    Eval Accuracy: 0.5
+    3 loss is : 0.0194720447
+    Eval Accuracy: 0.5
+    4 loss is : 0.0128109713
+    Eval Accuracy: 0.5
+    5 loss is : 0.0092022886
+    Eval Accuracy: 0.5
+    6 loss is : 0.0069948425
+    Eval Accuracy: 0.5
+    7 loss is : 0.0055302560
+    Eval Accuracy: 0.5
+    8 loss is : 0.0045029074
+    Eval Accuracy: 0.5
+    9 loss is : 0.0037492002
+    Eval Accuracy: 0.5
+    Can not use matplot TkAgg
+    2
+    1 loss is : 0.8468652089
+    Eval Accuracy: 0.5
+    2 loss is : 0.7299760183
+    Eval Accuracy: 0.5
+    3 loss is : 0.6732901891
+    Eval Accuracy: 0.5
+    4 loss is : 0.6209689458
+    Eval Accuracy: 0.5
+    5 loss is : 0.5729962667
+    Eval Accuracy: 0.5
+    6 loss is : 0.5289377848
+    Eval Accuracy: 0.5
+    7 loss is : 0.4887968381
+    Eval Accuracy: 0.5
+    8 loss is : 0.4520395279
+    Eval Accuracy: 0.53
+    9 loss is : 0.4186156909
+    Eval Accuracy: 0.52
+
+
