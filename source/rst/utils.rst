@@ -332,9 +332,9 @@ split_data
 
     设置分布式计算参数。
 
-    :param: x_train: `np.array` - 训练数据.
-    :param: y_train: `np.array` -  训练数据标签.
-    :param: shuffle: `bool` - 是否打乱后再进行切分，默认值是False.
+    :param x_train: `np.array` - 训练数据.
+    :param y_train: `np.array` -  训练数据标签.
+    :param shuffle: `bool` - 是否打乱后再进行切分，默认值是False.
 
     :return: 切分后的训练数据和标签。
 
@@ -359,7 +359,7 @@ model_allreduce
 
     设置分布式计算参数。
 
-    :param: model: `Module` - 训练的模型.
+    :param model: `Module` - 训练的模型.
     
     :return: 参数更新后的模型。
 
@@ -399,7 +399,7 @@ model_reduce
 
     设置分布式计算参数。
 
-    :param: model: `Module` - 训练的模型.
+    :param model: `Module` - 训练的模型.
 
     :return: 参数更新后的模型。
 
@@ -531,10 +531,11 @@ model_reduce
         mount node2:/data/mpi/ /data/mpi
 
 
-本块介绍如何在cpu硬件平台上，利用VQNet分布式计算接口实现数据并行训练模型，用例为example目录下的test_mdis.py文件
 
 案例
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+本块介绍如何在cpu硬件平台上，利用VQNet分布式计算接口实现数据并行训练模型，用例为example目录下的test_mdis.py文件
 
 导入相关库
 
