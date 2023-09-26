@@ -6334,9 +6334,251 @@ vqe_func_analytic()函数是使用参数偏移计算理论梯度，vqe_func_shot
     # test:--------------->loss:[0.3134713] #####accuray:1.0
 
 
+量子奇异值分解
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+下面例子实现论文 `Variational Quantum Singular Value Decomposition <https://arxiv.org/abs/2006.02336>`_ 中的算法。 
+
+奇异值分解 (Singular Value Decomposition，简称 ``SVD``) 是线性代数中一种重要的矩阵分解，它作为特征分解在任意维数矩阵上的推广，在机器学习领域中被广泛应用，常用于矩阵压缩、推荐系统以及自然语言处理等。
+
+变分量子奇异值分解(Variational Quantum Singular Value Decomposition，简称 ``QSVD``)将SVD转换成优化问题，并通过变分量子线路求解。
+
+论文中将矩阵奇异值分解分解成四个步骤求解：
+
+    1. 输入带分解矩阵 :math:`\mathbf{M}`，想压缩到的阶数 :math:`\mathbf{T}`, 权重 :math:`\mathbf{W}`，参数话的酉矩阵 :math:`\mathbf{U}(\theta)` 和 :math:`\mathbf{V}(\phi)`
+    2. 搭建量子神经网络估算奇异值 :math:`m_j = Re\langle\psi_j\mid U(\theta)^\dagger M V(\phi) \mid\psi_j\rangle`，并最大化加权奇异值的和 :math:`L(\theta, \phi) = \sum_{j=1}^{T} q_j \cdot \operatorname{Re}\langle\psi_j \mid U(\theta)^\dagger MV(\phi) \mid \psi_j\rangle`, 其中，加权是为了让计算出的奇异值从大到小排列
+    3. 读出最大化时参数值，计算出 :math:`\mathbf{U}(\alpha^{*})` 和 :math:`\mathbf{V}(\beta^{*})`
+    4. 输出结果: 奇异值 :math:`m_1, \dots, m_r`，和奇异矩阵 :math:`\mathbf{U}(\alpha^{*})` 和 :math:`\mathbf{V}(\beta^{*})`
+
+.. image:: ./images/qsvd.png
+   :width: 700 px
+   :align: center
+
+|
+
+伪代码如下：
+
+.. image:: ./images/qsvd_algorithm.png
+   :width: 700 px
+   :align: center
+
+|
+
+量子线路设计如下：
+
+.. code-block::
+
+    q0: ──RY(v_theta0)────RZ(v_theta3)────●─────────X────RY(v_theta6)─────RZ(v_theta9)────●─────────X────RY(v_theta12)────RZ(v_theta15)────●─────────X────RY(v_theta18)────RZ(v_theta21)────●─────────X────RY(v_theta24)────RZ(v_theta27)────●─────────X────RY(v_theta30)────RZ(v_theta33)────●─────────X────RY(v_theta36)────RZ(v_theta39)────●─────────X────RY(v_theta42)────RZ(v_theta45)────●─────────X────RY(v_theta48)────RZ(v_theta51)────●─────────X────RY(v_theta54)────RZ(v_theta57)────●─────────X────RY(v_theta60)────RZ(v_theta63)────●─────────X────RY(v_theta66)────RZ(v_theta69)────●─────────X────RY(v_theta72)────RZ(v_theta75)────●─────────X────RY(v_theta78)────RZ(v_theta81)────●─────────X────RY(v_theta84)────RZ(v_theta87)────●─────────X────RY(v_theta90)────RZ(v_theta93)────●─────────X────RY(v_theta96)────RZ(v_theta99)─────●─────────X────RY(v_theta102)────RZ(v_theta105)────●─────────X────RY(v_theta108)────RZ(v_theta111)────●─────────X────RY(v_theta114)────RZ(v_theta117)────●─────────X──
+                                          │         │                                     │         │                                      │         │                                      │         │                                      │         │                                      │         │                                      │         │                                      │         │                                      │         │                                      │         │                                      │         │                                      │         │                                      │         │                                      │         │                                      │         │                                      │         │                                       │         │                                        │         │                                        │         │                                        │         │
+    q1: ──RY(v_theta1)────RZ(v_theta4)────X────●────┼────RY(v_theta7)────RZ(v_theta10)────X────●────┼────RY(v_theta13)────RZ(v_theta16)────X────●────┼────RY(v_theta19)────RZ(v_theta22)────X────●────┼────RY(v_theta25)────RZ(v_theta28)────X────●────┼────RY(v_theta31)────RZ(v_theta34)────X────●────┼────RY(v_theta37)────RZ(v_theta40)────X────●────┼────RY(v_theta43)────RZ(v_theta46)────X────●────┼────RY(v_theta49)────RZ(v_theta52)────X────●────┼────RY(v_theta55)────RZ(v_theta58)────X────●────┼────RY(v_theta61)────RZ(v_theta64)────X────●────┼────RY(v_theta67)────RZ(v_theta70)────X────●────┼────RY(v_theta73)────RZ(v_theta76)────X────●────┼────RY(v_theta79)────RZ(v_theta82)────X────●────┼────RY(v_theta85)────RZ(v_theta88)────X────●────┼────RY(v_theta91)────RZ(v_theta94)────X────●────┼────RY(v_theta97)────RZ(v_theta100)────X────●────┼────RY(v_theta103)────RZ(v_theta106)────X────●────┼────RY(v_theta109)────RZ(v_theta112)────X────●────┼────RY(v_theta115)────RZ(v_theta118)────X────●────┼──
+                                               │    │                                          │    │                                           │    │                                           │    │                                           │    │                                           │    │                                           │    │                                           │    │                                           │    │                                           │    │                                           │    │                                           │    │                                           │    │                                           │    │                                           │    │                                           │    │                                            │    │                                             │    │                                             │    │                                             │    │
+    q2: ──RY(v_theta2)────RZ(v_theta5)─────────X────●────RY(v_theta8)────RZ(v_theta11)─────────X────●────RY(v_theta14)────RZ(v_theta17)─────────X────●────RY(v_theta20)────RZ(v_theta23)─────────X────●────RY(v_theta26)────RZ(v_theta29)─────────X────●────RY(v_theta32)────RZ(v_theta35)─────────X────●────RY(v_theta38)────RZ(v_theta41)─────────X────●────RY(v_theta44)────RZ(v_theta47)─────────X────●────RY(v_theta50)────RZ(v_theta53)─────────X────●────RY(v_theta56)────RZ(v_theta59)─────────X────●────RY(v_theta62)────RZ(v_theta65)─────────X────●────RY(v_theta68)────RZ(v_theta71)─────────X────●────RY(v_theta74)────RZ(v_theta77)─────────X────●────RY(v_theta80)────RZ(v_theta83)─────────X────●────RY(v_theta86)────RZ(v_theta89)─────────X────●────RY(v_theta92)────RZ(v_theta95)─────────X────●────RY(v_theta98)────RZ(v_theta101)─────────X────●────RY(v_theta104)────RZ(v_theta107)─────────X────●────RY(v_theta110)────RZ(v_theta113)─────────X────●────RY(v_theta116)────RZ(v_theta119)─────────X────●──
+
+
+以下是具体QSVD实现代码:
+
+.. code-block::
+
+    import os
+    os.environ['OMP_NUM_THREADS'] = '1'
+
+    import numpy as np
+    import tqdm
+
+    from pyvqnet.nn import Module
+    from pyvqnet.tensor.tensor import QTensor
+    from pyvqnet.tensor import tensor
+    from pyvqnet.optim import Adam
+    from pyvqnet.qnn.measure import expval
+    from pyvqnet.nn.parameter import Parameter
+    from pyvqnet.dtype import *
+    from pyqpanda import *
+    import pyvqnet
+    from pyvqnet.qnn.vqc import ry, QMachine, cnot, rz
+
+    n_qubits = 3  # qbits number
+    cir_depth = 20  # circuit depth
+    N = 2**n_qubits
+    rank = 8  # learning rank
+    step = 7
+    ITR = 200  # iterations
+    LR = 0.02  # learning rate
+
+    if step == 0:
+        weight = QTensor(np.ones(rank))
+    else:
+        weight = QTensor(np.arange(rank * step, 0, -step),requires_grad=True,dtype=kfloat32).reshape((-1,1))
+
+    # Define random seed
+    np.random.seed(42)
+
+    def mat_generator():
+        '''
+        Generate a random complex matrix
+        '''
+        matrix = np.random.randint(
+            10, size=(N, N)) + 1j * np.random.randint(10, size=(N, N))
+        return matrix
+
+
+    # Generate matrix M which will be decomposed
+    M = mat_generator()
+
+    # m_copy is generated to error analysis
+    m_copy = np.copy(M)
+
+    # Print M
+    print('Random matrix M is: ')
+    print(M)
+
+    # Get SVD results
+    U, D, v_dagger = np.linalg.svd(M, full_matrices=True)
+    # Random matrix M is: 
+    # [[6.+1.j 3.+9.j 7.+3.j 4.+7.j 6.+6.j 9.+8.j 2.+7.j 6.+4.j]
+    #  [7.+1.j 4.+4.j 3.+7.j 7.+9.j 7.+8.j 2.+8.j 5.+0.j 4.+8.j]
+    #  [1.+6.j 7.+8.j 5.+7.j 1.+0.j 4.+7.j 0.+7.j 9.+2.j 5.+0.j]
+    #  [8.+7.j 0.+2.j 9.+2.j 2.+0.j 6.+4.j 3.+9.j 8.+6.j 2.+9.j]
+    #  [4.+8.j 2.+6.j 6.+8.j 4.+7.j 8.+1.j 6.+0.j 1.+6.j 3.+6.j]
+    #  [8.+7.j 1.+4.j 9.+2.j 8.+7.j 9.+5.j 4.+2.j 1.+0.j 3.+2.j]
+    #  [6.+4.j 7.+2.j 2.+0.j 0.+4.j 3.+9.j 1.+6.j 7.+6.j 3.+8.j]
+    #  [1.+9.j 5.+9.j 5.+2.j 9.+6.j 3.+0.j 5.+3.j 1.+3.j 9.+4.j]]
+
+    print(D)
+    # [54.8348498 19.1814107 14.9886625 11.6141956 10.1592704  7.6022325
+    #  5.8104054  3.30116  ]
+
+    def vqc_circuit(matrix, para):
+        qm = QMachine(3)
+
+        qm.set_states(matrix)
+
+        num = 0
+        for _ in range(20):
+            for i in range(3):
+                ry(q_machine=qm, params=para[num], wires=i, num_wires=3)
+                num += 1 
+
+            for i in range(3):
+                rz(q_machine=qm, params=para[num], wires=i, num_wires=3)
+                num += 1
+
+            for i in range(2):
+                cnot(q_machine=qm, wires=[i, i+1], num_wires=3)
+
+            cnot(q_machine=qm, wires=[2, 0], num_wires=3)
+
+        return qm.states
+
+    i_matrix = np.identity(N)
+
+    class VQC_svd(Module):
+        def __init__(self):
+            super(VQC_svd, self).__init__()
+
+            self.params_u = list()
+            self.params_v = list()
+
+            self.params_u_single = Parameter((120, ), dtype=kfloat32)
+            self.params_v_single = Parameter((120, ), dtype=kfloat32)
+
+
+        def forward(self):
+            qm_u_list = list()
+            qm_v_list = list()
+
+            for i in range(8):
+
+                qm = vqc_circuit(QTensor(i_matrix[i], dtype=kcomplex64).reshape((1,2,2,2)), self.params_u_single)
+                qm_u_list.append(qm)    
+
+            for i in range(8):
+                qm = vqc_circuit(QTensor(i_matrix[i], dtype=kcomplex64).reshape((1,2,2,2)), self.params_v_single)
+                qm_v_list.append(qm)    
+
+            result = []
+
+
+            for i in range(8):
+                states_u = qm_u_list[i].reshape((1,-1))
+                states_u = tensor.conj(states_u)
+
+                states_v = qm_v_list[i].reshape((-1,1))
+
+                pred = tensor.matmul(states_u, QTensor(M,dtype=kcomplex64))
+                pred = tensor.matmul(pred, states_v)
+
+                result.append(tensor.real(pred))
+
+            return qm_u_list, qm_v_list, result
+
+
+        def __call__(self):
+            return self.forward()
+
+    def loss_(x, w):
+        loss = tensor.mul(x, w)
+        return loss
+
+    def run():
+
+        model = VQC_svd()
+        opt = Adam(model.parameters(), lr = 0.02)
+        for itr in tqdm.tqdm(range(ITR)):
+
+            opt.zero_grad()
+            model.train()
+            qm_u_list, qm_v_list, result = model()
+            loss = 0
+            for i in range(8):
+                loss -= loss_(result[i], weight[i])
+            if(itr % 20 == 0):
+                print(loss)
+                print(result)
+            loss.backward()
+            opt.step()
+
+        pyvqnet.utils.storage.save_parameters(model.state_dict(),f"vqc_svd_{ITR}.model")
+
+    def eval():
+        model = VQC_svd()
+        model_para = pyvqnet.utils.storage.load_parameters(f"vqc_svd_{ITR}.model")
+        model.load_state_dict(model_para)
+        qm_u_list, qm_v_list, result = model()
+        # U is qm_u_list
+        # V is qm_v_list
+        print(result)
+
+    if __name__=="__main__":
+        run()
+    
+运行的loss以及奇异值结果：
+
+.. code-block::
+
+    [[-145.04752]]  ## 20/200 [00:56<09:30,  3.17s/it]
+    [[[-5.9279256]], [[0.7229557]], [[12.809682]], [[-3.2357244]], [[-5.232873]], [[4.5523396]], [[0.9724817]], [[7.733829]]]
+     [[-4836.0083]] ## 40/200 [02:08<10:11,  3.82s/it]
+    [[[30.293152]], [[21.15204]], [[26.832254]], [[11.953516]], [[9.615778]], [[9.914136]], [[5.34158]], [[0.7990487]]]
+     [[-5371.0034]] ## 60/200 [03:31<10:04,  4.32s/it]
+    [[[52.829674]], [[16.831125]], [[15.112174]], [[12.098673]], [[9.9859915]], [[8.895033]], [[5.1445904]], [[-1.2537733]]]
+     [[-5484.087]]  ## 80/200 [05:03<09:23,  4.69s/it]
+    [[[54.775055]], [[16.41207]], [[15.00042]], [[13.043125]], [[9.884815]], [[8.17144]], [[5.8188157]], [[-0.5532891]]]
+     [[-5516.793]]  ## 100/200 [06:41<08:23,  5.04s/it]
+    [[[54.797073]], [[17.457108]], [[14.50795]], [[13.288734]], [[9.7749815]], [[7.900285]], [[5.7255745]], [[-0.2063196]]]
+     [[-5531.2007]] ## 120/200 [08:24<07:08,  5.35s/it]
+    [[[54.816666]], [[18.107487]], [[14.094158]], [[13.305479]], [[9.837374]], [[7.7387457]], [[5.6890383]], [[-0.1503702]]]
+     [[-5539.823]]  ## 140/200 [10:11<05:20,  5.34s/it]
+    [[[54.822754]], [[18.518795]], [[13.9633045]], [[13.136647]], [[9.929082]], [[7.647796]], [[5.6548705]], [[-0.2427776]]]
+     [[-5545.748]]  ## 160/200 [12:00<03:37,  5.43s/it]
+    [[[54.825073]], [[18.766531]], [[14.041204]], [[12.855356]], [[10.009973]], [[7.5971537]], [[5.6524153]], [[-0.3767563]]]
+     [[-5550.124]]  ## 180/200 [13:50<01:49,  5.45s/it]
+    [[[54.82772]], [[18.913624]], [[14.219269]], [[12.547045]], [[10.063704]], [[7.569273]], [[5.6508512]], [[-0.4574079]]]
+     [[-5553.423]]  ## 200/200 [15:40<00:00,  4.70s/it]
+    [[[54.829308]], [[19.001402]], [[14.423045]], [[12.262444]], [[10.100731]], [[7.5507345]], [[5.6469355]], [[-0.4976197]]]
+
 在VQNet使用量子计算层进行模型训练
 ----------------------------------
-以下是使用 ``QuantumLayer``，``NoiseQuantumLayer`` ，``VQCLayer`` 等VQNet接口实现量子机器学习的例子。
+以下是使用 ``QuantumLayer``, ``NoiseQuantumLayer``, ``VQCLayer`` 等VQNet接口实现量子机器学习的例子。
 
 在VQNet中使用QuantumLayer进行模型训练
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

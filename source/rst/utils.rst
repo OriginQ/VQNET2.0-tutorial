@@ -1,5 +1,5 @@
 其他函数以及模块
-=================
+==============================
 
 随机种子生成
 ----------------------------------
@@ -287,13 +287,159 @@ VQNet 分布式计算模块
 
 VQNet分布式计算模块支持将VQNet量子机器学习模型通过分布式计算模块相应接口，实现对数据的切分，模型参数在多进程间的通信，模型参数的更新，基于分布式计算实现对VQNet模型的加速。
 
-环境依赖:mpich，mpi4py
+init_process
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+使用 ``init_process`` 对分布式计算参数进行初始化。
+
+.. py:function:: pyvqnet.distributed.init_process(size, path, hostpath=None, train_size=None, test_size=None, shuffle=False)
+
+    设置分布式计算参数。
+
+    :param size: 进程数。
+    :param path: 当前运行文件绝对路径。
+    :param hostpath: 多节点配置文件绝对路径。
+    :param train_size: 训练集大小。
+    :param test_size: 测试集大小。
+    :param shuffle: 是否随机采样。
+
+    Example::
+
+        import argparse
+        import os
+        from pyvqnet.distributed import *
+
+        parser = argparse.ArgumentParser(description='parser example')
+        parser.add_argument('--init', default=False, type=bool, help='whether to use multiprocessing')
+        parser.add_argument('--np', default=1, type=int, help='number of processes')
+        parser.add_argument('--hostpath', default=None, type=str, help='multi node configuration files')
+        parser.add_argument('--shuffle', default=False, type=bool, help='shuffle')
+        parser.add_argument('--train_size', default=120, type=int, help='train_size')
+        parser.add_argument('--test_size', default=50, type=int, help='test_size')
+        args = parser.parse_args()
+
+        if(args.init):
+            init_process(args.np, os.path.realpath(__file__))
+        else:
+            ...
+
+split_data
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+在多进程中，使用 ``split_data`` 根据进程数对数据进行切分，返回相应进程上数据。
+
+.. py:function:: pyvqnet.distributed.split_data(x_train, y_train, shuffle=False)
+
+    设置分布式计算参数。
+
+    :param: x_train: `np.array` - 训练数据.
+    :param: y_train: `np.array` -  训练数据标签.
+    :param: shuffle: `bool` - 是否打乱后再进行切分，默认值是False.
+
+    :return: 切分后的训练数据和标签。
+
+    Example::
+
+        from pyvqnet.distributed import split_data
+        import numpy as np
+
+        x_train = np.random.randint(255, size = (100, 5))
+        y_train = np.random.randint(2, size = (100, 1))
+
+        x_train, y_train= split_data(x_train, y_train)
+
+        return x_train, y_train
+
+model_allreduce
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+使用 ``model_allreduce`` 以allreduce的方式对不同进程上模型参数进程传递并更新。
+
+.. py:function:: pyvqnet.distributed.model_allreduce(model)
+
+    设置分布式计算参数。
+
+    :param: model: `Module` - 训练的模型.
+    
+    :return: 参数更新后的模型。
+
+    Example::
+
+        from pyvqnet.distributed import parallel_model
+        import numpy as np
+        from pyvqnet.nn.module import Module
+        from pyvqnet.nn.linear import Linear
+        from pyvqnet.nn import activation as F
+        from pyvqnet.distributed import *
+
+        class Net(Module):
+            def __init__(self):
+                super(Net, self).__init__()
+                self.fc = Linear(input_channels=5, output_channels=1)
+
+            def forward(self, x):
+                x = F.ReLu()(self.fc(x))
+                return x
+
+        model = Net()
+        print(f"rank {get_rank()} parameters is {model.parameters()}")
+        model = parallel_model(model)
+
+        if get_rank() == 0:
+            print(model.parameters())
+        
+        # mpirun -n 2 python run.py
+
+model_reduce
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+使用 ``model_reduce`` 以reduce的方式对不同进程上模型参数进程传递并更新。
+
+.. py:function:: pyvqnet.distributed.model_reduce(x_train, y_train, shuffle=False)
+
+    设置分布式计算参数。
+
+    :param: model: `Module` - 训练的模型.
+
+    :return: 参数更新后的模型。
+
+    Example::
+
+        from pyvqnet.distributed import model_reduce
+        import numpy as np
+        from pyvqnet.nn.module import Module
+        from pyvqnet.nn.linear import Linear
+        from pyvqnet.nn import activation as F
+        from pyvqnet.distributed import *
+
+        class Net(Module):
+            def __init__(self):
+                super(Net, self).__init__()
+                self.fc = Linear(input_channels=5, output_channels=1)
+
+            def forward(self, x):
+                x = F.ReLu()(self.fc(x))
+                return x
+
+
+        model = Net()
+        print(f"rank {get_rank()} parameters is {model.parameters()}")
+        model = model_reduce(model)
+
+        if get_rank() == 0:
+            print(model.parameters())
+
+        # mpirun -n 2 python run.py
+        
+环境依赖:mpich,mpi4py,gcc,gfortran
 
 .. note::
 
-    当前仅支持cpu的分布式计算，不支持以gloo、nccl为通信库的分布式计算。
+    当前仅支持cpu的分布式计算,不支持以gloo、nccl为通信库的分布式计算。
 
-**分布式计算单节点环境部署**
+分布式计算单节点环境部署
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 
     完成mpich通信库的编译安装，编译前检测gcc、gfortran编译器是否安装。
 
@@ -333,7 +479,8 @@ VQNet分布式计算模块支持将VQNet量子机器学习模型通过分布式�
     
     之后，用which来检验下配置的环境变量是否正确。如果显示了其路径，则说明安装顺利完成了。
 
-**分布式计算多节点环境部署**
+分布式计算多节点环境部署
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
     在多节点上实现分布式计算，首先需要保证多节点上mpich环境的一致，python环境一致，其次，需要设置节点间的免密通信。
     假设需要设置node0（主节点）、node1、node2三个节点的免密通信。
@@ -385,6 +532,9 @@ VQNet分布式计算模块支持将VQNet量子机器学习模型通过分布式�
 
 
 本块介绍如何在cpu硬件平台上，利用VQNet分布式计算接口实现数据并行训练模型，用例为example目录下的test_mdis.py文件
+
+案例
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 导入相关库
 
@@ -765,20 +915,7 @@ VQNet分布式计算模块支持将VQNet量子机器学习模型通过分布式�
     0
     1 loss is : 0.8230862300
     Eval Accuracy: 0.5
-    2 loss is : 0.6979023616
-    Eval Accuracy: 0.5
-    3 loss is : 0.5718536377
-    Eval Accuracy: 0.47
-    4 loss is : 0.5429712931
-    Eval Accuracy: 0.51
-    5 loss is : 0.5333395640
-    Eval Accuracy: 0.52
-    6 loss is : 0.5185367266
-    Eval Accuracy: 0.65
-    7 loss is : 0.5187034607
-    Eval Accuracy: 0.6
-    8 loss is : 0.5176532110
-    Eval Accuracy: 0.43
+            ...
     9 loss is : 0.5660219193
     Eval Accuracy: 0.46
     time: {} 15.132369756698608
@@ -791,39 +928,14 @@ VQNet分布式计算模块支持将VQNet量子机器学习模型通过分布式�
     1
     1 loss is : 0.0316730281
     Eval Accuracy: 0.5
-    2 loss is : 0.0082226296
-    Eval Accuracy: 0.5
-    3 loss is : 0.0041910132
-    Eval Accuracy: 0.5
-    4 loss is : 0.0026126946
-    Eval Accuracy: 0.5
-    5 loss is : 0.0018102199
-    Eval Accuracy: 0.5
-    6 loss is : 0.0013386756
-    Eval Accuracy: 0.5
-    7 loss is : 0.0010348094
-    Eval Accuracy: 0.5
-    8 loss is : 0.0008260541
-    Eval Accuracy: 0.5
+            ...
     9 loss is : 0.0006756162
     Eval Accuracy: 0.5
+
     0
     1 loss is : 0.0072183679
     Eval Accuracy: 0.85
-    2 loss is : 0.0014325128
-    Eval Accuracy: 0.84
-    3 loss is : 0.0009416074
-    Eval Accuracy: 0.86
-    4 loss is : 0.0006576005
-    Eval Accuracy: 0.84
-    5 loss is : 0.0004843485
-    Eval Accuracy: 0.82
-    6 loss is : 0.0003716738
-    Eval Accuracy: 0.82
-    7 loss is : 0.0002943836
-    Eval Accuracy: 0.82
-    8 loss is : 0.0002390019
-    Eval Accuracy: 0.82
+            ...
     9 loss is : 0.0001979264
     Eval Accuracy: 0.82
     time: {} 9.132536888122559
@@ -839,80 +951,29 @@ VQNet分布式计算模块支持将VQNet量子机器学习模型通过分布式�
     0
     1 loss is : 0.8609524409
     Eval Accuracy: 0.5
-    2 loss is : 0.7399766286
-    Eval Accuracy: 0.5
-    3 loss is : 0.6829307556
-    Eval Accuracy: 0.5
-    4 loss is : 0.6301216125
-    Eval Accuracy: 0.49
-    5 loss is : 0.5815347036
-    Eval Accuracy: 0.38
-    6 loss is : 0.5370124817
-    Eval Accuracy: 0.24
-    7 loss is : 0.4962680499
-    Eval Accuracy: 0.06
-    8 loss is : 0.4590748787
-    Eval Accuracy: 0.44
+            ...
     9 loss is : 0.4251357079
     Eval Accuracy: 0.5
     time: {} 6.5950517654418945
-    Can not use matplot TkAgg
+    
     3
     1 loss is : 0.0034498004
     Eval Accuracy: 0.5
-    2 loss is : 0.0007666681
-    Eval Accuracy: 0.5
-    3 loss is : 0.0005568531
-    Eval Accuracy: 0.5
-    4 loss is : 0.0004169762
-    Eval Accuracy: 0.5
-    5 loss is : 0.0003228062
-    Eval Accuracy: 0.5
-    6 loss is : 0.0002573317
-    Eval Accuracy: 0.5
-    7 loss is : 0.0002102273
-    Eval Accuracy: 0.5
-    8 loss is : 0.0001751528
-    Eval Accuracy: 0.5
+            ...
     9 loss is : 0.0001483827
     Eval Accuracy: 0.5
-    Can not use matplot TkAgg
+    
     1
     1 loss is : 0.0990966797
     Eval Accuracy: 0.5
-    2 loss is : 0.0346243183
-    Eval Accuracy: 0.5
-    3 loss is : 0.0194720447
-    Eval Accuracy: 0.5
-    4 loss is : 0.0128109713
-    Eval Accuracy: 0.5
-    5 loss is : 0.0092022886
-    Eval Accuracy: 0.5
-    6 loss is : 0.0069948425
-    Eval Accuracy: 0.5
-    7 loss is : 0.0055302560
-    Eval Accuracy: 0.5
-    8 loss is : 0.0045029074
-    Eval Accuracy: 0.5
+            ...
     9 loss is : 0.0037492002
     Eval Accuracy: 0.5
-    Can not use matplot TkAgg
+    
     2
     1 loss is : 0.8468652089
     Eval Accuracy: 0.5
-    2 loss is : 0.7299760183
-    Eval Accuracy: 0.5
-    3 loss is : 0.6732901891
-    Eval Accuracy: 0.5
-    4 loss is : 0.6209689458
-    Eval Accuracy: 0.5
-    5 loss is : 0.5729962667
-    Eval Accuracy: 0.5
-    6 loss is : 0.5289377848
-    Eval Accuracy: 0.5
-    7 loss is : 0.4887968381
-    Eval Accuracy: 0.5
-    8 loss is : 0.4520395279
+            ...
     Eval Accuracy: 0.53
     9 loss is : 0.4186156909
     Eval Accuracy: 0.52
