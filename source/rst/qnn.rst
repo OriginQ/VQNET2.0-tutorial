@@ -2434,6 +2434,52 @@ QGAN使用经典的GAN模型结构，分为Generator生成器与Discriminator鉴
 ----------------------------------
 
 VQNet基于自动微分算子构建以及一些常用量子逻辑门、量子线路以及测量方法，可使用自动微分代替量子线路parameter-shift方法计算梯度。
+我们可以像其他 `Module` 一样,使用VQC算子构成复杂神经网络。在 `Module` 中需要定义虚拟机 `QMachine`,并且需要对machine中 `states` 根据输入的batchsize进行reset_states。请具体看下例:
+
+    Example::
+
+        from pyvqnet.nn import Module,Linear,ModuleList
+        from pyvqnet.qnn.vqc.qcircuit import VQC_HardwareEfficientAnsatz,RZZ,RZ
+        from pyvqnet.qnn.vqc import Probability,QMachine
+        from pyvqnet import tensor
+
+        class QM(Module):
+            def __init__(self, name=""):
+                super().__init__(name)
+                self.linearx = Linear(4,2)
+                self.ansatz = VQC_HardwareEfficientAnsatz(4, ["rx", "RY", "rz"],
+                                            entangle_gate="cnot",
+                                            entangle_rules="linear",
+                                            depth=2)
+                #基于VQC的RZ 在0比特上
+                self.encode1 = RZ(wires=0)
+                #基于VQC的RZ 在1比特上
+                self.encode2 = RZ(wires=1)
+                #基于VQC的概率测量 在0，2比特上
+                self.measure = Probability(wires=[0,2])
+                #量子设备QMachine，使用4个比特。
+                self.device = QMachine(4)
+            def forward(self, x, *args, **kwargs):
+                #必须要将states reset到与输入一样的batchsize。
+                self.device.reset_states(x.shape[0])
+                y = self.linearx(x)
+                #将输入编码到RZ门上，注意输入必须是 [batchsize,1]的shape
+                self.encode1(params = y[:, [0]],q_machine = self.device,)
+                #将输入编码到RZ门上，注意输入必须是 [batchsize,1]的shape
+                self.encode2(params = y[:, [1]],q_machine = self.device,)
+                self.ansatz(q_machine =self.device)
+                return self.measure(q_machine =self.device)
+
+        bz =3
+        inputx = tensor.arange(1.0,bz*4+1).reshape([bz,4])
+        inputx.requires_grad= True
+        #像其他Module一样定义
+        qlayer = QM()
+        #前传
+        y = qlayer(inputx)
+        #反传
+        y.backward()
+        print(y)
 
 QMachine
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
