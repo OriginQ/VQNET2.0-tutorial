@@ -890,7 +890,7 @@ model_reduce
         # p_path = os.path.realpath (__file__)
 
         if(args.init):
-            init_p(args.np, os.path.realpath(__file__), args.hostpath, args.train_size,args.test_size, args.shuffle)
+            init_process(args.np, os.path.realpath(__file__), args.hostpath, args.train_size,args.test_size, args.shuffle)
         else:
             a = time.time()
             run(args)
