@@ -797,7 +797,7 @@ model_reduce
             return x
 
 
-以上均未用到分布式计算接口，而仅需要在训练时引用DataSplit、parallel_model、init_p即可实现数据并行的分布式计算。
+以上均未用到分布式计算接口，而仅需要在训练时引用split_data、model_allreduce、init_process即可实现数据并行的分布式计算。
 
 使用方法如下
 
@@ -809,8 +809,7 @@ model_reduce
         """
         x_train, y_train, x_test, y_test = data_select(args.train_size, args.test_size)
 
-        Data = DataSplit(args.shuffle)  # 分布式模块接口对数据切分
-        x_train, y_train= Data.split_data(x_train, y_train) # 分布式模块接口对数据切分
+        x_train, y_train= split_data(x_train, y_train) # 分布式模块接口对数据切分
         print(get_rank())
         model = Net()
         optimizer = Adam(model.parameters(), lr=0.001)
@@ -851,7 +850,7 @@ model_reduce
                 optimizer._step()
 
                 total_loss.append(loss_np)
-            model = parallel_model(model) # 对不同rank的模型参数梯度进行allreduce通信
+            model = model_allreduce(model) # 对不同rank的模型参数梯度进行allreduce通信
 
 
             train_loss_list.append(np.sum(total_loss) / len(total_loss))
