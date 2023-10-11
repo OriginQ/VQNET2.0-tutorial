@@ -3178,40 +3178,6 @@ cr
         #     [0.+0.j 0.+0.j]]]]]
 
 
-iswap
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-.. py:function:: pyvqnet.qnn.vqc.iswap(q_machine, wires, params=None, num_wires=None, use_dagger=False)
-    
-    对q_machine中的态矢作用量子逻辑门 iswap 。
-
-    :param q_machine:  量子虚拟机设备。
-    :param wires: 量子比特索引。
-    :param params: 参数矩阵，默认为None。
-    :param num_wires: 量子比特数，默认为None。
-    :param use_dagger: 是否共轭转置，默认为False。
-    :return: 输出QTensor。
-
-    Example::
-        
-        from pyvqnet.qnn.vqc import iswap,QMachine
-        from pyvqnet.tensor import QTensor
-        qm  = QMachine(4)
-        iswap(q_machine=qm,wires=[1,0],params=QTensor([0.5]),num_wires=4)
-        print(qm.states)
-
-        # [[[[[1.+0.j 0.+0.j]
-        #     [0.+0.j 0.+0.j]]
-        # 
-        #    [[0.+0.j 0.+0.j]
-        #     [0.+0.j 0.+0.j]]]
-        # 
-        # 
-        #   [[[0.+0.j 0.+0.j]
-        #     [0.+0.j 0.+0.j]]
-        # 
-        #    [[0.+0.j 0.+0.j]
-        #     [0.+0.j 0.+0.j]]]]]
 
 swap
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
