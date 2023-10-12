@@ -1,13 +1,13 @@
 量子机器学习模块
-==================================
+#################################
 
 量子计算层
-----------------------------------
+***********************************
 
 .. _QuantumLayer:
 
 QuantumLayer
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+============================
 
 QuantumLayer是一个支持量子含参线路作为参数的自动求导模块的封装类。用户定义一个函数作为参数 ``qprog_with_measure`` ，该函数需要包含pyQPanda定义的量子线路：一般包含量子线路的编码线路，演化线路和测量操作。
 该类可以嵌入量子经典混合机器学习模型，通过经典的梯度下降法，使得量子经典混合模型的目标函数或损失函数最小。
@@ -121,7 +121,7 @@ QuantumLayer是一个支持量子含参线路作为参数的自动求导模块�
 
 
 QuantumLayerV2
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+============================
 
 如您更加熟悉pyQPanda语法，可以使用QuantumLayerV2，自定义量子比特 ``qubits`` ,经典比特 ``cbits`` ,后端模拟器 ``machine`` 加入QuantumLayerV2的参数 ``qprog_with_measure`` 函数中。
 
@@ -219,7 +219,7 @@ QuantumLayerV2
 
 
 QuantumLayerMultiProcess
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+============================
 
 如您更加熟悉pyQPanda语法，可以使用QuantumLayerMultiProcess，自定义量子比特 ``qubits`` ,经典比特 ``cbits`` ,后端模拟器 ``machine`` 加入QuantumLayerMultiProcess的参数 ``qprog_with_measure`` 函数中。
 
@@ -320,7 +320,7 @@ QuantumLayerMultiProcess
 
 
 NoiseQuantumLayer
-^^^^^^^^^^^^^^^^^^^
+=========================
 
 在真实的量子计算机中，受制于量子比特自身的物理特性，常常存在不可避免的计算误差。为了能在量子虚拟机中更好的模拟这种误差，VQNet同样支持含噪声量子虚拟机。含噪声量子虚拟机的模拟更贴近真实的量子计算机，我们可以自定义支持的逻辑门类型，自定义逻辑门支持的噪声模型。
 现有可支持的量子噪声模型依据QPanda中定义，具体参考链接 `QPANDA2 <https://pyqpanda-toturial.readthedocs.io/zh/latest/NoiseQVM.html>`_ 中的介绍。
@@ -458,7 +458,7 @@ NoiseQuantumLayer
 		return qvm
 		
 VQCLayer
-^^^^^^^^^^^^^^^^^^^^^^^^
+=========================
 
 基于pyQPanda的可变量子线路VariationalQuantumCircuit，VQNet提供了抽象量子计算层 ``VQCLayer`` 。用户只需要定义一个类 ``VQC_wrapper`` ，
 其中定义相应的量子线路逻辑门和测量函数即可基于pyQPanda的 ``VariationalQuantumCircuit`` ，进行机器学习模型的构建。
@@ -625,7 +625,7 @@ VQCLayer
         VQCLayer(qvc_vqc,24,"CPU",4)
 
 Qconv
-^^^^^^^^^^^^^^^^^^^^^^^^
+=========================
 
 Qconv是一种量子卷积算法接口。
 量子卷积操作采用量子线路对经典数据进行卷积操作，其无需计算乘法和加法操作，只需将数据编码到量子态，然后通过量子线路进行演化操作和测量得到最终的卷积结果。
@@ -671,7 +671,7 @@ Qconv是一种量子卷积算法接口。
         # ]
 
 QLinear
-^^^^^^^^^^
+==============
 
 QLinear 实现了一种量子全连接算法。首先将数据编码到量子态，然后通过量子线路进行演化操作和测量得到最终的全连接结果。
 
@@ -708,7 +708,7 @@ QLinear 实现了一种量子全连接算法。首先将数据编码到量子态
         #]
 
 grad
-^^^^^^^^^^
+==============
 .. py:function:: pyvqnet.qnn.quantumlayer.grad(quantum_prog_func,, input_params, *args)
 
     grad 函数提供了一种对用户设计的含参量子线路参数的梯度进行计算的接口。
@@ -756,13 +756,13 @@ grad
 
 
 量子逻辑门
-----------------------------------
+***********************************
 
 处理量子比特的方式就是量子逻辑门。 使用量子逻辑门，我们有意识的使量子态发生演化。量子逻辑门是构成量子算法的基础。
 
 
 基本量子逻辑门
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+============================
 
 在VQNet中，我们使用本源量子自研的 `pyQPanda <https://pyqpanda-toturial.readthedocs.io/zh/latest/>`_ 的各个逻辑门搭建量子线路，进行量子模拟。
 当前pyQPanda支持的逻辑门可参考pyQPanda `量子逻辑门 <https://pyqpanda-toturial.readthedocs.io/zh/latest/>`_ 部分的定义。
@@ -770,7 +770,7 @@ grad
 
 
 BasicEmbeddingCircuit
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+============================
 
 .. py:function:: pyvqnet.qnn.template.BasicEmbeddingCircuit(input_feat,qlist)
 
@@ -801,7 +801,7 @@ BasicEmbeddingCircuit
         #           └─┘
 
 AngleEmbeddingCircuit
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+============================
 
 .. py:function:: pyvqnet.qnn.template.AngleEmbeddingCircuit(input_feat,qubits,rotation:str='X')
 
@@ -864,7 +864,7 @@ AngleEmbeddingCircuit
         #           └────────────┘
 
 AmplitudeEmbeddingCircuit
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+============================
 
 .. py:function:: pyvqnet.qnn.template.AmplitudeEmbeddingCircuit(input_feat,qubits)
 
@@ -895,7 +895,7 @@ AmplitudeEmbeddingCircuit
         #           └────────────┘ └─┘                └─┘
 
 IQPEmbeddingCircuits
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+============================
 
 .. py:function:: pyvqnet.qnn.template.IQPEmbeddingCircuits(input_feat,qubits,rep:int = 1)
 
@@ -931,7 +931,7 @@ IQPEmbeddingCircuits
 
 
 RotCircuit
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+============================
 
 .. py:function:: pyvqnet.qnn.template.RotCircuit(para,qubits)
 
@@ -970,7 +970,7 @@ RotCircuit
 
 
 CRotCircuit
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+============================
 
 .. py:function:: pyvqnet.qnn.template.CRotCircuit(para,control_qubits,rot_qubits)
 
@@ -1011,7 +1011,7 @@ CRotCircuit
 
 
 CSWAPcircuit
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+============================
 
 .. py:function:: pyvqnet.qnn.template.CSWAPcircuit(qubits)
 
@@ -1052,7 +1052,7 @@ CSWAPcircuit
         # q_2:  |0>─X─
 
 Controlled_Hadamard
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+=======================
 
 .. py:function:: pyvqnet.qnn.template.Controlled_Hadamard(qubits)
 
@@ -1084,7 +1084,7 @@ Controlled_Hadamard
         #           └─────────────┘ └──┘ └────────────┘
 
 CCZ
-^^^^^^^^^^^^^^^^
+==============
 
 .. py:function:: pyvqnet.qnn.template.CCZ(qubits)
 
@@ -1129,7 +1129,7 @@ CCZ
 
 
 BlockEncode
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+=======================
 
 .. py:function:: pyvqnet.qnn.template.BlockEncode(A,qlists)
 
@@ -1177,7 +1177,7 @@ BlockEncode
         #           └───────────┘ 
 
 Random_Init_Quantum_State
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+=============================
 
 .. py:function:: pyvqnet.qnn.template.Random_Init_Quantum_State(qlists)
 
@@ -1215,7 +1215,7 @@ Random_Init_Quantum_State
 
 
 FermionicSingleExcitation
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+============================
 
 .. py:function:: pyvqnet.qnn.template.FermionicSingleExcitation(weight, wires, qubits)
 
@@ -1255,7 +1255,7 @@ FermionicSingleExcitation
 
 
 FermionicDoubleExcitation
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+============================
 
 .. py:function:: pyvqnet.qnn.template.FermionicDoubleExcitation(weight,  wires1, wires2, qubits)
 
@@ -1310,7 +1310,7 @@ FermionicDoubleExcitation
         #vqnet 1.58
 
 UCCSD
-^^^^^^^^^^^^^
+==================
 
 .. py:function:: pyvqnet.qnn.template.UCCSD(weights, wires, s_wires, d_wires, init_state, qubits)
 
@@ -1371,7 +1371,7 @@ UCCSD
 
 
 QuantumPoolingCircuit
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+============================
 
 .. py:function:: pyvqnet.qnn.template.QuantumPoolingCircuit(sources_wires, sinks_wires, params,qubits)
 
@@ -1428,12 +1428,12 @@ QuantumPoolingCircuit
         # q_3:  |0>┤CNOT├ ┤RY(0.350000)├ ────!
 
 常用量子线路组合
-----------------------------------
+***********************************
 VQNet提供了量子机器学习研究中常用的一些量子线路
 
 
 HardwareEfficientAnsatz
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+============================
 
 .. py:class:: pyvqnet.qnn.ansatz.HardwareEfficientAnsatz(n_qubits,single_rot_gate_list,qubits,entangle_gate="CNOT",entangle_rules='linear',depth=1)
 
@@ -1474,7 +1474,7 @@ HardwareEfficientAnsatz
         #           └────────────┘ └────────────┘ └────────────┘                       └────┘         └────────────┘ └────────────┘ └────────────┘     
 
 BasicEntanglerTemplate
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+============================
 
 .. py:class:: pyvqnet.qnn.template.BasicEntanglerTemplate(weights=None, num_qubits=1, rotation=pyqpanda.RX)
 
@@ -1525,7 +1525,7 @@ BasicEntanglerTemplate
 
 
 StronglyEntanglingTemplate
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+============================
 
 .. py:class:: pyvqnet.qnn.template.StronglyEntanglingTemplate(weights=None, num_qubits=1, ranges=None)
 
@@ -1579,7 +1579,7 @@ StronglyEntanglingTemplate
 
 
 ComplexEntangelingTemplate
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+============================
 
 .. py:class:: pyvqnet.qnn.ComplexEntangelingTemplate(weights,num_qubits,depth)
 
@@ -1717,7 +1717,7 @@ ComplexEntangelingTemplate
 
 
 Quantum_Embedding
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+============================
 
 .. py:class:: pyvqnet.qnn.Quantum_Embedding(qubits, machine, num_repetitions_input, depth_input, num_unitary_layers, num_repetitions)
 
@@ -1777,10 +1777,10 @@ Quantum_Embedding
 
 
 对量子线路进行测量
-----------------------------------
+***********************************
 
 expval
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+============================
 
 .. py:function:: pyvqnet.qnn.measure.expval(machine,prog,pauli_str_dict,qubits)
 
@@ -1819,7 +1819,7 @@ expval
         #0.9983341664682731
 
 QuantumMeasure
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+============================
 
 .. py:function:: pyvqnet.qnn.measure.QuantumMeasure(measure_qubits:list,prog,machine,qubits,slots:int = 1000)
 
@@ -1861,7 +1861,7 @@ QuantumMeasure
         #[240, 246, 246, 268]
 
 ProbsMeasure
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+============================
 
 .. py:function:: pyvqnet.qnn.measure.ProbsMeasure(measure_qubits:list,prog,machine,qubits)
 
@@ -1905,7 +1905,7 @@ ProbsMeasure
         #[0.2499999999999947, 0.2499999999999947, 0.2499999999999947, 0.2499999999999947]
 
 DensityMatrixFromQstate
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==========================
 .. py:function:: pyvqnet.qnn.measure.DensityMatrixFromQstate(state, indices)
 
     计算量子态在一组特定量子比特上的密度矩阵。
@@ -1925,7 +1925,7 @@ DensityMatrixFromQstate
         #  [0.03791166+0.j 0.01866219+0.j 0.00768507+0.j 0.00378301+0.j]]
 
 VN_Entropy
-^^^^^^^^^^^^^^^
+==============
 .. py:function:: pyvqnet.qnn.measure.VN_Entropy(state, indices, base=None)
 
     根据给定 qubits 列表上的状态向量计算Von Neumann熵 。
@@ -1950,7 +1950,7 @@ VN_Entropy
         #0.14592917648464448
 
 Mutal_Info
-^^^^^^^^^^^^^^^
+==============
 .. py:function:: pyvqnet.qnn.measure.Mutal_Info(state, indices0, indices1, base=None)
 
     根据给定两个子 qubits 列表上的状态向量计算互信息 。
@@ -1984,7 +1984,7 @@ Mutal_Info
 
 
 MeasurePauliSum
-^^^^^^^^^^^^^^^^^^^^
+=========================
 .. py:function:: pyvqnet.qnn.measure.MeasurePauliSum(machine, prog, obs_list, qlists)
 
     根据提供的哈密顿观量的期望值。
@@ -2026,7 +2026,7 @@ MeasurePauliSum
 
 
 VarMeasure
-^^^^^^^^^^^^^^^^^^^^
+=========================
 
 .. py:function:: pyvqnet.qnn.measure.VarMeasure(machine, prog, actual_qlist)
 
@@ -2059,7 +2059,7 @@ VarMeasure
 
 
 Purity
-^^^^^^^^^^^^^^^^^^^^
+=========================
 
 .. py:function:: pyvqnet.qnn.measure.Purity(state, qubits_idx)
 
@@ -2091,11 +2091,11 @@ Purity
         #0.902503479761881
 
 量子机器学习算法接口
-----------------------------------
+***********************************
 
 
 QGAN制备任意分布初态
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+=======================
 
 基于2019年 Christa Zoufal 的论文 `Quantum Generative Adversarial Networks for learning and loading random distributions <https://www.nature.com/articles/s41534-019-0223-2>`_ , VQNet提供了一个QGAN制备任意分布初态的例子。该算法使用纯量子变分线路制备特定随机分布的生成量子态，可以减少原先生成特定量子态所需的逻辑门，降低量子线路复杂度。
 QGAN使用经典的GAN模型结构，分为Generator生成器与Discriminator鉴别器两个子模型，Generator为量子线路产生特定分布，而Generator生成的分布generated data samples 以及真实的随机分布training data samples 输入Discriminator模型进行鉴别真伪。
@@ -2207,7 +2207,7 @@ QGAN使用经典的GAN模型结构，分为Generator生成器与Discriminator鉴
 |
 
 量子核SVM算法
-^^^^^^^^^^^^^^^^^^^
+=========================
 
 在机器学习任务中，数据通常不能被原始空间中的超平面分隔。寻找此类超平面的一种常见技术是对数据应用非线性变换函数。
 此函数称为特征映射，通过特征映射，我们可以在这个新的特征空间中计算数据点之间的距离有多近，从而进行机器学习的分类任务。
@@ -2289,7 +2289,7 @@ QGAN使用经典的GAN模型结构，分为Generator生成器与Discriminator鉴
 
 
 同时扰动随机近似优化器
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+============================
 
 .. py:class:: pyvqnet.qnn.SPSA(maxiter: int = 1000, last_avg: int = 1, c0: float = _C0, c1: float = 0.2, c2: float = 0.602, c3: float = 0.101, c4: float = 0, init_para=None, model=None, calibrate_flag=False)
     
@@ -2431,7 +2431,7 @@ QGAN使用经典的GAN模型结构，分为Generator生成器与Discriminator鉴
 
 
 基于VQC的量子方法
-----------------------------------
+***********************************
 
 VQNet基于自动微分算子构建以及一些常用量子逻辑门、量子线路以及测量方法，可使用自动微分代替量子线路parameter-shift方法计算梯度。
 我们可以像其他 `Module` 一样,使用VQC算子构成复杂神经网络。在 `Module` 中需要定义虚拟机 `QMachine`,并且需要对machine中 `states` 根据输入的batchsize进行reset_states。请具体看下例:
@@ -2483,7 +2483,7 @@ VQNet基于自动微分算子构建以及一些常用量子逻辑门、量子线
 
 
 QMachine
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+=======================
 
 .. py:class:: pyvqnet.qnn.vqc.QMachine(num_wires, dtype=pyvqnet.kcomplex64)
 
@@ -2515,7 +2515,7 @@ QMachine
         #     [0.+0.j 0.+0.j]]]]]
 
 i
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+============================
 
 .. py:function:: pyvqnet.qnn.vqc.i(q_machine, wires, params=None, num_wires=None, use_dagger=False)
 
@@ -2549,7 +2549,7 @@ i
         #     [0.+0.j 0.+0.j]]]]]
 
 hadamard
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+============================
 
 .. py:function:: pyvqnet.qnn.vqc.hadamard(q_machine, wires, params=None, num_wires=None, use_dagger=False)
     
@@ -2584,7 +2584,7 @@ hadamard
 
 
 t
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+============================
 
 .. py:function:: pyvqnet.qnn.vqc.t(q_machine, wires, params=None, num_wires=None, use_dagger=False)
     
@@ -2619,7 +2619,7 @@ t
 
 
 s
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+============================
 
 .. py:function:: pyvqnet.qnn.vqc.s(q_machine, wires, params=None, num_wires=None, use_dagger=False)
     
@@ -2654,7 +2654,7 @@ s
 
 
 paulix
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+============================
 
 .. py:function:: pyvqnet.qnn.vqc.paulix(q_machine, wires, params=None, num_wires=None, use_dagger=False)
     
@@ -2689,7 +2689,7 @@ paulix
 
 
 pauliy
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+============================
 
 .. py:function:: pyvqnet.qnn.vqc.pauliy(q_machine, wires, params=None, num_wires=None, use_dagger=False)
     
@@ -2723,7 +2723,7 @@ pauliy
         #     [0.+0.j 0.+0.j]]]]]
 
 pauliz
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+============================
 
 .. py:function:: pyvqnet.qnn.vqc.pauliz(q_machine, wires, params=None, num_wires=None, use_dagger=False)
     
@@ -2757,7 +2757,7 @@ pauliz
         #     [0.+0.j 0.+0.j]]]]]
 
 x1
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+============================
 
 .. py:function:: pyvqnet.qnn.vqc.x1(q_machine, wires, params=None, num_wires=None, use_dagger=False)
     
@@ -2791,7 +2791,7 @@ x1
         #     [0.       +0.j        0.       +0.j       ]]]]]
 
 y1
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+============================
 
 .. py:function:: pyvqnet.qnn.vqc.y1(q_machine, wires, params=None, num_wires=None, use_dagger=False)
     
@@ -2826,7 +2826,7 @@ y1
 
 
 z1
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+============================
 
 .. py:function:: pyvqnet.qnn.vqc.z1(q_machine, wires, params=None, num_wires=None, use_dagger=False)
     
@@ -2860,7 +2860,7 @@ z1
         #     [0.       +0.j        0.       +0.j       ]]]]]
 
 rx
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+============================
 
 .. py:function:: pyvqnet.qnn.vqc.rx(q_machine, wires, params=None, num_wires=None, use_dagger=False)
     
@@ -2896,7 +2896,7 @@ rx
 
 
 ry
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+============================
 
 .. py:function:: pyvqnet.qnn.vqc.ry(q_machine, wires, params=None, num_wires=None, use_dagger=False)
     
@@ -2932,7 +2932,7 @@ ry
 
 
 rz
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+============================
 
 .. py:function:: pyvqnet.qnn.vqc.rz(q_machine, wires, params=None, num_wires=None, use_dagger=False)
     
@@ -2968,7 +2968,7 @@ rz
 
 
 p
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+============================
 
 .. py:function:: pyvqnet.qnn.vqc.p(q_machine, wires, params=None, num_wires=None, use_dagger=False)
     
@@ -3003,7 +3003,7 @@ p
         #     [0.+0.j 0.+0.j]]]]]
 
 u1
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+============================
 
 .. py:function:: pyvqnet.qnn.vqc.u1(q_machine, wires, params=None, num_wires=None, use_dagger=False)
     
@@ -3039,7 +3039,7 @@ u1
 
 
 u2
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+============================
 
 .. py:function:: pyvqnet.qnn.vqc.u2(q_machine, wires, params=None, num_wires=None, use_dagger=False)
     
@@ -3074,7 +3074,7 @@ u2
         #     [0.       +0.j        0.       +0.j       ]]]]]
 
 u3
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+============================
 
 .. py:function:: pyvqnet.qnn.vqc.u3(q_machine, wires, params=None, num_wires=None, use_dagger=False)
     
@@ -3109,7 +3109,7 @@ u3
         #     [0.       +0.j        0.       +0.j       ]]]]]
 
 cnot
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+============================
 
 .. py:function:: pyvqnet.qnn.vqc.cnot(q_machine, wires, params=None, num_wires=None, use_dagger=False)
     
@@ -3143,7 +3143,7 @@ cnot
         #     [0.+0.j 0.+0.j]]]]]
 
 cr
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+============================
 
 .. py:function:: pyvqnet.qnn.vqc.cr(q_machine, wires, params=None, num_wires=None, use_dagger=False)
     
@@ -3180,7 +3180,7 @@ cr
 
 
 swap
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+============================
 
 .. py:function:: pyvqnet.qnn.vqc.swap(q_machine, wires, params=None, num_wires=None, use_dagger=False)
     
@@ -3215,7 +3215,7 @@ swap
 
 
 cz
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+============================
 
 .. py:function:: pyvqnet.qnn.vqc.cz(q_machine, wires, params=None, num_wires=None, use_dagger=False)
     
@@ -3250,7 +3250,7 @@ cz
 
 
 rxx
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+============================
 
 .. py:function:: pyvqnet.qnn.vqc.rxx(q_machine, wires, params=None, num_wires=None, use_dagger=False)
     
@@ -3286,7 +3286,7 @@ rxx
 
 
 ryy
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+============================
 
 .. py:function:: pyvqnet.qnn.vqc.ryy(q_machine, wires, params=None, num_wires=None, use_dagger=False)
     
@@ -3322,7 +3322,7 @@ ryy
 
 
 rzz
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+============================
 
 .. py:function:: pyvqnet.qnn.vqc.rzz(q_machine, wires, params=None, num_wires=None, use_dagger=False)
     
@@ -3357,7 +3357,7 @@ rzz
         #     [0.       +0.j        0.       +0.j       ]]]]]
 
 RZX
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+============================
 
 .. py:function:: pyvqnet.qnn.vqc.rzx(q_machine, wires, params=None, num_wires=None, use_dagger=False)
     
@@ -3393,7 +3393,7 @@ RZX
 
 
 toffoli
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+============================
 
 .. py:function:: pyvqnet.qnn.vqc.toffoli(q_machine, wires, params=None, num_wires=None, use_dagger=False)
     
@@ -3428,7 +3428,7 @@ toffoli
 
 
 VQC_BasisEmbedding
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+============================
 
 .. py:function:: pyvqnet.qnn.vqc.VQC_BasisEmbedding(basis_state,q_machine)
 
@@ -3455,7 +3455,7 @@ VQC_BasisEmbedding
 
 
 VQC_AngleEmbedding
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+============================
 
 .. py:function:: pyvqnet.qnn.vqc.VQC_AngleEmbedding(input_feat, wires, q_machine: QMachine, rotation: str = "X")
 
@@ -3502,7 +3502,7 @@ VQC_AngleEmbedding
         #   [0.4569675+0.047989j  0.340018 +0.0099326j]]]
 
 VQC_AmplitudeEmbedding
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+============================
 
 .. py:function:: pyvqnet.qnn.vqc.VQC_AmplitudeEmbeddingCircuit(input_feature, q_machine)
 
@@ -3527,7 +3527,7 @@ VQC_AmplitudeEmbedding
         #    [ 0.1546073+0.j -0.0773037+0.j]]]]
 
 VQC_IQPEmbedding
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+============================
 
 .. py:function:: pyvqnet.qnn.vqc.VQC_IQPEmbedding(input_feat, q_machine: QMachine, rep: int = 1)
 
@@ -3558,7 +3558,7 @@ VQC_IQPEmbedding
 
 
 VQC_RotCircuit
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+============================
 
 .. py:function:: pyvqnet.qnn.vqc.VQC_RotCircuit(q_machine, wire, params)
 
@@ -3592,7 +3592,7 @@ VQC_RotCircuit
         #    [ 0.       +0.j         0.       +0.j       ]]]]
 
 VQC_CRotCircuit
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+============================
 
 .. py:function:: pyvqnet.qnn.vqc.VQC_CRotCircuit(para,control_qubits,rot_wire,q_machine)
 
@@ -3627,7 +3627,7 @@ VQC_CRotCircuit
 
 
 VQC_CSWAPcircuit
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+============================
 
 .. py:function:: pyvqnet.qnn.vqc.VQC_CSWAPcircuit(wires, q_machine)
 
@@ -3665,7 +3665,7 @@ VQC_CSWAPcircuit
         # [[1.]]
 
 VQC_Controlled_Hadamard
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+========================
 
 .. py:function:: pyvqnet.qnn.vqc.VQC_Controlled_Hadamard(wires, q_machine)
 
@@ -3699,7 +3699,7 @@ VQC_Controlled_Hadamard
         # [[1.]]
 
 VQC_CCZ
-^^^^^^^^^^^^^^^^
+==============
 
 .. py:function:: pyvqnet.qnn.vqc.VQC_CCZ(wires, q_machine)
 
@@ -3741,7 +3741,7 @@ VQC_CCZ
 
 
 VQC_FermionicSingleExcitation
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+=====================================
 
 .. py:function:: pyvqnet.qnn.vqc.VQC_FermionicSingleExcitation(weight, wires, q_machine)
 
@@ -3776,7 +3776,7 @@ VQC_FermionicSingleExcitation
 
 
 VQC_FermionicDoubleExcitation
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+====================================
 
 .. py:function:: pyvqnet.qnn.vqc.VQC_FermionicDoubleExcitation(weight, wires1, wires2, q_machine)
 
@@ -3825,7 +3825,7 @@ VQC_FermionicDoubleExcitation
         # [[0.9999998]]
 
 VQC_UCCSD
-^^^^^^^^^^^^^
+===================
 
 .. py:function:: pyvqnet.qnn.vqc.VQC_UCCSD(weights, wires, s_wires, d_wires, init_state, q_machine)
 
@@ -3882,7 +3882,7 @@ VQC_UCCSD
 
 
 VQC_QuantumPoolingCircuit
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+============================
 
 .. py:function:: pyvqnet.qnn.vqc.VQC_QuantumPoolingCircuit(ignored_wires, sinks_wires, params, q_machine)
 
@@ -3919,7 +3919,7 @@ VQC_QuantumPoolingCircuit
 
 
 VQC_HardwareEfficientAnsatz
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+============================
 
 .. py:class:: pyvqnet.qnn.vqc.VQC_HardwareEfficientAnsatz(n_qubits,single_rot_gate_list,entangle_gate="CNOT",entangle_rules='linear',depth=1)
 
@@ -3971,7 +3971,7 @@ VQC_HardwareEfficientAnsatz
         #  [0.3075958 0.2315062 0.2491432 0.2117545]]
 
 VQC_BasicEntanglerTemplate
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+============================
 
 .. py:class:: pyvqnet.qnn.vqc.VQC_BasicEntanglerTemplate(num_layer=1, num_qubits=1, rotation="RX", initial=None, dtype=None)
 
@@ -4019,7 +4019,7 @@ VQC_BasicEntanglerTemplate
 
 
 VQC_StronglyEntanglingTemplate
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================
 
 .. py:class:: pyvqnet.qnn.vqc.VQC_StronglyEntanglingTemplate(weights=None, num_qubits=1, ranges=None)
 
@@ -4069,7 +4069,7 @@ VQC_StronglyEntanglingTemplate
 
 
 VQC_QuantumEmbedding
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+============================
 
 .. py:class:: pyvqnet.qnn.vqc.VQC_QuantumEmbedding(qubits, machine, num_repetitions_input, depth_input, num_unitary_layers, num_repetitions)
 
@@ -4137,7 +4137,7 @@ VQC_QuantumEmbedding
 
 
 VQC_Purity
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+============================
 
 .. py:class:: pyvqnet.qnn.vqc.VQC_Purity(state, qubits_idx, num_wires)
 
@@ -4152,7 +4152,7 @@ VQC_Purity
 
     :param state: 从pyqpanda get_qstate()获取的量子态
     :param qubits_idx: 要计算纯度的量子比特位索引
-    :param num_wires: 
+    :param num_wires: 量子比特数
 
     :return:
             纯度
@@ -4176,7 +4176,7 @@ VQC_Purity
         # [0.9356751 0.875957]
 
 VQC_VarMeasure
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+============================
 
 .. py:class:: pyvqnet.qnn.vqc.VQC_VarMeasure(q_machine, obs)
 
@@ -4201,7 +4201,7 @@ VQC_VarMeasure
         # [[0.7701511]]
 
 VQC_DensityMatrixFromQstate
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+============================
 
 .. py:class:: pyvqnet.qnn.vqc.VQC_DensityMatrixFromQstate(state, indices)
 
@@ -4248,7 +4248,7 @@ VQC_DensityMatrixFromQstate
 
 
 Probability
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+============================
 
 .. py:class:: pyvqnet.qnn.vqc.Probability(wires)
 
@@ -4278,7 +4278,7 @@ Probability
         #  [1.0000002 0.       ]]        
 
 MeasureAll
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+============================
 
 .. py:class:: pyvqnet.qnn.vqc.MeasureAll(obs)
 
