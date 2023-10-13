@@ -92,7 +92,7 @@ VQNet提供的 ``QuantumLayer`` 以及 ``QuantumLayerV2`` 类已经封装了量�
         mm = M()
         print(mm.state_dict().keys())
 
-**问: 为什么原先的代码在2.0.7版本无法运行**
+**问: 为什么原先的代码在2.0.7及以后版本无法运行**
 
-答: v2.0.7版本中，我们为QTensor增加了不同数据类型，dtype属性，并参照pytorch对输入进行了限制。例如： Emedding层输入需要为kint64，CategoricalCrossEntropy, SoftmaxCrossEntropy, NLL_Loss, CrossEntropyLoss 的标签需要为kint64。
+答: 自v2.0.7版本中，我们为QTensor增加了不同数据类型，dtype属性，并参照pytorch对输入进行了限制。例如： Emedding层输入需要为kint64，CategoricalCrossEntropy, SoftmaxCrossEntropy, NLL_Loss, CrossEntropyLoss 的标签需要为kint64。
 你可以使用 `astype()` 接口进行类型转化为指定数据类型，或使用对应的数据类型numpy数组初始化QTensor。

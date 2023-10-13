@@ -1916,7 +1916,7 @@ CrossEntropyLoss
 
 
 激活函数
-*********************************************************---
+*********************************************************
 
 Activation
 =================================
@@ -2821,7 +2821,7 @@ precision_recall_f1_N_score
 
 
 precision_recall_f1_Multi_score
-=================================^^^^^^^
+=================================
 
 .. py:class:: pyvqnet.utils.metrics.precision_recall_f1_Multi_score(y_true_Qtensor, y_pred_Qtensor, N, average)
 

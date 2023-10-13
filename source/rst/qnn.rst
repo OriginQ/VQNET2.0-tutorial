@@ -3356,7 +3356,7 @@ rzz
         #    [[0.       +0.j        0.       +0.j       ]
         #     [0.       +0.j        0.       +0.j       ]]]]]
 
-RZX
+rzx
 ============================
 
 .. py:function:: pyvqnet.qnn.vqc.rzx(q_machine, wires, params=None, num_wires=None, use_dagger=False)
