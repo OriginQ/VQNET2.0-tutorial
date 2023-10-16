@@ -7,7 +7,8 @@ VQNet Changelog
 
 Added
 ===========
-- 增加了现有接口支持complex128、complex64、double、float、uint8、int8、bool、int16、int32、int64等类型计算（Linux下GPU,cuda11.7）。
+- 增加了现有接口支持complex128、complex64、double、float、uint8、int8、bool、int16、int32、int64等类型计算。
+- Linux版本支持gpu下的计算,需要cuda11.7版本cudatoolkit以及nvidia驱动。
 - 基于vqc的基础逻辑门：Hadamard、CNOT、I、RX、RY、PauliZ、PauliX、PauliY、S、RZ、RXX、RYY、RZZ、RZX、X1、Y1、Z1、U1、U2、U3、T、SWAP、P、TOFFOLI、CZ、CR。
 - 基于vqc的组合量子线路：VQC_HardwareEfficientAnsatz、VQC_BasicEntanglerTemplate、VQC_StronglyEntanglingTemplate、VQC_QuantumEmbedding、VQC_RotCircuit、VQC_CRotCircuit、VQC_CSWAPcircuit、VQC_Controlled_Hadamard、VQC_CCZ、VQC_FermionicSingleExcitation、VQC_FermionicDoubleExcitation、VQC_UCCSD、VQC_QuantumPoolingCircuit、VQC_BasisEmbedding、VQC_AngleEmbedding、VQC_AmplitudeEmbedding、VQC_IQPEmbedding。
 - 基于vqc的测量方法：VQC_Purity、VQC_VarMeasure、VQC_DensityMatrixFromQstate、Probability、MeasureAll。
