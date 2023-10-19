@@ -1,5 +1,5 @@
 XTensor 模块
-==============
+###########################
 
 XTensor 是VQNet借助算子自动并行方式对张量计算进行加速的接口，接口支持CPU/GPU下经典计算，API定义与原先XTensor基本一致。
 
@@ -14,11 +14,11 @@ XTensor 是VQNet借助算子自动并行方式对张量计算进行加速的接�
 
 
 XTensor's 函数与属性
-----------------------------------
+******************************************
 
 
 ndim
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 
 .. py:attribute:: XTensor.ndim
@@ -37,7 +37,7 @@ ndim
         # 1
     
 shape
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:attribute:: XTensor.shape
 
@@ -55,7 +55,7 @@ shape
         # (4)
 
 size
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:attribute:: XTensor.size
 
@@ -73,7 +73,7 @@ size
         # 4
 
 numel
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:method:: XTensor.numel
 
@@ -91,7 +91,7 @@ numel
         # 4
 
 device
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:attribute:: XTensor.device
 
@@ -110,7 +110,7 @@ device
         # 0
 
 dtype
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:attribute:: XTensor.dtype
 
@@ -130,7 +130,7 @@ dtype
         # 4
 
 requires_grad
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:attribute:: XTensor.requires_grad
 
@@ -150,7 +150,7 @@ requires_grad
 
 
 backward
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:method:: XTensor.backward(grad=None)
 
@@ -176,7 +176,7 @@ backward
         #[[2. 2. 2. 2. 2. 2. 2. 2. 2. 2.]]
 
 to_numpy
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:method:: XTensor.to_numpy()
 
@@ -194,7 +194,7 @@ to_numpy
         # [2. 3. 4. 5.]
 
 item
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:method:: XTensor.item()
 
@@ -212,7 +212,7 @@ item
         # 1.0
 
 argmax
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:method:: XTensor.argmax(*kargs)
 
@@ -254,7 +254,7 @@ argmax
         # ]
 
 argmin
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:method:: XTensor.argmin(*kargs)
 
@@ -291,7 +291,7 @@ argmin
         # [2., 3., 1., 0.]
 
 all
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:method:: XTensor.all()
 
@@ -311,7 +311,7 @@ all
         #<XTensor  cpu(0) kbool>
 
 any
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:method:: XTensor.any()
 
@@ -332,7 +332,7 @@ any
 
 
 fill_rand_binary\_
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:method:: XTensor.fill_rand_binary_(v=0.5)
 
@@ -360,7 +360,7 @@ fill_rand_binary\_
         # ]
 
 fill_rand_signed_uniform\_
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:method:: XTensor.fill_rand_signed_uniform_(v=1)
 
@@ -388,7 +388,7 @@ fill_rand_signed_uniform\_
 
 
 fill_rand_uniform\_
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:method:: XTensor.fill_rand_uniform_(v=1)
 
@@ -415,7 +415,7 @@ fill_rand_uniform\_
 
 
 fill_rand_normal\_
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:method:: XTensor.fill_rand_normal_(m=0, s=1)
 
@@ -442,7 +442,7 @@ fill_rand_normal\_
 
 
 XTensor.transpose
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:method:: XTensor.transpose(*axes)
 
@@ -487,7 +487,7 @@ XTensor.transpose
         """
 
 XTensor.reshape
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:method:: XTensor.reshape(new_shape)
 
@@ -516,7 +516,7 @@ XTensor.reshape
 
 
 getdata
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:method:: XTensor.getdata()
 
@@ -536,7 +536,7 @@ getdata
         #  [1. 1. 1. 1.]]
 
 __getitem__
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:method:: XTensor.__getitem__()
 
@@ -668,7 +668,7 @@ __getitem__
         """
 
 __setitem__
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:method:: XTensor.__setitem__()
 
@@ -818,7 +818,7 @@ __setitem__
 
 
 GPU
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: XTensor.GPU(device: int = DEV_GPU_0)
 
@@ -847,7 +847,7 @@ GPU
         #1000
 
 CPU
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: XTensor.CPU()
 
@@ -868,7 +868,7 @@ CPU
         # 0
 
 toGPU
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: XTensor.toGPU(device: int = DEV_GPU_0)
 
@@ -896,7 +896,7 @@ toGPU
 
 
 toCPU
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: XTensor.toCPU()
 
@@ -918,7 +918,7 @@ toCPU
 
 
 isGPU
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: XTensor.isGPU()
 
@@ -935,7 +935,7 @@ isGPU
         # False
 
 isCPU
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: XTensor.isCPU()
 
@@ -953,10 +953,10 @@ isCPU
 
 
 创建函数
------------------------------
+***********************
 
 ones
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.ones(shape,device=None,dtype=None)
 
@@ -981,7 +981,7 @@ ones
         # ]
 
 ones_like
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.ones_like(t: pyvqnet.xtensor.XTensor)
 
@@ -1003,7 +1003,7 @@ ones_like
 
 
 full
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.full(shape, value, device=None, dtype=None)
 
@@ -1031,7 +1031,7 @@ full
 
 
 full_like
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.full_like(t, value)
 
@@ -1058,7 +1058,7 @@ full_like
         
 
 zeros
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.zeros(shape, device=None,dtype=None)
 
@@ -1087,7 +1087,7 @@ zeros
         
 
 zeros_like
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.zeros_like(t: pyvqnet.xtensor.XTensor)
 
@@ -1110,7 +1110,7 @@ zeros_like
 
 
 arange
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.arange(start, end, step=1, device=None,dtype=None)
 
@@ -1134,7 +1134,7 @@ arange
         
 
 linspace
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.linspace(start, end, num, device=None,dtype=None)
 
@@ -1158,7 +1158,7 @@ linspace
         #[-2.5000000, -1.1111112, 0.2777777, 1.6666665, 3.0555553, 4.4444442, 5.8333330, 7.2222219, 8.6111107, 10.]
 
 logspace
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.logspace(start, end, num, base, device=None,dtype=None)
 
@@ -1184,7 +1184,7 @@ logspace
         
 
 eye
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.eye(size, offset: int = 0, device=None,dtype=None)
 
@@ -1212,7 +1212,7 @@ eye
         
 
 diag
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.diag(t, k: int = 0)
 
@@ -1269,7 +1269,7 @@ diag
 
 
 randu
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.randu(shape, min=0.0,max=1.0, device=None, dtype=None)
 
@@ -1298,7 +1298,7 @@ randu
         
 
 randn
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.randn(shape, mean=0.0,std=1.0, device=None, dtype=None)
 
@@ -1327,7 +1327,7 @@ randn
 
 
 multinomial
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.multinomial(t, num_samples)
 
@@ -1354,7 +1354,7 @@ multinomial
         # [1 3 2]
 
 triu
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.triu(t, diagonal=0)
 
@@ -1388,7 +1388,7 @@ triu
         # ]
 
 tril
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.tril(t, diagonal=0)
 
@@ -1422,11 +1422,11 @@ tril
         # ]
 
 数学函数
------------------------------
+***********************
 
 
 floor
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.floor(t)
 
@@ -1448,7 +1448,7 @@ floor
         # [-2., -2., -2., -2., -1., -1., -1., -1., 0., 0., 0., 0., 1., 1., 1., 1.]
 
 ceil
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.ceil(t)
 
@@ -1468,7 +1468,7 @@ ceil
         # [-2., -1., -1., -1., -1., -0., -0., -0., 0., 1., 1., 1., 1., 2., 2., 2.]
 
 round
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.round(t)
 
@@ -1488,7 +1488,7 @@ round
         # [-2., -2., -1., -1., -0., -0., 0., 1., 1., 2.]
 
 sort
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.sort(t, axis=None, descending=False, stable=True)
 
@@ -1517,7 +1517,7 @@ sort
         # ]
 
 argsort
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.argsort(t, axis = None, descending=False, stable=True)
 
@@ -1546,7 +1546,7 @@ argsort
         # ]
 
 topK
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.topK(t, k, axis=-1, if_descent=True)
 
@@ -1583,7 +1583,7 @@ topK
         # ]
 
 argtopK
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.argtopK(t, k, axis=-1, if_descent=True)
 
@@ -1621,7 +1621,7 @@ argtopK
 
 
 add
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.add(t1: pyvqnet.xtensor.XTensor, t2: pyvqnet.xtensor.XTensor)
 
@@ -1644,7 +1644,7 @@ add
         # [5., 7., 9.]
 
 sub
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.sub(t1: pyvqnet.xtensor.XTensor, t2: pyvqnet.xtensor.XTensor)
 
@@ -1666,7 +1666,7 @@ sub
         # [-3., -3., -3.]
 
 mul
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.mul(t1: pyvqnet.xtensor.XTensor, t2: pyvqnet.xtensor.XTensor)
 
@@ -1688,7 +1688,7 @@ mul
         # [4., 10., 18.]
 
 divide
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.divide(t1: pyvqnet.xtensor.XTensor, t2: pyvqnet.xtensor.XTensor)
 
@@ -1711,7 +1711,7 @@ divide
         # [0.2500000, 0.4000000, 0.5000000]
 
 sums
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.sums(t: pyvqnet.xtensor.XTensor, axis: int = None, keepdims=False)
 
@@ -1726,14 +1726,14 @@ sums
 
         from pyvqnet.xtensor import XTensor
         import pyvqnet.xtensor as tensor
-        t = XTensor(([1, 2, 3], [4, 5, 6]))
+        t = XTensor([[1, 2, 3], [4, 5, 6]])
         x = tensor.sums(t)
         print(x)
 
         # [21.]
 
 cumsum
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.cumsum(t, axis=-1)
 
@@ -1758,7 +1758,7 @@ cumsum
 
 
 mean
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.mean(t: pyvqnet.xtensor.XTensor, axis=None, keepdims=False)
 
@@ -1780,7 +1780,7 @@ mean
         # [2. 5.]
 
 median
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.median(t: pyvqnet.xtensor.XTensor, axis=None, keepdims=False)
 
@@ -1815,7 +1815,7 @@ median
         # [-0.3982000, 0.2269999, 0.2487999, 0.4742000]
 
 std
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.std(t: pyvqnet.xtensor.XTensor, axis=None, keepdims=False, unbiased=True)
 
@@ -1848,7 +1848,7 @@ std
         # [0.6593542, 0.5583112, 0.3206565, 1.1103367]
 
 var
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.var(t: pyvqnet.xtensor.XTensor, axis=None, keepdims=False, unbiased=True)
 
@@ -1872,7 +1872,7 @@ var
         # [0.2631305]
 
 matmul
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.matmul(t1: pyvqnet.xtensor.XTensor, t2: pyvqnet.xtensor.XTensor)
 
@@ -1907,7 +1907,7 @@ matmul
         # ]
 
 kron
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.kron(t1: pyvqnet.xtensor.XTensor, t2: pyvqnet.xtensor.XTensor)
 
@@ -2015,7 +2015,7 @@ kron
 
 
 reciprocal
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.reciprocal(t)
 
@@ -2036,7 +2036,7 @@ reciprocal
         #[1., 0.5000000, 0.3333333, 0.2500000, 0.2000000, 0.1666667, 0.1428571, 0.1250000, 0.1111111]
 
 sign
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.sign(t)
 
@@ -2057,7 +2057,7 @@ sign
         # [-1., -1., -1., -1., -1., 0., 1., 1., 1., 1.]
 
 neg
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.neg(t: pyvqnet.xtensor.XTensor)
 
@@ -2078,7 +2078,7 @@ neg
         # [-1., -2., -3.]
 
 trace
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.trace(t, k: int = 0)
 
@@ -2108,7 +2108,7 @@ trace
         # 0.26980453729629517
 
 exp
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.exp(t: pyvqnet.xtensor.XTensor)
 
@@ -2129,7 +2129,7 @@ exp
         # [2.7182817, 7.3890562, 20.0855369]
 
 acos
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.acos(t: pyvqnet.xtensor.XTensor)
 
@@ -2166,7 +2166,7 @@ acos
         # ]
 
 asin
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.asin(t: pyvqnet.xtensor.XTensor)
 
@@ -2188,7 +2188,7 @@ asin
         #[-1.5707964, -0.5235988, 0., 0.5235988]
 
 atan
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.atan(t: pyvqnet.xtensor.XTensor)
 
@@ -2209,7 +2209,7 @@ atan
         # [-0.7853981, -0.4636476, 0., 0.4636476]
 
 sin
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.sin(t: pyvqnet.xtensor.XTensor)
 
@@ -2230,7 +2230,7 @@ sin
         # [0.8414709, 0.9092974, 0.1411200]
 
 cos
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.cos(t: pyvqnet.xtensor.XTensor)
 
@@ -2251,7 +2251,7 @@ cos
         # [0.5403022, -0.4161468, -0.9899924]
 
 tan 
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.tan(t: pyvqnet.xtensor.XTensor)
 
@@ -2272,7 +2272,7 @@ tan
         # [1.5574077, -2.1850397, -0.1425465]
 
 tanh
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.tanh(t: pyvqnet.xtensor.XTensor)
 
@@ -2293,7 +2293,7 @@ tanh
         # [0.7615941, 0.9640275, 0.9950547]
 
 sinh
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.sinh(t: pyvqnet.xtensor.XTensor)
 
@@ -2314,7 +2314,7 @@ sinh
         # [1.1752011, 3.6268603, 10.0178747]
 
 cosh
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.cosh(t: pyvqnet.xtensor.XTensor)
 
@@ -2335,7 +2335,7 @@ cosh
         # [1.5430806, 3.7621955, 10.0676622]
 
 power
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.power(t1: pyvqnet.xtensor.XTensor, t2: pyvqnet.xtensor.XTensor)
 
@@ -2357,7 +2357,7 @@ power
         # [1., 1024., 729.]
 
 abs
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.abs(t: pyvqnet.xtensor.XTensor)
 
@@ -2378,7 +2378,7 @@ abs
         # [1., 2., 3.]
 
 log
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.log(t: pyvqnet.xtensor.XTensor)
 
@@ -2399,7 +2399,7 @@ log
         # [0., 0.6931471, 1.0986123]
 
 log_softmax
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.log_softmax(t, axis=-1)
 
@@ -2427,7 +2427,7 @@ log_softmax
         # ]
 
 sqrt
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.sqrt(t: pyvqnet.xtensor.XTensor)
 
@@ -2448,7 +2448,7 @@ sqrt
         # [1., 1.4142135, 1.7320507]
 
 square
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.square(t: pyvqnet.xtensor.XTensor)
 
@@ -2469,7 +2469,7 @@ square
         # [1., 4., 9.]
 
 frobenius_norm
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.frobenius_norm(t: XTensor, axis: int = None, keepdims=False):
 
@@ -2498,10 +2498,10 @@ frobenius_norm
 
 
 逻辑函数
---------------------------
+***********************
 
 maximum
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.maximum(t1: pyvqnet.xtensor.XTensor, t2: pyvqnet.xtensor.XTensor)
 
@@ -2524,7 +2524,7 @@ maximum
         # [6., 5., 7.]
 
 minimum
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.minimum(t1: pyvqnet.xtensor.XTensor, t2: pyvqnet.xtensor.XTensor)
 
@@ -2547,7 +2547,7 @@ minimum
         # [2., 4., 3.]
 
 min
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.min(t: pyvqnet.xtensor.XTensor, axis=None, keepdims=False)
 
@@ -2573,7 +2573,7 @@ min
         # ]
 
 max
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.max(t: pyvqnet.xtensor.XTensor, axis=None, keepdims=False)
 
@@ -2600,7 +2600,7 @@ max
         # ]
 
 clip
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.clip(t: pyvqnet.xtensor.XTensor, min_val, max_val)
 
@@ -2623,7 +2623,7 @@ clip
 
 
 where
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.where(condition: pyvqnet.xtensor.XTensor, t1: pyvqnet.xtensor.XTensor, t2: pyvqnet.xtensor.XTensor)
 
@@ -2648,7 +2648,7 @@ where
         # [1., 5., 6.]
 
 nonzero
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.nonzero(t)
 
@@ -2675,7 +2675,7 @@ nonzero
         # ]
 
 isfinite
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.isfinite(t)
 
@@ -2696,7 +2696,7 @@ isfinite
         #[ True False  True False False]
 
 isinf
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.isinf(t)
 
@@ -2717,7 +2717,7 @@ isinf
         # [False  True False  True False]
 
 isnan
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.isnan(t)
 
@@ -2738,7 +2738,7 @@ isnan
         # [False False False False  True]
 
 isneginf
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.isneginf(t)
 
@@ -2759,7 +2759,7 @@ isneginf
         # [False False False  True False]
 
 isposinf
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.isposinf(t)
 
@@ -2780,7 +2780,7 @@ isposinf
         # [False  True False False False]
 
 logical_and
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.logical_and(t1, t2)
 
@@ -2804,7 +2804,7 @@ logical_and
         # [False False  True False]
 
 logical_or
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.logical_or(t1, t2)
 
@@ -2828,7 +2828,7 @@ logical_or
         # [ True  True  True False]
 
 logical_not
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.logical_not(t)
 
@@ -2849,7 +2849,7 @@ logical_not
         # [ True False False  True]
 
 logical_xor
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.logical_xor(t1, t2)
 
@@ -2873,7 +2873,7 @@ logical_xor
         # [ True  True False False]
 
 greater
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.greater(t1, t2)
 
@@ -2898,7 +2898,7 @@ greater
         #  [False False]]
 
 greater_equal
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.greater_equal(t1, t2)
 
@@ -2923,7 +2923,7 @@ greater_equal
         # [False  True]]
 
 less
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.less(t1, t2)
 
@@ -2948,7 +2948,7 @@ less
         # [ True False]]
 
 less_equal
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.less_equal(t1, t2)
 
@@ -2973,7 +2973,7 @@ less_equal
         #  [ True  True]]
 
 equal
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.equal(t1, t2)
 
@@ -2998,7 +2998,7 @@ equal
         # [False  True]]
 
 not_equal
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.not_equal(t1, t2)
 
@@ -3023,10 +3023,10 @@ not_equal
         # [ True False]]
 
 矩阵操作
---------------------------
+***********************
 
 broadcast
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.broadcast(t1: pyvqnet.xtensor.XTensor, t2: pyvqnet.xtensor.XTensor)
 
@@ -3078,7 +3078,7 @@ broadcast
 
 
 concatenate
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.concatenate(args: list, axis=0)
 
@@ -3105,7 +3105,7 @@ concatenate
         
 
 stack
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.stack(XTensors: list, axis=0) 
 
@@ -3146,7 +3146,7 @@ stack
                 
 
 permute
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.permute(t: pyvqnet.xtensor.XTensor, *axes)
 
@@ -3180,7 +3180,7 @@ permute
         
 
 transpose
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.transpose(t: pyvqnet.xtensor.XTensor, *axes)
 
@@ -3214,7 +3214,7 @@ transpose
         
 
 tile
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.tile(t: pyvqnet.xtensor.XTensor, reps: list)
 
@@ -3252,7 +3252,7 @@ tile
         
 
 squeeze
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.squeeze(t: pyvqnet.xtensor.XTensor, axis: int = - 1)
 
@@ -3283,7 +3283,7 @@ squeeze
         
 
 unsqueeze
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.unsqueeze(t: pyvqnet.xtensor.XTensor, axis: int = 0)
 
@@ -3316,7 +3316,7 @@ unsqueeze
         
 
 swapaxis
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.swapaxis(t, axis1: int, axis2: int)
 
@@ -3350,7 +3350,7 @@ swapaxis
         # ]
 
 masked_fill
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.masked_fill(t, mask, value)
 
@@ -3384,7 +3384,7 @@ masked_fill
         # ]
 
 flatten
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.flatten(t: pyvqnet.xtensor.XTensor, start: int = 0, end: int = - 1)
 
@@ -3407,7 +3407,7 @@ flatten
 
 
 reshape
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.reshape(t: pyvqnet.xtensor.XTensor,new_shape)
 
@@ -3436,7 +3436,7 @@ reshape
         # ]
 
 flip
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.flip(t, flip_dims)
 
@@ -3471,7 +3471,7 @@ flip
         # ]
 
 broadcast_to
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.broadcast_to(t, ref)
 
@@ -3497,11 +3497,11 @@ broadcast_to
 
 
 实用函数
------------------------------
+***********************
 
 
 to_xtensor
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.to_xtensor(x,device=None,dtype=None)
 
@@ -3524,7 +3524,7 @@ to_xtensor
         
 
 pad_sequence
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.pad_sequence(qtensor_list, batch_first=False, padding_value=0)
 
@@ -3581,7 +3581,7 @@ pad_sequence
 
 
 pad_packed_sequence
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.pad_packed_sequence(sequence, batch_first=False, padding_value=0, total_length=None)
 
@@ -3659,7 +3659,7 @@ pad_packed_sequence
 
 
 pack_pad_sequence
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
 .. py:function:: pyvqnet.xtensor.pack_pad_sequence(input, lengths, batch_first=False, enforce_sorted=True)
 

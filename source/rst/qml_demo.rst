@@ -6334,7 +6334,7 @@ vqe_func_analytic()函数是使用参数偏移计算理论梯度，vqe_func_shot
 
 
 量子奇异值分解
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===================================
 
 下面例子实现论文 `Variational Quantum Singular Value Decomposition <https://arxiv.org/abs/2006.02336>`_ 中的算法。 
 
