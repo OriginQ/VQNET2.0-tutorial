@@ -1,16 +1,16 @@
 QTensor 模块
-==============
+###########################
 
 VQNet量子机器学习所使用的数据结构QTensor的python接口介绍。QTensor支持常用的多维张量的操作，例如创建函数，数学函数，逻辑函数，矩阵变换等。
 
 
 
 QTensor's 函数与属性
-----------------------------------
+******************************************
 
 
 __init__
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: QTensor.__init__(data, requires_grad=False, nodes=None, device=0, dtype = None, name = "")
 
@@ -19,7 +19,7 @@ __init__
     :param data: 输入数据，可以是 _core.Tensor 或numpy 数组。
     :param requires_grad: 是否应该跟踪张量的梯度，默认为 False。
     :param nodes: 计算图中的后继者列表，默认为无。
-    :param device: 储存在哪个设备上，默认0，在CPU上。
+    :param device: 储存在哪个设备上，默认: pyvqnet.DEV_CPU，在CPU上。
     :param dtype: 参数的数据类型，defaults：None，使用默认数据类型:kfloat32,代表32位浮点数。
     :param name: QTensor的名字,default:""。
     :return: 输出 QTensor。
@@ -49,7 +49,7 @@ __init__
 
 
 ndim
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:attribute:: QTensor.ndim
 
@@ -67,7 +67,7 @@ ndim
         # 1
     
 shape
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:attribute:: QTensor.shape
 
@@ -85,7 +85,7 @@ shape
         # [4]
 
 size
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:attribute:: QTensor.size
 
@@ -103,7 +103,7 @@ size
         # 4
 
 numel
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:method:: QTensor.numel
 
@@ -122,7 +122,7 @@ numel
 
 
 dtype
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:attribute:: QTensor.dtype
 
@@ -143,7 +143,7 @@ dtype
 
 
 zero_grad
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:method:: QTensor.zero_grad()
 
@@ -161,7 +161,7 @@ zero_grad
         
 
 backward
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:method:: QTensor.backward(grad=None)
 
@@ -180,7 +180,7 @@ backward
         #[[2. 2. 2. 2. 2. 2. 2. 2. 2. 2.]]
 
 to_numpy
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:method:: QTensor.to_numpy()
 
@@ -199,7 +199,7 @@ to_numpy
         # [2. 3. 4. 5.]
 
 item
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:method:: QTensor.item()
 
@@ -217,7 +217,7 @@ item
         # 1.0
 
 argmax
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:method:: QTensor.argmax(*kargs)
 
@@ -259,7 +259,7 @@ argmax
         # ]
 
 argmin
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:method:: QTensor.argmin(*kargs)
 
@@ -298,7 +298,7 @@ argmin
         
 
 fill\_
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:method:: QTensor.fill_(v)
 
@@ -325,7 +325,7 @@ fill\_
 
 
 all
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:method:: QTensor.all()
 
@@ -346,7 +346,7 @@ all
         # True
 
 any
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:method:: QTensor.any()
 
@@ -368,7 +368,7 @@ any
 
 
 fill_rand_binary\_
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:method:: QTensor.fill_rand_binary_(v=0.5)
 
@@ -396,7 +396,7 @@ fill_rand_binary\_
         # ]
 
 fill_rand_signed_uniform\_
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:method:: QTensor.fill_rand_signed_uniform_(v=1)
 
@@ -425,7 +425,7 @@ fill_rand_signed_uniform\_
 
 
 fill_rand_uniform\_
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:method:: QTensor.fill_rand_uniform_(v=1)
 
@@ -453,7 +453,7 @@ fill_rand_uniform\_
 
 
 fill_rand_normal\_
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:method:: QTensor.fill_rand_normal_(m=0, s=1, fast_math=True)
 
@@ -482,7 +482,7 @@ fill_rand_normal\_
 
 
 QTensor.transpose
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:method:: QTensor.transpose(new_dims=None)
 
@@ -514,7 +514,7 @@ QTensor.transpose
 
 
 transpose\_
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:method:: QTensor.transpose_(new_dims=None)
 
@@ -547,7 +547,7 @@ transpose\_
 
 
 QTensor.reshape
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:method:: QTensor.reshape(new_shape)
 
@@ -576,7 +576,7 @@ QTensor.reshape
         
 
 reshape\_
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:method:: QTensor.reshape_(new_shape)
 
@@ -606,7 +606,7 @@ reshape\_
 
 
 getdata
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:method:: QTensor.getdata()
 
@@ -627,7 +627,7 @@ getdata
         #  [1. 1. 1. 1.]]
 
 __getitem__
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:method:: QTensor.__getitem__()
 
@@ -718,7 +718,7 @@ __getitem__
         # ]
 
 __setitem__
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:method:: QTensor.__setitem__()
 
@@ -870,20 +870,145 @@ __setitem__
         # ]
 
 
+GPU
+==============================
+
+.. py:function:: QTensor.GPU(device: int = DEV_GPU_0)
+
+    克隆QTensor到指定的GPU设备
+
+    device 指定存储其内部数据的设备。 当device >= DEV_GPU_0时，数据存储在GPU上。 
+    如果您的计算机有多个 GPU，您可以指定不同的设备来存储数据。 例如，device = DEV_GPU_1, DEV_GPU_2, DEV_GPU_3, ... 表示存储在具有不同序列号的GPU上。
+
+    .. note::
+        QTensor在不同GPU上无法进行计算。
+        如果您尝试在 ID 超过验证 GPU 最大数量的 GPU 上创建 QTensor，将引发 Cuda 错误。
+
+    :param device: 当前保存QTensor的设备，默认=DEV_GPU_0，
+     device = pyvqnet.DEV_GPU_0，存储在第一个 GPU 中，devcie = DEV_GPU_1，
+     存储在第二个 GPU 中，依此类推。
+
+    :return: QTensor 克隆到 GPU 设备。
+
+    Examples::
+
+        from pyvqnet.tensor import QTensor
+        a = QTensor([2])
+        b = a.GPU()
+        print(b.device)
+        #1000
+
+CPU
+==============================
+
+.. py:function:: QTensor.CPU()
+
+    克隆QTensor到特定的CPU设备
+
+    :return: QTensor 克隆到 CPU 设备。
+
+    Examples::
+
+        from pyvqnet.tensor import QTensor
+        a = QTensor([2])
+        b = a.CPU()
+        print(b.device)
+        # 0
+
+toGPU
+==============================
+
+.. py:function:: QTensor.toGPU(device: int = DEV_GPU_0)
+
+    移动QTensor到指定的GPU设备
+
+    device 指定存储其内部数据的设备。 当device >= DEV_GPU时，数据存储在GPU上。
+     如果您的计算机有多个 GPU，您可以指定不同的设备来存储数据。 
+     例如，device = DEV_GPU_1, DEV_GPU_2, DEV_GPU_3, ... 表示存储在具有不同序列号的GPU上。
+
+    .. note::
+        QTensor在不同GPU上无法进行计算。
+        如果您尝试在 ID 超过验证 GPU 最大数量的 GPU 上创建 QTensor，将引发 Cuda 错误。
+
+    :param device: 当前保存QTensor的设备，默认=DEV_GPU_0。device = pyvqnet.DEV_GPU_0，存储在第一个 GPU 中，devcie = DEV_GPU_1，存储在第二个 GPU 中，依此类推。
+    :return: QTensor 移动到 GPU 设备。
+
+    Examples::
+
+        from pyvqnet.tensor import QTensor
+        a = QTensor([2])
+        a = a.toGPU()
+        print(a.device)
+        #1000
+
+
+toCPU
+==============================
+
+.. py:function:: QTensor.toCPU()
+
+    移动QTensor到特定的GPU设备
+
+    :return: QTensor 移动到 CPU 设备。
+
+    Examples::
+
+        from pyvqnet.tensor import QTensor
+        a = QTensor([2])
+        b = a.toCPU()
+        print(b.device)
+        # 0
+
+
+isGPU
+==============================
+
+.. py:function:: QTensor.isGPU()
+
+    该 QTensor 的数据是否存储在 GPU 主机内存上。
+
+    :return: 该 QTensor 的数据是否存储在 GPU 主机内存上。
+
+    Examples::
+    
+        from pyvqnet.tensor import QTensor
+        a = QTensor([2])
+        a = a.isGPU()
+        print(a)
+        # False
+
+isCPU
+==============================
+
+.. py:function:: QTensor.isCPU()
+
+    该 QTensor 的数据是否存储在 CPU 主机内存上。
+
+    :return: 该 QTensor 的数据是否存储在 CPU 主机内存上。
+
+    Examples::
+    
+        from pyvqnet.tensor import QTensor
+        a = QTensor([2])
+        a = a.isCPU()
+        print(a)
+        # True
+
+
 创建函数
------------------------------
+*************
 
 .. _ones:
 
 ones
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
-.. py:function:: pyvqnet.tensor.ones(shape,device=0,dtype-None)
+.. py:function:: pyvqnet.tensor.ones(shape,device=pyvqnet.DEV_CPU,dtype-None)
 
     创建元素全一的 QTensor 。
 
     :param shape: 数据的形状。
-    :param device: 储存在哪个设备上，默认0，在CPU上。
+    :param device: 储存在哪个设备上，默认: pyvqnet.DEV_CPU，在CPU上。
     :param dtype: 参数的数据类型，defaults：None，使用默认数据类型:kfloat32,代表32位浮点数。
 
     :return: 返回新的 QTensor 。
@@ -901,14 +1026,14 @@ ones
         # ]
 
 ones_like
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
-.. py:function:: pyvqnet.tensor.ones_like(t: pyvqnet.tensor.QTensor,device=0,dtype=None)
+.. py:function:: pyvqnet.tensor.ones_like(t: pyvqnet.tensor.QTensor,device=pyvqnet.DEV_CPU,dtype=None)
 
     创建元素全一的 QTensor ,形状和输入的 QTensor 一样。
 
     :param t: 输入 QTensor 。
-    :param device: 储存在哪个设备上，默认0，在CPU上。
+    :param device: 储存在哪个设备上，默认: pyvqnet.DEV_CPU，在CPU上。
     :param dtype: 参数的数据类型，defaults：None,跟输入的dtype一样。
 
     :return: 新的全一  QTensor 。
@@ -925,15 +1050,15 @@ ones_like
 
 
 full
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
-.. py:function:: pyvqnet.tensor.full(shape, value, device: int = 0, dtype=None)
+.. py:function:: pyvqnet.tensor.full(shape, value, device=pyvqnet.DEV_CPU, dtype=None)
 
     创建一个指定形状的 QTensor 并用特定值填充它。
 
     :param shape: 要创建的张量形状。
     :param value: 填充的值。
-    :param device: 储存在哪个设备上，默认0，在CPU上。
+    :param device: 储存在哪个设备上，默认: pyvqnet.DEV_CPU，在CPU上。
     :param dtype: 参数的数据类型，defaults：None，使用默认数据类型:kfloat32,代表32位浮点数。
 
     :return: 输出新 QTensor 。 
@@ -953,15 +1078,15 @@ full
 
 
 full_like
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
-.. py:function:: pyvqnet.tensor.full_like(t, value, device: int = 0,dtype=None)
+.. py:function:: pyvqnet.tensor.full_like(t, value, device=pyvqnet.DEV_CPU,dtype=None)
 
     创建一个形状和输入一样的 QTensor,所有元素填充 value 。
 
     :param t: 输入 QTensor 。
     :param value: 填充 QTensor 的值。
-    :param device: 储存在哪个设备上，默认0，在CPU上。
+    :param device: 储存在哪个设备上，默认: pyvqnet.DEV_CPU，在CPU上。
     :param dtype: 参数的数据类型，defaults：None,跟输入的dtype一样。
 
     :return: 输出 QTensor。
@@ -982,14 +1107,14 @@ full_like
         
 
 zeros
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
-.. py:function:: pyvqnet.tensor.zeros(shape, device: int = 0,dtype=None)
+.. py:function:: pyvqnet.tensor.zeros(shape, device=pyvqnet.DEV_CPU,dtype=None)
 
     创建输入形状大小的全零 QTensor 。
 
     :param shape: 输入形状。
-    :param device: 储存在哪个设备上，默认0，在CPU上。
+    :param device: 储存在哪个设备上，默认: pyvqnet.DEV_CPU，在CPU上。
     :param dtype: 参数的数据类型，defaults：None，使用默认数据类型:kfloat32,代表32位浮点数。
 
     :return: 输出 QTensor 。
@@ -1011,14 +1136,14 @@ zeros
         
 
 zeros_like
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
-.. py:function:: pyvqnet.tensor.zeros_like(t: pyvqnet.tensor.QTensor, device: int = 0,dtype=None)
+.. py:function:: pyvqnet.tensor.zeros_like(t: pyvqnet.tensor.QTensor, device=pyvqnet.DEV_CPU,dtype=None)
 
     创建一个形状和输入一样的 QTensor,所有元素为0 。
 
     :param t: 输入参考 QTensor 。
-    :param device: 储存在哪个设备上，默认0，在CPU上。
+    :param device: 储存在哪个设备上，默认: pyvqnet.DEV_CPU，在CPU上。
     :param dtype: 参数的数据类型，defaults：None,跟输入的dtype一样。
 
     :return: 输出 QTensor 。
@@ -1036,16 +1161,16 @@ zeros_like
 
 
 arange
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
-.. py:function:: pyvqnet.tensor.arange(start, end, step=1, device: int = 0,dtype=None,requires_grad=False)
+.. py:function:: pyvqnet.tensor.arange(start, end, step=1, device=pyvqnet.DEV_CPU,dtype=None,requires_grad=False)
 
     创建一个在给定间隔内具有均匀间隔值的一维 QTensor 。
 
     :param start: 间隔开始。
     :param end: 间隔结束。
     :param step: 值之间的间距，默认为1。
-    :param device: 要使用的设备，默认 = 0 ，使用 CPU 设备。
+    :param device: 要使用的设备，默认 = pyvqnet.DEV_CPU，使用 CPU 设备。
     :param dtype: 参数的数据类型，defaults：None，使用默认数据类型:kfloat32,代表32位浮点数。
     :param requires_grad: 是否计算梯度，默认为False。
 
@@ -1062,16 +1187,16 @@ arange
         
 
 linspace
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
-.. py:function:: pyvqnet.tensor.linspace(start, end, num, device: int = 0,dtype=None,requires_grad= False)
+.. py:function:: pyvqnet.tensor.linspace(start, end, num, device=pyvqnet.DEV_CPU,dtype=None,requires_grad= False)
 
     创建一维 QTensor ，其中的元素为区间 start 和 end 上均匀间隔的共 num 个值。
 
     :param start: 间隔开始。
     :param end: 间隔结束。
     :param num: 间隔的个数。
-    :param device: 要使用的设备，默认 = 0 ，使用 CPU 设备。
+    :param device: 要使用的设备，默认 = pyvqnet.DEV_CPU ，使用 CPU 设备。
     :param dtype: 参数的数据类型，defaults：None，使用默认数据类型:kfloat32,代表32位浮点数。
     :param requires_grad: 是否计算梯度，默认为False。
 
@@ -1087,9 +1212,9 @@ linspace
         #[-2.5000000, -1.1111112, 0.2777777, 1.6666665, 3.0555553, 4.4444442, 5.8333330, 7.2222219, 8.6111107, 10.]
 
 logspace
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
-.. py:function:: pyvqnet.tensor.logspace(start, end, num, base, device: int = 0,dtype=None, requires_grad)
+.. py:function:: pyvqnet.tensor.logspace(start, end, num, base, device=pyvqnet.DEV_CPU,dtype=None, requires_grad)
 
     在对数刻度上创建具有均匀间隔值的一维 QTensor。
 
@@ -1097,7 +1222,7 @@ logspace
     :param end: ``base ** end`` 是序列的最终值
     :param num: 要生成的样本数
     :param base: 对数刻度的基数
-    :param device: 要使用的设备，默认 = 0 ，使用 CPU 设备。
+    :param device: 要使用的设备，默认 = pyvqnet.DEV_CPU ，使用 CPU 设备。
     :param dtype: 参数的数据类型，defaults：None，使用默认数据类型:kfloat32,代表32位浮点数。
     :param requires_grad: 是否计算梯度，默认为False。
 
@@ -1115,15 +1240,15 @@ logspace
         
 
 eye
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
-.. py:function:: pyvqnet.tensor.eye(size, offset: int = 0, device: int = 0,dtype=None)
+.. py:function:: pyvqnet.tensor.eye(size, offset: int = 0, device=pyvqnet.DEV_CPU,dtype=None)
 
     创建一个 size x size 的 QTensor，对角线上为 1，其他地方为 0。
 
     :param size: 要创建的（正方形）QTensor 的大小。
     :param offset: 对角线的索引：0（默认）表示主对角线，正值表示上对角线，负值表示下对角线。
-    :param device: 要使用的设备，默认 = 0 ，使用 CPU 设备。
+    :param device: 要使用的设备，默认 =pyvqnet.DEV_CPU ，使用 CPU 设备。
     :param dtype: 参数的数据类型，defaults：None，使用默认数据类型:kfloat32,代表32位浮点数。
 
     :return: 输出 QTensor 。
@@ -1144,7 +1269,7 @@ eye
         
 
 diag
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.diag(t, k: int = 0,requires_grad=False)
 
@@ -1202,16 +1327,16 @@ diag
 
 
 randu
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
-.. py:function:: pyvqnet.tensor.randu(shape, min=0.0,max=1.0, device: int = 0, dtype=None, requires_grad=False)
+.. py:function:: pyvqnet.tensor.randu(shape, min=0.0,max=1.0, device=pyvqnet.DEV_CPU, dtype=None, requires_grad=False)
 
     创建一个具有均匀分布随机值的 QTensor 。
 
     :param shape: 要创建的 QTensor 的形状。
     :param min: 分布的下限，默认: 0。
     :param max: 分布的上线，默认: 1。
-    :param device: 要使用的设备，默认 = 0 ，使用 CPU 设备。
+    :param device: 要使用的设备，默认 =pyvqnet.DEV_CPU ，使用 CPU 设备。
     :param dtype: 参数的数据类型，defaults：None，使用默认数据类型:kfloat32,代表32位浮点数。
     :param requires_grad: 是否计算梯度，默认为False。
 
@@ -1232,16 +1357,16 @@ randu
         
 
 randn
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
-.. py:function:: pyvqnet.tensor.randn(shape, mean=0.0,std=1.0, device: int = 0, dtype=None, requires_grad=False)
+.. py:function:: pyvqnet.tensor.randn(shape, mean=0.0,std=1.0, device=pyvqnet.DEV_CPU, dtype=None, requires_grad=False)
 
     创建一个具有正态分布随机值的 QTensor 。
 
     :param shape: 要创建的 QTensor 的形状。
     :param mean: 分布的均值，默认: 0。
     :param max: 分布的方差，默认: 1。
-    :param device: 要使用的设备，默认 = 0 ，使用 CPU 设备。
+    :param device: 要使用的设备，默认 = pyvqnet.DEV_CPU ，使用 CPU 设备。
     :param dtype: 参数的数据类型，defaults：None，使用默认数据类型:kfloat32,代表32位浮点数。
     :param requires_grad: 是否计算梯度，默认为False。
 
@@ -1262,7 +1387,7 @@ randn
 
 
 multinomial
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.multinomial(t, num_samples)
 
@@ -1290,7 +1415,7 @@ multinomial
         # [1 3 2]
 
 triu
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.triu(t, diagonal=0)
 
@@ -1323,7 +1448,7 @@ triu
         # ]
 
 tril
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.tril(t, diagonal=0)
 
@@ -1356,11 +1481,11 @@ tril
         # ]
 
 数学函数
------------------------------
+*******************************
 
 
 floor
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.floor(t)
 
@@ -1381,7 +1506,7 @@ floor
         # [-2., -2., -2., -2., -1., -1., -1., -1., 0., 0., 0., 0., 1., 1., 1., 1.]
 
 ceil
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.ceil(t)
 
@@ -1401,7 +1526,7 @@ ceil
         # [-2., -1., -1., -1., -1., -0., -0., -0., 0., 1., 1., 1., 1., 2., 2., 2.]
 
 round
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.round(t)
 
@@ -1421,7 +1546,7 @@ round
         # [-2., -2., -1., -1., -0., -0., 0., 1., 1., 2.]
 
 sort
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.sort(t, axis: int, descending=False, stable=True)
 
@@ -1450,7 +1575,7 @@ sort
         # ]
 
 argsort
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.argsort(t, axis: int, descending=False, stable=True)
 
@@ -1479,7 +1604,7 @@ argsort
         # ]
 
 topK
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.topK(t, k, axis=-1, if_descent=True)
 
@@ -1515,7 +1640,7 @@ topK
         # ]
 
 argtopK
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.argtopK(t, k, axis=-1, if_descent=True)
 
@@ -1552,7 +1677,7 @@ argtopK
 
 
 add
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.add(t1: pyvqnet.tensor.QTensor, t2: pyvqnet.tensor.QTensor)
 
@@ -1574,7 +1699,7 @@ add
         # [5., 7., 9.]
 
 sub
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.sub(t1: pyvqnet.tensor.QTensor, t2: pyvqnet.tensor.QTensor)
 
@@ -1596,7 +1721,7 @@ sub
         # [-3., -3., -3.]
 
 mul
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.mul(t1: pyvqnet.tensor.QTensor, t2: pyvqnet.tensor.QTensor)
 
@@ -1618,7 +1743,7 @@ mul
         # [4., 10., 18.]
 
 divide
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.divide(t1: pyvqnet.tensor.QTensor, t2: pyvqnet.tensor.QTensor)
 
@@ -1641,7 +1766,7 @@ divide
         # [0.2500000, 0.4000000, 0.5000000]
 
 sums
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.sums(t: pyvqnet.tensor.QTensor, axis: Optional[int] = None, keepdims=False)
 
@@ -1663,7 +1788,7 @@ sums
         # [21.]
 
 cumsum
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.cumsum(t, axis=-1)
 
@@ -1686,7 +1811,7 @@ cumsum
 
 
 mean
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.mean(t: pyvqnet.tensor.QTensor, axis=None, keepdims=False)
 
@@ -1708,7 +1833,7 @@ mean
         # [2. 5.]
 
 median
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.median(t: pyvqnet.tensor.QTensor, axis=None, keepdims=False)
 
@@ -1740,7 +1865,7 @@ median
         # [-0.3982000, 0.2269999, 0.2487999, 0.4742000]
 
 std
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.std(t: pyvqnet.tensor.QTensor, axis=None, keepdims=False, unbiased=True)
 
@@ -1773,7 +1898,7 @@ std
         # [0.6593542, 0.5583112, 0.3206565, 1.1103367]
 
 var
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.var(t: pyvqnet.tensor.QTensor, axis=None, keepdims=False, unbiased=True)
 
@@ -1797,7 +1922,7 @@ var
         # [0.2631305]
 
 matmul
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.matmul(t1: pyvqnet.tensor.QTensor, t2: pyvqnet.tensor.QTensor)
 
@@ -1832,7 +1957,7 @@ matmul
         # ]
 
 kron
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.kron(t1: pyvqnet.tensor.QTensor, t2: pyvqnet.tensor.QTensor)
 
@@ -1941,7 +2066,7 @@ kron
 
 
 reciprocal
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.reciprocal(t)
 
@@ -1962,7 +2087,7 @@ reciprocal
         #[1., 0.5000000, 0.3333333, 0.2500000, 0.2000000, 0.1666667, 0.1428571, 0.1250000, 0.1111111]
 
 sign
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.sign(t)
 
@@ -1985,7 +2110,7 @@ sign
         # [-1., -1., -1., -1., -1., 0., 1., 1., 1., 1.]
 
 neg
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.neg(t: pyvqnet.tensor.QTensor)
 
@@ -2006,7 +2131,7 @@ neg
         # [-1., -2., -3.]
 
 trace
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.trace(t, k: int = 0)
 
@@ -2036,7 +2161,7 @@ trace
         # 0.26980453729629517
 
 exp
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.exp(t: pyvqnet.tensor.QTensor)
 
@@ -2057,7 +2182,7 @@ exp
         # [2.7182817, 7.3890562, 20.0855369]
 
 acos
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.acos(t: pyvqnet.tensor.QTensor)
 
@@ -2094,7 +2219,7 @@ acos
         # ]
 
 asin
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.asin(t: pyvqnet.tensor.QTensor)
 
@@ -2116,7 +2241,7 @@ asin
         #[-1.5707964, -0.5235988, 0., 0.5235988]
 
 atan
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.atan(t: pyvqnet.tensor.QTensor)
 
@@ -2137,7 +2262,7 @@ atan
         # [-0.7853981, -0.4636476, 0., 0.4636476]
 
 sin
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.sin(t: pyvqnet.tensor.QTensor)
 
@@ -2158,7 +2283,7 @@ sin
         # [0.8414709, 0.9092974, 0.1411200]
 
 cos
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.cos(t: pyvqnet.tensor.QTensor)
 
@@ -2179,7 +2304,7 @@ cos
         # [0.5403022, -0.4161468, -0.9899924]
 
 tan 
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.tan(t: pyvqnet.tensor.QTensor)
 
@@ -2200,7 +2325,7 @@ tan
         # [1.5574077, -2.1850397, -0.1425465]
 
 tanh
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.tanh(t: pyvqnet.tensor.QTensor)
 
@@ -2221,7 +2346,7 @@ tanh
         # [0.7615941, 0.9640275, 0.9950547]
 
 sinh
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.sinh(t: pyvqnet.tensor.QTensor)
 
@@ -2242,7 +2367,7 @@ sinh
         # [1.1752011, 3.6268603, 10.0178747]
 
 cosh
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.cosh(t: pyvqnet.tensor.QTensor)
 
@@ -2263,7 +2388,7 @@ cosh
         # [1.5430806, 3.7621955, 10.0676622]
 
 power
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.power(t1: pyvqnet.tensor.QTensor, t2: pyvqnet.tensor.QTensor)
 
@@ -2285,7 +2410,7 @@ power
         # [1., 1024., 729.]
 
 abs
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.abs(t: pyvqnet.tensor.QTensor)
 
@@ -2306,7 +2431,7 @@ abs
         # [1., 2., 3.]
 
 log
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.log(t: pyvqnet.tensor.QTensor)
 
@@ -2327,7 +2452,7 @@ log
         # [0., 0.6931471, 1.0986123]
 
 log_softmax
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.log_softmax(t, axis=-1)
 
@@ -2354,7 +2479,7 @@ log_softmax
         # ]
 
 sqrt
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.sqrt(t: pyvqnet.tensor.QTensor)
 
@@ -2375,7 +2500,7 @@ sqrt
         # [1., 1.4142135, 1.7320507]
 
 square
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.square(t: pyvqnet.tensor.QTensor)
 
@@ -2396,7 +2521,7 @@ square
         # [1., 4., 9.]
 
 frobenius_norm
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.frobenius_norm(t: QTensor, axis: int = None, keepdims=False):
 
@@ -2424,10 +2549,10 @@ frobenius_norm
 
 
 逻辑函数
---------------------------
+*************************************
 
 maximum
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.maximum(t1: pyvqnet.tensor.QTensor, t2: pyvqnet.tensor.QTensor)
 
@@ -2450,7 +2575,7 @@ maximum
         # [6., 5., 7.]
 
 minimum
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.minimum(t1: pyvqnet.tensor.QTensor, t2: pyvqnet.tensor.QTensor)
 
@@ -2473,7 +2598,7 @@ minimum
         # [2., 4., 3.]
 
 min
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.min(t: pyvqnet.tensor.QTensor, axis=None, keepdims=False)
 
@@ -2499,7 +2624,7 @@ min
         # ]
 
 max
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.max(t: pyvqnet.tensor.QTensor, axis=None, keepdims=False)
 
@@ -2526,7 +2651,7 @@ max
         # ]
 
 clip
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.clip(t: pyvqnet.tensor.QTensor, min_val, max_val)
 
@@ -2549,7 +2674,7 @@ clip
 
 
 where
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.where(condition: pyvqnet.tensor.QTensor, t1: pyvqnet.tensor.QTensor, t2: pyvqnet.tensor.QTensor)
 
@@ -2574,7 +2699,7 @@ where
         # [1., 5., 6.]
 
 nonzero
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.nonzero(t)
 
@@ -2601,7 +2726,7 @@ nonzero
         # ]
 
 isfinite
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.isfinite(t)
 
@@ -2622,7 +2747,7 @@ isfinite
         #[ True False  True False False]
 
 isinf
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.isinf(t)
 
@@ -2643,7 +2768,7 @@ isinf
         # [False  True False  True False]
 
 isnan
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.isnan(t)
 
@@ -2664,7 +2789,7 @@ isnan
         # [False False False False  True]
 
 isneginf
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.isneginf(t)
 
@@ -2685,7 +2810,7 @@ isneginf
         # [False False False  True False]
 
 isposinf
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.isposinf(t)
 
@@ -2706,7 +2831,7 @@ isposinf
         # [False  True False False False]
 
 logical_and
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.logical_and(t1, t2)
 
@@ -2730,7 +2855,7 @@ logical_and
         # [False False  True False]
 
 logical_or
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.logical_or(t1, t2)
 
@@ -2754,7 +2879,7 @@ logical_or
         # [ True  True  True False]
 
 logical_not
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.logical_not(t)
 
@@ -2775,7 +2900,7 @@ logical_not
         # [ True False False  True]
 
 logical_xor
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.logical_xor(t1, t2)
 
@@ -2799,7 +2924,7 @@ logical_xor
         # [ True  True False False]
 
 greater
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.greater(t1, t2)
 
@@ -2824,7 +2949,7 @@ greater
         #  [False False]]
 
 greater_equal
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.greater_equal(t1, t2)
 
@@ -2849,7 +2974,7 @@ greater_equal
         # [False  True]]
 
 less
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.less(t1, t2)
 
@@ -2874,7 +2999,7 @@ less
         # [ True False]]
 
 less_equal
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.less_equal(t1, t2)
 
@@ -2900,7 +3025,7 @@ less_equal
         #  [ True  True]]
 
 equal
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.equal(t1, t2)
 
@@ -2925,7 +3050,7 @@ equal
         # [False  True]]
 
 not_equal
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.not_equal(t1, t2)
 
@@ -2949,11 +3074,11 @@ not_equal
         #[[False  True]
         # [ True False]]
 
-矩阵操作
---------------------------
+变换函数
+*********************
 
 broadcast
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.broadcast(t1: pyvqnet.tensor.QTensor, t2: pyvqnet.tensor.QTensor)
 
@@ -3005,7 +3130,7 @@ broadcast
         # [2, 5, 4]
 
 select
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.select(t: pyvqnet.tensor.QTensor, index)
 
@@ -3034,7 +3159,7 @@ select
         # ]
 
 concatenate
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.concatenate(args: list, axis=1)
 
@@ -3061,7 +3186,7 @@ concatenate
         
 
 stack
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.stack(QTensors: list, axis) 
 
@@ -3102,7 +3227,7 @@ stack
                 
 
 permute
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.permute(t: pyvqnet.tensor.QTensor, dim: list)
 
@@ -3136,7 +3261,7 @@ permute
         
 
 transpose
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.transpose(t: pyvqnet.tensor.QTensor, dim: list)
 
@@ -3170,7 +3295,7 @@ transpose
         
 
 tile
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.tile(t: pyvqnet.tensor.QTensor, reps: list)
 
@@ -3208,7 +3333,7 @@ tile
         
 
 squeeze
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.squeeze(t: pyvqnet.tensor.QTensor, axis: int = - 1)
 
@@ -3239,7 +3364,7 @@ squeeze
         
 
 unsqueeze
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.unsqueeze(t: pyvqnet.tensor.QTensor, axis: int = 0)
 
@@ -3272,7 +3397,7 @@ unsqueeze
         
 
 swapaxis
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.swapaxis(t, axis1: int, axis2: int)
 
@@ -3306,7 +3431,7 @@ swapaxis
         # ]
 
 masked_fill
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.masked_fill(t, mask, value)
 
@@ -3339,7 +3464,7 @@ masked_fill
         # ]
 
 flatten
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.flatten(t: pyvqnet.tensor.QTensor, start: int = 0, end: int = - 1)
 
@@ -3362,7 +3487,7 @@ flatten
 
 
 reshape
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.reshape(t: pyvqnet.tensor.QTensor,new_shape)
 
@@ -3391,7 +3516,7 @@ reshape
         # ]
 
 flip
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.flip(t, flip_dims)
 
@@ -3425,7 +3550,7 @@ flip
         # ]
 
 gather
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.gather(t, dim, index)
 
@@ -3471,7 +3596,7 @@ gather
 
 
 scatter
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.scatter(input, dim, index,src)
 
@@ -3539,7 +3664,7 @@ scatter
         #    [ -0.2257515  -0.5655377]]]]
 
 broadcast_to
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.broadcast_to(t, ref)
 
@@ -3565,11 +3690,11 @@ broadcast_to
 
 
 实用函数
------------------------------
+************
 
 
 to_tensor
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.to_tensor(x)
 
@@ -3589,7 +3714,7 @@ to_tensor
         
 
 pad_sequence
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.pad_sequence(qtensor_list, batch_first=False, padding_value=0)
 
@@ -3645,7 +3770,7 @@ pad_sequence
 
 
 pad_packed_sequence
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.pad_packed_sequence(sequence, batch_first=False, padding_value=0, total_length=None)
 
@@ -3722,7 +3847,7 @@ pad_packed_sequence
 
 
 pack_pad_sequence
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 .. py:function:: pyvqnet.tensor.pack_pad_sequence(input, lengths, batch_first=False, enforce_sorted=True)
 
