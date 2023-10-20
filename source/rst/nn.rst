@@ -1023,7 +1023,7 @@ Dropout
         # ]
 
 Pixel_Shuffle 
-^^^^^^^^^^^^^^^^^^^^^^^^^
+=================================
 .. py:class:: pyvqnet.nn.pixel_shuffle.Pixel_Shuffle(upscale_factors, name="")
 
     重新排列形状为：(*, C * r^2, H, W)  的张量
@@ -1047,7 +1047,7 @@ Pixel_Shuffle
         #[5, 2, 3, 2, 12, 12]
 
 Pixel_Unshuffle 
-^^^^^^^^^^^^^^^^^^^^^^^^^
+=================================
 .. py:class:: pyvqnet.nn.pixel_shuffle.Pixel_Unshuffle(downscale_factors, name="")
 
     通过重新排列元素来反转 Pixel_Shuffle 操作. 将 (*, C, H * r, W * r) 形状的张量变化为 (*, C * r^2, H, W) ，其中 r 是缩小因子。
@@ -1071,7 +1071,7 @@ Pixel_Unshuffle
 
 
 GRU
-^^^^^^^^^^^^^^^^^^^^^^^^^
+=================================
 
 .. py:class:: pyvqnet.nn.gru.GRU(input_size, hidden_size, num_layers=1, nonlinearity='tanh', batch_first=True, use_bias=True, bidirectional=False, dtype=None, name: str = "")
 
@@ -1144,7 +1144,7 @@ GRU
         # ]
 
 RNN 
-^^^^^^^^^^^^^^^^^^^^^^^^^
+=================================
 
 .. py:class:: pyvqnet.nn.rnn.RNN(input_size, hidden_size, num_layers=1, nonlinearity='tanh', batch_first=True, use_bias=True, bidirectional=False, dtype=None, name: str = "")
 
@@ -1436,7 +1436,7 @@ Dynamic_GRU
         # [4 1 2]
 
 Dynamic_RNN 
-^^^^^^^^^^^^^^^^^^^^^^^^^
+=================================
 
 .. py:class:: pyvqnet.nn.rnn.Dynamic_RNN(input_size, hidden_size, num_layers=1, nonlinearity='tanh', batch_first=True, use_bias=True, bidirectional=False, dtype=None, name: str = "")
 
