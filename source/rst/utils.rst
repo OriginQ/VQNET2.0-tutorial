@@ -350,22 +350,22 @@ split_data
 
         return x_train, y_train
 
-model_allreduce
-==================
+average_parameters_allreduce
+===============================
 
-使用 ``model_allreduce`` 以allreduce的方式对不同进程上模型参数进程传递并更新。
+使用 ``average_parameters_allreduce`` 以allreduce的方式对不同进程上模型参数进行传递并以平均值更新。
 
-.. py:function:: pyvqnet.distributed.model_allreduce(model)
+.. py:function:: pyvqnet.distributed.average_parameters_allreduce(model)
 
     设置分布式计算参数。
 
     :param model: `Module` - 训练的模型.
     
-    :return: 参数更新后的模型。
+    :return: 参数更新后的模型.
 
     Example::
 
-        from pyvqnet.distributed import parallel_model
+        from pyvqnet.distributed import average_parameters_allreduce
         import numpy as np
         from pyvqnet.nn.module import Module
         from pyvqnet.nn.linear import Linear
@@ -383,29 +383,86 @@ model_allreduce
 
         model = Net()
         print(f"rank {get_rank()} parameters is {model.parameters()}")
-        model = parallel_model(model)
+        model = average_parameters_allreduce(model)
 
         if get_rank() == 0:
             print(model.parameters())
         
         # mpirun -n 2 python run.py
 
-model_reduce
-==================
+average_grad_allreduce
+===============================
 
-使用 ``model_reduce`` 以reduce的方式对不同进程上模型参数进程传递并更新。
+使用 ``average_grad_allreduce`` 以allreduce的方式对不同进程上模型参数梯度进行传递并以平均值更新.
 
-.. py:function:: pyvqnet.distributed.model_reduce(x_train, y_train, shuffle=False)
+.. py:function:: pyvqnet.distributed.average_grad_allreduce(optimizer)
+
+    设置分布式计算参数。
+
+    :param optimizer: optimizer.
+    
+    :return: 梯度更新后的优化器。
+
+    Example::
+
+        from pyvqnet.distributed import average_grad_allreduce
+        import numpy as np
+        from pyvqnet.nn.module import Module
+        from pyvqnet.nn.linear import Linear
+        from pyvqnet.nn import activation as F
+        from pyvqnet.distributed import *
+        from pyvqnet.nn.loss import MeanSquaredError
+        from pyvqnet.optim import Adam
+        
+        class Net(Module):
+            def __init__(self):
+                super(Net, self).__init__()
+                self.fc = Linear(input_channels=5, output_channels=1)
+
+            def forward(self, x):
+                x = F.ReLu()(self.fc(x))
+                return x
+        model = Net()
+        opti = Adam(model.parameters(), lr=0.01)
+        actual = tensor.QTensor([1,1,1,1,1,0,0,0,0,0],dtype=6).reshape((10,1))
+                
+        x = tensor.randn((10, 5))
+        for i in range(10):
+            opti.zero_grad()
+            model.train()
+            
+            result = model(x)
+            loss = MeanSquaredError()(actual, result)
+            loss.backward()
+            
+            print(f"rank {get_rank()} grad is {model.parameters()[0].grad}")
+            opti = average_grad_allreduce(opti)
+            # if get_rank() == 0 :
+            print(f"rank {get_rank()} grad is {model.parameters()[0].grad}")
+            opti.step()
+            
+            return 
+        
+        # mpirun -n 2 python run.py
+
+
+average_parameters_reduce
+===============================
+
+使用 ``average_parameters_reduce`` 以reduce的方式对进程上模型参数进行传递, 并对指定进程上的参数进行更新。
+
+.. py:function:: pyvqnet.distributed.average_parameters_reduce(model, root = 0)
 
     设置分布式计算参数。
 
     :param model: `Module` - 训练的模型.
+    :param root: 指定的进程号.
 
     :return: 参数更新后的模型。
 
     Example::
 
-        from pyvqnet.distributed import model_reduce
+        from pyvqnet.distributed import average_parameters_reduce
         import numpy as np
         from pyvqnet.nn.module import Module
         from pyvqnet.nn.linear import Linear
@@ -424,13 +481,71 @@ model_reduce
 
         model = Net()
         print(f"rank {get_rank()} parameters is {model.parameters()}")
-        model = model_reduce(model)
+        model = average_parameters_reduce(model)
 
         if get_rank() == 0:
             print(model.parameters())
 
         # mpirun -n 2 python run.py
+
+
+average_grad_reduce
+===============================
+
+使用 ``average_grad_reduce`` 以reduce的方式对进程上参数的梯度进行传递， 并对指定进程上的参数梯度更新。
+
+.. py:function:: pyvqnet.distributed.average_grad_reduce(optimizer, root = 0)
+
+    设置分布式计算参数。
+
+    :param optimizer: optimizer.
+    :param root: 指定的进程号.
+
+    :return: 梯度更新后的优化器.
+
+    Example::
+
+        from pyvqnet.distributed import average_grad_reduce
+        import numpy as np
+        from pyvqnet.nn.module import Module
+        from pyvqnet.nn.linear import Linear
+        from pyvqnet.nn import activation as F
+        from pyvqnet.distributed import *
+        from pyvqnet.nn.loss import MeanSquaredError
+        from pyvqnet.optim import Adam
         
+        class Net(Module):
+            def __init__(self):
+                super(Net, self).__init__()
+                self.fc = Linear(input_channels=5, output_channels=1)
+
+            def forward(self, x):
+                x = F.ReLu()(self.fc(x))
+                return x
+        model = Net()
+        opti = Adam(model.parameters(), lr=0.01)
+        actual = tensor.QTensor([1,1,1,1,1,0,0,0,0,0],dtype=6).reshape((10,1))
+                
+        x = tensor.randn((10, 5))
+        for i in range(10):
+            opti.zero_grad()
+            model.train()
+            
+            result = model(x)
+            loss = MeanSquaredError()(actual, result)
+            loss.backward()
+            
+            print(f"rank {get_rank()} grad is {model.parameters()[0].grad}")
+            opti = average_grad_reduce(opti)
+            # if get_rank() == 0 :
+            print(f"rank {get_rank()} grad is {model.parameters()[0].grad}")
+            opti.step()
+            
+            return 
+        
+        # mpirun -n 2 python run.py
+
+
 环境依赖:mpich,mpi4py,gcc,gfortran
 
 .. note::
@@ -797,7 +912,7 @@ model_reduce
             return x
 
 
-以上均未用到分布式计算接口，而仅需要在训练时引用DataSplit、parallel_model、init_p即可实现数据并行的分布式计算。
+在训练时引用split_data、average_parameters_allreduce、init_process实现基于数据并行的分布式计算。
 
 使用方法如下
 
@@ -809,8 +924,7 @@ model_reduce
         """
         x_train, y_train, x_test, y_test = data_select(args.train_size, args.test_size)
 
-        Data = DataSplit(args.shuffle)  # 分布式模块接口对数据切分
-        x_train, y_train= Data.split_data(x_train, y_train) # 分布式模块接口对数据切分
+        x_train, y_train= split_data(x_train, y_train) # 分布式模块接口对数据切分
         print(get_rank())
         model = Net()
         optimizer = Adam(model.parameters(), lr=0.001)
@@ -848,10 +962,11 @@ model_reduce
                 n_train += batch_size
 
                 loss.backward()
+                # optimizer = average_grad_allreduce(optimizer) 以allreduce方式对优化器中参数梯度进行传递, 并更新
                 optimizer._step()
 
                 total_loss.append(loss_np)
-            model = parallel_model(model) # 对不同rank的模型参数梯度进行allreduce通信
+            model = average_parameters_allreduce(model) # 对不同rank的模型参数以allreduce方式通信, 并对参数更新
 
 
             train_loss_list.append(np.sum(total_loss) / len(total_loss))
