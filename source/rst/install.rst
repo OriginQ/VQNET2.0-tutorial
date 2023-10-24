@@ -6,7 +6,7 @@ VQNet python包安装
 
 我们提供了Linux,Windows,MacOS上的python预编译包供安装，需要 **python==3.8, 3.9 或 3.10** 。还需要numpy>=1.18.5,pyqpanda>=3.7.8。
 
-对于Linux系统,pyvqnet提供了基于Nvidia GPU加速的软件包，当您的电脑的GPU是GTX10系列及其以后的型号，按照cuda官方网站安装cuda11.7，可使用pyvqnet的GPU功能。
+对于Linux系统,pyvqnet提供了基于Nvidia GPU加速功能，当您的电脑的GPU是GTX10系列及其以后的型号，按照cuda官方网站安装cuda11.7，可使用pyvqnet的GPU功能。
 
 
 .. code-block::
@@ -21,6 +21,16 @@ VQNet 测试安装成功
     import pyvqnet 
     from pyvqnet.tensor import *
     a = arange(1,25).reshape([2, 3, 4])
+    print(a)
+
+VQNet 测试GPU功能
+----------------------------------
+
+.. code-block::
+
+    from pyvqnet import DEV_GPU_0
+    from pyvqnet.tensor import *
+    a = ones([4,5],device = DEV_GPU_0)
     print(a)
 
 VQNet 的一个简单例子
