@@ -162,11 +162,11 @@ QuantumLayer是一个支持量子含参线路作为参数的自动求导模块�
 
         #这里的"CPU" 指的是qpanda量子计算模拟器使用CPU,跟pyvqnet是否使用GPU无关。
         pqc = QuantumLayer(pqctest,3,"CPU",4,1)
-        #这里使用to_gpu将QuantumLayer 移动到GPU上
-        pqc.to_gpu()
+        #这里使用toGPU将QuantumLayer 移动到GPU上
+        pqc.toGPU()
         #classic data as input
         input = QTensor([[1,2,3,4],[40,22,2,3],[33,3,25,2.0]] )
-        input.to_gpu()
+        input.toGPU()
         #forward circuits
         rlt = pqc(input)
         grad =  QTensor(np.ones(rlt.data.shape)*1000,device=DEV_GPU_0)
@@ -318,11 +318,11 @@ QuantumLayerV2
 
         pqc = QuantumLayerV2(pqctest,3)
         #layer move to gpu
-        pqc.to_gpu()
+        pqc.toGPU()
         #classic data as input       
         input = QTensor([[1.0,2,3,4],[4,2,2,3],[3,3,2,2]] )
         #data move to gpu
-        input.to_gpu(DEV_GPU_0)
+        input.toGPU(DEV_GPU_0)
         #forward circuits
         rlt = pqc(input)
 
