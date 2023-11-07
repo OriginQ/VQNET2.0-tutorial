@@ -2965,6 +2965,113 @@ rz
         #    [[0.       +0.j       0.       +0.j      ]
         #     [0.       +0.j       0.       +0.j      ]]]]]
 
+crx
+============================
+
+.. py:function:: pyvqnet.qnn.vqc.crx(q_machine, wires, params=None, num_wires=None, use_dagger=False)
+    
+    对q_machine中的态矢作用量子逻辑门 crx 。
+
+    :param q_machine:  量子虚拟机设备。
+    :param wires: 量子比特索引。
+    :param params: 参数矩阵，默认为None。
+    :param num_wires: 量子比特数，默认为None。
+    :param use_dagger: 是否共轭转置，默认为False。
+    :return: 输出QTensor。
+
+    Example::
+
+        from pyvqnet.qnn.vqc import QMachine
+        import pyvqnet.qnn.vqc as vqc
+        from pyvqnet.tensor import QTensor
+        qm = QMachine(4)
+        vqc.crx(q_machine=qm,wires=[0,2], params=QTensor([0.5]),num_wires=4)
+        print(qm.states)
+
+        # [[[[[1.+0.j 0.+0.j]
+        #     [0.+0.j 0.+0.j]]
+        # 
+        #    [[0.+0.j 0.+0.j]
+        #     [0.+0.j 0.+0.j]]]
+        # 
+        # 
+        #   [[[0.+0.j 0.+0.j]
+        #     [0.+0.j 0.+0.j]]
+        # 
+        #    [[0.+0.j 0.+0.j]
+        #     [0.+0.j 0.+0.j]]]]]
+
+cry
+============================
+
+.. py:function:: pyvqnet.qnn.vqc.cry(q_machine, wires, params=None, num_wires=None, use_dagger=False)
+    
+    对q_machine中的态矢作用量子逻辑门 cry 。
+
+    :param q_machine:  量子虚拟机设备。
+    :param wires: 量子比特索引。
+    :param params: 参数矩阵，默认为None。
+    :param num_wires: 量子比特数，默认为None。
+    :param use_dagger: 是否共轭转置，默认为False。
+    :return: 输出QTensor。
+
+    Example::
+
+        from pyvqnet.qnn.vqc import QMachine
+        import pyvqnet.qnn.vqc as vqc
+        from pyvqnet.tensor import QTensor
+        qm = QMachine(4)
+        vqc.cry(q_machine=qm,wires=[0,2], params=QTensor([0.5]))
+        print(qm.states)
+
+        # [[[[[1.+0.j 0.+0.j]
+        #     [0.+0.j 0.+0.j]]
+        # 
+        #    [[0.+0.j 0.+0.j]
+        #     [0.+0.j 0.+0.j]]]
+        # 
+        # 
+        #   [[[0.+0.j 0.+0.j]
+        #     [0.+0.j 0.+0.j]]
+        # 
+        #    [[0.+0.j 0.+0.j]
+        #     [0.+0.j 0.+0.j]]]]]
+
+crz
+============================
+
+.. py:function:: pyvqnet.qnn.vqc.crz(q_machine, wires, params=None, num_wires=None, use_dagger=False)
+    
+    对q_machine中的态矢作用量子逻辑门 crz 。
+
+    :param q_machine:  量子虚拟机设备。
+    :param wires: 量子比特索引。
+    :param params: 参数矩阵，默认为None。
+    :param num_wires: 量子比特数，默认为None。
+    :param use_dagger: 是否共轭转置，默认为False。
+    :return: 输出QTensor。
+
+    Example::
+
+        from pyvqnet.qnn.vqc import QMachine
+        import pyvqnet.qnn.vqc as vqc
+        from pyvqnet.tensor import QTensor
+        qm = QMachine(4)
+        vqc.crz(q_machine=qm,wires=[0,2], params=QTensor([0.5]))
+        print(qm.states)
+        
+        # [[[[[1.+0.j 0.+0.j]
+        #     [0.+0.j 0.+0.j]]
+        # 
+        #    [[0.+0.j 0.+0.j]
+        #     [0.+0.j 0.+0.j]]]
+        # 
+        # 
+        #   [[[0.+0.j 0.+0.j]
+        #     [0.+0.j 0.+0.j]]
+        # 
+        #    [[0.+0.j 0.+0.j]
+        #     [0.+0.j 0.+0.j]]]]]
 
 p
 ============================
@@ -3213,6 +3320,42 @@ swap
         #     [0.+0.j 0.+0.j]]]]]
 
 
+iswap
+============================
+
+.. py:function:: pyvqnet.qnn.vqc.iswap(q_machine, wires, params=None, num_wires=None, use_dagger=False)
+    
+    对q_machine中的态矢作用量子逻辑门 iswap 。
+
+    :param q_machine:  量子虚拟机设备。
+    :param wires: 量子比特索引。
+    :param params: 参数矩阵，默认为None。
+    :param num_wires: 量子比特数，默认为None。
+    :param use_dagger: 是否共轭转置，默认为False。
+    :return: 输出QTensor。
+
+    Example::
+
+        from pyvqnet.qnn.vqc import QMachine
+        import pyvqnet.qnn.vqc as vqc
+        from pyvqnet.tensor import QTensor
+        qm = QMachine(4)
+        vqc.iswap(q_machine=qm,wires=[0,1], params = QTensor([0.5]),num_wires=4)
+        print(qm.states)
+
+        # [[[[[1.+0.j 0.+0.j]
+        #     [0.+0.j 0.+0.j]]
+        # 
+        #    [[0.+0.j 0.+0.j]
+        #     [0.+0.j 0.+0.j]]]
+        # 
+        # 
+        #   [[[0.+0.j 0.+0.j]
+        #     [0.+0.j 0.+0.j]]
+        # 
+        #    [[0.+0.j 0.+0.j]
+        #     [0.+0.j 0.+0.j]]]]]
+
 cz
 ============================
 
@@ -3425,6 +3568,481 @@ toffoli
         #    [[0.+0.j 0.+0.j]
         #     [0.+0.j 0.+0.j]]]]]
 
+isingxx
+============================
+
+.. py:function:: pyvqnet.qnn.vqc.isingxx(q_machine, wires, params=None, num_wires=None, use_dagger=False)
+    
+    对q_machine中的态矢作用量子逻辑门 isingxx 。
+
+    :param q_machine:  量子虚拟机设备。
+    :param wires: 量子比特索引。
+    :param params: 参数矩阵，默认为None。
+    :param num_wires: 量子比特数，默认为None。
+    :param use_dagger: 是否共轭转置，默认为False。
+    :return: 输出QTensor。
+
+    Example::
+    
+        from pyvqnet.qnn.vqc import QMachine
+        import pyvqnet.qnn.vqc as vqc
+        from pyvqnet.tensor import QTensor
+        qm = QMachine(4)
+        vqc.isingxx(q_machine=qm,wires=[0,1], params = QTensor([0.5]),num_wires=4)
+        print(qm.states)
+
+        # [[[[[0.9689124+0.j       0.       +0.j      ]
+        #     [0.       +0.j       0.       +0.j      ]]
+        # 
+        #    [[0.       +0.j       0.       +0.j      ]
+        #     [0.       +0.j       0.       +0.j      ]]]
+        # 
+        # 
+        #   [[[0.       +0.j       0.       +0.j      ]
+        #     [0.       +0.j       0.       +0.j      ]]
+        # 
+        #    [[0.       -0.247404j 0.       +0.j      ]
+        #     [0.       +0.j       0.       +0.j      ]]]]]
+
+
+isingyy
+============================
+
+.. py:function:: pyvqnet.qnn.vqc.isingyy(q_machine, wires, params=None, num_wires=None, use_dagger=False)
+    
+    对q_machine中的态矢作用量子逻辑门 isingyy 。
+
+    :param q_machine:  量子虚拟机设备。
+    :param wires: 量子比特索引。
+    :param params: 参数矩阵，默认为None。
+    :param num_wires: 量子比特数，默认为None。
+    :param use_dagger: 是否共轭转置，默认为False。
+    :return: 输出QTensor。
+
+    Example::
+    
+        from pyvqnet.qnn.vqc import QMachine
+        import pyvqnet.qnn.vqc as vqc
+        from pyvqnet.tensor import QTensor
+        qm = QMachine(4)
+        vqc.isingyy(q_machine=qm,wires=[0,1], params = QTensor([0.5]),num_wires=4)
+        print(qm.states)
+
+        # [[[[[0.9689124+0.j       0.       +0.j      ]
+        #     [0.       +0.j       0.       +0.j      ]]
+        # 
+        #    [[0.       +0.j       0.       +0.j      ]
+        #     [0.       +0.j       0.       +0.j      ]]]
+        # 
+        # 
+        #   [[[0.       +0.j       0.       +0.j      ]
+        #     [0.       +0.j       0.       +0.j      ]]
+        # 
+        #    [[0.       +0.247404j 0.       +0.j      ]
+        #     [0.       +0.j       0.       +0.j      ]]]]]
+
+
+isingzz
+============================
+
+.. py:function:: pyvqnet.qnn.vqc.isingzz(q_machine, wires, params=None, num_wires=None, use_dagger=False)
+    
+    对q_machine中的态矢作用量子逻辑门 isingzz 。
+
+    :param q_machine:  量子虚拟机设备。
+    :param wires: 量子比特索引。
+    :param params: 参数矩阵，默认为None。
+    :param num_wires: 量子比特数，默认为None。
+    :param use_dagger: 是否共轭转置，默认为False。
+    :return: 输出QTensor。
+
+    Example::
+    
+        from pyvqnet.qnn.vqc import QMachine
+        import pyvqnet.qnn.vqc as vqc
+        from pyvqnet.tensor import QTensor
+        qm = QMachine(4)
+        vqc.isingzz(q_machine=qm,wires=[0,1], params = QTensor([0.5]),num_wires=4)
+        print(qm.states)
+
+        # [[[[[0.9689124-0.247404j 0.       +0.j      ]
+        #     [0.       +0.j       0.       +0.j      ]]
+        # 
+        #    [[0.       +0.j       0.       +0.j      ]
+        #     [0.       +0.j       0.       +0.j      ]]]
+        # 
+        # 
+        #   [[[0.       +0.j       0.       +0.j      ]
+        #     [0.       +0.j       0.       +0.j      ]]
+        # 
+        #    [[0.       +0.j       0.       +0.j      ]
+        #     [0.       +0.j       0.       +0.j      ]]]]]
+
+isingxy
+============================
+
+.. py:function:: pyvqnet.qnn.vqc.isingxy(q_machine, wires, params=None, num_wires=None, use_dagger=False)
+    
+    对q_machine中的态矢作用量子逻辑门 isingxy 。
+
+    :param q_machine:  量子虚拟机设备。
+    :param wires: 量子比特索引。
+    :param params: 参数矩阵，默认为None。
+    :param num_wires: 量子比特数，默认为None。
+    :param use_dagger: 是否共轭转置，默认为False。
+    :return: 输出QTensor。
+
+    Example::
+    
+        from pyvqnet.qnn.vqc import QMachine
+        import pyvqnet.qnn.vqc as vqc
+        from pyvqnet.tensor import QTensor
+        qm = QMachine(4)
+        vqc.isingxy(q_machine=qm,wires=[0,1], params = QTensor([0.5]),num_wires=4)
+        print(qm.states)
+
+        # [[[[[1.+0.j 0.+0.j]
+        #     [0.+0.j 0.+0.j]]
+        # 
+        #    [[0.+0.j 0.+0.j]
+        #     [0.+0.j 0.+0.j]]]
+        # 
+        # 
+        #   [[[0.+0.j 0.+0.j]
+        #     [0.+0.j 0.+0.j]]
+        # 
+        #    [[0.+0.j 0.+0.j]
+        #     [0.+0.j 0.+0.j]]]]]
+
+
+phaseshift
+============================
+
+.. py:function:: pyvqnet.qnn.vqc.phaseshift(q_machine, wires, params=None, num_wires=None, use_dagger=False)
+    
+    对q_machine中的态矢作用量子逻辑门 phaseshift 。
+
+    :param q_machine:  量子虚拟机设备。
+    :param wires: 量子比特索引。
+    :param params: 参数矩阵，默认为None。
+    :param num_wires: 量子比特数，默认为None。
+    :param use_dagger: 是否共轭转置，默认为False。
+    :return: 输出QTensor。
+
+    Example::
+    
+        from pyvqnet.qnn.vqc import QMachine
+        import pyvqnet.qnn.vqc as vqc
+        from pyvqnet.tensor import QTensor
+        qm = QMachine(4)
+        vqc.phaseshift(q_machine=qm,wires=[0], params = QTensor([0.5]),num_wires=4)
+        print(qm.states)
+
+        # [[[[[1.+0.j 0.+0.j]
+        #     [0.+0.j 0.+0.j]]
+        # 
+        #    [[0.+0.j 0.+0.j]
+        #     [0.+0.j 0.+0.j]]]
+        # 
+        # 
+        #   [[[0.+0.j 0.+0.j]
+        #     [0.+0.j 0.+0.j]]
+        # 
+        #    [[0.+0.j 0.+0.j]
+        #     [0.+0.j 0.+0.j]]]]]
+
+multirz
+============================
+
+.. py:function:: pyvqnet.qnn.vqc.multirz(q_machine, wires, params=None, num_wires=None, use_dagger=False)
+    
+    对q_machine中的态矢作用量子逻辑门 multirz 。
+
+    :param q_machine:  量子虚拟机设备。
+    :param wires: 量子比特索引。
+    :param params: 参数矩阵，默认为None。
+    :param num_wires: 量子比特数，默认为None。
+    :param use_dagger: 是否共轭转置，默认为False。
+    :return: 输出QTensor。
+
+    Example::
+    
+        from pyvqnet.qnn.vqc import QMachine
+        import pyvqnet.qnn.vqc as vqc
+        from pyvqnet.tensor import QTensor
+        qm = QMachine(4)
+        vqc.multirz(q_machine=qm,wires=[0, 1], params = QTensor([0.5]),num_wires=4)
+        print(qm.states)
+
+        # [[[[[0.9689124-0.247404j 0.       +0.j      ]
+        #     [0.       +0.j       0.       +0.j      ]]
+        # 
+        #    [[0.       +0.j       0.       +0.j      ]
+        #     [0.       +0.j       0.       +0.j      ]]]
+        # 
+        # 
+        #   [[[0.       +0.j       0.       +0.j      ]
+        #     [0.       +0.j       0.       +0.j      ]]
+        # 
+        #    [[0.       +0.j       0.       +0.j      ]
+        #     [0.       +0.j       0.       +0.j      ]]]]]
+
+sdg
+============================
+
+.. py:function:: pyvqnet.qnn.vqc.sdg(q_machine, wires, params=None, num_wires=None, use_dagger=False)
+    
+    对q_machine中的态矢作用量子逻辑门 sdg 。
+
+    :param q_machine:  量子虚拟机设备。
+    :param wires: 量子比特索引。
+    :param params: 参数矩阵，默认为None。
+    :param num_wires: 量子比特数，默认为None。
+    :param use_dagger: 是否共轭转置，默认为False。
+    :return: 输出QTensor。
+
+    Example::
+    
+        from pyvqnet.qnn.vqc import QMachine
+        import pyvqnet.qnn.vqc as vqc
+        from pyvqnet.tensor import QTensor
+        qm = QMachine(4)
+        vqc.sdg(q_machine=qm,wires=[0],num_wires=4)
+        print(qm.states)
+
+        # [[[[[1.+0.j 0.+0.j]
+        #     [0.+0.j 0.+0.j]]
+        # 
+        #    [[0.+0.j 0.+0.j]
+        #     [0.+0.j 0.+0.j]]]
+        # 
+        # 
+        #   [[[0.+0.j 0.+0.j]
+        #     [0.+0.j 0.+0.j]]
+        # 
+        #    [[0.+0.j 0.+0.j]
+        #     [0.+0.j 0.+0.j]]]]]
+
+tdg
+============================
+
+.. py:function:: pyvqnet.qnn.vqc.tdg(q_machine, wires, params=None, num_wires=None, use_dagger=False)
+    
+    对q_machine中的态矢作用量子逻辑门 tdg 。
+
+    :param q_machine:  量子虚拟机设备。
+    :param wires: 量子比特索引。
+    :param params: 参数矩阵，默认为None。
+    :param num_wires: 量子比特数，默认为None。
+    :param use_dagger: 是否共轭转置，默认为False。
+    :return: 输出QTensor。
+
+    Example::
+    
+        from pyvqnet.qnn.vqc import QMachine
+        import pyvqnet.qnn.vqc as vqc
+        from pyvqnet.tensor import QTensor
+        qm = QMachine(4)
+        vqc.tdg(q_machine=qm,wires=[0],num_wires=4)
+        print(qm.states)
+
+        # [[[[[1.+0.j 0.+0.j]
+        #     [0.+0.j 0.+0.j]]
+        # 
+        #    [[0.+0.j 0.+0.j]
+        #     [0.+0.j 0.+0.j]]]
+        # 
+        # 
+        #   [[[0.+0.j 0.+0.j]
+        #     [0.+0.j 0.+0.j]]
+        # 
+        #    [[0.+0.j 0.+0.j]
+        #     [0.+0.j 0.+0.j]]]]]
+
+controlledphaseshift
+============================
+
+.. py:function:: pyvqnet.qnn.vqc.controlledphaseshift(q_machine, wires, params=None, num_wires=None, use_dagger=False)
+    
+    对q_machine中的态矢作用量子逻辑门 controlledphaseshift 。
+
+    :param q_machine:  量子虚拟机设备。
+    :param wires: 量子比特索引。
+    :param params: 参数矩阵，默认为None。
+    :param num_wires: 量子比特数，默认为None。
+    :param use_dagger: 是否共轭转置，默认为False。
+    :return: 输出QTensor。
+
+    Example::
+    
+        from pyvqnet.qnn.vqc import QMachine
+        import pyvqnet.qnn.vqc as vqc
+        from pyvqnet.tensor import QTensor
+        qm = QMachine(4)
+        for i in range(4):
+            vqc.hadamard(q_machine=qm, wires=i)
+        vqc.controlledphaseshift(q_machine=qm,params=QTensor([0.5]),wires=[0,1],num_wires=4)
+        print(qm.states)
+
+        # [[[[[0.25     +0.j        0.25     +0.j       ]
+        #     [0.25     +0.j        0.25     +0.j       ]]
+        # 
+        #    [[0.25     +0.j        0.25     +0.j       ]
+        #     [0.25     +0.j        0.25     +0.j       ]]]
+        # 
+        # 
+        #   [[[0.25     +0.j        0.25     +0.j       ]
+        #     [0.25     +0.j        0.25     +0.j       ]]
+        # 
+        #    [[0.2193956+0.1198564j 0.2193956+0.1198564j]
+        #     [0.2193956+0.1198564j 0.2193956+0.1198564j]]]]]
+
+multicnot
+============================
+
+.. py:function:: pyvqnet.qnn.vqc.multicnot(q_machine, wires, params=None, num_wires=None, use_dagger=False)
+    
+    对q_machine中的态矢作用量子逻辑门 multicnot 。
+
+    :param q_machine:  量子虚拟机设备。
+    :param wires: 量子比特索引。
+    :param params: 参数矩阵，默认为None。
+    :param num_wires: 量子比特数，默认为None。
+    :param use_dagger: 是否共轭转置，默认为False。
+    :return: 输出QTensor。
+
+    Example::
+    
+        from pyvqnet.qnn.vqc import QMachine
+        import pyvqnet.qnn.vqc as vqc
+        from pyvqnet.tensor import QTensor
+        qm = QMachine(4)
+        vqc.multicnot(q_machine=qm, wires=[0, 1],num_wires=4)
+        print(qm.states)
+
+        # [[[[[1.+0.j 0.+0.j]
+        #     [0.+0.j 0.+0.j]]
+        # 
+        #    [[0.+0.j 0.+0.j]
+        #     [0.+0.j 0.+0.j]]]
+        # 
+        # 
+        #   [[[0.+0.j 0.+0.j]
+        #     [0.+0.j 0.+0.j]]
+        # 
+        #    [[0.+0.j 0.+0.j]
+        #     [0.+0.j 0.+0.j]]]]]
+
+multixcnot
+============================
+
+.. py:function:: pyvqnet.qnn.vqc.multixcnot(q_machine, wires, params=None, num_wires=None, use_dagger=False)
+    
+    对q_machine中的态矢作用量子逻辑门 multixcnot 。
+
+    :param q_machine:  量子虚拟机设备。
+    :param wires: 量子比特索引。
+    :param params: 参数矩阵，默认为None。
+    :param num_wires: 量子比特数，默认为None。
+    :param use_dagger: 是否共轭转置，默认为False。
+    :return: 输出QTensor。
+
+    Example::
+    
+        from pyvqnet.qnn.vqc import QMachine
+        import pyvqnet.qnn.vqc as vqc
+        from pyvqnet.tensor import QTensor
+        qm = QMachine(4)
+        vqc.multixcnot(q_machine=qm, wires=[0, 1],num_wires=4)
+        print(qm.states)
+
+        # [[[[[0.+0.j 0.+0.j]
+        #     [0.+0.j 0.+0.j]]
+        # 
+        #    [[1.+0.j 0.+0.j]
+        #     [0.+0.j 0.+0.j]]]
+        # 
+        # 
+        #   [[[0.+0.j 0.+0.j]
+        #     [0.+0.j 0.+0.j]]
+        # 
+        #    [[0.+0.j 0.+0.j]
+        #     [0.+0.j 0.+0.j]]]]]
+
+single_excitation
+============================
+
+.. py:function:: pyvqnet.qnn.vqc.single_excitation(q_machine, wires, params=None, num_wires=None, use_dagger=False)
+    
+    对q_machine中的态矢作用量子逻辑门 single_excitation 。
+
+    :param q_machine:  量子虚拟机设备。
+    :param wires: 量子比特索引。
+    :param params: 参数矩阵，默认为None。
+    :param num_wires: 量子比特数，默认为None。
+    :param use_dagger: 是否共轭转置，默认为False。
+    :return: 输出QTensor。
+
+    Example::
+    
+        from pyvqnet.qnn.vqc import QMachine
+        import pyvqnet.qnn.vqc as vqc
+        from pyvqnet.tensor import QTensor
+        qm = QMachine(4)
+        vqc.single_excitation(q_machine=qm, wires=[0, 1],num_wires=4, params=QTensor([0.5]))
+        print(qm.states)
+
+        # [[[[[1.+0.j 0.+0.j]
+        #     [0.+0.j 0.+0.j]]
+        # 
+        #    [[0.+0.j 0.+0.j]
+        #     [0.+0.j 0.+0.j]]]
+        # 
+        # 
+        #   [[[0.+0.j 0.+0.j]
+        #     [0.+0.j 0.+0.j]]
+        # 
+        #    [[0.+0.j 0.+0.j]
+        #     [0.+0.j 0.+0.j]]]]]
+
+double_excitation
+============================
+
+.. py:function:: pyvqnet.qnn.vqc.double_excitation(q_machine, wires, params=None, num_wires=None, use_dagger=False)
+    
+    对q_machine中的态矢作用量子逻辑门 double_excitation 。
+
+    :param q_machine:  量子虚拟机设备。
+    :param wires: 量子比特索引。
+    :param params: 参数矩阵，默认为None。
+    :param num_wires: 量子比特数，默认为None。
+    :param use_dagger: 是否共轭转置，默认为False。
+    :return: 输出QTensor。
+
+    Example::
+    
+        from pyvqnet.qnn.vqc import QMachine
+        import pyvqnet.qnn.vqc as vqc
+        from pyvqnet.tensor import QTensor
+        qm = QMachine(4)
+        for i in range(4):
+            vqc.hadamard(q_machine=qm, wires=i)
+        vqc.isingzz(q_machine=qm, params=QTensor([0.55]), wires=[1,0])
+        vqc.double_excitation(q_machine=qm, params=QTensor([0.55]), wires=[0,1,2,3])
+        print(qm.states)
+
+        # [[[[[0.2406063-0.0678867j 0.2406063-0.0678867j]
+        #     [0.2406063-0.0678867j 0.1662296-0.0469015j]]
+        # 
+        #    [[0.2406063+0.0678867j 0.2406063+0.0678867j]
+        #     [0.2406063+0.0678867j 0.2406063+0.0678867j]]]
+        # 
+        # 
+        #   [[[0.2406063+0.0678867j 0.2406063+0.0678867j]
+        #     [0.2406063+0.0678867j 0.2406063+0.0678867j]]
+        # 
+        #    [[0.2969014-0.0837703j 0.2406063-0.0678867j]
+        #     [0.2406063-0.0678867j 0.2406063-0.0678867j]]]]]  
 
 VQC_BasisEmbedding
 ============================
@@ -3879,6 +4497,178 @@ VQC_UCCSD
 
         # [[0.963802]]
 
+VQC_ZFeatureMap
+===================
+
+.. py:function:: pyvqnet.qnn.vqc.VQC_ZFeatureMap(input_feat, q_machine: QMachine, data_map_func=None, rep: int = 2)
+
+    一阶泡利 Z 演化电路。
+
+    对于 3 个量子位和 2 次重复，电路表示为：
+
+    .. parsed-literal::
+
+        ┌───┐┌──────────────┐┌───┐┌──────────────┐
+        ┤ H ├┤ U1(2.0*x[0]) ├┤ H ├┤ U1(2.0*x[0]) ├
+        ├───┤├──────────────┤├───┤├──────────────┤
+        ┤ H ├┤ U1(2.0*x[1]) ├┤ H ├┤ U1(2.0*x[1]) ├
+        ├───┤├──────────────┤├───┤├──────────────┤
+        ┤ H ├┤ U1(2.0*x[2]) ├┤ H ├┤ U1(2.0*x[2]) ├
+        └───┘└──────────────┘└───┘└──────────────┘
+    
+    泡利弦固定为“['Z']”。 因此，一阶展开将是一个没有纠缠门的电路。
+
+    :param input_feat: 表示输入参数的数组。
+    :param q_machine: 量子虚拟机。
+    :param data_map_func: 参数映射矩阵。
+    :param rep: 模块重复次数。
+    
+    Example::
+
+        from pyvqnet.qnn.vqc import VQC_ZFeatureMap, QMachine
+        from pyvqnet.tensor import QTensor
+        qm = QMachine(3)
+        for i in range(3):
+            hadamard(q_machine=qm, wires=[i])
+        VQC_ZFeatureMap(input_feat=QTensor([[0.1,0.2,0.3]]),q_machine = qm)
+        print(qm.states)
+        
+        # [[[[0.3535534+0.j        0.2918002+0.1996312j]
+        #    [0.3256442+0.1376801j 0.1910257+0.2975049j]]
+        # 
+        #   [[0.3465058+0.0702402j 0.246323 +0.2536236j]
+        #    [0.2918002+0.1996312j 0.1281128+0.3295255j]]]]
+
+VQC_ZZFeatureMap
+===================
+
+.. py:function:: pyvqnet.qnn.vqc.VQC_ZZFeatureMap(input_feat, q_machine: QMachine, data_map_func=None, entanglement: Union[str, List[List[int]],Callable[[int], List[int]]] = "full",rep: int = 2)
+
+    二阶 Pauli-Z 演化电路。
+
+    对于 3 个量子位、1 个重复和线性纠缠，电路表示为：
+
+    .. parsed-literal::
+
+        ┌───┐┌─────────────────┐
+        ┤ H ├┤ U1(2.0*φ(x[0])) ├──■────────────────────────────■────────────────────────────────────
+        ├───┤├─────────────────┤┌─┴─┐┌──────────────────────┐┌─┴─┐
+        ┤ H ├┤ U1(2.0*φ(x[1])) ├┤ X ├┤ U1(2.0*φ(x[0],x[1])) ├┤ X ├──■────────────────────────────■──
+        ├───┤├─────────────────┤└───┘└──────────────────────┘└───┘┌─┴─┐┌──────────────────────┐┌─┴─┐
+        ┤ H ├┤ U1(2.0*φ(x[2])) ├──────────────────────────────────┤ X ├┤ U1(2.0*φ(x[1],x[2])) ├┤ X ├
+        └───┘└─────────────────┘                                  └───┘└──────────────────────┘└───┘
+    
+    其中 ``φ`` 是经典的非线性函数，如果且 ``φ(x,y) = (pi - x)(pi - y)``, 则默认为 ``φ(x) = x``。
+
+    :param input_feat: 表示输入参数的数组。
+    :param q_machine: 量子虚拟机。
+    :param data_map_func: 参数映射矩阵。
+    :param entanglement: 指定的纠缠结构。
+    :param rep: 模块重复次数。
+    
+    Example::
+
+        from pyvqnet.qnn.vqc import VQC_ZZFeatureMap, QMachine
+        from pyvqnet.tensor import QTensor
+        qm = QMachine(3)
+        VQC_ZZFeatureMap(q_machine=qm, input_feat=QTensor([[0.1,0.2,0.3]]))
+        print(qm.states)
+
+        # [[[[-0.4234843-0.0480578j -0.144067 +0.1220178j]
+        #    [-0.0800646+0.0484439j -0.5512857-0.2947832j]]
+        # 
+        #   [[ 0.0084012-0.0050071j -0.2593993-0.2717131j]
+        #    [-0.1961917-0.3470543j  0.2786197+0.0732045j]]]]
+
+VQC_AllSinglesDoubles
+======================
+
+.. py:function:: pyvqnet.qnn.vqc.VQC_AllSinglesDoubles(weights, q_machine: QMachine, hf_state, wires, singles=None, doubles=None)
+
+    在这种情况下，我们有四个单激发和双激发来保留 Hartree-Fock 态的总自旋投影。 :class:`~.vqc.qCircuit.single_exitation` 门 :math:`G` 作用于量子位 ``[0, 2], [0, 4], [1, 3], [1, 5]``, 
+    而 :class:`~.vqc.qCircuit.double_exitation` 运算 :math:`G^{(2)}` 应用于量子位 ``[0, 1, 2, 3] , [0, 1, 2, 5], [0, 1, 2, 4], [0, 1, 4, 5]``。
+
+    由此产生的酉保留了粒子数量，并在初始 Hartree-Fock 状态和编码多激发配置的其他状态的叠加中准备了n量子位系统。
+      
+    :param weights: 大小为 ``(len(singles) + len(doubles),)`` 的QTensor，包含按顺序进入 vqc.qCircuit.single_excitation 和 vqc.qCircuit.double_excitation 操作的角度
+    :param q_machine: 量子虚拟机。
+    :param hf_state: 代表 Hartree-Fock 状态的长度 ``len(wires)`` 占用数向量， ``hf_state`` 用于初始化线路。
+    :param wires: 作用的量子位。
+    :param singles: 具有single_exitation操作所作用的两个量子位索引的列表序列。
+    :param doubles: 具有double_exitation操作所作用的两个量子位索引的列表序列。
+
+    例如，两个电子和六个量子位情况下的量子电路如下图所示：
+    
+.. image:: ./images/all_singles_doubles.png
+    :width: 600 px
+    :align: center
+
+|
+
+    Example::
+
+        from pyvqnet.qnn.vqc import VQC_AllSinglesDoubles, QMachine
+        from pyvqnet.tensor import QTensor
+        qm = QMachine(qubits)
+
+        VQC_AllSinglesDoubles(q_machine=qm, weights=QTensor([0.55, 0.11, 0.53]), 
+                              hf_state = QTensor([1,1,0,0]), singles=[[0, 2], [1, 3]], doubles=[[0, 1, 2, 3]], wires=[0,1,2,3])
+        print(qm.states)
+        
+        # [ 0.        +0.j  0.        +0.j  0.        +0.j -0.23728043+0.j
+        #   0.        +0.j  0.        +0.j -0.27552837+0.j  0.        +0.j
+        #   0.        +0.j -0.12207296+0.j  0.        +0.j  0.        +0.j
+        #   0.9235152 +0.j  0.        +0.j  0.        +0.j  0.        +0.j]
+
+
+VQC_BasisRotation
+======================
+
+.. py:function:: pyvqnet.qnn.vqc.VQC_BasisRotation(q_machine: QMachine, wires, unitary_matrix: QTensor, check=False)
+
+    实现一个电路，提供可用于执行精确的单体基础旋转的整体。
+
+    :class:`~.vqc.qCircuit.VQC_BasisRotation` 执行以下由 `arXiv:1711.04789 <https://arxiv.org/abs/1711.04789>`_\ 中给出的单粒子费米子确定的酉变换 :math:`U(u)`
+    
+    .. math::
+
+        U(u) = \exp{\left( \sum_{pq} \left[\log u \right]_{pq} (a_p^\dagger a_q - a_q^\dagger a_p) \right)}.
+    
+    :math:`U(u)` 通过使用论文 `Optica, 3, 1460 (2016) <https://opg.optica.org/optica/fulltext.cfm?uri=optica-3-12-1460&id=355743>`_\ 中给出的方案。
+    将输入酉矩阵分解后，由一系列 :class:`~vqc.qCircuit.phaseshift` 和 :class:`~vqc.qCircuit.single_exitation` 门来有效实现。
+    
+
+    :param q_machine: 量子虚拟机。
+    :param wires: 作用的量子位。
+    :param unitary_matrix: 指定基础变换的矩阵。
+    :param check: 检测 `unitary_matrix` 是否为酉矩阵。
+
+    Example::
+
+        from pyvqnet.qnn.vqc import VQC_BasisRotation, QMachine, hadamard, isingzz
+        from pyvqnet.tensor import QTensor
+        V = np.array([[0.73678+0.27511j, -0.5095 +0.10704j, -0.06847+0.32515j],
+                      [0.73678+0.27511j, -0.5095 +0.10704j, -0.06847+0.32515j],
+                      [-0.21271+0.34938j, -0.38853+0.36497j,  0.61467-0.41317j]])
+
+        eigen_vals, eigen_vecs = np.linalg.eigh(V)
+        umat = eigen_vecs.T
+        wires = range(len(umat))
+        
+        qm = QMachine(len(umat))
+
+        for i in range(len(umat)):
+            hadamard(q_machine=qm, wires=i)
+        isingzz(q_machine=qm, params=QTensor([0.55]), wires=[0,2])
+        VQC_BasisRotation(q_machine=qm, wires=wires,unitary_matrix=QTensor(umat,dtype=qm.state.dtype))
+        
+        print(qm.states)
+        
+        # [[[[ 0.3402686-0.0960063j  0.4140436-0.3069579j]
+        #    [ 0.1206574+0.1982292j  0.5662895-0.0949503j]]
+        # 
+        #   [[-0.1715559-0.1614315j  0.1624039-0.0598041j]
+        #    [ 0.0608986-0.1078906j -0.305845 +0.1773662j]]]]
 
 VQC_QuantumPoolingCircuit
 ============================
