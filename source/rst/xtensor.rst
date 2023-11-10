@@ -168,7 +168,7 @@ backward
         from pyvqnet.xtensor import xtensor,autograd
 
         target = xtensor([[0, 0, 1, 0, 0, 0, 0, 0, 0, 0.2]])
-        target = requires_grad=True
+        target.requires_grad=True
         with autograd.tape():
             y = 2*target + 3
             y.backward()
@@ -225,7 +225,7 @@ argmax
 
     Example::
 
-        from pyvqnet.xtensor import xtensor
+        from pyvqnet.xtensor import XTensor
         a = XTensor([[1.3398, 0.2663, -0.2686, 0.2450],
                     [-0.7401, -0.8805, -0.3402, -1.1936],
                     [0.4907, -1.3948, -1.0691, -0.3132],
@@ -1126,7 +1126,7 @@ arange
 
     Example::
 
-        from pyvqnet.xtensor import XTensor
+        from pyvqnet.xtensor import arange
         t =  arange(2, 30, 4)
         print(t)
 
@@ -1238,36 +1238,6 @@ diag
             print(u)
 
 
-        # [[ 0.  0.  0.  0.]
-        #  [ 0.  0.  0.  0.]
-        #  [ 0.  0.  0.  0.]
-        #  [12.  0.  0.  0.]]
-        # [[ 0.  0.  0.  0.]
-        #  [ 0.  0.  0.  0.]
-        #  [ 8.  0.  0.  0.]
-        #  [ 0. 13.  0.  0.]]
-        # [[ 0.  0.  0.  0.]
-        #  [ 4.  0.  0.  0.]
-        #  [ 0.  9.  0.  0.]
-        #  [ 0.  0. 14.  0.]]
-        # [[ 0.  0.  0.  0.]
-        #  [ 0.  5.  0.  0.]
-        #  [ 0.  0. 10.  0.]
-        #  [ 0.  0.  0. 15.]]
-        # [[ 0.  1.  0.  0.]
-        #  [ 0.  0.  6.  0.]
-        #  [ 0.  0.  0. 11.]
-        #  [ 0.  0.  0.  0.]]
-        # [[0. 0. 2. 0.]
-        #  [0. 0. 0. 7.]
-        #  [0. 0. 0. 0.]
-        #  [0. 0. 0. 0.]]
-        # [[0. 0. 0. 3.]
-        #  [0. 0. 0. 0.]
-        #  [0. 0. 0. 0.]
-        #  [0. 0. 0. 0.]]
-
-
 randu
 ===========================================================
 
@@ -1350,8 +1320,6 @@ multinomial
         idx = tensor.multinomial(weights,3)
         print(idx)
 
-        # [1 0 3]
-        # [1 3 2]
 
 triu
 ===========================================================
@@ -1885,12 +1853,14 @@ matmul
     Example::
 
         import pyvqnet.xtensor as tensor
+        from pyvqnet.xtensor import autograd
         t1 = tensor.ones([2,3])
         t1.requires_grad = True
         t2 = tensor.ones([3,4])
         t2.requires_grad = True
-        t3  = tensor.matmul(t1,t2)
-        t3.backward(tensor.ones_like(t3))
+        with autogard.tape():
+            t3  = tensor.matmul(t1,t2)
+            t3.backward(tensor.ones_like(t3))
         print(t1.grad)
 
         # [
@@ -2099,13 +2069,6 @@ trace
             u=tensor.trace(t,k=k)
             print(u)
 
-        # 0.07717618346214294
-        # -1.9287869930267334
-        # 0.6111435890197754
-        # 2.8094992637634277
-        # 0.6388946771621704
-        # -1.3400784730911255
-        # 0.26980453729629517
 
 exp
 ===========================================================
@@ -3486,10 +3449,9 @@ broadcast_to
 
     Example::
 
-        from pyvqnet.xtensor import XTensor
         import pyvqnet.xtensor as tensor
         ref = [2,3,4]
-        a = tensor。ones([4])
+        a = tensor.ones([4])
         b = tensor.broadcast_to(a,ref)
         print(b.shape)
         #[2, 3, 4]
@@ -3515,9 +3477,8 @@ to_xtensor
 
     Example::
 
-        from pyvqnet.xtensor import XTensor
         import pyvqnet.xtensor as tensor
-        t = tensor.to_tensor(10.0)
+        t = tensor.to_xtensor(10.0)
         print(t)
 
         # [10.]
