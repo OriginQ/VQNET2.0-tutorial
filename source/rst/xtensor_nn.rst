@@ -168,8 +168,8 @@ toGPU
 
     Examples::
 
-        from pyvqnet.xtensor. import ConvT2D 
-        test_conv = ConvT2D(3, 2, [4,4], [2, 2], "same")
+        from pyvqnet.xtensor import ConvT2D 
+        test_conv = ConvT2D(3, 2, (4,4), (2, 2), "same")
         test_conv = test_conv.toGPU()
         print(test_conv.backend)
         #1000
@@ -186,8 +186,8 @@ toCPU
 
     Examples::
 
-        from pyvqnet.xtensor. import ConvT2D 
-        test_conv = ConvT2D(3, 2, [4,4], [2, 2], "same")
+        from pyvqnet.xtensor import ConvT2D 
+        test_conv = ConvT2D(3, 2, (4,4), (2, 2), "same")
         test_conv = test_conv.toCPU()
         print(test_conv.backend)
         #0
