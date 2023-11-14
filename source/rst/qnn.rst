@@ -4520,7 +4520,7 @@ VQC_ZFeatureMap
 
     :param input_feat: 表示输入参数的数组。
     :param q_machine: 量子虚拟机。
-    :param data_map_func: 参数映射矩阵。
+    :param data_map_func: 参数映射矩阵, 为可调用函数, 设计方式为： ``data_map_func = lambda x: x``。
     :param rep: 模块重复次数。
     
     Example::
@@ -4558,11 +4558,17 @@ VQC_ZZFeatureMap
         ┤ H ├┤ U1(2.0*φ(x[2])) ├──────────────────────────────────┤ X ├┤ U1(2.0*φ(x[1],x[2])) ├┤ X ├
         └───┘└─────────────────┘                                  └───┘└──────────────────────┘└───┘
     
-    其中 ``φ`` 是经典的非线性函数，如果且 ``φ(x,y) = (pi - x)(pi - y)``, 则默认为 ``φ(x) = x``。
+    其中 ``φ`` 是经典的非线性函数，如果输入两个值则 ``φ(x,y) = (pi - x)(pi - y)``, 输入一个则为 ``φ(x) = x``, 用 ``data_map_func`` 表示如下：
+    
+    .. code-block::
+        
+        def data_map_func(x):
+            coeff = x if x.shape[-1] == 1 else ft.reduce(lambda x, y: (np.pi - x) * (np.pi - y), x)
+            return coeff
 
     :param input_feat: 表示输入参数的数组。
     :param q_machine: 量子虚拟机。
-    :param data_map_func: 参数映射矩阵。
+    :param data_map_func: 参数映射矩阵, 为可调用函数。 
     :param entanglement: 指定的纠缠结构。
     :param rep: 模块重复次数。
     
