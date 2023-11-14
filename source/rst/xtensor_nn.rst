@@ -168,8 +168,8 @@ toGPU
 
     Examples::
 
-        from pyvqnet.xtensor. import ConvT2D 
-        test_conv = ConvT2D(3, 2, [4,4], [2, 2], "same")
+        from pyvqnet.xtensor import ConvT2D 
+        test_conv = ConvT2D(3, 2, (4,4), (2, 2), "same")
         test_conv = test_conv.toGPU()
         print(test_conv.backend)
         #1000
@@ -186,8 +186,8 @@ toCPU
 
     Examples::
 
-        from pyvqnet.xtensor. import ConvT2D 
-        test_conv = ConvT2D(3, 2, [4,4], [2, 2], "same")
+        from pyvqnet.xtensor import ConvT2D 
+        test_conv = ConvT2D(3, 2, (4,4), (2, 2), "same")
         test_conv = test_conv.toCPU()
         print(test_conv.backend)
         #0
@@ -597,7 +597,7 @@ AvgPool2D
         import numpy as np
         from pyvqnet.xtensor import XTensor
         from pyvqnet.xtensor import AvgPool2D
-        test_mp = AvgPool2D([2,2],[2,2],"valid")
+        test_mp = AvgPool2D((2,2),(2,2),"valid")
         x= XTensor(np.array([0, 1, 0, 4, 5,
                                     2, 3, 2, 1, 3,
                                     4, 4, 0, 4, 3,
@@ -635,7 +635,7 @@ MaxPool2D
         import numpy as np
         from pyvqnet.xtensor import XTensor
         from pyvqnet.xtensor import MaxPool2D
-        test_mp = MaxPool2D([2,2],[2,2],"valid")
+        test_mp = MaxPool2D((2,2),(2,2),"valid")
         x= XTensor(np.array([0, 1, 0, 4, 5,
                                     2, 3, 2, 1, 3,
                                     4, 4, 0, 4, 3,
@@ -1087,7 +1087,7 @@ Pixel_Unshuffle
 
     Example::
 
-        from pyvqnet.xtensor import Pixel_Shuffle
+        from pyvqnet.xtensor import Pixel_Unshuffle
         from pyvqnet.xtensor import ones
         ps = Pixel_Unshuffle(3)
         inx = ones([5, 2, 3, 2, 12, 12])
@@ -1956,7 +1956,7 @@ CrossEntropyLoss
 
     Example::
 
-        from pyvqnet.xtensor import XTensor, kint64
+        from pyvqnet.xtensor import XTensor, kfloat32
         from pyvqnet.xtensor import CrossEntropyLoss
         x = XTensor([
             0.9476322568516703, 0.226547421131723, 0.5944201443911326,
@@ -1967,7 +1967,7 @@ CrossEntropyLoss
         ]).reshape([1, 3, 1, 5])
         
         x.requires_grad = True
-        y = XTensor([[[2, 1, 0, 0, 2]]], dtype=kint64)
+        y = XTensor([[[2, 1, 0, 0, 2]]], dtype=kfloat32)
 
         loss_result = CrossEntropyLoss()
         result = loss_result(y, x)
