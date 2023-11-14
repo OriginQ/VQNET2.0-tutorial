@@ -316,6 +316,70 @@ ModuleList
         #odict_keys(['pqc2.0.m_para', 'pqc2.1.weights', 'pqc2.1.bias'])
 
 
+ParameterList
+*********************************************************
+.. py:class:: pyvqnet.nn.module.ParameterList([pyvqnet.nn.module.Module])
+
+
+    将参数保存在列表中, ParameterList 可以像普通的 Python 列表一样被索引， 它包含的Parameter的内部参数等可以被保存起来。
+
+    :param modules: nn.Parameter 列表
+
+    :return: 一个参数列表
+
+    Example::
+
+        from pyvqnet import nn
+        class MyModule(nn.Module):
+            def __init__(self):
+                super().__init__()
+                self.params = nn.ParameterList([nn.Parameter((10, 10)) for i in range(10)])
+            def forward(self, x):
+
+                # ParameterList can act as an iterable, or be indexed using ints
+                for i, p in enumerate(self.params):
+                    x = self.params[i // 2] * x + p * x
+                return x
+
+        model = MyModule()
+        print(model.state_dict().keys())
+
+
+Sequential
+*********************************************************
+.. py:class:: pyvqnet.nn.module.Sequential([pyvqnet.nn.module.Module])
+
+    模块将按照传递的顺序添加模块。或者，也可以将模块的 ``OrderedDict`` 传入。``Sequential`` 的 ``forward()`` 方法接受任何输入，并将其转发给它的第一个模块。
+    然后将输出依次 "链 "到其后每个模块的输入、最后返回最后一个模块的输出。
+
+    :param modules: 添加的Module
+
+    :return: Sequential
+
+    Example::
+        
+        from pyvqnet import nn
+        from collections import OrderedDict
+
+        # 使用Sequential创建一个小模型
+        model = nn.Sequential(
+                  nn.Conv2D(1,20,(5, 5)),
+                  nn.ReLu(),
+                  nn.Conv2D(20,64,(5, 5)),
+                  nn.ReLu()
+                )
+        print(model.state_dict().keys())
+
+        # 基于OrderedDict来使用Sequential, 代码如下
+                
+        model = nn.Sequential(OrderedDict([
+                  ('conv1', nn.Conv2D(1,20,(5, 5))),
+                  ('relu1', nn.ReLu()),
+                  ('conv2', nn.Conv2D(20,64,(5, 5))),
+                  ('relu2', nn.ReLu())
+                ]))
+        print(model.state_dict().keys())
+
 经典神经网络层
 *********************************************************
 
