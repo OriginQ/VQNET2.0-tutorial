@@ -4,6 +4,11 @@ XTensor 经典神经网络模块
 以下的经典神经网络模块均支持XTensor自动反向传播计算。当您运行前传函数以后，
 需要使用在 ``with pyvqnet.xtensor.autograd.tape()`` 的范围内定义前向计算。这样就可以将需要自动微分的算子纳入计算图中。
 
+.. warning::
+
+    XTensor相关功能属于开发阶段中，当前只支持经典神经网络计算，与前述介绍的基于QTenor的接口不能混用。
+    如需要训练量子机器学习模型，请使用QTensor下相关接口。
+
 接着执行反向函数就获取 ``requires_grad == True`` 的 `XTensor` 的计算梯度。
 一个卷积层的简单例子如下:
 
