@@ -6289,7 +6289,7 @@ ExpressiveEntanglingAnsatz
     论文 `Expressibility and entangling capability of parameterized quantum circuits for hybrid quantum-classical algorithms <https://arxiv.org/pdf/1905.10876.pdf>`_ 中的 19 种不同的ansatz。
 
     :param type: 电路类型从 1 到 19。
-    :param num_wires: 电线数量。
+    :param num_wires: 量子比特数。
     :param depth: 电路深度。
     :param name: 名字，默认"".
 
