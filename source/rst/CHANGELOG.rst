@@ -2,6 +2,20 @@
 VQNet Changelog
 ######################
 
+
+[v2.10.0] - 2023-12-30
+***************************
+
+Added
+===========
+- 增加了pyvqnet.qnn.vqc下的新接口:IsingXX、IsingXY、IsingYY、IsingZZ、SDG、TDG、PhaseShift、MutliRZ、MultiCnot、MultixCnot、ControlledPhaseShift、SingleExcitation、DoubleExcitation、VQC_AllSinglesDoubles,ExpressiveEntanglingAnsatz等；
+- 支持adjoint梯度计算的pyvqnet.qnn.vqc.QuantumLayerAdjoint接口;
+- 支持originIR与VQC相互转换的功能;
+- 支持统计VQC模型中的经典和量子模块信息;
+- 增加量子经典神经网络混合模型下的两个案例：基于小样本的量子卷积神经网络模型、用于手写数字识别的量子核函数模型。
+
+
+
 [v2.9.0] - 2023-11-15
 ***************************
 

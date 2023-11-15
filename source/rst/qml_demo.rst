@@ -4253,7 +4253,7 @@ QUnet主要是用于解决图像分割的技术。
 |
 
 
-7. 基于小样本的量子卷积神经网络模型
+7.基于小样本的量子卷积神经网络模型
 =============================================
 
 下面的例子使用2.0.8新加入的 `pyvqnet.qnn.vqc` 下的变分线路接口，实现了论文 `Generalization in quantum machine learning from few training data <https://www.nature.com/articles/s41467-022-32550-3>`_ 中的用于小样本的量子卷积神经网络模型。用于探讨量子机器学习模型中的泛化功能。
