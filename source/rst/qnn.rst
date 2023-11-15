@@ -2309,9 +2309,14 @@ QGAN使用经典的GAN模型结构，分为Generator生成器与Discriminator鉴
     :param c4: 同样用来控制a的参数。默认值：0。
     :param init_para: 初始化参数。默认值：无。
     :param model: 参数模型：模型。默认值：无。
-    :param calibrate_flag: 是否校准 hpyer 参数 a 和 c，默认值：False。
+    :param calibrate_flag: 是否校准超参数 a 和 c，默认值：False。
 
     :return: 一个SPSA优化器实例
+
+
+    .. warning::
+
+        SPSA只支持一维的输入参数。
 
     Example::
 
@@ -2430,7 +2435,7 @@ QGAN使用经典的GAN模型结构，分为Generator生成器与Discriminator鉴
         print(y)
 
 
-基于VQC的量子方法
+支持自动微分的变分量子线路模拟
 ***********************************
 
 VQNet基于自动微分算子构建以及一些常用量子逻辑门、量子线路以及测量方法，可使用自动微分代替量子线路parameter-shift方法计算梯度。
