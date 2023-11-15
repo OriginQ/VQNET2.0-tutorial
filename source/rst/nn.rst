@@ -1,6 +1,12 @@
 经典神经网络模块
 ######################
 
+基本例子
+*********************************************************
+
+CPU下模型训练
+=================================
+
 以下的经典神经网络模块均支持自动反向传播计算。当您运行前传函数以后，再执行反向函数就可以计算梯度。一个卷积层的简单例子如下:
 
 .. code-block::
@@ -46,6 +52,42 @@
     #  [-0.0068994, 0.0914679, -0.0068994, 0.0914679],
     #  [-0.2820665, 0.3160213, -0.2820665, 0.3160213]]]
     # ]
+
+GPU下模型训练
+=================================
+
+您需要安装linux版本下的pyvqnet才能使用GPU。需要保证数据QTensor以及Module均在GPU上。可使用 `toGPU` 转移数据或者 `gpu` 创建副本，或者在数据创建函数中使用device指定。
+
+请参考以下例子：
+
+.. code-block::
+
+    from pyvqnet.tensor import arange
+    from pyvqnet import kfloat32,DEV_GPU_0
+    from pyvqnet.nn import Conv2D
+
+
+    b = 2        # batch size 
+    ic = 2       # input channels
+    oc = 2      # output channels
+    hw = 4      # input width and heights
+
+
+    test_conv = Conv2D(ic,oc,(2,2),(2,2),"same")
+    #复制到gpu上DEV_GPU_0
+    test_conv.toGPU(DEV_GPU_0)
+    # input of shape [b,ic,hw,hw]
+    x0 = arange(1,b*ic*hw*hw+1,requires_grad=True,dtype=kfloat32).reshape([b,ic,hw,hw])
+
+    #使用gpu 复制数据到DEV_GPU_0，亦可以在函数内指定ID，也可以使用相关tensor接口的device进行指定
+    x0 = x0.GPU(DEV_GPU_0)
+    x0.requires_grad = True
+    #forward function
+    x = test_conv(x0)
+
+    #backward function with autograd
+    x.backward()
+    print(x0.grad)
 
 .. currentmodule:: pyvqnet.nn
 
