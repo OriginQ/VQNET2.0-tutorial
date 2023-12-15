@@ -5239,19 +5239,19 @@ VQC_AngleEmbedding
         from pyvqnet.qnn.vqc import VQC_AngleEmbedding, QMachine
         from pyvqnet.tensor import QTensor
         qm  = QMachine(2)
-        VQC_AngleEmbedding([2.2, 1], [0, 1], q_machine=qm, rotation='X')
+        VQC_AngleEmbedding(QTensor([2.2, 1]), [0, 1], q_machine=qm, rotation='X')
         
         print(qm.states)
         # [[[ 0.398068 +0.j         0.       -0.2174655j]
         #   [ 0.       -0.7821081j -0.4272676+0.j       ]]]
 
-        VQC_AngleEmbedding([2.2, 1], [0, 1], q_machine=qm, rotation='Y')
+        VQC_AngleEmbedding(QTensor([2.2, 1]), [0, 1], q_machine=qm, rotation='Y')
 
         print(qm.states)
         # [[[-0.0240995+0.6589843j  0.4207355+0.2476033j]
         #   [ 0.4042482-0.2184162j  0.       -0.3401631j]]]
 
-        VQC_AngleEmbedding([2.2, 1], [0, 1], q_machine=qm, rotation='Z')
+        VQC_AngleEmbedding(QTensor([2.2, 1]), [0, 1], q_machine=qm, rotation='Z')
 
         print(qm.states)
 
