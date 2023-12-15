@@ -51,7 +51,7 @@ Added
 
 Changed
 ===========
-- QTenor 以及Module类的init函数增加 `dtype` 参数。对QTenor索引、 部分神经网络层的输入进行了类型限制。
+- QTensor 以及Module类的init函数增加 `dtype` 参数。对QTensor索引、 部分神经网络层的输入进行了类型限制。
 - 量子神经网络，由于MacOS兼容性问题，去掉了Mnist_Dataset，CIFAR10_Dataset接口。
 
 [v2.0.6] - 2023-02-22
@@ -194,7 +194,7 @@ Fixed
 Added
 ===========
 
-- 增加基本数据结构QTenor接口100余个，包括创建函数，逻辑函数，数学函数，矩阵操作。
+- 增加基本数据结构QTensor接口100余个，包括创建函数，逻辑函数，数学函数，矩阵操作。
 - 增加基本神经网络网络函数14个，包括卷积，反卷积，池化等。
 - 增加损失函数4个，包括MSE,BCE,CCE,SCE等。
 - 增加激活函数10个，包括ReLu，Sigmoid，ELU等。

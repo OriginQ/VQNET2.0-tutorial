@@ -3202,7 +3202,7 @@ rx
         from pyvqnet.qnn.vqc import rx,QMachine
         from pyvqnet.tensor import QTensor
         qm  = QMachine(4)
-        rx(q_machine=qm, wires=1,params=QTenor([0.5]))
+        rx(q_machine=qm, wires=1,params=QTensor([0.5]))
         print(qm.states)
 
         # [[[[[0.9689124+0.j       0.       +0.j      ]
@@ -5851,11 +5851,7 @@ VQC_QuantumPoolingCircuit
     Examples:: 
 
         from pyvqnet.qnn.vqc import VQC_QuantumPoolingCircuit, QMachine, MeasureAll
-        import pyqpanda as pq
         from pyvqnet import tensor
-        machine = pq.CPUQVM()
-        machine.init_qvm()
-        qlists = machine.qAlloc_many(4)
         p = tensor.full([6], 0.35)
         qm = QMachine(4)
         VQC_QuantumPoolingCircuit(q_machine=qm,
