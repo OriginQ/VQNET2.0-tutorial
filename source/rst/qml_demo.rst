@@ -4293,7 +4293,7 @@ QUnet主要是用于解决图像分割的技术。
     from pyvqnet.qnn.vqc.qmachine import QMachine
     from pyvqnet.qnn.vqc.qmeasure import probs
     from pyvqnet.nn import Module, Parameter
-    from pyvqnet.tensor import tensor
+    from pyvqnet.tensor import tensor,kfloat32
     from pyvqnet.tensor import QTensor
     from pyvqnet.dtype import *
     from pyvqnet.optim import Adam
@@ -4412,7 +4412,7 @@ QUnet主要是用于解决图像分割的技术。
         def __init__(self):
             super(Qcnn_ising, self).__init__()
             self.conv = conv_net
-            self.qm = QMachine(num_wires)
+            self.qm = QMachine(num_wires,dtype=kcomplex128)
             self.weights = Parameter((18, 2), dtype=7)
             self.weights_last = Parameter((4 ** 2 -1,1), dtype=7)
 
@@ -4421,7 +4421,7 @@ QUnet主要是用于解决图像分割的技术。
             return self.conv(self.qm, self.weights, self.weights_last, input)
 
 
-    from tqdm import tqdm  
+    from tqdm import tqdm
 
 
     def train_qcnn(n_train, n_test, n_epochs):
@@ -4562,17 +4562,18 @@ QUnet主要是用于解决图像分割的技术。
         ax.set_ylim(0.5, 1.05)
 
         legend_elements = [
-                              mpl.lines.Line2D([0], [0], label=f'N={n}', color=colors[i]) for i, n in enumerate(train_sizes)
-                          ] + [
-                              mpl.lines.Line2D([0], [0], marker='o', ls='-', label='Train', color='Black'),
-                              mpl.lines.Line2D([0], [0], marker='x', ls='--', label='Test', color='Black')
-                          ]
+                                mpl.lines.Line2D([0], [0], label=f'N={n}', color=colors[i]) for i, n in enumerate(train_sizes)
+                            ] + [
+                                mpl.lines.Line2D([0], [0], marker='o', ls='-', label='Train', color='Black'),
+                                mpl.lines.Line2D([0], [0], marker='x', ls='--', label='Test', color='Black')
+                            ]
 
         axes[0].legend(handles=legend_elements, ncol=3)
         axes[2].legend(handles=legend_elements, ncol=3)
 
         axes[1].set_yscale('log', base=2)
         plt.show()
+
 
 
 运行后的实验结果如下图所示：
@@ -4598,6 +4599,7 @@ QUnet主要是用于解决图像分割的技术。
 具体代码实现如下，需要额外安装 `sklearn`, `scipy` 等：
 
 .. code-block::
+
 
     import numpy as np
     from sklearn.svm import SVC

@@ -3202,7 +3202,7 @@ rx
         from pyvqnet.qnn.vqc import rx,QMachine
         from pyvqnet.tensor import QTensor
         qm  = QMachine(4)
-        rx(q_machine=qm, wires=1,params=QTenor([0.5]),)
+        rx(q_machine=qm, wires=1,params=QTenor([0.5]))
         print(qm.states)
 
         # [[[[[0.9689124+0.j       0.       +0.j      ]
@@ -5228,7 +5228,7 @@ VQC_AngleEmbedding
 
      ``wires`` 代表旋转门在量子比特上的idx。
 
-    :param input_feat: 表示参数的numpy数组。
+    :param input_feat: 表示参数的数组。
     :param wires: 量子比特idx。
     :param q_machine: 量子虚拟机设备。
     :param rotation: 旋转门，默认为“X”。
@@ -5295,7 +5295,7 @@ VQC_IQPEmbedding
 
     通过指定 ``rep`` ，可以重复基本IQP线路。
 
-    :param input_feat: 表示参数的numpy数组。
+    :param input_feat: 表示参数的数组。
     :param q_machine: 量子虚拟机设备。
     :param rep: 重复量子线路块次数,默认次数为1。
     :return: 输出QTensor。
@@ -5365,7 +5365,7 @@ VQC_CRotCircuit
             0 & 0 & e^{-i(\phi-\omega)/2}\sin(\theta/2) & e^{i(\phi+\omega)/2}\cos(\theta/2)
         \end{bmatrix}.
     
-    :param para: 表示参数的numpy数组。
+    :param para: 表示参数的数组。
     :param control_qubits: 控制量子比特索引。
     :param rot_wire: Rot量子比特索引。
     :param q_machine: 量子虚拟机设备。
@@ -5675,7 +5675,7 @@ VQC_ZFeatureMap
     
     Example::
 
-        from pyvqnet.qnn.vqc import VQC_ZFeatureMap, QMachine
+        from pyvqnet.qnn.vqc import VQC_ZFeatureMap, QMachine,hadamard
         from pyvqnet.tensor import QTensor
         qm = QMachine(3)
         for i in range(3):
@@ -5767,6 +5767,7 @@ VQC_AllSinglesDoubles
 
         from pyvqnet.qnn.vqc import VQC_AllSinglesDoubles, QMachine
         from pyvqnet.tensor import QTensor
+        qubits = 4
         qm = QMachine(qubits)
 
         VQC_AllSinglesDoubles(q_machine=qm, weights=QTensor([0.55, 0.11, 0.53]), 
@@ -5806,6 +5807,7 @@ VQC_BasisRotation
 
         from pyvqnet.qnn.vqc import VQC_BasisRotation, QMachine, hadamard, isingzz
         from pyvqnet.tensor import QTensor
+        import numpy as np
         V = np.array([[0.73678+0.27511j, -0.5095 +0.10704j, -0.06847+0.32515j],
                       [0.73678+0.27511j, -0.5095 +0.10704j, -0.06847+0.32515j],
                       [-0.21271+0.34938j, -0.38853+0.36497j,  0.61467-0.41317j]])
@@ -5848,7 +5850,7 @@ VQC_QuantumPoolingCircuit
 
     Examples:: 
 
-        from pyvqnet.qnn.vqc import VQC_QuantumPoolingCircuit, QMachine
+        from pyvqnet.qnn.vqc import VQC_QuantumPoolingCircuit, QMachine, MeasureAll
         import pyqpanda as pq
         from pyvqnet import tensor
         machine = pq.CPUQVM()
