@@ -21,7 +21,7 @@
 
 .. math::
 
-    x = 1101 \rightarrow|\psi\rangle=|1101\rangle
+    x = 0101 \rightarrow|\psi\rangle=|0101\rangle
 
 .. image:: ./images/qvc_circuit.png
    :width: 600 px
@@ -4252,6 +4252,582 @@ QUnet主要是用于解决图像分割的技术。
 
 |
 
+
+7.基于小样本的量子卷积神经网络模型
+=============================================
+
+下面的例子使用2.0.8新加入的 `pyvqnet.qnn.vqc` 下的变分线路接口，实现了论文 `Generalization in quantum machine learning from few training data <https://www.nature.com/articles/s41467-022-32550-3>`_ 中的用于小样本的量子卷积神经网络模型。用于探讨量子机器学习模型中的泛化功能。
+
+为了在量子电路中构建卷积层和池化层，我们将遵循论文中提出的 QCNN 结构。前一层将提取局部相关性，而后者允许降低特征向量的维度。在量子电路中，卷积层由沿着整个图像扫描的内核组成，是一个与相邻量子位相关的两个量子位酉。
+至于池化层，我们将使用取决于相邻量子位测量的条件单量子位酉。最后，我们使用一个密集层，使用全对全单一门来纠缠最终状态的所有量子位，如下图所示：
+
+.. image:: ./images/qcnn_structrue.png
+   :width: 500 px
+   :align: center
+
+|
+
+参考这种量子卷积层的设计方式，我们基于IsingXX、IsingYY、IsingZZ三个量子逻辑门对量子线路进行了构建，如下图所示：
+
+.. image:: ./images/Qcnn_circuit.png
+   :width: 600 px
+   :align: center
+
+|
+
+其中输入数据为维度8*8的手写数字数据集，通过数据编码层，经过第一层卷积，由IsingXX、IsingYY、IsingZZ、U3构成，，随后经过一层池化层，在0、2、5位量子比特上再经过一层卷积和一层池化，最后再经过一层Random Unitary，其中由15个随机酉矩阵构成，对应经典的Dense Layer，测量结果为对手写数据为0和1的预测概率，具体代码实现如下：
+
+以下代码运行需要额外安装 `pandas`, `sklearn`, `seaborn`。
+
+.. code-block::
+
+    import matplotlib as mpl
+    import matplotlib.pyplot as plt
+    import numpy as np
+    import pandas as pd
+    from sklearn import datasets
+    import seaborn as sns
+
+    from pyqpanda import *
+    from pyvqnet.qnn.vqc.qcircuit import isingxx,isingyy,isingzz,u3,cnot,VQC_AmplitudeEmbedding,rxx,ryy,rzz,rzx
+    from pyvqnet.qnn.vqc.qmachine import QMachine
+    from pyvqnet.qnn.vqc.qmeasure import probs
+    from pyvqnet.nn import Module, Parameter
+    from pyvqnet.tensor import tensor,kfloat32
+    from pyvqnet.tensor import QTensor
+    from pyvqnet.dtype import *
+    from pyvqnet.optim import Adam
+
+    sns.set()
+
+    seed = 0
+    rng = np.random.default_rng(seed=seed)
+
+
+    def convolutional_layer(qm, weights, wires, skip_first_layer=True):
+
+        n_wires = len(wires)
+        assert n_wires >= 3, "this circuit is too small!"
+        for p in [0, 1]:
+            for indx, w in enumerate(wires):
+                if indx % 2 == p and indx < n_wires - 1:
+                    if indx % 2 == 0 and not skip_first_layer:
+
+                        u3(q_machine=qm, wires=w, params=weights[:3])
+                        u3(q_machine=qm, wires=wires[indx + 1], params=weights[3:6])
+
+                    isingxx(q_machine=qm,  wires=[w, wires[indx + 1]], params=weights[6])
+                    isingyy(q_machine=qm,  wires=[w, wires[indx + 1]], params=weights[7])
+                    isingzz(q_machine=qm,  wires=[w, wires[indx + 1]], params=weights[8])
+                    u3(q_machine=qm, wires=w, params=weights[9:12])
+                    u3(q_machine=qm, wires=wires[indx + 1], params=weights[12:])
+
+        return qm
+
+    def pooling_layer(qm, weights, wires):
+        """Adds a pooling layer to a circuit."""
+        n_wires = len(wires)
+        assert len(wires) >= 2, "this circuit is too small!"
+        for indx, w in enumerate(wires):
+            if indx % 2 == 1 and indx < n_wires:
+                cnot(q_machine=qm, wires=[w, wires[indx - 1]])
+                u3(q_machine=qm, params=weights, wires=wires[indx - 1])
+
+    def conv_and_pooling(qm, kernel_weights, n_wires, skip_first_layer=True):
+        """Apply both the convolutional and pooling layer."""
+
+        convolutional_layer(qm, kernel_weights[:15], n_wires, skip_first_layer=skip_first_layer)
+        pooling_layer(qm, kernel_weights[15:], n_wires)
+        return qm
+
+    def dense_layer(qm, weights, wires):
+        """Apply an arbitrary unitary gate to a specified set of wires."""
+        
+        rzz(q_machine=qm,params=weights[0], wires=wires)
+        rxx(q_machine=qm,params=weights[1], wires=wires)
+        ryy(q_machine=qm,params=weights[2], wires=wires)
+        rzx(q_machine=qm,params=weights[3], wires=wires)
+        rxx(q_machine=qm,params=weights[5], wires=wires)
+        rzx(q_machine=qm,params=weights[6], wires=wires)
+        rzz(q_machine=qm,params=weights[7], wires=wires)
+        ryy(q_machine=qm,params=weights[8], wires=wires)
+        rzz(q_machine=qm,params=weights[9], wires=wires)
+        rxx(q_machine=qm,params=weights[10], wires=wires)
+        rzx(q_machine=qm,params=weights[11], wires=wires)
+        rzx(q_machine=qm,params=weights[12], wires=wires)
+        rzz(q_machine=qm,params=weights[13], wires=wires)
+        ryy(q_machine=qm,params=weights[14], wires=wires)
+        return qm
+
+
+    num_wires = 6
+
+    def conv_net(qm, weights, last_layer_weights, features):
+
+        layers = weights.shape[1]
+        wires = list(range(num_wires))
+
+        VQC_AmplitudeEmbedding(input_feature = features, q_machine=qm)
+
+        # adds convolutional and pooling layers
+        for j in range(layers):
+            conv_and_pooling(qm, weights[:, j], wires, skip_first_layer=(not j == 0))
+            wires = wires[::2]
+
+        assert last_layer_weights.size == 4 ** (len(wires)) - 1, (
+            "The size of the last layer weights vector is incorrect!"
+            f" \n Expected {4 ** (len(wires)) - 1}, Given {last_layer_weights.size}"
+        )
+        dense_layer(qm, last_layer_weights, wires)
+
+        return probs(q_state=qm.states, num_wires=qm.num_wires, wires=[0])
+
+
+    def load_digits_data(num_train, num_test, rng):
+        """Return training and testing data of digits dataset."""
+        digits = datasets.load_digits()
+        features, labels = digits.data, digits.target
+
+        # only use first two classes
+        features = features[np.where((labels == 0) | (labels == 1))]
+        labels = labels[np.where((labels == 0) | (labels == 1))]
+
+        # normalize data
+        features = features / np.linalg.norm(features, axis=1).reshape((-1, 1))
+
+        # subsample train and test split
+        train_indices = rng.choice(len(labels), num_train, replace=False)
+        test_indices = rng.choice(
+            np.setdiff1d(range(len(labels)), train_indices), num_test, replace=False
+        )
+
+        x_train, y_train = features[train_indices], labels[train_indices]
+        x_test, y_test = features[test_indices], labels[test_indices]
+
+        return x_train, y_train,x_test, y_test
+
+
+    class Qcnn_ising(Module):
+
+        def __init__(self):
+            super(Qcnn_ising, self).__init__()
+            self.conv = conv_net
+            self.qm = QMachine(num_wires,dtype=kcomplex128)
+            self.weights = Parameter((18, 2), dtype=7)
+            self.weights_last = Parameter((4 ** 2 -1,1), dtype=7)
+
+        def forward(self, input):
+
+            return self.conv(self.qm, self.weights, self.weights_last, input)
+
+
+    from tqdm import tqdm
+
+
+    def train_qcnn(n_train, n_test, n_epochs):
+
+        # load data
+        x_train, y_train, x_test, y_test = load_digits_data(n_train, n_test, rng)
+
+        # init weights and optimizer
+        model = Qcnn_ising()
+
+        opti = Adam(model.parameters(), lr=0.01)
+
+        # data containers
+        train_cost_epochs, test_cost_epochs, train_acc_epochs, test_acc_epochs = [], [], [], []
+
+        for step in range(n_epochs):
+            model.train()
+            opti.zero_grad()
+
+            result = model(QTensor(x_train))
+
+            train_cost = 1.0 - tensor.sums(result[tensor.arange(0, len(y_train)), y_train]) / len(y_train)
+            # print(f"step {step}, train_cost {train_cost}")
+
+            train_cost.backward()
+            opti.step()
+
+            train_cost_epochs.append(train_cost.to_numpy()[0])
+            # compute accuracy on training data
+
+            # print(tensor.sums(result[tensor.arange(0, len(y_train)), y_train] > 0.5))
+            train_acc = tensor.sums(result[tensor.arange(0, len(y_train)), y_train] > 0.5) / result.shape[0]
+            # print(train_acc)
+            # print(f"step {step}, train_acc {train_acc}")
+            train_acc_epochs.append(train_acc.to_numpy()[0])
+
+            # compute accuracy and cost on testing data
+            test_out = model(QTensor(x_test))
+            test_acc = tensor.sums(test_out[tensor.arange(0, len(y_test)), y_test] > 0.5) / test_out.shape[0]
+            test_acc_epochs.append(test_acc.to_numpy()[0])
+            test_cost = 1.0 - tensor.sums(test_out[tensor.arange(0, len(y_test)), y_test]) / len(y_test)
+            test_cost_epochs.append(test_cost.to_numpy()[0])
+
+            # print(f"step {step}, test_cost {test_cost}")
+            # print(f"step {step}, test_acc {test_acc}")
+
+        return dict(
+            n_train=[n_train] * n_epochs,
+            step=np.arange(1, n_epochs + 1, dtype=int),
+            train_cost=train_cost_epochs,
+            train_acc=train_acc_epochs,
+            test_cost=test_cost_epochs,
+            test_acc=test_acc_epochs,
+        )
+
+    n_reps = 100
+    n_test = 100
+    n_epochs = 100
+
+    def run_iterations(n_train):
+        results_df = pd.DataFrame(
+            columns=["train_acc", "train_cost", "test_acc", "test_cost", "step", "n_train"]
+        )
+
+        for _ in tqdm(range(n_reps)):
+            results = train_qcnn(n_train=n_train, n_test=n_test, n_epochs=n_epochs)
+            # np.save('test_qcnn.npy', results)
+            results_df = pd.concat(
+                [results_df, pd.DataFrame.from_dict(results)], axis=0, ignore_index=True
+            )
+
+        return results_df
+
+    # run training for multiple sizes
+    train_sizes = [2, 5, 10, 20, 40, 80]
+    results_df = run_iterations(n_train=2)
+
+
+    for n_train in train_sizes[1:]:
+        results_df = pd.concat([results_df, run_iterations(n_train=n_train)])
+
+    save = 0 # 保存数据
+    draw = 0 # 绘图
+
+    if save:
+        results_df.to_csv('test_qcnn.csv', index=False)
+    import pickle
+
+    if draw:
+        # aggregate dataframe
+        results_df = pd.read_csv('test_qcnn.csv')
+        df_agg = results_df.groupby(["n_train", "step"]).agg(["mean", "std"])
+        df_agg = df_agg.reset_index()
+
+        sns.set_style('whitegrid')
+        colors = sns.color_palette()
+        fig, axes = plt.subplots(ncols=3, figsize=(16.5, 5))
+
+        generalization_errors = []
+
+        # plot losses and accuracies
+        for i, n_train in enumerate(train_sizes):
+            df = df_agg[df_agg.n_train == n_train]
+
+            dfs = [df.train_cost["mean"], df.test_cost["mean"], df.train_acc["mean"], df.test_acc["mean"]]
+            lines = ["o-", "x--", "o-", "x--"]
+            labels = [fr"$N={n_train}$", None, fr"$N={n_train}$", None]
+            axs = [0, 0, 2, 2]
+
+            for k in range(4):
+                ax = axes[axs[k]]
+                ax.plot(df.step, dfs[k], lines[k], label=labels[k], markevery=10, color=colors[i], alpha=0.8)
+
+            # plot final loss difference
+            dif = df[df.step == 100].test_cost["mean"] - df[df.step == 100].train_cost["mean"]
+            generalization_errors.append(dif)
+
+        # format loss plot
+        ax = axes[0]
+        ax.set_title('Train and Test Losses', fontsize=14)
+        ax.set_xlabel('Epoch')
+        ax.set_ylabel('Loss')
+
+        # format generalization error plot
+        ax = axes[1]
+        ax.plot(train_sizes, generalization_errors, "o-", label=r"$gen(\alpha)$")
+        ax.set_xscale('log')
+        ax.set_xticks(train_sizes)
+        ax.set_xticklabels(train_sizes)
+        ax.set_title(r'Generalization Error $gen(\alpha) = R(\alpha) - \hat{R}_N(\alpha)$', fontsize=14)
+        ax.set_xlabel('Training Set Size')
+
+        # format loss plot
+        ax = axes[2]
+        ax.set_title('Train and Test Accuracies', fontsize=14)
+        ax.set_xlabel('Epoch')
+        ax.set_ylabel('Accuracy')
+        ax.set_ylim(0.5, 1.05)
+
+        legend_elements = [
+                                mpl.lines.Line2D([0], [0], label=f'N={n}', color=colors[i]) for i, n in enumerate(train_sizes)
+                            ] + [
+                                mpl.lines.Line2D([0], [0], marker='o', ls='-', label='Train', color='Black'),
+                                mpl.lines.Line2D([0], [0], marker='x', ls='--', label='Test', color='Black')
+                            ]
+
+        axes[0].legend(handles=legend_elements, ncol=3)
+        axes[2].legend(handles=legend_elements, ncol=3)
+
+        axes[1].set_yscale('log', base=2)
+        plt.show()
+
+
+
+运行后的实验结果如下图所示：
+
+.. image:: ./images/result_qcnn_small.png
+   :width: 1000 px
+   :align: center
+
+|
+
+
+8.用于手写数字识别的量子核函数模型
+=============================================
+
+下面的例子使用 `pyvqnet.qnn.vqc` 下的变分量子线路接口实现了论文 `Quantum Advantage Seeker with Kernels (QuASK): a software framework to speed up the research in quantum machine learning <https://link.springer.com/article/10.1007/s42484-023-00107-2>`_ 中的量子核函数，基于手写数字数据集来对量子核的性能进行评估。
+
+
+本次实验基于crz、ZZFeatureMap逻辑门实现了量子核矩阵以及量子核映射中两种线路的设计。
+算法输入数据为维度8*8的手写数字数据集, 通过PCA降维, 将输入的数据降维到相应的比特数的维度如2、4、8, 之后对数据进行标准化处理后, 获取训练数据集以及测试数据用于训练, 本次实现可分为两个, 分别为量子核矩阵以及核映射。
+量子核矩阵由量子线路计算每一对数据的相似度，随后组成矩阵后输出；
+量子核映射则分别计算两组数据映射后计算两组数据的相似度矩阵。
+
+具体代码实现如下，需要额外安装 `sklearn`, `scipy` 等：
+
+.. code-block::
+
+
+    import numpy as np
+    from sklearn.svm import SVC
+    from sklearn import datasets
+    from sklearn.decomposition import PCA
+    from sklearn.preprocessing import StandardScaler, MinMaxScaler
+    from sklearn.model_selection import train_test_split
+    from sklearn.metrics import accuracy_score
+    from scipy.linalg import sqrtm
+    import matplotlib.pyplot as plt
+    from scipy.linalg import expm
+    import numpy.linalg as la
+
+
+    import sys
+    sys.path.insert(0, "../")
+    import pyvqnet
+    from pyvqnet import _core
+    from pyvqnet.dtype import *
+
+    from pyvqnet.tensor.tensor import QTensor
+    from pyvqnet.qnn.vqc.qcircuit import PauliZ, VQC_ZZFeatureMap,PauliX,PauliY,hadamard,crz,rz
+    from pyvqnet.qnn.vqc import QMachine
+    from pyvqnet.qnn.vqc.qmeasure import expval
+    from pyvqnet import tensor
+    import functools as ft
+
+    np.random.seed(42)
+    # data load
+    digits = datasets.load_digits(n_class=2)
+    # create lists to save the results
+    gaussian_accuracy = []
+    quantum_accuracy = []
+    projected_accuracy = []
+    quantum_gaussian = []
+    projected_gaussian = []
+
+    # reduce dimensionality
+
+    def custom_data_map_func(x):
+        """
+        custom data map function
+        """
+        coeff = x[0] if x.shape[0] == 1 else ft.reduce(lambda m, n: m * n, x)
+        return coeff
+
+    def vqnet_quantum_kernel(X_1, X_2=None):
+
+        if X_2 is None:
+            X_2 = X_1  # Training Gram matrix
+        assert (
+            X_1.shape[1] == X_2.shape[1]
+        ), "The training and testing data must have the same dimensionality"
+        N = X_1.shape[1]
+
+        # create device using JAX
+
+        # create projector (measures probability of having all "00...0")
+        projector = np.zeros((2**N, 2**N))
+        projector[0, 0] = 1
+        projector = QTensor(projector,dtype=kcomplex128)
+        # define the circuit for the quantum kernel ("overlap test" circuit)
+
+        def kernel(x1, x2):
+            qm = QMachine(N, dtype=kcomplex128)
+
+            for i in range(N):
+                hadamard(q_machine=qm, wires=i)
+                rz(q_machine=qm,params=QTensor(2 * x1[i],dtype=kcomplex128), wires=i)
+            for i in range(N):
+                for j in range(i + 1, N):
+                    crz(q_machine=qm,params=QTensor(2 * (np.pi - x1[i]) * (np.pi - x1[j]),dtype=kcomplex128), wires=[i, j])
+
+            for i in range(N):
+                for j in range(i + 1, N):
+                    crz(q_machine=qm,params=QTensor(2 * (np.pi - x2[i]) * (np.pi - x2[j]),dtype=kcomplex128), wires=[i, j],use_dagger=True)        
+            for i in range(N):
+                rz(q_machine=qm,params=QTensor(2 * x2[i],dtype=kcomplex128), wires=i,use_dagger=True)
+                hadamard(q_machine=qm, wires=i,use_dagger=True)
+
+            states_1 = qm.states.reshape((1,-1))
+            states_1 = tensor.conj(states_1)
+
+            states_2 = qm.states.reshape((-1,1))
+
+            result = tensor.matmul(tensor.conj(states_1), projector)
+            result = tensor.matmul(result, states_2)
+            return result.to_numpy()[0][0].real
+
+        gram = np.zeros(shape=(X_1.shape[0], X_2.shape[0]))
+        for i in range(len(X_1)):
+            for j in range(len(X_2)):
+                gram[i][j] = kernel(X_1[i], X_2[j])
+
+        return gram
+
+
+    def vqnet_projected_quantum_kernel(X_1, X_2=None, params=QTensor([1.0])):
+
+        if X_2 is None:
+            X_2 = X_1  # Training Gram matrix
+        assert (
+            X_1.shape[1] == X_2.shape[1]
+        ), "The training and testing data must have the same dimensionality"
+
+
+        def projected_xyz_embedding(X):
+            """
+            Create a Quantum Kernel given the template written in Pennylane framework
+
+            Args:
+                embedding: Pennylane template for the quantum feature map
+                X: feature data (matrix)
+
+            Returns:
+                projected quantum feature map X
+            """
+            N = X.shape[1]
+
+            def proj_feature_map(x):
+                qm = QMachine(N, dtype=kcomplex128)
+                VQC_ZZFeatureMap(x, qm, data_map_func=custom_data_map_func, entanglement="linear")
+
+                return (
+                    [expval(qm, i, PauliX(init_params=QTensor(1.0))).to_numpy() for i in range(N)]
+                    + [expval(qm, i, PauliY(init_params=QTensor(1.0))).to_numpy() for i in range(N)]
+                    + [expval(qm, i, PauliZ(init_params=QTensor(1.0))).to_numpy() for i in range(N)]
+                )
+
+            # build the gram matrix
+            X_proj = [proj_feature_map(x) for x in X]
+
+            return X_proj
+        X_1_proj = projected_xyz_embedding(QTensor(X_1))
+        X_2_proj = projected_xyz_embedding(QTensor(X_2))
+
+        # print(X_1_proj)
+        # print(X_2_proj)
+        # build the gram matrix
+
+        gamma = params[0]
+        gram = tensor.zeros(shape=[X_1.shape[0], X_2.shape[0]],dtype=7)
+
+        for i in range(len(X_1_proj)):
+            for j in range(len(X_2_proj)):
+                result = [a - b for a,b in zip(X_1_proj[i], X_2_proj[j])]
+                result = [a**2 for a in result]
+                value = tensor.exp(-gamma * sum(result))
+                gram[i,j] = value
+        return gram
+
+
+    def calculate_generalization_accuracy(
+        training_gram, training_labels, testing_gram, testing_labels
+    ):
+
+        svm = SVC(kernel="precomputed")
+        svm.fit(training_gram, training_labels)
+
+        y_predict = svm.predict(testing_gram)
+        correct = np.sum(testing_labels == y_predict)
+        accuracy = correct / len(testing_labels)
+        return accuracy
+
+    import time 
+    qubits = [2, 4, 8]
+
+    for n in qubits:
+        n_qubits = n
+        x_tr, x_te , y_tr , y_te = train_test_split(digits.data, digits.target, test_size=0.3, random_state=22)
+
+        pca = PCA(n_components=n_qubits).fit(x_tr)
+        x_tr_reduced = pca.transform(x_tr)
+        x_te_reduced = pca.transform(x_te)
+
+        # normalize and scale
+
+        std = StandardScaler().fit(x_tr_reduced)
+        x_tr_norm = std.transform(x_tr_reduced)
+        x_te_norm = std.transform(x_te_reduced)
+
+        samples = np.append(x_tr_norm, x_te_norm, axis=0)
+        minmax = MinMaxScaler((-1,1)).fit(samples)
+        x_tr_norm = minmax.transform(x_tr_norm)
+        x_te_norm = minmax.transform(x_te_norm)
+
+        # select only 100 training and 20 test data
+
+        tr_size = 100
+        x_tr = x_tr_norm[:tr_size]
+        y_tr = y_tr[:tr_size]
+
+        te_size = 100
+        x_te = x_te_norm[:te_size]
+        y_te = y_te[:te_size]
+        
+        quantum_kernel_tr = vqnet_quantum_kernel(X_1=x_tr)
+
+        projected_kernel_tr = vqnet_projected_quantum_kernel(X_1=x_tr)
+
+        quantum_kernel_te = vqnet_quantum_kernel(X_1=x_te, X_2=x_tr)
+
+        projected_kernel_te = vqnet_projected_quantum_kernel(X_1=x_te, X_2=x_tr)
+        
+        quantum_accuracy.append(calculate_generalization_accuracy(quantum_kernel_tr, y_tr, quantum_kernel_te, y_te))
+        print(f"qubits {n}, quantum_accuracy {quantum_accuracy[-1]}")
+        projected_accuracy.append(calculate_generalization_accuracy(projected_kernel_tr.to_numpy(), y_tr, projected_kernel_te.to_numpy(), y_te))
+        print(f"qubits {n}, projected_accuracy {projected_accuracy[-1]}")
+
+    # train_size 100 test_size 20
+    #
+    # qubits 2, quantum_accuracy 1.0
+    # qubits 2, projected_accuracy 1.0
+    # qubits 4, quantum_accuracy 1.0
+    # qubits 4, projected_accuracy 1.0
+    # qubits 8, quantum_accuracy 0.45
+    # qubits 8, projected_accuracy 1.0
+
+    # train_size 100 test_size 100
+    #
+    # qubits 2, quantum_accuracy 1.0
+    # qubits 2, projected_accuracy 0.99
+    # qubits 4, quantum_accuracy 0.99
+    # qubits 4, projected_accuracy 0.98
+    # qubits 8, quantum_accuracy 0.51
+    # qubits 8, projected_accuracy 0.99
+
+
 无监督学习
 ****************************
 
@@ -6333,13 +6909,255 @@ vqe_func_analytic()函数是使用参数偏移计算理论梯度，vqe_func_shot
     # test:--------------->loss:[0.3134713] #####accuray:1.0
 
 
-在VQNet使用量子计算层进行模型训练
-*******************************************
+量子奇异值分解
+===================================
 
-以下是使用 ``QuantumLayer``，``NoiseQuantumLayer`` ，``VQCLayer`` 等VQNet接口实现量子机器学习的例子。
+下面例子实现论文 `Variational Quantum Singular Value Decomposition <https://arxiv.org/abs/2006.02336>`_ 中的算法。 
+
+奇异值分解 (Singular Value Decomposition，简称 ``SVD``) 是线性代数中一种重要的矩阵分解，它作为特征分解在任意维数矩阵上的推广，在机器学习领域中被广泛应用，常用于矩阵压缩、推荐系统以及自然语言处理等。
+
+变分量子奇异值分解(Variational Quantum Singular Value Decomposition，简称 ``QSVD``)将SVD转换成优化问题，并通过变分量子线路求解。
+
+论文中将矩阵奇异值分解分解成四个步骤求解：
+
+    1. 输入带分解矩阵 :math:`\mathbf{M}`，想压缩到的阶数 :math:`\mathbf{T}`, 权重 :math:`\mathbf{W}`，参数话的酉矩阵 :math:`\mathbf{U}(\theta)` 和 :math:`\mathbf{V}(\phi)`
+    2. 搭建量子神经网络估算奇异值 :math:`m_j = Re\langle\psi_j\mid U(\theta)^\dagger M V(\phi) \mid\psi_j\rangle`，并最大化加权奇异值的和 :math:`L(\theta, \phi) = \sum_{j=1}^{T} q_j \cdot \operatorname{Re}\langle\psi_j \mid U(\theta)^\dagger MV(\phi) \mid \psi_j\rangle`, 其中，加权是为了让计算出的奇异值从大到小排列
+    3. 读出最大化时参数值，计算出 :math:`\mathbf{U}(\alpha^{*})` 和 :math:`\mathbf{V}(\beta^{*})`
+    4. 输出结果: 奇异值 :math:`m_1, \dots, m_r`，和奇异矩阵 :math:`\mathbf{U}(\alpha^{*})` 和 :math:`\mathbf{V}(\beta^{*})`
+
+.. image:: ./images/qsvd.png
+   :width: 700 px
+   :align: center
+
+|
+
+伪代码如下：
+
+.. image:: ./images/qsvd_algorithm.png
+   :width: 700 px
+   :align: center
+
+|
+
+量子线路设计如下：
+
+.. code-block::
+
+    q0: ──RY(v_theta0)────RZ(v_theta3)────●─────────X────RY(v_theta6)─────RZ(v_theta9)────●─────────X────RY(v_theta12)────RZ(v_theta15)────●─────────X────RY(v_theta18)────RZ(v_theta21)────●─────────X────RY(v_theta24)────RZ(v_theta27)────●─────────X────RY(v_theta30)────RZ(v_theta33)────●─────────X────RY(v_theta36)────RZ(v_theta39)────●─────────X────RY(v_theta42)────RZ(v_theta45)────●─────────X────RY(v_theta48)────RZ(v_theta51)────●─────────X────RY(v_theta54)────RZ(v_theta57)────●─────────X────RY(v_theta60)────RZ(v_theta63)────●─────────X────RY(v_theta66)────RZ(v_theta69)────●─────────X────RY(v_theta72)────RZ(v_theta75)────●─────────X────RY(v_theta78)────RZ(v_theta81)────●─────────X────RY(v_theta84)────RZ(v_theta87)────●─────────X────RY(v_theta90)────RZ(v_theta93)────●─────────X────RY(v_theta96)────RZ(v_theta99)─────●─────────X────RY(v_theta102)────RZ(v_theta105)────●─────────X────RY(v_theta108)────RZ(v_theta111)────●─────────X────RY(v_theta114)────RZ(v_theta117)────●─────────X──
+                                          │         │                                     │         │                                      │         │                                      │         │                                      │         │                                      │         │                                      │         │                                      │         │                                      │         │                                      │         │                                      │         │                                      │         │                                      │         │                                      │         │                                      │         │                                      │         │                                       │         │                                        │         │                                        │         │                                        │         │
+    q1: ──RY(v_theta1)────RZ(v_theta4)────X────●────┼────RY(v_theta7)────RZ(v_theta10)────X────●────┼────RY(v_theta13)────RZ(v_theta16)────X────●────┼────RY(v_theta19)────RZ(v_theta22)────X────●────┼────RY(v_theta25)────RZ(v_theta28)────X────●────┼────RY(v_theta31)────RZ(v_theta34)────X────●────┼────RY(v_theta37)────RZ(v_theta40)────X────●────┼────RY(v_theta43)────RZ(v_theta46)────X────●────┼────RY(v_theta49)────RZ(v_theta52)────X────●────┼────RY(v_theta55)────RZ(v_theta58)────X────●────┼────RY(v_theta61)────RZ(v_theta64)────X────●────┼────RY(v_theta67)────RZ(v_theta70)────X────●────┼────RY(v_theta73)────RZ(v_theta76)────X────●────┼────RY(v_theta79)────RZ(v_theta82)────X────●────┼────RY(v_theta85)────RZ(v_theta88)────X────●────┼────RY(v_theta91)────RZ(v_theta94)────X────●────┼────RY(v_theta97)────RZ(v_theta100)────X────●────┼────RY(v_theta103)────RZ(v_theta106)────X────●────┼────RY(v_theta109)────RZ(v_theta112)────X────●────┼────RY(v_theta115)────RZ(v_theta118)────X────●────┼──
+                                               │    │                                          │    │                                           │    │                                           │    │                                           │    │                                           │    │                                           │    │                                           │    │                                           │    │                                           │    │                                           │    │                                           │    │                                           │    │                                           │    │                                           │    │                                           │    │                                            │    │                                             │    │                                             │    │                                             │    │
+    q2: ──RY(v_theta2)────RZ(v_theta5)─────────X────●────RY(v_theta8)────RZ(v_theta11)─────────X────●────RY(v_theta14)────RZ(v_theta17)─────────X────●────RY(v_theta20)────RZ(v_theta23)─────────X────●────RY(v_theta26)────RZ(v_theta29)─────────X────●────RY(v_theta32)────RZ(v_theta35)─────────X────●────RY(v_theta38)────RZ(v_theta41)─────────X────●────RY(v_theta44)────RZ(v_theta47)─────────X────●────RY(v_theta50)────RZ(v_theta53)─────────X────●────RY(v_theta56)────RZ(v_theta59)─────────X────●────RY(v_theta62)────RZ(v_theta65)─────────X────●────RY(v_theta68)────RZ(v_theta71)─────────X────●────RY(v_theta74)────RZ(v_theta77)─────────X────●────RY(v_theta80)────RZ(v_theta83)─────────X────●────RY(v_theta86)────RZ(v_theta89)─────────X────●────RY(v_theta92)────RZ(v_theta95)─────────X────●────RY(v_theta98)────RZ(v_theta101)─────────X────●────RY(v_theta104)────RZ(v_theta107)─────────X────●────RY(v_theta110)────RZ(v_theta113)─────────X────●────RY(v_theta116)────RZ(v_theta119)─────────X────●──
+
+
+以下是具体QSVD实现代码:
+
+.. code-block::
+
+    import os
+    os.environ['OMP_NUM_THREADS'] = '1'
+
+    import numpy as np
+    import tqdm
+
+    from pyvqnet.nn import Module
+    from pyvqnet.tensor.tensor import QTensor
+    from pyvqnet.tensor import tensor
+    from pyvqnet.optim import Adam
+    from pyvqnet.qnn.measure import expval
+    from pyvqnet.nn.parameter import Parameter
+    from pyvqnet.dtype import *
+    from pyqpanda import *
+    import pyvqnet
+    from pyvqnet.qnn.vqc import ry, QMachine, cnot, rz
+
+    n_qubits = 3  # qbits number
+    cir_depth = 20  # circuit depth
+    N = 2**n_qubits
+    rank = 8  # learning rank
+    step = 7
+    ITR = 200  # iterations
+    LR = 0.02  # learning rate
+
+    if step == 0:
+        weight = QTensor(np.ones(rank))
+    else:
+        weight = QTensor(np.arange(rank * step, 0, -step),requires_grad=True,dtype=kfloat32).reshape((-1,1))
+
+    # Define random seed
+    np.random.seed(42)
+
+    def mat_generator():
+        '''
+        Generate a random complex matrix
+        '''
+        matrix = np.random.randint(
+            10, size=(N, N)) + 1j * np.random.randint(10, size=(N, N))
+        return matrix
+
+
+    # Generate matrix M which will be decomposed
+    M = mat_generator()
+
+    # m_copy is generated to error analysis
+    m_copy = np.copy(M)
+
+    # Print M
+    print('Random matrix M is: ')
+    print(M)
+
+    # Get SVD results
+    U, D, v_dagger = np.linalg.svd(M, full_matrices=True)
+    # Random matrix M is: 
+    # [[6.+1.j 3.+9.j 7.+3.j 4.+7.j 6.+6.j 9.+8.j 2.+7.j 6.+4.j]
+    #  [7.+1.j 4.+4.j 3.+7.j 7.+9.j 7.+8.j 2.+8.j 5.+0.j 4.+8.j]
+    #  [1.+6.j 7.+8.j 5.+7.j 1.+0.j 4.+7.j 0.+7.j 9.+2.j 5.+0.j]
+    #  [8.+7.j 0.+2.j 9.+2.j 2.+0.j 6.+4.j 3.+9.j 8.+6.j 2.+9.j]
+    #  [4.+8.j 2.+6.j 6.+8.j 4.+7.j 8.+1.j 6.+0.j 1.+6.j 3.+6.j]
+    #  [8.+7.j 1.+4.j 9.+2.j 8.+7.j 9.+5.j 4.+2.j 1.+0.j 3.+2.j]
+    #  [6.+4.j 7.+2.j 2.+0.j 0.+4.j 3.+9.j 1.+6.j 7.+6.j 3.+8.j]
+    #  [1.+9.j 5.+9.j 5.+2.j 9.+6.j 3.+0.j 5.+3.j 1.+3.j 9.+4.j]]
+
+    print(D)
+    # [54.8348498 19.1814107 14.9886625 11.6141956 10.1592704  7.6022325
+    #  5.8104054  3.30116  ]
+
+    def vqc_circuit(matrix, para):
+        qm = QMachine(3)
+
+        qm.set_states(matrix)
+
+        num = 0
+        for _ in range(20):
+            for i in range(3):
+                ry(q_machine=qm, params=para[num], wires=i, num_wires=3)
+                num += 1 
+
+            for i in range(3):
+                rz(q_machine=qm, params=para[num], wires=i, num_wires=3)
+                num += 1
+
+            for i in range(2):
+                cnot(q_machine=qm, wires=[i, i+1], num_wires=3)
+
+            cnot(q_machine=qm, wires=[2, 0], num_wires=3)
+
+        return qm.states
+
+    i_matrix = np.identity(N)
+
+    class VQC_svd(Module):
+        def __init__(self):
+            super(VQC_svd, self).__init__()
+
+            self.params_u = list()
+            self.params_v = list()
+
+            self.params_u_single = Parameter((120, ), dtype=kfloat32)
+            self.params_v_single = Parameter((120, ), dtype=kfloat32)
+
+
+        def forward(self):
+            qm_u_list = list()
+            qm_v_list = list()
+
+            for i in range(8):
+
+                qm = vqc_circuit(QTensor(i_matrix[i], dtype=kcomplex64).reshape((1,2,2,2)), self.params_u_single)
+                qm_u_list.append(qm)    
+
+            for i in range(8):
+                qm = vqc_circuit(QTensor(i_matrix[i], dtype=kcomplex64).reshape((1,2,2,2)), self.params_v_single)
+                qm_v_list.append(qm)    
+
+            result = []
+
+
+            for i in range(8):
+                states_u = qm_u_list[i].reshape((1,-1))
+                states_u = tensor.conj(states_u)
+
+                states_v = qm_v_list[i].reshape((-1,1))
+
+                pred = tensor.matmul(states_u, QTensor(M,dtype=kcomplex64))
+                pred = tensor.matmul(pred, states_v)
+
+                result.append(tensor.real(pred))
+
+            return qm_u_list, qm_v_list, result
+
+
+        def __call__(self):
+            return self.forward()
+
+    def loss_(x, w):
+        loss = tensor.mul(x, w)
+        return loss
+
+    def run():
+
+        model = VQC_svd()
+        opt = Adam(model.parameters(), lr = 0.02)
+        for itr in tqdm.tqdm(range(ITR)):
+
+            opt.zero_grad()
+            model.train()
+            qm_u_list, qm_v_list, result = model()
+            loss = 0
+            for i in range(8):
+                loss -= loss_(result[i], weight[i])
+            if(itr % 20 == 0):
+                print(loss)
+                print(result)
+            loss.backward()
+            opt.step()
+
+        pyvqnet.utils.storage.save_parameters(model.state_dict(),f"vqc_svd_{ITR}.model")
+
+    def eval():
+        model = VQC_svd()
+        model_para = pyvqnet.utils.storage.load_parameters(f"vqc_svd_{ITR}.model")
+        model.load_state_dict(model_para)
+        qm_u_list, qm_v_list, result = model()
+        # U is qm_u_list
+        # V is qm_v_list
+        print(result)
+
+    if __name__=="__main__":
+        run()
+    
+运行的loss以及奇异值结果：
+
+.. code-block::
+
+    [[-145.04752]]  ## 20/200 [00:56<09:30,  3.17s/it]
+    [[[-5.9279256]], [[0.7229557]], [[12.809682]], [[-3.2357244]], [[-5.232873]], [[4.5523396]], [[0.9724817]], [[7.733829]]]
+     [[-4836.0083]] ## 40/200 [02:08<10:11,  3.82s/it]
+    [[[30.293152]], [[21.15204]], [[26.832254]], [[11.953516]], [[9.615778]], [[9.914136]], [[5.34158]], [[0.7990487]]]
+     [[-5371.0034]] ## 60/200 [03:31<10:04,  4.32s/it]
+    [[[52.829674]], [[16.831125]], [[15.112174]], [[12.098673]], [[9.9859915]], [[8.895033]], [[5.1445904]], [[-1.2537733]]]
+     [[-5484.087]]  ## 80/200 [05:03<09:23,  4.69s/it]
+    [[[54.775055]], [[16.41207]], [[15.00042]], [[13.043125]], [[9.884815]], [[8.17144]], [[5.8188157]], [[-0.5532891]]]
+     [[-5516.793]]  ## 100/200 [06:41<08:23,  5.04s/it]
+    [[[54.797073]], [[17.457108]], [[14.50795]], [[13.288734]], [[9.7749815]], [[7.900285]], [[5.7255745]], [[-0.2063196]]]
+     [[-5531.2007]] ## 120/200 [08:24<07:08,  5.35s/it]
+    [[[54.816666]], [[18.107487]], [[14.094158]], [[13.305479]], [[9.837374]], [[7.7387457]], [[5.6890383]], [[-0.1503702]]]
+     [[-5539.823]]  ## 140/200 [10:11<05:20,  5.34s/it]
+    [[[54.822754]], [[18.518795]], [[13.9633045]], [[13.136647]], [[9.929082]], [[7.647796]], [[5.6548705]], [[-0.2427776]]]
+     [[-5545.748]]  ## 160/200 [12:00<03:37,  5.43s/it]
+    [[[54.825073]], [[18.766531]], [[14.041204]], [[12.855356]], [[10.009973]], [[7.5971537]], [[5.6524153]], [[-0.3767563]]]
+     [[-5550.124]]  ## 180/200 [13:50<01:49,  5.45s/it]
+    [[[54.82772]], [[18.913624]], [[14.219269]], [[12.547045]], [[10.063704]], [[7.569273]], [[5.6508512]], [[-0.4574079]]]
+     [[-5553.423]]  ## 200/200 [15:40<00:00,  4.70s/it]
+    [[[54.829308]], [[19.001402]], [[14.423045]], [[12.262444]], [[10.100731]], [[7.5507345]], [[5.6469355]], [[-0.4976197]]]
+
+在VQNet使用量子计算层进行模型训练
+***************************************
+
+以下是使用 ``QuantumLayer``, ``NoiseQuantumLayer``, ``VQCLayer`` 等VQNet接口实现量子机器学习的例子。
 
 在VQNet中使用QuantumLayer进行模型训练
-=============================================
+=========================================
 
 .. code-block::
 
@@ -7054,8 +7872,4 @@ VQNet提供了封装类 ``VQC_wrapper`` ，用户使用普通逻辑门在函数 
     start testing..............
     [0.3132616580]
     test:--------------->loss:QTensor(0.3132616580, requires_grad=True) #####accuray:1.0
-
-
-
-
 

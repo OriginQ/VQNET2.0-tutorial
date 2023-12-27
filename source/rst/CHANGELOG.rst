@@ -2,6 +2,32 @@
 VQNet Changelog
 ######################
 
+
+[v2.10.0] - 2023-12-30
+***************************
+
+Added
+===========
+- 增加了pyvqnet.qnn.vqc下的新接口:IsingXX、IsingXY、IsingYY、IsingZZ、SDG、TDG、PhaseShift、MutliRZ、MultiCnot、MultixCnot、ControlledPhaseShift、SingleExcitation、DoubleExcitation、VQC_AllSinglesDoubles,ExpressiveEntanglingAnsatz等；
+- 支持adjoint梯度计算的pyvqnet.qnn.vqc.QuantumLayerAdjoint接口;
+- 支持originIR与VQC相互转换的功能;
+- 支持统计VQC模型中的经典和量子模块信息;
+- 增加量子经典神经网络混合模型下的两个案例：基于小样本的量子卷积神经网络模型、用于手写数字识别的量子核函数模型;
+- 增加对arm芯片Mac的支持;
+
+
+[v2.9.0] - 2023-11-15
+***************************
+
+Added
+===========
+- 增加了xtensor接口定义，支持经典神经网络模块自动并行和CPU/GPU多后端，包含对多维数组的常用数学，逻辑，矩阵计算，以及常见的经典神经网络层，优化器等150余个接口。
+
+Changed
+===========
+- 从本版本开始，版本号从2.0.8 升级为2.9.0。
+- 自本版本开始，软件包上传到 https://pypi.originqc.com.cn， 使用 ``pip install pyvqnet --index-url https://pypi.originqc.com.cn`` 安装。
+
 [v2.0.8] - 2023-09-26
 ***************************
 
@@ -25,7 +51,7 @@ Added
 
 Changed
 ===========
-- QTenor 以及Module类的init函数增加 `dtype` 参数。对QTenor索引、 部分神经网络层的输入进行了类型限制。
+- QTensor 以及Module类的init函数增加 `dtype` 参数。对QTensor索引、 部分神经网络层的输入进行了类型限制。
 - 量子神经网络，由于MacOS兼容性问题，去掉了Mnist_Dataset，CIFAR10_Dataset接口。
 
 [v2.0.6] - 2023-02-22
@@ -168,7 +194,7 @@ Fixed
 Added
 ===========
 
-- 增加基本数据结构QTenor接口100余个，包括创建函数，逻辑函数，数学函数，矩阵操作。
+- 增加基本数据结构QTensor接口100余个，包括创建函数，逻辑函数，数学函数，矩阵操作。
 - 增加基本神经网络网络函数14个，包括卷积，反卷积，池化等。
 - 增加损失函数4个，包括MSE,BCE,CCE,SCE等。
 - 增加激活函数10个，包括ReLu，Sigmoid，ELU等。

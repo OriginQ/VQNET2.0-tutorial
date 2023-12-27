@@ -25,38 +25,32 @@ CPU下模型训练
     test_conv = Conv2D(ic,oc,(2,2),(2,2),"same")
 
     # input of shape [b,ic,hw,hw]
-    x0 = arange(1,b*ic*hw*hw+1,requires_grad=True,dtype=kfloat32).reshape([b,ic,hw,hw])
+    x0 = arange(1,b*ic*hw*hw+1,requires_grad=True,dtype=kfloat32)
+
+    x1 = x0.reshape([b,ic,hw,hw])
 
     #forward function
-    x = test_conv(x0)
+    y = test_conv(x1)
 
     #backward function with autograd
-    x.backward()
+    y.backward()
     print(x0.grad)
-
-    # [
-    # [[[0.0958736, 0.3032238, 0.0958736, 0.3032238],
-    #  [-0.2665333, 0.1081382, -0.2665333, 0.1081382],
-    #  [0.0958736, 0.3032238, 0.0958736, 0.3032238],
-    #  [-0.2665333, 0.1081382, -0.2665333, 0.1081382]],
-    # [[-0.0068994, 0.0914679, -0.0068994, 0.0914679],
-    #  [-0.2820665, 0.3160213, -0.2820665, 0.3160213],
-    #  [-0.0068994, 0.0914679, -0.0068994, 0.0914679],
-    #  [-0.2820665, 0.3160213, -0.2820665, 0.3160213]]],
-    # [[[0.0958736, 0.3032238, 0.0958736, 0.3032238],
-    #  [-0.2665333, 0.1081382, -0.2665333, 0.1081382],
-    #  [0.0958736, 0.3032238, 0.0958736, 0.3032238],
-    #  [-0.2665333, 0.1081382, -0.2665333, 0.1081382]],
-    # [[-0.0068994, 0.0914679, -0.0068994, 0.0914679],
-    #  [-0.2820665, 0.3160213, -0.2820665, 0.3160213],
-    #  [-0.0068994, 0.0914679, -0.0068994, 0.0914679],
-    #  [-0.2820665, 0.3160213, -0.2820665, 0.3160213]]]
-    # ]
+    # [-0.0008376 -0.2780731 -0.0008376 -0.2780731  0.1125833  0.2805848
+    #   0.1125833  0.2805848 -0.0008376 -0.2780731 -0.0008376 -0.2780731
+    #   0.1125833  0.2805848  0.1125833  0.2805848  0.5759128 -0.057339
+    #   0.5759128 -0.057339  -0.342508  -0.4853693 -0.342508  -0.4853693
+    #   0.5759128 -0.057339   0.5759128 -0.057339  -0.342508  -0.4853693
+    #  -0.342508  -0.4853693 -0.0008376 -0.2780731 -0.0008376 -0.2780731
+    #   0.1125833  0.2805848  0.1125833  0.2805848 -0.0008376 -0.2780731
+    #  -0.0008376 -0.2780731  0.1125833  0.2805848  0.1125833  0.2805848
+    #   0.5759128 -0.057339   0.5759128 -0.057339  -0.342508  -0.4853693
+    #  -0.342508  -0.4853693  0.5759128 -0.057339   0.5759128 -0.057339
+    #  -0.342508  -0.4853693 -0.342508  -0.4853693]
 
 GPU下模型训练
 =================================
 
-您需要安装linux版本下的pyvqnet才能使用GPU。需要保证数据QTensor以及Module均在GPU上。可使用 `to_gpu` 转移数据或者 `gpu` 创建副本，或者在数据创建函数中使用device指定。
+您需要安装linux版本下的pyvqnet才能使用GPU。需要保证数据QTensor以及Module均在GPU上。可使用 `toGPU` 转移数据或者 `gpu` 创建副本，或者在数据创建函数中使用device指定。
 
 请参考以下例子：
 
@@ -75,12 +69,12 @@ GPU下模型训练
 
     test_conv = Conv2D(ic,oc,(2,2),(2,2),"same")
     #复制到gpu上DEV_GPU_0
-    test_conv.to_gpu(DEV_GPU_0)
+    test_conv.toGPU(DEV_GPU_0)
     # input of shape [b,ic,hw,hw]
     x0 = arange(1,b*ic*hw*hw+1,requires_grad=True,dtype=kfloat32).reshape([b,ic,hw,hw])
 
     #使用gpu 复制数据到DEV_GPU_0，亦可以在函数内指定ID，也可以使用相关tensor接口的device进行指定
-    x0 = x0.gpu(DEV_GPU_0)
+    x0 = x0.GPU(DEV_GPU_0)
     x0.requires_grad = True
     #forward function
     x = test_conv(x0)
@@ -357,6 +351,70 @@ ModuleList
         print(mm.state_dict().keys())
         #odict_keys(['pqc2.0.m_para', 'pqc2.1.weights', 'pqc2.1.bias'])
 
+
+ParameterList
+*********************************************************
+.. py:class:: pyvqnet.nn.module.ParameterList([pyvqnet.nn.module.Module])
+
+
+    将参数保存在列表中, ParameterList 可以像普通的 Python 列表一样被索引， 它包含的Parameter的内部参数等可以被保存起来。
+
+    :param modules: nn.Parameter 列表
+
+    :return: 一个参数列表
+
+    Example::
+
+        from pyvqnet import nn
+        class MyModule(nn.Module):
+            def __init__(self):
+                super().__init__()
+                self.params = nn.ParameterList([nn.Parameter((10, 10)) for i in range(10)])
+            def forward(self, x):
+
+                # ParameterList can act as an iterable, or be indexed using ints
+                for i, p in enumerate(self.params):
+                    x = self.params[i // 2] * x + p * x
+                return x
+
+        model = MyModule()
+        print(model.state_dict().keys())
+
+
+Sequential
+*********************************************************
+.. py:class:: pyvqnet.nn.module.Sequential([pyvqnet.nn.module.Module])
+
+    模块将按照传递的顺序添加模块。或者，也可以将模块的 ``OrderedDict`` 传入。``Sequential`` 的 ``forward()`` 方法接受任何输入，并将其转发给它的第一个模块。
+    然后将输出依次 "链 "到其后每个模块的输入、最后返回最后一个模块的输出。
+
+    :param modules: 添加的Module
+
+    :return: Sequential
+
+    Example::
+        
+        from pyvqnet import nn
+        from collections import OrderedDict
+
+        # 使用Sequential创建一个小模型
+        model = nn.Sequential(
+                  nn.Conv2D(1,20,(5, 5)),
+                  nn.ReLu(),
+                  nn.Conv2D(20,64,(5, 5)),
+                  nn.ReLu()
+                )
+        print(model.state_dict().keys())
+
+        # 基于OrderedDict来使用Sequential, 代码如下
+                
+        model = nn.Sequential(OrderedDict([
+                  ('conv1', nn.Conv2D(1,20,(5, 5))),
+                  ('relu1', nn.ReLu()),
+                  ('conv2', nn.Conv2D(20,64,(5, 5))),
+                  ('relu2', nn.ReLu())
+                ]))
+        print(model.state_dict().keys())
 
 经典神经网络层
 *********************************************************
@@ -1066,6 +1124,7 @@ Dropout
 
 Pixel_Shuffle 
 =================================
+
 .. py:class:: pyvqnet.nn.pixel_shuffle.Pixel_Shuffle(upscale_factors, name="")
 
     重新排列形状为：(*, C * r^2, H, W)  的张量
@@ -1090,6 +1149,7 @@ Pixel_Shuffle
 
 Pixel_Unshuffle 
 =================================
+
 .. py:class:: pyvqnet.nn.pixel_shuffle.Pixel_Unshuffle(downscale_factors, name="")
 
     通过重新排列元素来反转 Pixel_Shuffle 操作. 将 (*, C, H * r, W * r) 形状的张量变化为 (*, C * r^2, H, W) ，其中 r 是缩小因子。
