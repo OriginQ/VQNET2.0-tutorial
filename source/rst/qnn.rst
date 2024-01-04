@@ -5338,7 +5338,7 @@ VQC_CRotCircuit
         p = QTensor([2, 3, 4.0])
         qm = QMachine(2)
         VQC_CRotCircuit(p, 0, 1, qm)
-        m = MeasureAll({"Z0": 1})
+        m = MeasureAll(obs={"Z0": 1})
         exp = m(q_machine=qm)
         print(exp)
 
@@ -5378,7 +5378,7 @@ VQC_CSWAPcircuit
         p = QTensor([0.2, 3, 4.0])
         qm = QMachine(3)
         VQC_CSWAPcircuit([1, 0, 2], qm)
-        m = MeasureAll({"Z0": 1})
+        m = MeasureAll(obs={"Z0": 1})
         exp = m(q_machine=qm)
         print(exp)
 
@@ -5413,7 +5413,7 @@ VQC_Controlled_Hadamard
         qm = QMachine(3)
 
         VQC_Controlled_Hadamard([1, 0], qm)
-        m = MeasureAll({"Z0": 1})
+        m = MeasureAll(obs={"Z0": 1})
         exp = m(q_machine=qm)
         print(exp)
 
@@ -5455,7 +5455,7 @@ VQC_CCZ
         qm = QMachine(3)
 
         VQC_CCZ([1, 0, 2], qm)
-        m = MeasureAll({"Z0": 1})
+        m = MeasureAll(obs={"Z0": 1})
         exp = m(q_machine=qm)
         print(exp)
 
@@ -5491,7 +5491,7 @@ VQC_FermionicSingleExcitation
         p0 = QTensor([0.5])
 
         VQC_FermionicSingleExcitation(p0, [1, 0, 2], qm)
-        m = MeasureAll({"Z0": 1})
+        m = MeasureAll(obs={"Z0": 1})
         exp = m(q_machine=qm)
         print(exp)
 
@@ -5542,7 +5542,7 @@ VQC_FermionicDoubleExcitation
         p0 = QTensor([0.5])
 
         VQC_FermionicDoubleExcitation(p0, [0, 1], [2, 3], qm)
-        m = MeasureAll({"Z0": 1})
+        m = MeasureAll(obs={"Z0": 1})
         exp = m(q_machine=qm)
         print(exp)
         
@@ -5599,7 +5599,7 @@ VQC_UCCSD
         qm = QMachine(6)
 
         VQC_UCCSD(p0, range(6), s_wires, d_wires, QTensor([1.0, 1, 0, 0, 0, 0]), qm)
-        m = MeasureAll({"Z1": 1})
+        m = MeasureAll(obs={"Z1": 1})
         exp = m(q_machine=qm)
         print(exp)
 
@@ -5817,7 +5817,7 @@ VQC_QuantumPoolingCircuit
                                 ignored_wires=[0, 1],
                                 sinks_wires=[2, 3],
                                 params=p)
-        m = MeasureAll({"Z1": 1})
+        m = MeasureAll(obs={"Z1": 1})
         exp = m(q_machine=qm)
         print(exp)
 
@@ -5943,13 +5943,13 @@ Probability
 ---------------------------------------------------------------
 
 
-.. py:class:: pyvqnet.qnn.vqc.Probability(wires)
+.. py:class:: pyvqnet.qnn.vqc.Probability(wires=None, name="")
 
-    计算线路概率测量。
+    计算量子线路在特定比特上概率测量结果。
 
-    :param wires: 测量比特idx。
-
-    :return: 测量结果。
+    :param wires: 测量比特的索引，列表、元组或者整数。
+    :param name: 模块的名字，默认：""。
+    :return: 测量结果，QTensor。
 
     Example::
 
@@ -5964,7 +5964,7 @@ Probability
         ry(q_machine=qm,wires=2,params=x[:,[1]])
         cnot(q_machine=qm,wires=[0,2])
         rz(q_machine=qm,wires=3,params=x[:,[1]])
-        ma = Probability(1)
+        ma = Probability(wires=1)
         y =ma(q_machine=qm)
 
         # [[1.0000002 0.       ]
@@ -5973,7 +5973,7 @@ Probability
 MeasureAll
 ---------------------------------------------------------------
 
-.. py:class:: pyvqnet.qnn.vqc.MeasureAll(obs)
+.. py:class:: pyvqnet.qnn.vqc.MeasureAll(obs=None, name="")
 
     计算量子线路的测量结果，支持输入obs为多个或单个泡利算子或这哈密顿量。
     例如：
@@ -5985,8 +5985,8 @@ MeasureAll
     [{\'wires\': [0, 2, 3],\'observables\': [\'X\', \'Y\', \'Z\'],\'coefficient\': [1, 0.5, 0.4]}, {\'wires\': [0, 1, 2],\'observables\': [\'X\', \'Y\', \'Z\'],\'coefficient\': [1, 0.5, 0.4]}]
 
     :param obs: observable。
-
-    :return: 测量结果。
+    :param name: 模块的名字，默认：""。
+    :return: 测量结果，QTensor。
 
     Example::
 
@@ -6010,12 +6010,165 @@ MeasureAll
             'observables': ['X', 'Y', 'Z'],
             'coefficient': [1, 0.5, 0.4]
         }]
-        ma = MeasureAll(obs_list)
-        y =ma(q_machine=qm)
+        ma = MeasureAll(obs = obs_list)
+        y = ma(q_machine=qm)
         print(y)
 
         # [[0.4000001 0.3980018]
         #  [0.4000001 0.3980018]]
+
+
+SparseHamiltonian
+---------------------------------------------------------------
+
+.. py:class:: pyvqnet.qnn.vqc.SparseHamiltonian(obs=None, name="")
+
+    计算观测量的稀疏哈密顿量，例如 {"observables":H,"wires":[0,2,3]}。
+
+    :param obs: 稀疏哈密顿量,使用 `tensor.dense_to_csr()` 函数获取稠密函数的稀疏格式。
+    :param name: 模块的名字，默认：""。
+    :return: 期望结果，QTensor。
+
+    Example::
+
+        import pyvqnet
+        pyvqnet.utils.set_random_seed(42)
+        from pyvqnet import tensor
+        from pyvqnet.nn import Module
+        from pyvqnet.qnn.vqc import QMachine,CRX,PauliX,paulix,crx,SparseHamiltonian
+        H = tensor.QTensor(
+        [[ 0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,
+        0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j, -1.+0.j,],
+        [ 0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,
+        0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  1.+0.j,  0.+0.j,],
+        [ 0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,
+        0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  1.+0.j,  0.+0.j,  0.+0.j,],
+        [ 0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,
+        0.+0.j,  0.+0.j,  0.+0.j, -1.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,],
+        [ 0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,
+        0.+0.j,  0.+0.j, -1.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,],
+        [ 0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,
+        0.+0.j,  1.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,],
+        [ 0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,
+        1.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,],
+        [ 0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j, -1.+0.j,
+        0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,],
+        [ 0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j, -1.+0.j,  0.+0.j,
+        0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,],
+        [ 0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  1.+0.j,  0.+0.j,  0.+0.j,
+        0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,],
+        [ 0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  1.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,
+        0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,],
+        [ 0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j, -1.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,
+        0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,],
+        [ 0.+0.j,  0.+0.j,  0.+0.j, -1.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,
+        0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,],
+        [ 0.+0.j,  0.+0.j,  1.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,
+        0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,],
+        [ 0.+0.j,  1.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,
+        0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,],
+        [-1.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,
+        0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,  0.+0.j,]],dtype=pyvqnet.kcomplex64)
+        cpu_csr = tensor.dense_to_csr(H)
+        class QModel(Module):
+            def __init__(self, num_wires, dtype,grad_mode=""):
+                super(QModel, self).__init__()
+
+                self._num_wires = num_wires
+                self._dtype = dtype
+                self.qm = QMachine(num_wires)
+                self.measure = SparseHamiltonian(obs = {"observables":cpu_csr, "wires":[2, 1, 3, 5]})
+
+
+            def forward(self, x, *args, **kwargs):
+                self.qm.reset_states(x.shape[0])
+                paulix(q_machine=self.qm, wires= 0)
+                paulix(q_machine=self.qm, wires = 2)
+                crx(q_machine=self.qm,wires=[0, 1],params=tensor.full((x.shape[0],1),0.1,dtype=pyvqnet.kcomplex64))
+                crx(q_machine=self.qm,wires=[2, 3],params=tensor.full((x.shape[0],1),0.2,dtype=pyvqnet.kcomplex64))
+                crx(q_machine=self.qm,wires=[1, 2],params=tensor.full((x.shape[0],1),0.3,dtype=pyvqnet.kcomplex64))
+                crx(q_machine=self.qm,wires=[2, 4],params=tensor.full((x.shape[0],1),0.3,dtype=pyvqnet.kcomplex64))
+                crx(q_machine=self.qm,wires=[5, 3],params=tensor.full((x.shape[0],1),0.3,dtype=pyvqnet.kcomplex64))
+                
+                rlt = self.measure(q_machine=self.qm)
+                return rlt
+
+        model = QModel(6,pyvqnet.kcomplex64)
+        y = model(tensor.ones([1,1]))
+
+        print(y)
+        #[0.]
+
+
+HermitianExpval
+---------------------------------------------------------------
+
+.. py:class:: pyvqnet.qnn.vqc.HermitianExpval(obs=None, name="")
+
+    计算量子线路某个厄密特量的期望。
+
+    :param obs: 厄密特量。
+    :param name: 模块的名字，默认：""。
+    :return: 期望结果，QTensor。
+
+    Example::
+
+
+        from pyvqnet.qnn.vqc import qcircuit
+        from pyvqnet.qnn.vqc import QMachine, RX, RY, CNOT, PauliX, qmatrix, PauliZ, VQC_RotCircuit,HermitianExpval
+        from pyvqnet.tensor import QTensor, tensor
+        import pyvqnet
+        from pyvqnet.nn import Parameter
+        import numpy as np
+        bsz = 3
+        H = np.array([[8, 4, 0, -6], [4, 0, 4, 0], [0, 4, 8, 0], [-6, 0, 0, 0]])
+        class QModel(pyvqnet.nn.Module):
+            def __init__(self, num_wires, dtype):
+                super(QModel, self).__init__()
+                self.rot_param = Parameter((3, ))
+                self.rot_param.copy_value_from(tensor.QTensor([-0.5, 1, 2.3]))
+                self._num_wires = num_wires
+                self._dtype = dtype
+                self.qm = QMachine(num_wires, dtype=dtype)
+                self.rx_layer1 = VQC_RotCircuit
+                self.ry_layer2 = RY(has_params=True,
+                                    trainable=True,
+                                    wires=0,
+                                    init_params=tensor.QTensor([-0.5]))
+                self.xlayer = PauliX(wires=0)
+                self.cnot = CNOT(wires=[0, 1])
+                self.measure = HermitianExpval(obs = {'wires':(1,0),'observables':tensor.to_tensor(H)})
+
+            def forward(self, x, *args, **kwargs):
+                self.qm.reset_states(x.shape[0])
+
+                qcircuit.rx(q_machine=self.qm, wires=0, params=x[:, [1]])
+                qcircuit.ry(q_machine=self.qm, wires=1, params=x[:, [0]])
+                self.xlayer(q_machine=self.qm)
+                self.rx_layer1(params=self.rot_param, wire=1, q_machine=self.qm)
+                self.ry_layer2(q_machine=self.qm)
+                self.cnot(q_machine=self.qm)
+                rlt = self.measure(q_machine = self.qm)
+
+                return rlt
+
+
+        input_x = tensor.arange(1, bsz * 2 + 1,
+                                dtype=pyvqnet.kfloat32).reshape([bsz, 2])
+        input_x.requires_grad = True
+
+        qunatum_model = QModel(num_wires=2, dtype=pyvqnet.kcomplex64)
+
+        batch_y = qunatum_model(input_x)
+        batch_y.backward()
+
+        print(batch_y)
+
+
+        # [[5.3798223],
+        #  [7.1294155],
+        #  [0.7028297]]
+
 
 常用量子变分线路模板
 =======================================
@@ -6210,7 +6363,7 @@ VQC_QuantumEmbedding
                                                 num_repetitions, pyvqnet.kfloat64,
                                                 initial=tensor.full([1],12.0))
 
-                self.measure = MeasureAll({f"Z{nq-1}":1})
+                self.measure = MeasureAll(obs = {f"Z{nq-1}":1})
                 self.device = QMachine(nq,dtype=pyvqnet.kcomplex128)
 
             def forward(self, x, *args, **kwargs):
@@ -6267,7 +6420,7 @@ ExpressiveEntanglingAnsatz
                 self._dtype = dtype
                 self.qm = QMachine(num_wires, dtype=dtype,grad_mode=grad_mode,save_ir=True)
                 self.c1 = ExpressiveEntanglingAnsatz(13,3,2)
-                self.measure = MeasureAll({
+                self.measure = MeasureAll(obs = {
                     'wires': [1],
                     'observables': ['z'],
                     'coefficient': [1]
@@ -6341,7 +6494,7 @@ QuantumLayerAdjoint
                                                     depth=5)
                 self.tlayer = T(wires=1)
                 self.cnot = CNOT(wires=[0, 1])
-                self.measure = MeasureAll({
+                self.measure = MeasureAll(obs = {
                     'wires': [1],
                     'observables': ['x'],
                     'coefficient': [1]
@@ -6477,7 +6630,7 @@ vqc_to_originir_list
                 self.iSWAP = iSWAP(True,True,wires=[0,2])
                 self.tlayer = T(wires=1)
                 self.cnot = CNOT(wires=[0, 1])
-                self.measure = MeasureAll({
+                self.measure = MeasureAll(obs = {
                     'wires': [1],
                     'observables': ['x'],
                     'coefficient': [1]
@@ -6685,7 +6838,7 @@ model_summary
                                     init_params=tensor.QTensor([-0.5]))
                 self.xlayer = PauliX(wires=0)
                 self.cnot = CNOT(wires=[0, 1])
-                self.measure = MeasureAll(PauliZ)
+                self.measure = MeasureAll(obs = PauliZ)
                 self.linear = Linear(24,2)
                 self.lstm =LSTM(23,5)
             def forward(self, x, *args, **kwargs):
@@ -6699,7 +6852,7 @@ model_summary
         # total classic parameters: 650
 
         # =========================================
-        # qubits num: 0
+        # qubits num: 4
         # gates: {'RX': 1, 'RY': 1, 'PauliX': 1, 'CNOT': 1}
         # total quantum gates: 4
         # total quantum parameter gates: 2
@@ -6707,3 +6860,588 @@ model_summary
         # #########################################################
 
 
+QNG
+---------------------------------------------------------------
+
+.. py:class:: pyvqnet.qnn.vqc.qng.QNG(qmodel, stepsize=0.01)
+
+    `量子自然梯度法(Quantum Nature Gradient) <https://arxiv.org/abs/1909.02108>`_ 借鉴经典自然梯度法的概念 `Amari (1998) <https://www.mitpressjournals.org/doi/abs/10.1162/089976698300017746>`__ ，
+    我们改为将优化问题视为给定输入的可能输出值的概率分布（即，最大似然估计），则更好的方法是在分布
+    空间中执行梯度下降，它相对于参数化是无量纲和不变的. 因此，无论参数化如何，每个优化步骤总是会为每个参数选择最佳步长。
+    在量子机器学习任务中，量子态空间拥有一个独特的不变度量张量，称为 Fubini-Study 度量张量 :math:`g_{ij}`。
+    该张量将量子线路参数空间中的最速下降转换为分布空间中的最速下降。
+    量子自然梯度的公式如下：
+
+    .. math:: \theta_{t+1} = \theta_t - \eta g^{+}(\theta_t)\nabla \mathcal{L}(\theta),
+
+    其中 :math:`g^{+}` 是伪逆。
+
+    `wrapper_calculate_qng` 是需要加到待计算量子自然梯度的模型的forward函数的装饰器。仅对模型注册的 `Parameter` 类型的参数优化。
+
+    :param qmodel: 量子变分线路模型,需要使用 `wrapper_calculate_qng` 作为forward函数的装饰器。
+    :param stepsize: 梯度下降法的步长，默认0.01。
+
+    .. note::
+
+        仅在非批处理数据上进行了测试。
+        仅支持纯变分量子电路。
+        step() 将更新输入和参数的梯度。
+        step() 仅会更新模型参数的数值。
+
+    Example::
+
+        from pyvqnet.qnn.vqc import QMachine, RX, RY, RZ, CNOT, rz, PauliX, qmatrix, PauliZ, Probability, rx, ry, MeasureAll, U2
+        from pyvqnet.tensor import QTensor, tensor
+        import pyvqnet
+        import numpy as np
+        from pyvqnet.qnn.vqc import wrapper_calculate_qng
+
+        class QModel(pyvqnet.nn.Module):
+            def __init__(self, num_wires, dtype):
+                super(QModel, self).__init__()
+
+                self._num_wires = num_wires
+                self._dtype = dtype
+                self.qm = QMachine(num_wires, dtype=dtype)
+                self.rz_layer1 = RZ(has_params=True, trainable=False, wires=0)
+                self.rz_layer2 = RZ(has_params=True, trainable=False, wires=1)
+                self.u2_layer1 = U2(has_params=True, trainable=False, wires=0)
+                self.l_train1 = RY(has_params=True, trainable=True, wires=1)
+                self.l_train1.params.init_from_tensor(
+                    QTensor([333], dtype=pyvqnet.kfloat32))
+                self.l_train2 = RX(has_params=True, trainable=True, wires=2)
+                self.l_train2.params.init_from_tensor(
+                    QTensor([4444], dtype=pyvqnet.kfloat32))
+                self.xlayer = PauliX(wires=0)
+                self.cnot01 = CNOT(wires=[0, 1])
+                self.cnot12 = CNOT(wires=[1, 2])
+                self.measure = MeasureAll(obs={'Y0': 1})
+
+            @wrapper_calculate_qng
+            def forward(self, x, *args, **kwargs):
+                self.qm.reset_states(x.shape[0])
+
+                ry(q_machine=self.qm, wires=0, params=np.pi / 4)
+                ry(q_machine=self.qm, wires=1, params=np.pi / 3)
+                ry(q_machine=self.qm, wires=2, params=np.pi / 7)
+                self.rz_layer1(q_machine=self.qm, params=x[:, [0]])
+                self.rz_layer2(q_machine=self.qm, params=x[:, [1]])
+
+                self.u2_layer1(q_machine=self.qm, params=x[:, [3, 4]])  #
+
+                self.cnot01(q_machine=self.qm)
+                self.cnot12(q_machine=self.qm)
+                ry(q_machine=self.qm, wires=0, params=np.pi / 7)
+
+                self.l_train1(q_machine=self.qm)
+                self.l_train2(q_machine=self.qm)
+                #rx(q_machine=self.qm, wires=2, params=x[:, [3]])
+                rz(q_machine=self.qm, wires=1, params=x[:, [2]])
+                ry(q_machine=self.qm, wires=0, params=np.pi / 7)
+                rz(q_machine=self.qm, wires=1, params=x[:, [2]])
+
+                self.cnot01(q_machine=self.qm)
+                self.cnot12(q_machine=self.qm)
+                rlt = self.measure(q_machine=self.qm)
+                return rlt
+
+
+        qmodel = QModel(3, pyvqnet.kcomplex64)
+
+        x = QTensor([[1111.0, 2222, 444, 55, 666]])
+
+        qng = pyvqnet.qnn.vqc.QNG(qmodel,0.01)
+
+        qng.step(x)
+
+        print(qmodel.parameters())
+        #[[[333.0084]], [[4443.9985]]]
+
+
+wrapper_single_qubit_op_fuse
+---------------------------------------------------------------
+
+.. py:function:: pyvqnet.qnn.vqc.wrapper_single_qubit_op_fuse(f)
+
+    一个用于将单比特运算融合到 Rot 运算中的装饰器。
+
+    .. note::
+
+        f 是模块的前向函数,需要运行一次模型的前向函数才能生效。
+        此处定义的模型继承自 `pyvqnet.qnn.vqc.QModule`，该类是 `pyvqnet.nn.Module` 的子类。
+
+    Example::
+
+        from pyvqnet import tensor
+        from pyvqnet.qnn.vqc import QMachine, Operation, apply_unitary_bmm
+        from pyvqnet import kcomplex128
+        from pyvqnet.tensor import adjoint
+        import numpy as np
+        from pyvqnet.qnn.vqc import single_qubit_ops_fuse, wrapper_single_qubit_op_fuse, QModule,op_history_summary
+        from pyvqnet.qnn.vqc import QMachine, RX, RY, CNOT, PauliX, qmatrix, PauliZ, T, MeasureAll, RZ
+        from pyvqnet.tensor import QTensor, tensor
+        import pyvqnet
+        import numpy as np
+        from pyvqnet.utils import set_random_seed
+
+
+        set_random_seed(42)
+
+        class QModel(QModule):
+            def __init__(self, num_wires, dtype):
+                super(QModel, self).__init__()
+
+                self._num_wires = num_wires
+                self._dtype = dtype
+                self.qm = QMachine(num_wires, dtype=dtype)
+                self.rx_layer = RX(has_params=True, trainable=False, wires=0, dtype=dtype)
+                self.ry_layer = RY(has_params=True, trainable=False, wires=1, dtype=dtype)
+                self.rz_layer = RZ(has_params=True, trainable=False, wires=1, dtype=dtype)
+                self.rz_layer2 = RZ(has_params=True, trainable=False, wires=1, dtype=dtype)
+                self.tlayer = T(wires=1)
+                self.cnot = CNOT(wires=[0, 1])
+                self.measure = MeasureAll(obs={
+                    'wires': [1],
+                    'observables': ['x'],
+                    'coefficient': [1]
+                })
+
+            @wrapper_single_qubit_op_fuse
+            def forward(self, x, *args, **kwargs):
+                self.qm.reset_states(x.shape[0])
+
+                self.rx_layer(params=x[:, [0]], q_machine=self.qm)
+                self.cnot(q_machine=self.qm)
+                self.ry_layer(params=x[:, [1]], q_machine=self.qm)
+                self.tlayer(q_machine=self.qm)
+                self.rz_layer(params=x[:, [2]], q_machine=self.qm)
+                self.rz_layer2(params=x[:, [3]], q_machine=self.qm)
+                rlt = self.measure(q_machine=self.qm)
+
+                return rlt
+
+        input_x = tensor.QTensor([[0.1, 0.2, 0.3, 0.4], [0.1, 0.2, 0.3, 0.4]],
+                                dtype=pyvqnet.kfloat64)
+
+        input_xt = tensor.tile(input_x, (100, 1))
+        input_xt.requires_grad = True
+
+        qunatum_model = QModel(num_wires=2, dtype=pyvqnet.kcomplex128)
+        batch_y = qunatum_model(input_xt)
+        print(op_history_summary(qunatum_model.qm.op_history))
+
+
+        # ###################Summary#######################
+        # qubits num: 2
+        # gates: {'rot': 2, 'cnot': 1}
+        # total gates: 3
+        # total parameter gates: 2
+        # total parameters: 6
+        # #################################################
+
+
+wrapper_commute_controlled
+---------------------------------------------------------------
+
+.. py:function:: pyvqnet.qnn.vqc.wrapper_commute_controlled(f, direction = "right")
+
+    装饰器用于进行受控门交换
+    这是一个量子变换，用于将可交换的门移动到受控操作的控制比特和目标比特之前。
+    控制比特两侧的对角门不会影响受控门的结果；因此，我们可以将所有作用在第一个比特上的单比特门一起推到右边（如果需要，可以进行融合）。
+    类似地，X 门与 CNOT 和 Toffoli 的目标比特可交换（PauliY 与 CRY 也是如此）。
+    我们可以使用此变换将单比特门尽可能推到受控操作的深处。
+
+    .. note::
+
+        f 是模块的前向函数,需要运行一次模型的前向函数才能生效。
+        此处定义的模型继承自 `pyvqnet.qnn.vqc.QModule`，该类是 `pyvqnet.nn.Module` 的子类。
+
+    :param f: 前向函数。
+    :param direction: 移动单比特门的方向，可选值为 "left" 或 "right"，默认为 "right"。
+
+
+    Example::
+
+        from pyvqnet import tensor
+        from pyvqnet.qnn.vqc import QMachine
+        from pyvqnet import kcomplex128
+        from pyvqnet.tensor import adjoint
+        import numpy as np
+        from pyvqnet.qnn.vqc import wrapper_commute_controlled, pauliy, QModule,op_history_summary
+
+        from pyvqnet.qnn.vqc import QMachine, RX, RY, CNOT, S, CRY, PauliZ, PauliX, T, MeasureAll, RZ, CZ, PhaseShift, Toffoli, cnot, cry, toffoli
+        from pyvqnet.tensor import QTensor, tensor
+        import pyvqnet
+        import numpy as np
+        from pyvqnet.utils import set_random_seed
+        from pyvqnet.qnn import expval, QuantumLayerV2
+        import time
+        from functools import partial
+        set_random_seed(42)
+
+        class QModel(QModule):
+            def __init__(self, num_wires, dtype):
+                super(QModel, self).__init__()
+
+                self._num_wires = num_wires
+                self._dtype = dtype
+                self.qm = QMachine(num_wires, dtype=dtype)
+
+                self.cz = CZ(wires=[0, 2])
+                self.paulix = PauliX(wires=2)
+                self.s = S(wires=0)
+                self.ps = PhaseShift(has_params=True, trainable= True, wires=0, dtype=dtype)
+                self.t = T(wires=0)
+                self.rz = RZ(has_params=True, wires=1, dtype=dtype)
+                self.measure = MeasureAll(obs={
+                    'wires': [0],
+                    'observables': ['z'],
+                    'coefficient': [1]
+                })
+
+            @partial(wrapper_commute_controlled, direction="left")
+            def forward(self, x, *args, **kwargs):
+                self.qm.reset_states(x.shape[0])
+                self.cz(q_machine=self.qm)
+                self.paulix(q_machine=self.qm)
+                self.s(q_machine=self.qm)
+                cnot(q_machine=self.qm, wires=[0, 1])
+                pauliy(q_machine=self.qm, wires=1)
+                cry(q_machine=self.qm, params=1 / 2, wires=[0, 1])
+                self.ps(q_machine=self.qm)
+                toffoli(q_machine=self.qm, wires=[0, 1, 2])
+                self.t(q_machine=self.qm)
+                self.rz(q_machine=self.qm)
+                rlt = self.measure(q_machine=self.qm)
+
+                return rlt
+
+        import pyvqnet
+        import pyvqnet.tensor as tensor
+        input_x = tensor.QTensor([[0.1, 0.2, 0.3, 0.4], [0.1, 0.2, 0.3, 0.4]],
+                                    dtype=pyvqnet.kfloat64)
+
+        input_xt = tensor.tile(input_x, (100, 1))
+        input_xt.requires_grad = True
+
+        qunatum_model = QModel(num_wires=3, dtype=pyvqnet.kcomplex128)
+
+        batch_y = qunatum_model(input_xt)
+        for d in qunatum_model.qm.op_history:
+            name = d["name"]
+            wires = d["wires"]
+            p = d["params"]
+            print(f"name: {name} wires: {wires}, params = {p}")
+
+
+        # name: s wires: (0,), params = None
+        # name: phaseshift wires: (0,), params = [[4.744782]]
+        # name: t wires: (0,), params = None
+        # name: cz wires: (0, 2), params = None
+        # name: paulix wires: (2,), params = None
+        # name: cnot wires: (0, 1), params = None
+        # name: pauliy wires: (1,), params = None
+        # name: cry wires: (0, 1), params = [[0.5]]
+        # name: rz wires: (1,), params = [[4.7447823]]
+        # name: toffoli wires: (0, 1, 2), params = None
+        # name: MeasureAll wires: [0], params = None
+
+
+wrapper_merge_rotations
+---------------------------------------------------------------
+
+.. py:function:: pyvqnet.qnn.vqc.wrapper_merge_rotations(f)
+
+
+    合并相同类型的旋转门的装饰器，包括 "rx"、"ry"、"rz"、"phaseshift"、"crx"、"cry"、"crz"、"controlledphaseshift"、"isingxx"、
+    "isingyy"、"isingzz"、"rot"。
+
+    .. note::
+
+        f 是模块的前向函数,需要运行一次模型的前向函数才能生效。
+        此处定义的模型继承自 `pyvqnet.qnn.vqc.QModule`，该类是 `pyvqnet.nn.Module` 的子类。
+
+    :param f: 前向函数。
+
+    Example::
+
+        import pyvqnet
+        from pyvqnet.tensor import tensor
+
+        from pyvqnet import tensor
+        from pyvqnet.qnn.vqc import QMachine,op_history_summary
+        from pyvqnet import kcomplex128
+        from pyvqnet.tensor import adjoint
+        import numpy as np
+
+
+        from pyvqnet.qnn.vqc import *
+        from pyvqnet.qnn.vqc import QModule
+        from pyvqnet.tensor import QTensor, tensor
+        import pyvqnet
+        import numpy as np
+        from pyvqnet.utils import set_random_seed
+
+        set_random_seed(42)
+
+        class QModel(QModule):
+            def __init__(self, num_wires, dtype):
+                super(QModel, self).__init__()
+
+                self._num_wires = num_wires
+                self._dtype = dtype
+                self.qm = QMachine(num_wires, dtype=dtype)
+
+                self.measure = MeasureAll(obs={
+                    'wires': [0],
+                    'observables': ['z'],
+                    'coefficient': [1]
+                })
+
+            @wrapper_merge_rotations
+            def forward(self, x, *args, **kwargs):
+
+                self.qm.reset_states(x.shape[0])
+                
+                rx(q_machine=self.qm, params=x[:, [1]], wires=(0, ))
+                rx(q_machine=self.qm, params=x[:, [1]], wires=(0, ))
+                rx(q_machine=self.qm, params=x[:, [1]], wires=(0, ))
+                rot(q_machine=self.qm, params=x, wires=(1, ), use_dagger=True)
+                rot(q_machine=self.qm, params=x, wires=(1, ), use_dagger=True)
+                isingxy(q_machine=self.qm, params=x[:, [2]], wires=(0, 1))
+                isingxy(q_machine=self.qm, params=x[:, [0]], wires=(0, 1))
+                cnot(q_machine=self.qm, wires=[1, 2])
+                ry(q_machine=self.qm, params=x[:, [1]], wires=(1, ))
+                hadamard(q_machine=self.qm, wires=(2, ))
+                crz(q_machine=self.qm, params=x[:, [2]], wires=(2, 0))
+                ry(q_machine=self.qm, params=-x[:, [1]], wires=1)
+                return self.measure(q_machine=self.qm)
+
+
+        input_x = tensor.QTensor([[1, 2, 3], [1, 2, 3]], dtype=pyvqnet.kfloat64)
+
+        input_x.requires_grad = True
+
+        qunatum_model = QModel(num_wires=3, dtype=pyvqnet.kcomplex128)
+        qunatum_model.use_merge_rotations = True
+        batch_y = qunatum_model(input_x)
+        print(op_history_summary(qunatum_model.qm.op_history))
+        # ###################Summary#######################
+        # qubits num: 3
+        # gates: {'rx': 1, 'rot': 1, 'isingxy': 2, 'cnot': 1, 'hadamard': 1, 'crz': 1}
+        # total gates: 7
+        # total parameter gates: 5
+        # total parameters: 7
+        # #################################################
+
+
+
+wrapper_compile
+---------------------------------------------------------------
+
+.. py:function:: pyvqnet.qnn.vqc.wrapper_compile(f,compile_rules=[commute_controlled_right, merge_rotations, single_qubit_ops_fuse])
+
+    使用编译规则来优化 QModule 的电路。
+
+    .. note::
+
+        f 是模块的前向函数,需要运行一次模型的前向函数才能生效。
+        此处定义的模型继承自 `pyvqnet.qnn.vqc.QModule`，该类是 `pyvqnet.nn.Module` 的子类。
+
+    :param f: 前向函数。
+
+    Example::
+
+        from functools import partial
+
+        from pyvqnet.qnn.vqc import op_history_summary
+        from pyvqnet.qnn.vqc import QModule
+        from pyvqnet import tensor
+        from pyvqnet.qnn.vqc import QMachine, wrapper_compile
+
+        from pyvqnet.qnn.vqc import pauliy
+
+        from pyvqnet.qnn.vqc import QMachine, ry,rz, ControlledPhaseShift, \
+            rx, S, rot, isingxy,CSWAP, PauliX, T, MeasureAll, RZ, CZ, PhaseShift, u3, cnot, cry, toffoli, cy
+        from pyvqnet.tensor import QTensor, tensor
+        import pyvqnet
+
+        class QModel_before(QModule):
+            def __init__(self, num_wires, dtype):
+                super(QModel_before, self).__init__()
+
+                self._num_wires = num_wires
+                self._dtype = dtype
+                self.qm = QMachine(num_wires, dtype=dtype)
+                self.qm.set_save_op_history_flag(True)
+                self.cswap = CSWAP(wires=(0, 2, 1))
+                self.cz = CZ(wires=[0, 2])
+
+                self.paulix = PauliX(wires=2)
+
+                self.s = S(wires=0)
+
+                self.ps = PhaseShift(has_params=True,
+                                        trainable=True,
+                                        wires=0,
+                                        dtype=dtype)
+
+                self.cps = ControlledPhaseShift(has_params=True,
+                                                trainable=True,
+                                                wires=(1, 0),
+                                                dtype=dtype)
+                self.t = T(wires=0)
+                self.rz = RZ(has_params=True, wires=1, dtype=dtype)
+
+                self.measure = MeasureAll(obs={
+                    'wires': [0],
+                    'observables': ['z'],
+                    'coefficient': [1]
+                })
+
+            def forward(self, x, *args, **kwargs):
+                self.qm.reset_states(x.shape[0])
+                self.cz(q_machine=self.qm)
+                self.paulix(q_machine=self.qm)
+                rx(q_machine=self.qm,wires=1,params = x[:,[0]])
+                ry(q_machine=self.qm,wires=1,params = x[:,[1]])
+                rz(q_machine=self.qm,wires=1,params = x[:,[2]])
+                rot(q_machine=self.qm, params=x[:, 0:3], wires=(1, ), use_dagger=True)
+                rot(q_machine=self.qm, params=x[:, 1:4], wires=(1, ), use_dagger=True)
+                isingxy(q_machine=self.qm, params=x[:, [2]], wires=(0, 1))
+                u3(q_machine=self.qm, params=x[:, 0:3], wires=1)
+                self.s(q_machine=self.qm)
+                self.cswap(q_machine=self.qm)
+                cnot(q_machine=self.qm, wires=[0, 1])
+                ry(q_machine=self.qm,wires=2,params = x[:,[1]])
+                pauliy(q_machine=self.qm, wires=1)
+                cry(q_machine=self.qm, params=1 / 2, wires=[0, 1])
+                self.ps(q_machine=self.qm)
+                self.cps(q_machine=self.qm)
+                ry(q_machine=self.qm,wires=2,params = x[:,[1]])
+                rz(q_machine=self.qm,wires=2,params = x[:,[2]])
+                toffoli(q_machine=self.qm, wires=[0, 1, 2])
+                self.t(q_machine=self.qm)
+
+                cy(q_machine=self.qm, wires=(2, 1))
+                ry(q_machine=self.qm,wires=1,params = x[:,[1]])
+                self.rz(q_machine=self.qm)
+
+                rlt = self.measure(q_machine=self.qm)
+
+                return rlt
+        class QModel(QModule):
+            def __init__(self, num_wires, dtype):
+                super(QModel, self).__init__()
+
+                self._num_wires = num_wires
+                self._dtype = dtype
+                self.qm = QMachine(num_wires, dtype=dtype)
+
+                self.cswap = CSWAP(wires=(0, 2, 1))
+                self.cz = CZ(wires=[0, 2])
+
+                self.paulix = PauliX(wires=2)
+
+                self.s = S(wires=0)
+
+                self.ps = PhaseShift(has_params=True,
+                                        trainable=True,
+                                        wires=0,
+                                        dtype=dtype)
+
+                self.cps = ControlledPhaseShift(has_params=True,
+                                                trainable=True,
+                                                wires=(1, 0),
+                                                dtype=dtype)
+                self.t = T(wires=0)
+                self.rz = RZ(has_params=True, wires=1, dtype=dtype)
+
+                self.measure = MeasureAll(obs={
+                    'wires': [0],
+                    'observables': ['z'],
+                    'coefficient': [1]
+                })
+
+            @partial(wrapper_compile)
+            def forward(self, x, *args, **kwargs):
+                self.qm.reset_states(x.shape[0])
+                self.cz(q_machine=self.qm)
+                self.paulix(q_machine=self.qm)
+                rx(q_machine=self.qm,wires=1,params = x[:,[0]])
+                ry(q_machine=self.qm,wires=1,params = x[:,[1]])
+                rz(q_machine=self.qm,wires=1,params = x[:,[2]])
+                rot(q_machine=self.qm, params=x[:, 0:3], wires=(1, ), use_dagger=True)
+                rot(q_machine=self.qm, params=x[:, 1:4], wires=(1, ), use_dagger=True)
+                isingxy(q_machine=self.qm, params=x[:, [2]], wires=(0, 1))
+                u3(q_machine=self.qm, params=x[:, 0:3], wires=1)
+                self.s(q_machine=self.qm)
+                self.cswap(q_machine=self.qm)
+                cnot(q_machine=self.qm, wires=[0, 1])
+                ry(q_machine=self.qm,wires=2,params = x[:,[1]])
+                pauliy(q_machine=self.qm, wires=1)
+                cry(q_machine=self.qm, params=1 / 2, wires=[0, 1])
+                self.ps(q_machine=self.qm)
+                self.cps(q_machine=self.qm)
+                ry(q_machine=self.qm,wires=2,params = x[:,[1]])
+                rz(q_machine=self.qm,wires=2,params = x[:,[2]])
+                toffoli(q_machine=self.qm, wires=[0, 1, 2])
+                self.t(q_machine=self.qm)
+
+                cy(q_machine=self.qm, wires=(2, 1))
+                ry(q_machine=self.qm,wires=1,params = x[:,[1]])
+                self.rz(q_machine=self.qm)
+
+                rlt = self.measure(q_machine=self.qm)
+
+                return rlt
+
+        import pyvqnet
+        import pyvqnet.tensor as tensor
+        input_x = tensor.QTensor([[0.1, 0.2, 0.3, 0.4], [0.1, 0.2, 0.3, 0.4]],
+                                    dtype=pyvqnet.kfloat64)
+
+        input_x.requires_grad = True
+        num_wires = 3
+        qunatum_model = QModel(num_wires=num_wires, dtype=pyvqnet.kcomplex128)
+        qunatum_model_before = QModel_before(num_wires=num_wires, dtype=pyvqnet.kcomplex128)
+
+        batch_y = qunatum_model(input_x)
+        batch_y = qunatum_model_before(input_x)
+
+        flatten_oph_names = []
+
+        print("before")
+
+        print(op_history_summary(qunatum_model_before.qm.op_history))
+        flatten_oph_names = []
+        for d in qunatum_model.compiled_op_historys:
+                if "compile" in d.keys():
+                    oph = d["op_history"]
+                    for i in oph:
+                        n = i["name"]
+                        w = i["wires"]
+                        p = i["params"]
+                        flatten_oph_names.append({"name":n,"wires":w, "params": p})
+        print("after")
+        print(op_history_summary(qunatum_model.qm.op_history))
+
+
+        # ###################Summary#######################
+        # qubits num: 3
+        # gates: {'cz': 1, 'paulix': 1, 'rx': 1, 'ry': 4, 'rz': 3, 'rot': 2, 'isingxy': 1, 'u3': 1, 's': 1, 'cswap': 1, 'cnot': 1, 'pauliy': 1, 'cry': 1, 'phaseshift': 1, 'controlledphaseshift': 1, 'toffoli': 1, 't': 1, 'cy': 1}
+        # total gates: 24
+        # total parameter gates: 15
+        # total parameters: 21
+        # #################################################
+            
+        # after
+
+
+        # ###################Summary#######################
+        # qubits num: 3
+        # gates: {'cz': 1, 'rot': 7, 'isingxy': 1, 'u3': 1, 'cswap': 1, 'cnot': 1, 'cry': 1, 'controlledphaseshift': 1, 'toffoli': 1, 'cy': 1}
+        # total gates: 16
+        # total parameter gates: 11
+        # total parameters: 27
+        # #################################################
