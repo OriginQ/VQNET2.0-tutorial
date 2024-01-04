@@ -2696,14 +2696,13 @@ QMachine
 i
 ---------------------------------------------------------------
 
-.. py:function:: pyvqnet.qnn.vqc.i(q_machine, wires, params=None, num_wires=None, use_dagger=False)
+.. py:function:: pyvqnet.qnn.vqc.i(q_machine, wires, params=None, use_dagger=False)
 
     对q_machine中的态矢作用量子逻辑门 I 。
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
-    :param num_wires: 量子比特数，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
     :return: 输出QTensor。
 
@@ -2757,14 +2756,13 @@ I
 hadamard
 ---------------------------------------------------------------
 
-.. py:function:: pyvqnet.qnn.vqc.hadamard(q_machine, wires, params=None, num_wires=None, use_dagger=False)
+.. py:function:: pyvqnet.qnn.vqc.hadamard(q_machine, wires, params=None, use_dagger=False)
     
     对q_machine中的态矢作用量子逻辑门 hadamard 。
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
-    :param num_wires: 量子比特数，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
     :return: 输出QTensor。
 
@@ -2819,14 +2817,13 @@ Hadamard
 t
 ---------------------------------------------------------------
 
-.. py:function:: pyvqnet.qnn.vqc.t(q_machine, wires, params=None, num_wires=None, use_dagger=False)
+.. py:function:: pyvqnet.qnn.vqc.t(q_machine, wires, params=None, use_dagger=False)
     
     对q_machine中的态矢作用量子逻辑门 t 。
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
-    :param num_wires: 量子比特数，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
     :return: 输出QTensor。
 
@@ -2879,14 +2876,13 @@ T
 s
 ---------------------------------------------------------------
 
-.. py:function:: pyvqnet.qnn.vqc.s(q_machine, wires, params=None, num_wires=None, use_dagger=False)
+.. py:function:: pyvqnet.qnn.vqc.s(q_machine, wires, params=None, use_dagger=False)
     
     对q_machine中的态矢作用量子逻辑门 s 。
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
-    :param num_wires: 量子比特数，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
     :return: 输出QTensor。
 
@@ -2940,14 +2936,13 @@ S
 paulix
 ---------------------------------------------------------------
 
-.. py:function:: pyvqnet.qnn.vqc.paulix(q_machine, wires, params=None, num_wires=None, use_dagger=False)
+.. py:function:: pyvqnet.qnn.vqc.paulix(q_machine, wires, params=None, use_dagger=False)
     
     对q_machine中的态矢作用量子逻辑门 paulix 。
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
-    :param num_wires: 量子比特数，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
     :return: 输出QTensor。
 
@@ -3000,14 +2995,13 @@ PauliX
 pauliy
 ---------------------------------------------------------------
 
-.. py:function:: pyvqnet.qnn.vqc.pauliy(q_machine, wires, params=None, num_wires=None, use_dagger=False)
+.. py:function:: pyvqnet.qnn.vqc.pauliy(q_machine, wires, params=None, use_dagger=False)
     
     对q_machine中的态矢作用量子逻辑门 pauliy 。
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
-    :param num_wires: 量子比特数，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
     :return: 输出QTensor。
 
@@ -3062,14 +3056,13 @@ pauliz
 ---------------------------------------------------------------
 
 
-.. py:function:: pyvqnet.qnn.vqc.pauliz(q_machine, wires, params=None, num_wires=None, use_dagger=False)
+.. py:function:: pyvqnet.qnn.vqc.pauliz(q_machine, wires, params=None, use_dagger=False)
     
     对q_machine中的态矢作用量子逻辑门 pauliz 。
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
-    :param num_wires: 量子比特数，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
     :return: 输出QTensor。
 
@@ -3124,14 +3117,13 @@ x1
 ---------------------------------------------------------------
 
 
-.. py:function:: pyvqnet.qnn.vqc.x1(q_machine, wires, params=None, num_wires=None, use_dagger=False)
+.. py:function:: pyvqnet.qnn.vqc.x1(q_machine, wires, params=None, use_dagger=False)
     
     对q_machine中的态矢作用量子逻辑门 x1 。
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
-    :param num_wires: 量子比特数，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
     :return: 输出QTensor。
 
@@ -3186,14 +3178,13 @@ rx
 ---------------------------------------------------------------
 
 
-.. py:function:: pyvqnet.qnn.vqc.rx(q_machine, wires, params=None, num_wires=None, use_dagger=False)
+.. py:function:: pyvqnet.qnn.vqc.rx(q_machine, wires, params=None, use_dagger=False)
     
     对q_machine中的态矢作用量子逻辑门 rx 。
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
-    :param num_wires: 量子比特数，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
     :return: 输出QTensor。
 
@@ -3249,14 +3240,13 @@ ry
 ---------------------------------------------------------------
 
 
-.. py:function:: pyvqnet.qnn.vqc.ry(q_machine, wires, params=None, num_wires=None, use_dagger=False)
+.. py:function:: pyvqnet.qnn.vqc.ry(q_machine, wires, params=None, use_dagger=False)
     
     对q_machine中的态矢作用量子逻辑门 ry 。
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
-    :param num_wires: 量子比特数，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
     :return: 输出QTensor。
 
@@ -3312,14 +3302,13 @@ rz
 ---------------------------------------------------------------
 
 
-.. py:function:: pyvqnet.qnn.vqc.rz(q_machine, wires, params=None, num_wires=None, use_dagger=False)
+.. py:function:: pyvqnet.qnn.vqc.rz(q_machine, wires, params=None, use_dagger=False)
     
     对q_machine中的态矢作用量子逻辑门 rz 。
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
-    :param num_wires: 量子比特数，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
     :return: 输出QTensor。
 
@@ -3375,14 +3364,13 @@ crx
 ---------------------------------------------------------------
 
 
-.. py:function:: pyvqnet.qnn.vqc.crx(q_machine, wires, params=None, num_wires=None, use_dagger=False)
+.. py:function:: pyvqnet.qnn.vqc.crx(q_machine, wires, params=None, use_dagger=False)
     
     对q_machine中的态矢作用量子逻辑门 crx 。
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
-    :param num_wires: 量子比特数，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
     :return: 输出QTensor。
 
@@ -3440,14 +3428,13 @@ cry
 ---------------------------------------------------------------
 
 
-.. py:function:: pyvqnet.qnn.vqc.cry(q_machine, wires, params=None, num_wires=None, use_dagger=False)
+.. py:function:: pyvqnet.qnn.vqc.cry(q_machine, wires, params=None, use_dagger=False)
     
     对q_machine中的态矢作用量子逻辑门 cry 。
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
-    :param num_wires: 量子比特数，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
     :return: 输出QTensor。
 
@@ -3504,14 +3491,13 @@ crz
 ---------------------------------------------------------------
 
 
-.. py:function:: pyvqnet.qnn.vqc.crz(q_machine, wires, params=None, num_wires=None, use_dagger=False)
+.. py:function:: pyvqnet.qnn.vqc.crz(q_machine, wires, params=None, use_dagger=False)
     
     对q_machine中的态矢作用量子逻辑门 crz 。
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
-    :param num_wires: 量子比特数，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
     :return: 输出QTensor。
 
@@ -3568,14 +3554,13 @@ p
 ---------------------------------------------------------------
 
 
-.. py:function:: pyvqnet.qnn.vqc.p(q_machine, wires, params=None, num_wires=None, use_dagger=False)
+.. py:function:: pyvqnet.qnn.vqc.p(q_machine, wires, params=None, use_dagger=False)
     
     对q_machine中的态矢作用量子逻辑门 p 。
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
-    :param num_wires: 量子比特数，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
     :return: 输出QTensor。
 
@@ -3606,14 +3591,13 @@ u1
 ---------------------------------------------------------------
 
 
-.. py:function:: pyvqnet.qnn.vqc.u1(q_machine, wires, params=None, num_wires=None, use_dagger=False)
+.. py:function:: pyvqnet.qnn.vqc.u1(q_machine, wires, params=None, use_dagger=False)
     
     对q_machine中的态矢作用量子逻辑门 u1 。
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
-    :param num_wires: 量子比特数，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
     :return: 输出QTensor。
 
@@ -3669,14 +3653,13 @@ u2
 ---------------------------------------------------------------
 
 
-.. py:function:: pyvqnet.qnn.vqc.u2(q_machine, wires, params=None, num_wires=None, use_dagger=False)
+.. py:function:: pyvqnet.qnn.vqc.u2(q_machine, wires, params=None, use_dagger=False)
     
     对q_machine中的态矢作用量子逻辑门 u2 。
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
-    :param num_wires: 量子比特数，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
     :return: 输出QTensor。
 
@@ -3732,14 +3715,13 @@ u3
 ---------------------------------------------------------------
 
 
-.. py:function:: pyvqnet.qnn.vqc.u3(q_machine, wires, params=None, num_wires=None, use_dagger=False)
+.. py:function:: pyvqnet.qnn.vqc.u3(q_machine, wires, params=None, use_dagger=False)
     
     对q_machine中的态矢作用量子逻辑门 u3 。
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
-    :param num_wires: 量子比特数，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
     :return: 输出QTensor。
 
@@ -3795,14 +3777,13 @@ cnot
 ---------------------------------------------------------------
 
 
-.. py:function:: pyvqnet.qnn.vqc.cnot(q_machine, wires, params=None, num_wires=None, use_dagger=False)
+.. py:function:: pyvqnet.qnn.vqc.cnot(q_machine, wires, params=None, use_dagger=False)
     
     对q_machine中的态矢作用量子逻辑门 cnot 。
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
-    :param num_wires: 量子比特数，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
     :return: 输出QTensor。
 
@@ -3857,14 +3838,13 @@ cr
 ---------------------------------------------------------------
 
 
-.. py:function:: pyvqnet.qnn.vqc.cr(q_machine, wires, params=None, num_wires=None, use_dagger=False)
+.. py:function:: pyvqnet.qnn.vqc.cr(q_machine, wires, params=None, use_dagger=False)
     
     对q_machine中的态矢作用量子逻辑门 cr 。
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
-    :param num_wires: 量子比特数，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
     :return: 输出QTensor。
 
@@ -3920,14 +3900,13 @@ swap
 ---------------------------------------------------------------
 
 
-.. py:function:: pyvqnet.qnn.vqc.swap(q_machine, wires, params=None, num_wires=None, use_dagger=False)
+.. py:function:: pyvqnet.qnn.vqc.swap(q_machine, wires, params=None, use_dagger=False)
     
     对q_machine中的态矢作用量子逻辑门 swap 。
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
-    :param num_wires: 量子比特数，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
     :return: 输出QTensor。
 
@@ -3983,14 +3962,13 @@ iswap
 ---------------------------------------------------------------
 
 
-.. py:function:: pyvqnet.qnn.vqc.iswap(q_machine, wires, params=None, num_wires=None, use_dagger=False)
+.. py:function:: pyvqnet.qnn.vqc.iswap(q_machine, wires, params=None, use_dagger=False)
     
     对q_machine中的态矢作用量子逻辑门 iswap 。
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
-    :param num_wires: 量子比特数，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
     :return: 输出QTensor。
 
@@ -4020,14 +3998,13 @@ cz
 ---------------------------------------------------------------
 
 
-.. py:function:: pyvqnet.qnn.vqc.cz(q_machine, wires, params=None, num_wires=None, use_dagger=False)
+.. py:function:: pyvqnet.qnn.vqc.cz(q_machine, wires, params=None, use_dagger=False)
     
     对q_machine中的态矢作用量子逻辑门 cz 。
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
-    :param num_wires: 量子比特数，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
     :return: 输出QTensor。
 
@@ -4083,14 +4060,13 @@ rxx
 ---------------------------------------------------------------
 
 
-.. py:function:: pyvqnet.qnn.vqc.rxx(q_machine, wires, params=None, num_wires=None, use_dagger=False)
+.. py:function:: pyvqnet.qnn.vqc.rxx(q_machine, wires, params=None, use_dagger=False)
     
     对q_machine中的态矢作用量子逻辑门 rxx 。
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
-    :param num_wires: 量子比特数，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
     :return: 输出QTensor。
 
@@ -4146,14 +4122,13 @@ ryy
 ---------------------------------------------------------------
 
 
-.. py:function:: pyvqnet.qnn.vqc.ryy(q_machine, wires, params=None, num_wires=None, use_dagger=False)
+.. py:function:: pyvqnet.qnn.vqc.ryy(q_machine, wires, params=None, use_dagger=False)
     
     对q_machine中的态矢作用量子逻辑门 ryy 。
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
-    :param num_wires: 量子比特数，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
     :return: 输出QTensor。
 
@@ -4209,14 +4184,13 @@ rzz
 ---------------------------------------------------------------
 
 
-.. py:function:: pyvqnet.qnn.vqc.rzz(q_machine, wires, params=None, num_wires=None, use_dagger=False)
+.. py:function:: pyvqnet.qnn.vqc.rzz(q_machine, wires, params=None, use_dagger=False)
     
     对q_machine中的态矢作用量子逻辑门 rzz 。
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
-    :param num_wires: 量子比特数，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
     :return: 输出QTensor。
 
@@ -4273,14 +4247,13 @@ rzx
 ---------------------------------------------------------------
 
 
-.. py:function:: pyvqnet.qnn.vqc.rzx(q_machine, wires, params=None, num_wires=None, use_dagger=False)
+.. py:function:: pyvqnet.qnn.vqc.rzx(q_machine, wires, params=None, use_dagger=False)
     
     对q_machine中的态矢作用量子逻辑门 RZX 。
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
-    :param num_wires: 量子比特数，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
     :return: 输出QTensor。
 
@@ -4335,14 +4308,13 @@ toffoli
 ---------------------------------------------------------------
 
 
-.. py:function:: pyvqnet.qnn.vqc.toffoli(q_machine, wires, params=None, num_wires=None, use_dagger=False)
+.. py:function:: pyvqnet.qnn.vqc.toffoli(q_machine, wires, params=None, use_dagger=False)
     
     对q_machine中的态矢作用量子逻辑门 toffoli 。
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
-    :param num_wires: 量子比特数，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
     :return: 输出QTensor。
 
@@ -4398,14 +4370,13 @@ isingxx
 ---------------------------------------------------------------
 
 
-.. py:function:: pyvqnet.qnn.vqc.isingxx(q_machine, wires, params=None, num_wires=None, use_dagger=False)
+.. py:function:: pyvqnet.qnn.vqc.isingxx(q_machine, wires, params=None, use_dagger=False)
     
     对q_machine中的态矢作用量子逻辑门 isingxx 。
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
-    :param num_wires: 量子比特数，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
     :return: 输出QTensor。
 
@@ -4463,14 +4434,13 @@ isingyy
 ---------------------------------------------------------------
 
 
-.. py:function:: pyvqnet.qnn.vqc.isingyy(q_machine, wires, params=None, num_wires=None, use_dagger=False)
+.. py:function:: pyvqnet.qnn.vqc.isingyy(q_machine, wires, params=None, use_dagger=False)
     
     对q_machine中的态矢作用量子逻辑门 isingyy 。
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
-    :param num_wires: 量子比特数，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
     :return: 输出QTensor。
 
@@ -4528,14 +4498,13 @@ isingzz
 ---------------------------------------------------------------
 
 
-.. py:function:: pyvqnet.qnn.vqc.isingzz(q_machine, wires, params=None, num_wires=None, use_dagger=False)
+.. py:function:: pyvqnet.qnn.vqc.isingzz(q_machine, wires, params=None, use_dagger=False)
     
     对q_machine中的态矢作用量子逻辑门 isingzz 。
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
-    :param num_wires: 量子比特数，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
     :return: 输出QTensor。
 
@@ -4591,14 +4560,13 @@ IsingZZ
 isingxy
 ---------------------------------------------------------------
 
-.. py:function:: pyvqnet.qnn.vqc.isingxy(q_machine, wires, params=None, num_wires=None, use_dagger=False)
+.. py:function:: pyvqnet.qnn.vqc.isingxy(q_machine, wires, params=None, use_dagger=False)
     
     对q_machine中的态矢作用量子逻辑门 isingxy 。
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
-    :param num_wires: 量子比特数，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
     :return: 输出QTensor。
 
@@ -4655,14 +4623,13 @@ phaseshift
 ---------------------------------------------------------------
 
 
-.. py:function:: pyvqnet.qnn.vqc.phaseshift(q_machine, wires, params=None, num_wires=None, use_dagger=False)
+.. py:function:: pyvqnet.qnn.vqc.phaseshift(q_machine, wires, params=None, use_dagger=False)
     
     对q_machine中的态矢作用量子逻辑门 phaseshift 。
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
-    :param num_wires: 量子比特数，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
     :return: 输出QTensor。
 
@@ -4719,14 +4686,13 @@ multirz
 ---------------------------------------------------------------
 
 
-.. py:function:: pyvqnet.qnn.vqc.multirz(q_machine, wires, params=None, num_wires=None, use_dagger=False)
+.. py:function:: pyvqnet.qnn.vqc.multirz(q_machine, wires, params=None, use_dagger=False)
     
     对q_machine中的态矢作用量子逻辑门 multirz 。
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
-    :param num_wires: 量子比特数，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
     :return: 输出QTensor。
 
@@ -4783,14 +4749,13 @@ sdg
 ---------------------------------------------------------------
 
 
-.. py:function:: pyvqnet.qnn.vqc.sdg(q_machine, wires, params=None, num_wires=None, use_dagger=False)
+.. py:function:: pyvqnet.qnn.vqc.sdg(q_machine, wires, params=None, use_dagger=False)
     
     对q_machine中的态矢作用量子逻辑门 sdg 。
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
-    :param num_wires: 量子比特数，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
     :return: 输出QTensor。
 
@@ -4848,14 +4813,13 @@ tdg
 ---------------------------------------------------------------
 
 
-.. py:function:: pyvqnet.qnn.vqc.tdg(q_machine, wires, params=None, num_wires=None, use_dagger=False)
+.. py:function:: pyvqnet.qnn.vqc.tdg(q_machine, wires, params=None, use_dagger=False)
     
     对q_machine中的态矢作用量子逻辑门 tdg 。
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
-    :param num_wires: 量子比特数，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
     :return: 输出QTensor。
 
@@ -4911,14 +4875,13 @@ controlledphaseshift
 ---------------------------------------------------------------
 
 
-.. py:function:: pyvqnet.qnn.vqc.controlledphaseshift(q_machine, wires, params=None, num_wires=None, use_dagger=False)
+.. py:function:: pyvqnet.qnn.vqc.controlledphaseshift(q_machine, wires, params=None, use_dagger=False)
     
     对q_machine中的态矢作用量子逻辑门 controlledphaseshift 。
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
-    :param num_wires: 量子比特数，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
     :return: 输出QTensor。
 
@@ -4979,14 +4942,13 @@ multicnot
 ---------------------------------------------------------------
 
 
-.. py:function:: pyvqnet.qnn.vqc.multicnot(q_machine, wires, params=None, num_wires=None, use_dagger=False)
+.. py:function:: pyvqnet.qnn.vqc.multicnot(q_machine, wires, params=None, use_dagger=False)
     
     对q_machine中的态矢作用量子逻辑门 multicnot 。
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
-    :param num_wires: 量子比特数，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
     :return: 输出QTensor。
 
@@ -5043,14 +5005,13 @@ multixcnot
 ---------------------------------------------------------------
 
 
-.. py:function:: pyvqnet.qnn.vqc.multixcnot(q_machine, wires, params=None, num_wires=None, use_dagger=False)
+.. py:function:: pyvqnet.qnn.vqc.multixcnot(q_machine, wires, params=None, use_dagger=False)
     
     对q_machine中的态矢作用量子逻辑门 multixcnot 。
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
-    :param num_wires: 量子比特数，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
     :return: 输出QTensor。
 
@@ -5108,14 +5069,13 @@ single_excitation
 ---------------------------------------------------------------
 
 
-.. py:function:: pyvqnet.qnn.vqc.single_excitation(q_machine, wires, params=None, num_wires=None, use_dagger=False)
+.. py:function:: pyvqnet.qnn.vqc.single_excitation(q_machine, wires, params=None, use_dagger=False)
     
     对q_machine中的态矢作用量子逻辑门 single_excitation 。
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
-    :param num_wires: 量子比特数，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
     :return: 输出QTensor。
 
@@ -5145,14 +5105,13 @@ double_excitation
 ---------------------------------------------------------------
 
 
-.. py:function:: pyvqnet.qnn.vqc.double_excitation(q_machine, wires, params=None, num_wires=None, use_dagger=False)
+.. py:function:: pyvqnet.qnn.vqc.double_excitation(q_machine, wires, params=None, use_dagger=False)
     
     对q_machine中的态矢作用量子逻辑门 double_excitation 。
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
-    :param num_wires: 量子比特数，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
     :return: 输出QTensor。
 
