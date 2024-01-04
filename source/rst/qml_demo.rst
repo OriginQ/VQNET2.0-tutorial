@@ -6144,7 +6144,8 @@ VQNet提供了 ``QuantumNeuron`` 模块实现该算法。首先初始化一个�
 
 其中 :math:`g^{+}` 是伪逆。
 
-以下我们基于VQNet实现对一个量子变分线路参数进行量子自然梯度优化的例子，可见使用量子自然梯度(Quantum Nature Gradient)使得某些损失函数下降更快。
+以下我们基于VQNet实现对一个量子变分线路参数进行量子自然梯度优化的例子，其中 `wrapper_calculate_qng` 是需要加到待计算量子自然梯度的模型的forward函数的装饰器。
+通过 `pyvqnet.qnn.vqc.QNG` 的 量子自然梯度优化器，可对模型注册的 `Parameter` 类型的参数优化。
 
 我们的目标是使如下的量子变分线路的期望最小，可见其中含有两层共3个量子含参逻辑门，第一层由0和1比特上的 RZ, RY 逻辑门构成，第二层由2比特上的RX 逻辑门构成。
 
@@ -6156,182 +6157,125 @@ VQNet提供了 ``QuantumNeuron`` 模块实现该算法。首先初始化一个�
 
 .. code-block::
 
-    import pyqpanda as pq
+
+    import sys
+    sys.path.insert(0, "../")
     import numpy as np
+    import pyvqnet
+    from pyvqnet.qnn import vqc
+    from pyvqnet.qnn.vqc import wrapper_calculate_qng
     from pyvqnet.tensor import QTensor
-    from pyvqnet.qnn.measure import expval, ProbsMeasure
-    from pyvqnet.qnn import insert_pauli_for_mt, get_metric_tensor, QNG,QuantumLayer
     import matplotlib.pyplot as plt
-    from pyvqnet.optim import SGD
-    from pyvqnet import _core
-    ###################################################
-    # Quantum Nature Gradients Examples
-    ###################################################
-    class pyqpanda_config_wrapper:
-        """
-        A wrapper for pyqpanda config,including QVM machine, allocated qubits, classic bits.
-        """
-        def __init__(self, qubits_num) -> None:
-            self._machine = pq.CPUQVM()
-            self._machine.init_qvm()
-            self._qubits = self._machine.qAlloc_many(qubits_num)
-            self._cubits = self._machine.cAlloc_many(qubits_num)
-            self._qcir = pq.QCircuit()
-
-        def __del__(self):
-            self._machine.finalize()
 
 
-    # use quantum nature gradient optimzer to optimize circuit quantum_net
-    steps = 200
 
-    def quantum_net(
-            q_input_features,
-            params,
-            qubits,
-            cubits,
-            machine):
-        qcir = pq.QCircuit()
-        qcir.insert(pq.RY(qubits[0], np.pi / 4))
-        qcir.insert(pq.RY(qubits[1], np.pi / 3))
-        qcir.insert(pq.RY(qubits[2], np.pi / 7))
+    class Hmodel(vqc.Module):
+        def __init__(self, num_wires, dtype,init_t):
+            super(Hmodel, self).__init__()
+            self._num_wires = num_wires
+            self._dtype = dtype
+            self.qm = vqc.QMachine(num_wires, dtype=dtype)
 
-        qcir.insert(pq.RZ(qubits[0], params[0]))
-        qcir.insert(pq.RY(qubits[1], params[1]))
+            self.p = pyvqnet.nn.Parameter([4], dtype=pyvqnet.kfloat64)
+            self.p.init_from_tensor(init_t)
+            self.ma = vqc.MeasureAll(obs={"Y0":1})
 
-        qcir.insert(pq.CNOT(qubits[0], qubits[1]))
-        qcir.insert(pq.CNOT(qubits[1], qubits[2]))
-        qcir.insert(pq.RX(qubits[2], params[2]))
+        @wrapper_calculate_qng
+        def forward(self, x, *args, **kwargs):
+            self.qm.reset_states(1)
+            vqc.ry(q_machine=self.qm, wires=0, params=np.pi / 4)
+            vqc.ry(q_machine=self.qm, wires=1, params=np.pi / 3)
+            vqc.ry(q_machine=self.qm, wires=2, params=np.pi / 7)
 
-        qcir.insert(pq.CNOT(qubits[0], qubits[1]))
-        qcir.insert(pq.CNOT(qubits[1], qubits[2]))
-        m_prog = pq.QProg()
-        m_prog.insert(qcir)
+            # V0(theta0, theta1): Parametrized layer 0
+            vqc.rz(q_machine=self.qm, wires=0, params=self.p[0])
+            vqc.rz(q_machine=self.qm, wires=1, params=self.p[1])
 
-        return expval(machine, m_prog, {'Y0': 1}, qubits)
+            # W1: non-parametrized gates
+            vqc.cnot(q_machine=self.qm, wires=[0, 1])
+            vqc.cnot(q_machine=self.qm, wires=[1, 2])
 
+            # V_1(theta2, theta3): Parametrized layer 1
+            vqc.ry(q_machine=self.qm, params=self.p[2], wires=1)
+            vqc.rx(q_machine=self.qm, params=self.p[3], wires=2)
 
-要使用量子自然梯度算法，我们首先需要计算出度量张量。
-按照算法定义，我们人工定义了如下两个子线路，分别计算两层含参线路的Fubini-Study 张量。
-第一个参数层计算度量张量的子线路如下：
+            # W2: non-parametrized gates
+            vqc.cnot(q_machine=self.qm, wires=[0, 1])
+            vqc.cnot(q_machine=self.qm, wires=[1, 2])
 
-.. image:: ./images/qng_subcir1.png
-   :width: 600 px
-   :align: center
-
-|
-
-.. code-block::
-
-    def layer0_subcircuit(config: pyqpanda_config_wrapper, params):
-        qcir = pq.QCircuit()
-        qcir.insert(pq.RY(config._qubits[0], np.pi / 4))
-        qcir.insert(pq.RY(config._qubits[1], np.pi / 3))
-        return qcir
-
-    def get_p01_diagonal_(config, params, target_gate_type, target_gate_bits,
-                            wires):
-        qcir = layer0_subcircuit(config, params)
-        qcir2 = insert_pauli_for_mt(config._qubits, target_gate_type,
-                                    target_gate_bits)
-        qcir3 = pq.QCircuit()
-        qcir3.insert(qcir)
-        qcir3.insert(qcir2)
-        m_prog = pq.QProg()
-        m_prog.insert(qcir3)
-
-        return ProbsMeasure(wires, m_prog, config._machine, config._qubits)
-
-第二个参数层计算度量张量的子线路如下：
-
-.. image:: ./images/qng_subcir2.png
-   :width: 600 px
-   :align: center
-
-|
-
-.. code-block::
+            return self.ma(q_machine=self.qm)
 
 
-    def layer1_subcircuit(config: pyqpanda_config_wrapper, params):
-        qcir = pq.QCircuit()
-        qcir.insert(pq.RY(config._qubits[0], np.pi / 4))
-        qcir.insert(pq.RY(config._qubits[1], np.pi / 3))
-        qcir.insert(pq.RY(config._qubits[2], np.pi / 7))
 
-        qcir.insert(pq.RZ(config._qubits[0], params[0]))
-        qcir.insert(pq.RY(config._qubits[1], params[1]))
+    class Hmodel2(vqc.Module):
+        def __init__(self, num_wires, dtype,init_t):
+            super(Hmodel2, self).__init__()
+            self._num_wires = num_wires
+            self._dtype = dtype
+            self.qm = vqc.QMachine(num_wires, dtype=dtype)
 
-        qcir.insert(pq.CNOT(config._qubits[0], config._qubits[1]))
-        qcir.insert(pq.CNOT(config._qubits[1], config._qubits[2]))
+            self.p = pyvqnet.nn.Parameter([4], dtype=pyvqnet.kfloat64)
+            self.p.init_from_tensor(init_t)
+            self.ma = vqc.MeasureAll(obs={"Y0":1})
 
-        return qcir
-    def get_p1_diagonal_(config, params, target_gate_type, target_gate_bits,
-                            wires):
-        qcir = layer1_subcircuit(config, params)
-        qcir2 = insert_pauli_for_mt(config._qubits, target_gate_type,
-                                    target_gate_bits)
-        qcir3 = pq.QCircuit()
-        qcir3.insert(qcir)
-        qcir3.insert(qcir2)
-        m_prog = pq.QProg()
-        m_prog.insert(qcir3)
-        
-        return ProbsMeasure(wires, m_prog, config._machine, config._qubits)
+        def forward(self, x, *args, **kwargs):
+            self.qm.reset_states(1)
+            vqc.ry(q_machine=self.qm, wires=0, params=np.pi / 4)
+            vqc.ry(q_machine=self.qm, wires=1, params=np.pi / 3)
+            vqc.ry(q_machine=self.qm, wires=2, params=np.pi / 7)
 
-使用 `QNG` 类定义的量子自然梯度类，其中[['RZ', 'RY'], ['RX']]为3个含参逻辑门的门类型，
-[[0, 1], [2]]为作用的比特，qcir为计算张量的线路函数列表，[0,1,2]为整个线路的量子比特索引。
+            # V0(theta0, theta1): Parametrized layer 0
+            vqc.rz(q_machine=self.qm, wires=0, params=self.p[0])
+            vqc.rz(q_machine=self.qm, wires=1, params=self.p[1])
 
-.. code-block::
+            # W1: non-parametrized gates
+            vqc.cnot(q_machine=self.qm, wires=[0, 1])
+            vqc.cnot(q_machine=self.qm, wires=[1, 2])
 
-    config = pyqpanda_config_wrapper(3)
-    qcir = []
-    qcir.append(get_p01_diagonal_)
-    qcir.append(get_p1_diagonal_)
+            # V_1(theta2, theta3): Parametrized layer 1
+            vqc.ry(q_machine=self.qm, params=self.p[2], wires=1)
+            vqc.rx(q_machine=self.qm, params=self.p[3], wires=2)
 
+            # W2: non-parametrized gates
+            vqc.cnot(q_machine=self.qm, wires=[0, 1])
+            vqc.cnot(q_machine=self.qm, wires=[1, 2])
 
-    # define QNG optimzer
-    opt = QNG(config, quantum_net, 0.02, [['RZ', 'RY'], ['RX']], [[0, 1], [2]],
-                qcir, [0, 1, 2])
+            return self.ma(q_machine=self.qm)
 
-进行迭代优化，使用 `opt` 函数进行单步优化，其中第一个入参为输入数据，
-此处线路没有输入，故为None，第二个入参为待优化参数theta。
-
-.. code-block::
-
-    qng_cost = []
-    theta2 = QTensor([0.432, 0.543, 0.233])
-
-    # iteration
-    for _ in range(steps):
-        theta2 = opt.step(None, theta2)
-
-        qng_cost.append(
-            quantum_net(None, theta2, config._qubits, config._cubits,
-                        config._machine))
 
 使用SGD经典梯度下降法作为基线比较两者在相同迭代次数下的损失值变化情况，可见使用量子自然梯度，该损失函数下降更快。
 
 .. code-block::
 
-    # use gradient descent as the baseline
+    steps = range(200)
+
+    x = QTensor([0.432, -0.123, 0.543, 0.233],
+                dtype=pyvqnet.kfloat64)
+    qng_model = Hmodel(3, pyvqnet.kcomplex128,x)
+    qng = pyvqnet.qnn.vqc.QNG(qng_model, 0.01)
+    qng_cost = []
+    for s in steps:
+        qng.zero_grad()
+        qng.step(None)
+        yy = qng_model(None).to_numpy().reshape([1])
+        qng_cost.append(yy)
+
+    x = QTensor([0.432, -0.123, 0.543, 0.233],
+                requires_grad=True,
+                dtype=pyvqnet.kfloat64)
+    qng_model = Hmodel2(3, pyvqnet.kcomplex128,x)
+    sgd = pyvqnet.optim.SGD(qng_model.parameters(), lr=0.01)
     sgd_cost = []
-    qlayer = QuantumLayer(quantum_net, 3, 'cpu', 3)
-
-    temp = _core.Tensor([0.432, 0.543, 0.233])
-    _core.vqnet.copyTensor(temp, qlayer.m_para.data)
-    opti = SGD(qlayer.parameters())
-
-    for i in range(steps):
-        opti.zero_grad()
-        loss = qlayer(QTensor([[1.0]]))
-        print(f'step {i}')
-        print(f'q param before {qlayer.m_para}')
-        loss.backward()
-        sgd_cost.append(loss.item())
-        opti._step()
-        print(f'q param after{qlayer.m_para}')
+    for s in steps:
         
+        sgd.zero_grad()
+        y = qng_model(None)
+        y.backward()
+        sgd.step()
+
+        sgd_cost.append(y.to_numpy().reshape([1]))
+
+
     plt.style.use("seaborn")
     plt.plot(qng_cost, "b", label="Quantum natural gradient descent")
     plt.plot(sgd_cost, "g", label="Vanilla gradient descent")
@@ -6339,7 +6283,9 @@ VQNet提供了 ``QuantumNeuron`` 模块实现该算法。首先初始化一个�
     plt.ylabel("Cost function value")
     plt.xlabel("Optimization steps")
     plt.legend()
-    plt.show()
+    plt.savefig('qng_new_compare.png')
+
+
 
 .. image:: ./images/qng_vs_sgd.png
    :width: 600 px
@@ -7150,6 +7096,215 @@ vqe_func_analytic()函数是使用参数偏移计算理论梯度，vqe_func_shot
     [[[54.82772]], [[18.913624]], [[14.219269]], [[12.547045]], [[10.063704]], [[7.569273]], [[5.6508512]], [[-0.4574079]]]
      [[-5553.423]]  ## 200/200 [15:40<00:00,  4.70s/it]
     [[[54.829308]], [[19.001402]], [[14.423045]], [[12.262444]], [[10.100731]], [[7.5507345]], [[5.6469355]], [[-0.4976197]]]
+
+
+
+变分量子线路的优化
+===================================
+
+VQNet当前提供4种方式对用户自定义的变分量子线路中的量子逻辑门进行优化：融合旋转门(commute_controlled_right，commute_controlled_left)，受控门交换(commute_controlled)，单比特逻辑门融合(single_qubit_ops_fuse)。
+
+这里使用 `wrapper_compile` 装饰器对 `QModule` 定义的模型forward函数进行装饰，会默认连续调用 `commute_controlled_right`, `merge_rotations`, `single_qubit_ops_fuse` 三个规则进行线路优化。
+最后通过 `op_history_summary` 接口，对 `QModule` 前向函数运行后产生的 `op_history` 的信息对比。
+
+
+.. code-block::
+
+    from functools import partial
+
+    from pyvqnet.qnn.vqc import op_history_summary
+    from pyvqnet.qnn.vqc import QModule
+    from pyvqnet import tensor
+    from pyvqnet.qnn.vqc import QMachine, wrapper_compile
+
+    from pyvqnet.qnn.vqc import pauliy
+
+    from pyvqnet.qnn.vqc import QMachine, ry,rz, ControlledPhaseShift, \
+        rx, S, rot, isingxy,CSWAP, PauliX, T, MeasureAll, RZ, CZ, PhaseShift, u3, cnot, cry, toffoli, cy
+    from pyvqnet.tensor import QTensor, tensor
+    import pyvqnet
+
+    class QModel_before(QModule):
+        def __init__(self, num_wires, dtype):
+            super(QModel_before, self).__init__()
+
+            self._num_wires = num_wires
+            self._dtype = dtype
+            self.qm = QMachine(num_wires, dtype=dtype)
+            self.qm.set_save_op_history_flag(True)
+            self.cswap = CSWAP(wires=(0, 2, 1))
+            self.cz = CZ(wires=[0, 2])
+
+            self.paulix = PauliX(wires=2)
+
+            self.s = S(wires=0)
+
+            self.ps = PhaseShift(has_params=True,
+                                    trainable=True,
+                                    wires=0,
+                                    dtype=dtype)
+
+            self.cps = ControlledPhaseShift(has_params=True,
+                                            trainable=True,
+                                            wires=(1, 0),
+                                            dtype=dtype)
+            self.t = T(wires=0)
+            self.rz = RZ(has_params=True, wires=1, dtype=dtype)
+
+            self.measure = MeasureAll(obs={
+                'wires': [0],
+                'observables': ['z'],
+                'coefficient': [1]
+            })
+
+        def forward(self, x, *args, **kwargs):
+            self.qm.reset_states(x.shape[0])
+            self.cz(q_machine=self.qm)
+            self.paulix(q_machine=self.qm)
+            rx(q_machine=self.qm,wires=1,params = x[:,[0]])
+            ry(q_machine=self.qm,wires=1,params = x[:,[1]])
+            rz(q_machine=self.qm,wires=1,params = x[:,[2]])
+            rot(q_machine=self.qm, params=x[:, 0:3], wires=(1, ), use_dagger=True)
+            rot(q_machine=self.qm, params=x[:, 1:4], wires=(1, ), use_dagger=True)
+            isingxy(q_machine=self.qm, params=x[:, [2]], wires=(0, 1))
+            u3(q_machine=self.qm, params=x[:, 0:3], wires=1)
+            self.s(q_machine=self.qm)
+            self.cswap(q_machine=self.qm)
+            cnot(q_machine=self.qm, wires=[0, 1])
+            ry(q_machine=self.qm,wires=2,params = x[:,[1]])
+            pauliy(q_machine=self.qm, wires=1)
+            cry(q_machine=self.qm, params=1 / 2, wires=[0, 1])
+            self.ps(q_machine=self.qm)
+            self.cps(q_machine=self.qm)
+            ry(q_machine=self.qm,wires=2,params = x[:,[1]])
+            rz(q_machine=self.qm,wires=2,params = x[:,[2]])
+            toffoli(q_machine=self.qm, wires=[0, 1, 2])
+            self.t(q_machine=self.qm)
+
+            cy(q_machine=self.qm, wires=(2, 1))
+            ry(q_machine=self.qm,wires=1,params = x[:,[1]])
+            self.rz(q_machine=self.qm)
+
+            rlt = self.measure(q_machine=self.qm)
+
+            return rlt
+    class QModel(QModule):
+        def __init__(self, num_wires, dtype):
+            super(QModel, self).__init__()
+
+            self._num_wires = num_wires
+            self._dtype = dtype
+            self.qm = QMachine(num_wires, dtype=dtype)
+
+            self.cswap = CSWAP(wires=(0, 2, 1))
+            self.cz = CZ(wires=[0, 2])
+
+            self.paulix = PauliX(wires=2)
+
+            self.s = S(wires=0)
+
+            self.ps = PhaseShift(has_params=True,
+                                    trainable=True,
+                                    wires=0,
+                                    dtype=dtype)
+
+            self.cps = ControlledPhaseShift(has_params=True,
+                                            trainable=True,
+                                            wires=(1, 0),
+                                            dtype=dtype)
+            self.t = T(wires=0)
+            self.rz = RZ(has_params=True, wires=1, dtype=dtype)
+
+            self.measure = MeasureAll(obs={
+                'wires': [0],
+                'observables': ['z'],
+                'coefficient': [1]
+            })
+
+        @partial(wrapper_compile)
+        def forward(self, x, *args, **kwargs):
+            self.qm.reset_states(x.shape[0])
+            self.cz(q_machine=self.qm)
+            self.paulix(q_machine=self.qm)
+            rx(q_machine=self.qm,wires=1,params = x[:,[0]])
+            ry(q_machine=self.qm,wires=1,params = x[:,[1]])
+            rz(q_machine=self.qm,wires=1,params = x[:,[2]])
+            rot(q_machine=self.qm, params=x[:, 0:3], wires=(1, ), use_dagger=True)
+            rot(q_machine=self.qm, params=x[:, 1:4], wires=(1, ), use_dagger=True)
+            isingxy(q_machine=self.qm, params=x[:, [2]], wires=(0, 1))
+            u3(q_machine=self.qm, params=x[:, 0:3], wires=1)
+            self.s(q_machine=self.qm)
+            self.cswap(q_machine=self.qm)
+            cnot(q_machine=self.qm, wires=[0, 1])
+            ry(q_machine=self.qm,wires=2,params = x[:,[1]])
+            pauliy(q_machine=self.qm, wires=1)
+            cry(q_machine=self.qm, params=1 / 2, wires=[0, 1])
+            self.ps(q_machine=self.qm)
+            self.cps(q_machine=self.qm)
+            ry(q_machine=self.qm,wires=2,params = x[:,[1]])
+            rz(q_machine=self.qm,wires=2,params = x[:,[2]])
+            toffoli(q_machine=self.qm, wires=[0, 1, 2])
+            self.t(q_machine=self.qm)
+
+            cy(q_machine=self.qm, wires=(2, 1))
+            ry(q_machine=self.qm,wires=1,params = x[:,[1]])
+            self.rz(q_machine=self.qm)
+
+            rlt = self.measure(q_machine=self.qm)
+
+            return rlt
+
+    import pyvqnet
+    import pyvqnet.tensor as tensor
+    input_x = tensor.QTensor([[0.1, 0.2, 0.3, 0.4], [0.1, 0.2, 0.3, 0.4]],
+                                dtype=pyvqnet.kfloat64)
+
+    input_x.requires_grad = True
+    num_wires = 3
+    qunatum_model = QModel(num_wires=num_wires, dtype=pyvqnet.kcomplex128)
+    qunatum_model_before = QModel_before(num_wires=num_wires, dtype=pyvqnet.kcomplex128)
+
+    batch_y = qunatum_model(input_x)
+    batch_y = qunatum_model_before(input_x)
+
+    flatten_oph_names = []
+
+    print("before")
+
+    print(op_history_summary(qunatum_model_before.qm.op_history))
+    flatten_oph_names = []
+    for d in qunatum_model.compiled_op_historys:
+            if "compile" in d.keys():
+                oph = d["op_history"]
+                for i in oph:
+                    n = i["name"]
+                    w = i["wires"]
+                    p = i["params"]
+                    flatten_oph_names.append({"name":n,"wires":w, "params": p})
+    print("after")
+    print(op_history_summary(qunatum_model.qm.op_history))
+
+
+    # ###################Summary#######################
+    # qubits num: 3
+    # gates: {'cz': 1, 'paulix': 1, 'rx': 1, 'ry': 4, 'rz': 3, 'rot': 2, 'isingxy': 1, 'u3': 1, 's': 1, 'cswap': 1, 'cnot': 1, 'pauliy': 1, 'cry': 1, 'phaseshift': 1, 'controlledphaseshift': 1, 'toffoli': 1, 't': 1, 'cy': 1}
+    # total gates: 24
+    # total parameter gates: 15
+    # total parameters: 21
+    # #################################################
+        
+    # after
+
+
+    # ###################Summary#######################
+    # qubits num: 3
+    # gates: {'cz': 1, 'rot': 7, 'isingxy': 1, 'u3': 1, 'cswap': 1, 'cnot': 1, 'cry': 1, 'controlledphaseshift': 1, 'toffoli': 1, 'cy': 1}
+    # total gates: 16
+    # total parameter gates: 11
+    # total parameters: 27
+    # #################################################
+
+
 
 在VQNet使用量子计算层进行模型训练
 ***************************************
