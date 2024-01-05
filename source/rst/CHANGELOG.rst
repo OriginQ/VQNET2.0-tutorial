@@ -2,6 +2,24 @@
 VQNet Changelog
 ######################
 
+Added
+===================
+
+- 添加新的 QNG（量子自然梯度）API 和演示。
+- 添加量子电路优化，例如 `wrapper_single_qubit_op_fuse` api 和 demo。
+- 添加 CY api、SparseHamiltonian、HermitianExpval。
+- 添加 is_csr、is_dense、dense_to_csr、csr_to_dense。
+
+Changed
+===================
+
+- 将 VQC_CSWAP 电路重构为 CSWAP。
+- 删除旧的 QNG 文档。
+- 从 `pyvqnet.qnn.vqc` 中删除函数和类无用的 `num_wires`。
+- 重构MeasureAll、概率api。
+
+Fixed
+===================
 
 [v2.10.0] - 2023-12-30
 ***************************
