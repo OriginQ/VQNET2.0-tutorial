@@ -2020,6 +2020,50 @@ Quantum_Embedding
 对量子线路进行测量
 ***********************************
 
+expval_qcloud
+===================================
+
+.. py:function:: pyvqnet.qnn.measure.expval_qcloud(machine, prog, pauli_str_dict, qlists,clists,shots=1000,qtype = pq.real_chip_type.origin_72)
+
+    提供的 QCloud 哈密顿可观测量值的期望值。
+
+    如果可观测量是 :math:`0.7Z\otimes X\otimes I+0.2I\otimes Z\otimes I` 。
+    那么 ``Hamiltonian`` ``dict`` 将是 ``{{'Z0, X1':0.7} ,{'Z1':0.2}}`` 。
+
+    :param machine: qpanda 创建的机器
+    :param prog: qpanda 创建的量子程序
+    :param pauli_str_dict: 哈密顿可观测量
+    :param qlists: pyQPanda 分配的量子位
+    :param clists: pyQPanda 分配的 cbit
+    :param shots: 测量次数，默认：1000。
+    :param qtype: 设置qmachine测量的类型，默认为""表示非qcloud。 为真实芯片设置`pq.real_chip_type.origin_72`。
+    :return: 期望值.
+
+    Example::
+
+        from pyqpanda import *
+        input = [0.56, 0.1]
+
+        m_machine = QCloud()
+
+        m_machine.init_qvm("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
+
+        m_prog = pq.QProg()
+        m_qlist = m_machine.qAlloc_many(4)
+        m_clist = m_machine.cAlloc_many(4)
+        cir = pq.QCircuit()
+        cir.insert(pq.RZ(m_qlist[0],input[0]))
+        cir.insert(pq.CNOT(m_qlist[0],m_qlist[1]))
+        cir.insert(pq.CNOT(m_qlist[0],m_qlist[3]))
+        cir.insert(pq.RY(m_qlist[1],input[1]))
+        cir.insert(pq.CNOT(m_qlist[0],m_qlist[2]))
+        m_prog.insert(cir)
+        pauli_dict  = {'Z0 X1':10,'Y2':-0.543}
+
+        from pyvqnet.qnn import expval_qcloud
+        exp2 = expval_qcloud(m_machine,m_prog,pauli_dict,m_qlist,m_clist,shots=100)
+        print(exp2)
+
 expval
 ============================
 
