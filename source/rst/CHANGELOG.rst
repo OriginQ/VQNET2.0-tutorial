@@ -2,24 +2,31 @@
 VQNet Changelog
 ######################
 
+
+[v2.10.0] - 2024-03-01
+***************************
+
 Added
 ===================
 
-- 添加新的 QNG（量子自然梯度）API 和演示。
-- 添加量子电路优化，例如 `wrapper_single_qubit_op_fuse` api 和 demo。
-- 添加 CY api、SparseHamiltonian、HermitianExpval。
-- 添加 is_csr、is_dense、dense_to_csr、csr_to_dense。
+- 添加新的 `QNG` （量子自然梯度）API 和演示。
+- 添加量子电路优化，例如 `wrapper_single_qubit_op_fuse` , `wrapper_commute_controlled` , `wrapper_merge_rotations` api 和 demo。
+- 添加 `CY``, `SparseHamiltonian` , `HermitianExpval` 。
+- 添加 `is_csr`、 `is_dense`、 `dense_to_csr` 、 `csr_to_dense` 。
+- 添加 `QuantumBatchAsyncQcloudLayer` 支持pyqpanda的QCloud真实芯片计算， `expval_qcloud`。
 
 Changed
 ===================
 
-- 将 VQC_CSWAP 电路重构为 CSWAP。
+- 将 `VQC_CSWAP` 电路重构为 `CSWAP`。
 - 删除旧的 QNG 文档。
-- 从 `pyvqnet.qnn.vqc` 中删除函数和类无用的 `num_wires`。
-- 重构MeasureAll、概率api。
+- 从 `pyvqnet.qnn.vqc` 中删除函数和类无用的 `num_wires` 参数。
+- 重构 `MeasureAll`, `Probability` api。
+- 为 `QuantumMeasure` 增加qtype参数。
 
 Fixed
 ===================
+- 将 `QuantumMeasure` 的 slots 改为 shots。
 
 [v2.10.0] - 2023-12-30
 ***************************

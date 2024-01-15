@@ -332,6 +332,132 @@ QuantumLayerV2
         print(rlt)
 
 
+QuantumBatchAsyncQcloudLayer
+=================================
+
+当您安装最新版本pyqpanda,可以使用本接口定义一个变分线路，并提交到originqc的真实芯片上运行。
+
+.. py:class:: pyvqnet.qnn.quantumlayer.QuantumBatchAsyncQcloudLayer(origin_qprog_func, qcloud_token, para_num, num_qubits, num_cubits, pauli_str_dict=None, shots = 1000, initializer=None, dtype=None, name="", diff_method="parameter_shift", submit_kwargs={}, query_kwargs={})
+
+    使用 pyqpanda QCLOUD 从版本 3.8.2.2 开始的 originqc 真实芯片的抽象计算模块。 它提交参数化量子电路到真实芯片并获得测量结果。
+
+    .. note::
+
+        qcloud_token 为您到 https://qcloud.originqc.com.cn/ 中申请的api token。
+        origin_qprog_func 需要返回pypqanda.QProg类型的数据，如果没有设置pauli_str_dict，需要保证该QProg中已经插入了measure。
+        origin_qprog_func 的形式必须按照如下：
+
+        origin_qprog_func(input,param,qubits,cbits,machine)
+        
+            `input`: 输入1~2维经典数据，二维的情况下，第一个维度为批处理大小。
+            
+            `param`: 输入一维的变分量子线路的待训练参数。
+
+            `machine`: 由QuantumBatchAsyncQcloudLayer创建的模拟器QCloud，无需用户额外在函数中定义。
+            
+            `qubits`: 由QuantumBatchAsyncQcloudLayer创建的模拟器QCloud创建的量子比特,数量为  `num_qubits`, 类型为pyQpanda.Qubits，无需用户额外在函数中定义。
+            
+            `cbits`: 由QuantumBatchAsyncQcloudLayer分配的经典比特, 数量为  `num_cubits`, 类型为 pyQpanda.ClassicalCondition，无需用户额外在函数中定义。。
+            
+
+
+    :param origin_qprog_func: QPanda 构建的变分量子电路函数，必须返回QProg。
+    :param qcloud_token: `str` - 量子机的类型或用于执行的云令牌。
+    :param para_num: `int` - 参数数量，参数是大小为[para_num]的QTensor。
+    :param num_qubits: `int` - 量子电路中的量子比特数量。
+    :param num_cubits: `int` - 量子电路中用于测量的经典比特数量。
+    :param pauli_str_dict: `dict|list` - 表示量子电路中泡利运算符的字典或字典列表。 默认为“无”，则进行测量操作，如果输入泡利算符的字典，则会计算单个期望或者多个期望。
+    :param shot: `int` - 测量次数。 默认值为 1000。
+    :param initializer: 参数值的初始化器。 默认为“无”，使用0~2*pi正态分布。
+    :param dtype: 参数的数据类型。 默认值为 None，即使用默认数据类型pyvqnet.kfloat32。
+    :param name: 模块的名称。 默认为空字符串。
+    :param diff_method: 梯度计算的微分方法。 默认为“parameter_shift”,当前不支持其他微分方法。
+    :param Submit_kwargs: 用于提交量子电路的附加关键字参数，预留参数，当前无作用。
+    :param query_kwargs: 用于查询量子结果的附加关键字参数，预留参数，当前无作用。
+    :return: 一个可以计算量子电路的模块。
+    
+    Example::
+
+        import numpy as np
+        import pyqpanda as pq
+        import pyvqnet
+        from pyvqnet.qnn import QuantumLayer,QuantumBatchAsyncQcloudLayer,set_test_qcloud_fake
+        from pyvqnet.qnn import expval_qcloud
+
+        #set_test_qcloud_fake(False) #uncomments this code to use realchip
+
+
+        def qfun(input,param, m_machine, m_qlist,cubits):
+            measure_qubits = [0,2]
+            m_prog = pq.QProg()
+            cir = pq.QCircuit()
+            cir.insert(pq.RZ(m_qlist[0],input[0]))
+            cir.insert(pq.CNOT(m_qlist[0],m_qlist[1]))
+            cir.insert(pq.RY(m_qlist[1],param[0]))
+            cir.insert(pq.CNOT(m_qlist[0],m_qlist[2]))
+            cir.insert(pq.RZ(m_qlist[1],input[1]))
+            cir.insert(pq.RY(m_qlist[2],param[1]))
+            cir.insert(pq.H(m_qlist[2]))
+            m_prog.insert(cir)
+
+            for idx, ele in enumerate(measure_qubits):
+                m_prog << pq.Measure(m_qlist[ele], cubits[idx])  # pylint: disable=expression-not-assigned
+            return m_prog
+
+        l = QuantumBatchAsyncQcloudLayer(qfun,
+                        "3047DE8A59764BEDAC9C3282093B16AF1",
+                        2,
+                        6,
+                        6,
+                        pauli_str_dict=None,
+                        shots = 1000,
+                        initializer=None,
+                        dtype=None,
+                        name="",
+                        diff_method="parameter_shift",
+                        submit_kwargs={},
+                        query_kwargs={})
+        x = pyvqnet.tensor.QTensor([[0.56,1.2],[0.56,1.2],[0.56,1.2],[0.56,1.2],[0.56,1.2]],requires_grad= True)
+        y = l(x)
+        print(y)
+        y.backward()
+        print(l.m_para.grad)
+        print(x.grad)
+
+        def qfun2(input,param, m_machine, m_qlist,cubits):
+            measure_qubits = [0,2]
+            m_prog = pq.QProg()
+            cir = pq.QCircuit()
+            cir.insert(pq.RZ(m_qlist[0],input[0]))
+            cir.insert(pq.CNOT(m_qlist[0],m_qlist[1]))
+            cir.insert(pq.RY(m_qlist[1],param[0]))
+            cir.insert(pq.CNOT(m_qlist[0],m_qlist[2]))
+            cir.insert(pq.RZ(m_qlist[1],input[1]))
+            cir.insert(pq.RY(m_qlist[2],param[1]))
+            cir.insert(pq.H(m_qlist[2]))
+            m_prog.insert(cir)
+
+            return m_prog
+        l = QuantumBatchAsyncQcloudLayer(qfun2,
+                    "3047DE8A59764BEDAC9C3282093B16AF",
+                    2,
+                    6,
+                    6,
+                    pauli_str_dict={'Z0 X1':10,'':-0.5,'Y2':-0.543},
+                    shots = 1000,
+                    initializer=None,
+                    dtype=None,
+                    name="",
+                    diff_method="parameter_shift",
+                    submit_kwargs={},
+                    query_kwargs={})
+        x = pyvqnet.tensor.QTensor([[0.56,1.2],[0.56,1.2],[0.56,1.2],[0.56,1.2]],requires_grad= True)
+        y = l(x)
+        print(y)
+        y.backward()
+        print(l.m_para.grad)
+        print(x.grad)
+
 
 QuantumLayerMultiProcess
 ============================
@@ -1936,7 +2062,7 @@ expval
 QuantumMeasure
 ============================
 
-.. py:function:: pyvqnet.qnn.measure.QuantumMeasure(measure_qubits:list,prog,machine,qubits,slots:int = 1000)
+.. py:function:: pyvqnet.qnn.measure.QuantumMeasure(measure_qubits:list,prog,machine,qubits,shots:int = 1000, qtype="")
 
     计算量子线路测量。返回通过蒙特卡罗方法获得的测量结果。
 
@@ -1948,7 +2074,8 @@ QuantumMeasure
     :param prog: pyQPanda创建的量子工程。
     :param machine: pyQPanda分配的量子虚拟机。
     :param qubits: pyQPanda分配的量子比特。
-    :param slots: 测量次数，默认值为1000次。
+    :param shots: 测量次数，默认值为1000次。
+    :param qtype: 设置 qmachine 测量的类型，默认为 "" 表示非 qcloud。 为真实芯片设置`pq.real_chip_type.origin_72`。
     :return: 返回通过蒙特卡罗方法获得的测量结果。
 
     Example::
