@@ -381,11 +381,8 @@ QuantumBatchAsyncQcloudLayer
         import numpy as np
         import pyqpanda as pq
         import pyvqnet
-        from pyvqnet.qnn import QuantumLayer,QuantumBatchAsyncQcloudLayer,set_test_qcloud_fake
+        from pyvqnet.qnn import QuantumLayer,QuantumBatchAsyncQcloudLayer
         from pyvqnet.qnn import expval_qcloud
-
-        #set_test_qcloud_fake(False) #uncomments this code to use realchip
-
 
         def qfun(input,param, m_machine, m_qlist,cubits):
             measure_qubits = [0,2]
@@ -5592,7 +5589,7 @@ VQC_RotCircuit
         from pyvqnet.qnn.vqc import VQC_RotCircuit, QMachine
         from pyvqnet.tensor import QTensor
         qm  = QMachine(3)
-        VQC_RotCircuit(q_machine=qm, wire=[1,0],params=QTensor([2.0,1.5,2.1]))
+        VQC_RotCircuit(q_machine=qm, wire=[1],params=QTensor([2.0,1.5,2.1]))
         print(qm.states)
 
         # [[[[-0.3373617-0.6492732j  0.       +0.j       ]
@@ -6900,7 +6897,7 @@ QuantumLayerES
 
         qunatum_model = QModel(num_wires=6,
                             dtype=pyvqnet.kcomplex64,
-                            grad_mode="adjoint")
+                            grad_mode="ES")
 
         ES_model = QuantumLayerES(qunatum_model, qunatum_model.qm)
 
