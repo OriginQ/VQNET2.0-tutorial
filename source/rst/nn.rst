@@ -3341,8 +3341,7 @@ average_grad_allreduce
             # if get_rank() == 0 :
             print(f"rank {get_rank()} grad is {model.parameters()[0].grad}")
             opti.step()
-            
-            return 
+        
         
         # mpirun -n 2 python run.py
 
@@ -3441,8 +3440,6 @@ average_grad_reduce
             # if get_rank() == 0 :
             print(f"rank {get_rank()} grad is {model.parameters()[0].grad}")
             opti.step()
-            
-            return 
         
         # mpirun -n 2 python run.py
 
@@ -4031,6 +4028,7 @@ nccl_average_grad_allreduce
         from pyvqnet.distributed.nccl_api import *
         from pyvqnet.nn.loss import MeanSquaredError
         from pyvqnet.optim import Adam
+        from pyvqnet.tensor import tensor
 
         nccl_op = NCCL_api()
         nccl_op.ncclCommInitRank()
@@ -4108,6 +4106,7 @@ nccl_average_grad_reduce
         from pyvqnet.distributed.nccl_api import *
         from pyvqnet.nn.loss import MeanSquaredError
         from pyvqnet.optim import Adam
+        from pyvqnet.tensor import tensor
 
         nccl_op = NCCL_api()
         nccl_op.ncclCommInitRank()
@@ -4356,8 +4355,6 @@ split_data
         y_train = np.random.randint(2, size = (100, 1))
 
         x_train, y_train= split_data(x_train, y_train)
-
-        return x_train, y_train
 
 broadcast_model_params
 =================================
