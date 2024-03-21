@@ -142,6 +142,62 @@ dtype
         # 4
 
 
+is_dense
+==============================
+
+.. py:attribute:: QTensor.is_dense
+
+    是否是稠密张量。
+
+    :return: 当该数据是稠密的时候，返回1；否则返回 0。
+
+    Example::
+
+        from pyvqnet.tensor import QTensor
+
+        a = QTensor([2, 3, 4, 5])
+        print(a.is_dense)
+        #1
+
+
+is_csr
+==============================
+
+.. py:attribute:: QTensor.is_csr
+
+    是否是Compressed Sparse Row格式的稀疏2维度矩阵。
+
+    :return: 当该数据是CSR格式的稀疏张量时候，返回1；否则返回 0。
+
+    Example::
+
+        from pyvqnet.tensor import QTensor,dense_to_csr
+
+        a = QTensor([[2, 3, 4, 5]])
+        b = dense_to_csr(a)
+        print(b.is_csr)
+        #1
+
+
+csr_members
+==============================
+
+.. py:method:: QTensor.csr_members()
+
+    返回Compressed Sparse Row格式的稀疏2维度矩阵的row_idx,col_idx 以及非0数值data,3个1维QTensor。具体含义见 https://en.wikipedia.org/wiki/Sparse_matrix#Compressed_sparse_row_(CSR,_CRS_or_Yale_format)。
+    :return:
+
+        返回列表，其中第一个元素为row_idx,shape为[矩阵行数+1],第2个元素为col_idx,shape为[非0元素数]，第3个元素为data,shape为[非0元素数]
+
+    Example::
+
+        from pyvqnet.tensor import QTensor,dense_to_csr
+
+        a = QTensor([[2, 3, 4, 5]])
+        b = dense_to_csr(a)
+        print(b.csr_members())
+        #([0,4], [0,1,2,3], [2,3,4,5])
+
 zero_grad
 ==============================
 
@@ -3688,6 +3744,44 @@ broadcast_to
         #[2, 3, 4]
 
 
+dense_to_csr
+==============================
+
+.. py:function:: pyvqnet.tensor.dense_to_csr(t)
+    
+    将稠密矩阵转化为CSR格式稀疏矩阵，仅支持2维。
+
+    :param t: 输入稠密QTensor
+    :return: CSR稀疏矩阵
+
+    Example::
+
+        from pyvqnet.tensor import QTensor,dense_to_csr
+
+        a = QTensor([[2, 3, 4, 5]])
+        b = dense_to_csr(a)
+        print(b.csr_members())
+        #([0,4], [0,1,2,3], [2,3,4,5])
+
+csr_to_dense
+==============================
+
+.. py:function:: pyvqnet.tensor.csr_to_dense(t)
+    
+    将CSR格式稀疏矩阵转化为稠密矩阵，仅支持2维。
+
+    :param t: 输入CSR稀疏矩阵
+    :return: 稠密QTensor
+
+    Example::
+
+        from pyvqnet.tensor import QTensor,dense_to_csr,csr_to_dense
+
+        a = QTensor([[2, 3, 4, 5]])
+        b = dense_to_csr(a)
+        c = csr_to_dense(b)
+        print(c)
+        #[[2,3,4,5]]
 
 实用函数
 ************
