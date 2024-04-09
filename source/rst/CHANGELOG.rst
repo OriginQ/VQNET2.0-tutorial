@@ -11,11 +11,11 @@ Added
 
 - 添加新的 `QNG` （量子自然梯度）API 和演示。
 - 添加量子电路优化，例如 `wrapper_single_qubit_op_fuse` , `wrapper_commute_controlled` , `wrapper_merge_rotations` api 和 demo。
-- 添加 `CY``, `SparseHamiltonian` , `HermitianExpval` 。
+- 添加 `CY`, `SparseHamiltonian` , `HermitianExpval` 。
 - 添加 `is_csr`、 `is_dense`、 `dense_to_csr` 、 `csr_to_dense` 。
 - 添加 `QuantumBatchAsyncQcloudLayer` 支持pyqpanda的QCloud真实芯片计算， `expval_qcloud`。
 - 添加基于NCCL的单节点下多GPU分布式计算数据并行模型训练的相关接口实现 `nccl_average_parameters_allreduce`, `nccl_average_parameters_reduce`, `nccl_average_grad_allreduce`, `nccl_average_grad_reduce` 以及控制NCCL初始化以及相关操作的类 `NCCL_api`。
-- 添加量子线路进化策略梯度计算方法 `QuantumLayerES`接口。
+- 添加量子线路进化策略梯度计算方法 `QuantumLayerES` 接口。
 
 Changed
 ===================
