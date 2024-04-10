@@ -1122,6 +1122,32 @@ Dropout
         #  [0., 14.]]]
         # ]
 
+
+DropPath
+=================================
+
+.. py:class:: pyvqnet.nn.dropout.DropPath(dropout_rate = 0.5,name="")
+
+    DropPath 模块将逐样本丢弃路径（随机深度）。
+
+    :param dropout_rate: `float` - 神经元被设置为零的概率。
+    :param name: 这个模块的名字， 默认为""。
+
+    :return: DropPath实例。
+
+    Example::
+
+        import pyvqnet.nn as nn
+        import pyvqnet.tensor as tensor
+
+        x = tensor.randu([4])
+        y = nn.DropPath()(x)
+        print(y)
+        #[0.9074978,0.9350062,0.6896403,0.3541051]
+
+
+
+
 Pixel_Shuffle 
 =================================
 
@@ -2209,7 +2235,33 @@ LeakyReLu
         print(y)
 
         # [-0.0100000, 2., -0.0300000, 4.]
-        
+
+
+
+Gelu
+=================================
+.. py:class:: pyvqnet.nn.Gelu(approximate="tanh", name="")
+    
+    应用高斯误差线性单元函数：
+
+    .. math:: \text{GELU}(x) = x * \Phi(x)
+
+    当近似参数为 'tanh' 时, GELU 通过以下方式估计：
+
+    .. math:: \text{GELU}(x) = 0.5 * x * (1 + \text{Tanh}(\sqrt{2 / \pi} * (x + 0.044715 * x^3)))
+
+    Examples::
+
+        from pyvqnet.tensor import randu, ones_like
+        from pyvqnet.nn import Gelu
+        qa = randu([5,4])
+        qb = Gelu()(qa)
+        print(qb)
+        # [[0.0292515,0.0668998,0.4036024,0.8369502],
+        #  [0.1929213,0.1981275,0.2358531,0.7790835],
+        #  [0.1754935,0.6204091,0.2354677,0.2409406],
+        #  [0.4238827,0.804715 ,0.1633414,0.2853   ],
+        #  [0.1959854,0.590143 ,0.553995 ,0.0008423]]
 
 
 ELU
@@ -2387,7 +2439,7 @@ Adagrad
 
 Adam
 =================================
-.. py:class:: pyvqnet.optim.adam.Adam( params, lr=0.01, beta1=0.9, beta2=0.999, epsilon=1e-8,amsgrad: bool = False)
+.. py:class:: pyvqnet.optim.adam.Adam(params, lr=0.01, beta1=0.9, beta2=0.999, epsilon=1e-8,amsgrad: bool = False)
 
     Adam优化器,它可以使用一阶矩估计动态调整每个参数的学习率和梯度的二阶矩估计。
     
@@ -2454,6 +2506,69 @@ Adam
         #  [15.9799995, 16.9799995, 17.9799995, 18.9799995],
         #  [19.9799995, 20.9799995, 21.9799995, 22.9799995]]]
         # ]
+
+AdamW
+=================================
+.. py:class:: pyvqnet.optim.adam.AdamW(params, lr=0.01, beta1=0.9, beta2=0.999, epsilon=1e-8, weight_decay=0.01, amsgrad: bool = False)
+
+    实现 AdamW 算法.
+
+
+    .. math::
+        t = t + 1
+    
+    .. math::
+        param\_new  = param - lr*weight\_decay*param
+    .. math::
+        moment\_1\_new=\beta1∗moment\_1+(1−\beta1)g
+    .. math::
+        moment\_2\_new=\beta2∗moment\_2+(1−\beta2)g*g
+    .. math::
+        lr = lr*\frac{\sqrt{1-\beta2^t}}{1-\beta1^t}
+
+    如果参数 amsgrad 为 True
+
+    .. math::
+        moment\_2\_max = max(moment\_2\_max,moment\_2)
+    .. math::
+        param\_new=param\_new-lr*\frac{moment\_1}{\sqrt{moment\_2\_max}+\epsilon} 
+
+    否则
+
+    .. math::
+        param\_new=param\_new-lr*\frac{moment\_1}{\sqrt{moment\_2}+\epsilon} 
+
+    :param params: 需要优化的模型参数。
+    :param lr: 学习率(默认值:0.01)。
+    :param beta1: 用于计算梯度及其平方的运行平均值的系数(默认值:0.9)。
+    :param beta2: 用于计算梯度及其平方的运行平均值的系数(默认值:0.999)。
+    :param epsilon: 添加到分母以提高数值稳定性的常数(默认值:1e-8)。
+    :param weight_decay: 权重衰减系数，默认0.01。
+    :param amsgrad: 是否使用该算法的 AMSGrad 变体(默认值:False)。
+    :return: 一个 AdamW 优化器。
+
+    Example::
+
+        from pyvqnet.optim import adam
+        import numpy as np
+        from pyvqnet.tensor import QTensor
+        w = np.arange(24).reshape(1,2,3,4).astype(np.float64)
+        param = QTensor(w)
+        param.grad = QTensor(np.arange(24).reshape(1,2,3,4).astype(np.float64))
+        params = [param]
+        opti = adam.AdamW(params, lr=0.5)
+
+        for i in range(1,3):
+            opti.step()
+        print(param)
+        # [[[[ 0.       ,-0.007475 , 0.98255  , 1.972575 ],
+        #    [ 2.9626   , 3.952625 , 4.9426501, 5.9326751],
+        #    [ 6.9227001, 7.9127251, 8.9027501, 9.8927751]],
+
+        #   [[10.8828001,11.8728251,12.8628501,13.8528751],
+        #    [14.8429002,15.8329252,16.8229502,17.8129752],
+        #    [18.8030002,19.7930252,20.7830502,21.7730752]]]]
+
 
 Adamax
 =================================
@@ -3043,7 +3158,7 @@ auc_calculate
 环境部署
 =================================
 
-以下介绍分别分别基于CPU、GPU分布式计算Linux系统下环境的部署.
+以下介绍VQNet分别基于CPU、GPU分布式计算所需的Linux系统下环境的部署.
 
 MPI安装
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -4390,3 +4505,133 @@ broadcast_model_params
         print(f"bcast after rank {get_rank()}: {model.parameters()}")
 
         # mpirun -n 2 python run.py
+
+
+PipelineParallelTrainingWrapper
+=================================
+.. py:class:: pyvqnet.distributed.pp.PipelineParallelTrainingWrapper(args,join_layers,trainset)
+    
+    Pipeline Parallel Training Wrapper 实现了 1F1B训练。仅在 Linux 平台上，且具有 GPU 的情况下可用。
+    更多算法细节可以在(https://www.deepspeed.ai/tutorials/pipeline/）找到。
+
+    :param args: 参数字典。参见示例。
+    :param join_layers: Sequential 模块的列表。
+    :param trainset: 数据集。
+
+    :return:
+        PipelineParallelTrainingWrapper 实例。
+
+    以下使用 CIFAR10数据库 `CIFAR10_Dataset`,在2块GPU上训练AlexNet上的分类任务。
+    本例子中分成两个流水线并行进程 `pipeline_parallel_size` = 2。
+    批处理大小为 `train_batch_size` = 64, 单GPU 上为 `train_micro_batch_size_per_gpu` = 32。
+    其他配置参数可见 `args`。
+    此外，每个进程需要在 `__main__` 函数中配置环境变量的 `LOCAL_RANK`。
+    
+    .. code-block::
+        os.environ["LOCAL_RANK"] = str(dist.get_local_rank())
+
+    调用 `train_batch` 进行训练。
+
+    Examples::
+
+        import os
+        import pyvqnet
+
+        from pyvqnet.nn import Module,Sequential,CrossEntropyLoss
+        from pyvqnet.nn import Linear
+        from pyvqnet.nn import Conv2D
+        from pyvqnet.nn import activation as F
+        from pyvqnet.nn import MaxPool2D
+        from pyvqnet.nn import CrossEntropyLoss
+
+        from pyvqnet.tensor import tensor
+        from pyvqnet.distributed.pp import PipelineParallelTrainingWrapper
+        from pyvqnet.distributed.pp import comm as dist
+        from pyvqnet.distributed import *
+
+
+        pipeline_parallel_size = 2
+
+        num_steps = 1000
+
+        def cifar_trainset_vqnet(local_rank, dl_path='./cifar10-data'):
+            transform = pyvqnet.data.TransformCompose([
+                pyvqnet.data.TransformResize(256),
+                pyvqnet.data.TransformCenterCrop(224),
+                pyvqnet.data.TransformToTensor(),
+                pyvqnet.data.TransformNormalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+            ])
+
+            trainset = pyvqnet.data.CIFAR10_Dataset(root=dl_path,
+                                                    mode="train",
+                                                    transform=transform,layout="HWC")
+
+            return trainset
+
+        class Model(Module):
+            def __init__(self):
+                super(Model, self).__init__()
+                self.features = Sequential( 
+                Conv2D(input_channels=3, output_channels=8, kernel_size=(3, 3), stride=(1, 1), padding='same'),
+                F.ReLu(),
+                MaxPool2D([2, 2], [2, 2]),
+
+                Conv2D(input_channels=8, output_channels=16, kernel_size=(3, 3), stride=(1, 1), padding='same'),
+                F.ReLu(),
+                MaxPool2D([2, 2], [2, 2]),
+
+                Conv2D(input_channels=16, output_channels=32, kernel_size=(3, 3), stride=(1, 1), padding='same'),
+                F.ReLu(),
+
+                Conv2D(input_channels=32, output_channels=64, kernel_size=(3, 3), stride=(1, 1), padding='same'),
+                F.ReLu(),
+
+                Conv2D(input_channels=64, output_channels=64, kernel_size=(3, 3), stride=(1, 1), padding='same'),
+                F.ReLu(),
+                MaxPool2D([3, 3], [2, 2]),)
+                
+                self.cls = Sequential( 
+                Linear(64 * 27 * 27, 512),
+                F.ReLu(),
+
+                Linear(512, 256),
+                F.ReLu(),
+                Linear(256, 10) )
+
+            def forward(self, x):
+                x = self.features(x)
+                x = tensor.flatten(x,1)
+                x = self.cls(x)
+
+                return x
+            
+        def join_layers(vision_model):
+            layers = [
+                *vision_model.features,
+                lambda x: tensor.flatten(x, 1),
+                *vision_model.cls,
+            ]
+            return layers
+
+
+        if __name__ == "__main__":
+
+
+            args = {
+            "backend":'nccl',  
+            "train_batch_size" : 64,
+            "train_micro_batch_size_per_gpu" : 32,
+        "optimizer": {
+            "type": "Adam",
+            "params": {
+            "lr": 0.001
+            }}, 
+            "local_rank":dist.get_local_rank(), 
+            "pipeline_parallel_size":pipeline_parallel_size, "seed":42, "steps":num_steps,
+            "loss":CrossEntropyLoss(),
+            }
+            os.environ["LOCAL_RANK"] = str(dist.get_local_rank())
+            trainset = cifar_trainset_vqnet(args["local_rank"])
+            w = PipelineParallelTrainingWrapper(args,join_layers(Model()),trainset)
+
+            w.train_batch()

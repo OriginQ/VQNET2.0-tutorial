@@ -1441,6 +1441,32 @@ randn
         # [-0.6987777, -0.0089036, -0.5084590]
         # ]
 
+binomial
+==============================
+.. py:function:: pyvqnet.tensor.binomial(total_countst, probs)
+
+    创建一个由 :attr:total_count 和 :attr:probs 参数化的二项分布。
+
+    :param total_counts: 伯努利试验的次数。
+    :param probs: 事件概率。
+
+    :return:
+        二项分布的 QTensor。
+
+    Example::
+
+        import pyvqnet.tensor as tensor
+
+        a = tensor.randu([3,4])
+        b = 1000
+
+        c = tensor.binomial(b,a)
+        print(c)
+
+        # [[221.,763., 30.,339.],
+        #  [803.,899.,105.,356.],
+        #  [550.,688.,828.,493.]]
+
 
 multinomial
 ==============================

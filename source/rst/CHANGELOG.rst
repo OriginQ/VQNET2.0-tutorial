@@ -2,6 +2,27 @@
 VQNet Changelog
 ######################
 
+[v2.12.0] - 2024-05-01
+***************************
+
+Added
+===================
+
+- 添加流水线并行PipelineParallelTrainingWrapper接口。
+- 添加 `Gelu`, `DropPath`, `binomial`, `adamW` 接口。
+- 添加 `QuantumBatchAsyncQcloudLayer` 支持pyqpanda的本地虚拟机模拟计算。
+- 添加 xtensor的 `QuantumBatchAsyncQcloudLayer` 支持pyqpanda的本地虚拟机模拟计算以及真机计算。
+- 使得QTensor 可以被deepcopy以及pickle。
+
+Changed
+===================
+
+- 安装包新加入依赖 "Pillow", "hjson"。
+
+Fixed
+===================
+- 降低Linux-GPU版本启动时候的显存消耗。
+- 修复slice以及power函数的内存泄露问题。
 
 [v2.11.0] - 2024-03-01
 ***************************
