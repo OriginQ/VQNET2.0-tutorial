@@ -19,7 +19,7 @@ Changed
 
 - 安装包新加入依赖 "Pillow", "hjson"。
 - 优化softmax以及tranpose在GPU下运行速度。
-
+- 使用cuda11.8编译。
 Fixed
 ===================
 - 降低Linux-GPU版本启动时候的显存消耗。
