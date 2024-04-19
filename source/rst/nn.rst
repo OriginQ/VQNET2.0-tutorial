@@ -3616,8 +3616,8 @@ GetDeviceNum
         from pyvqnet.distributed import CommController
         Comm_OP = CommController("nccl")
         
-        Comm_OP.ncclSplitGroup([[0, 1]])
-        # vqnetrun -n 2 python test.py
+        Comm_OP.GetDeviceNum()
+        # python test.py
 
 
 allreduce
