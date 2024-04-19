@@ -4000,7 +4000,7 @@ broadcast_model_params
 
 acc_allreduce
 ^^^^^^^^^^^^^^^^^^^^^^
-.. py:function:: CommController.broadcast_model_params(acc)
+.. py:function:: CommController.acc_allreduce(acc)
     
     以allreduce将训练结束后的准确度进行计算。
 
