@@ -13,17 +13,23 @@ Added
 - 添加 `QuantumBatchAsyncQcloudLayer` 支持pyqpanda的本地虚拟机模拟计算。
 - 添加 xtensor的 `QuantumBatchAsyncQcloudLayer` 支持pyqpanda的本地虚拟机模拟计算以及真机计算。
 - 使得QTensor 可以被deepcopy以及pickle。
+- 添加分布式计算启动命令 `vqnetrun`, 使用分布式计算接口时使用。
+- 添加ES梯度计算方法真机接口 `QuantumBatchAsyncQcloudLayerES` 支持pyqpanda的本地虚拟机模拟计算以及真机计算。
+- 添加在分布式计算中支持QTensor的数据通信接口 `allreduce`, `reduce`, `broadcast`, `allgather`, `send`, `recv` 等。
 
 Changed
 ===================
 
-- 安装包新加入依赖 "Pillow", "hjson"。
+- 安装包新加入依赖 "Pillow", "hjson", linux系统下安装包添加新依赖 "psutil"。 "cloudpickle"。
 - 优化softmax以及tranpose在GPU下运行速度。
 - 使用cuda11.8编译。
+- 整合了基于cpu、gpu下的分布式计算接口。
+
 Fixed
 ===================
 - 降低Linux-GPU版本启动时候的显存消耗。
 - 修复select以及power函数的内存泄露问题。
+- 删除了cpu、gpu下基于reduce方法的模型参数以及梯度更新方法 `nccl_average_parameters_reduce`, `nccl_average_grad_reduce`。
 
 [v2.11.0] - 2024-03-01
 ***************************
