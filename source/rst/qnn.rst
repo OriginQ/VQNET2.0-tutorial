@@ -497,7 +497,7 @@ QuantumBatchAsyncQcloudLayerES
     :param diff_method: 梯度计算的微分方法。 默认为“ES”, 源自论文"Learning to learn with an evolutionary strategy Learning to learn with an evolutionary strategy", 当前不支持其他微分方法。
     :param submit_kwargs: 用于提交量子电路的附加关键字参数，默认:{"chip_id":pyqpanda.real_chip_type.origin_72,"is_amend":True,"is_mapping":True,"is_optimization":True,"compile_level":3,"default_task_group_size":200,"test_qcloud_fake":False},当设置test_qcloud_fake为True则本地CPUQVM模拟。
     :param query_kwargs: 用于查询量子结果的附加关键字参数，默认:{"timeout":2,"print_query_info":True,"sub_circuits_split_size":1}。
-    :param sigma:  多元非三维分布的采样方差。
+    :param sigma:  多元非三维分布的采样方差, 一般取pi/6, pi/12, pi/24, 默认为pi/24。
     :return: 一个可以计算量子电路的模块。
     
     Example::
