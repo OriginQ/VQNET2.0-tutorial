@@ -4076,6 +4076,69 @@ split_data
 
         x_train, y_train= split_data(x_train, y_train)
 
+get_local_rank
+=================================
+
+使用 ``get_local_rank`` 得到当前机器上进程号。
+
+.. py:function:: pyvqnet.distributed.ControllComm.get_local_rank()
+
+    用于获得当前机器上的当前进程号。
+
+    :return: 当前机器上的当前进程号。
+
+    Example::
+
+        from pyvqnet.distributed.ControllComm import get_local_rank
+
+        print(get_local_rank())
+        # vqnetrun -n 2 python test.py
+
+get_rank
+=================================
+使用 ``get_rank`` 得到当前机器上进程号。
+
+.. py:function:: pyvqnet.distributed.ControllComm.get_rank()
+
+    用于获得当前进程的进程号。
+
+    :return: 当前进程的进程号。
+
+    Example::
+
+        from pyvqnet.distributed.ControllComm import get_rank
+
+        print(get_rank())
+        # vqnetrun -n 2 python test.py
+
+init_group
+=================================
+使用 ``init_group`` 根据给出的进程数列表来对基于cpu下的进程组进行初始化。
+
+.. py:function:: pyvqnet.distributed.ControllComm.init_group(rank_lists)
+
+    用于初始化进程通信组。
+
+    :param rank_lists: 通信进程组列表.
+    :return: 初始化后的进程组列表。
+
+    Example::
+        
+        from pyvqnet.distributed import *
+
+        Comm_OP = CommController("mpi")
+        num = tensor.to_tensor(np.random.rand(1, 5))
+        print(f"rank {Comm_OP.getRank()}  {num}")
+        
+        group_l = init_group([[0,2], [1]])
+
+        for comm_ in group_l:
+            if Comm_OP.getRank() in comm_[1]:
+                num = Comm_OP.allreduce_group(num, "sum", GroupComm = comm_[0])
+                print(f"rank {Comm_OP.getRank()}  {num} after")
+        
+        # vqnetrun -n 3 python test.py
+        
 PipelineParallelTrainingWrapper
 =================================
 .. py:class:: pyvqnet.distributed.pp.PipelineParallelTrainingWrapper(args,join_layers,trainset)
