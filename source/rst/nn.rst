@@ -908,7 +908,7 @@ BatchNorm1d
 LayerNormNd
 =================================
 
-.. py:class:: pyvqnet.nn.layer_norm.LayerNormNd(normalized_shape: list, epsilon: float = 1e-5, affine: bool = True, dtype=None, name="")
+.. py:class:: pyvqnet.nn.layer_norm.LayerNormNd(normalized_shape: list, epsilon: float = 1e-5, dtype=None, name="")
 
     在任意输入的后D个维度上进行层归一化。具体方式如论文所述:
     `Layer Normalization <https://arxiv.org/abs/1607.06450>`__。
@@ -920,7 +920,6 @@ LayerNormNd
 
     :param norm_shape: `float` - 标准化形状。
     :param epsilon: `float` - 数值稳定性常数，默认为 1e-5。
-    :param affine: `bool` - 是否使用应用仿射变换，默认为 True。
     :param dtype: 参数的数据类型，defaults：None，使用默认数据类型:kfloat32,代表32位浮点数。
     :param name: 这个模块的名字， 默认为""。
 
@@ -950,7 +949,7 @@ LayerNormNd
 LayerNorm2d
 =================================
 
-.. py:class:: pyvqnet.nn.layer_norm.LayerNorm2d(norm_size:int, epsilon:float = 1e-5,  affine: bool = True, dtype=None, name="")
+.. py:class:: pyvqnet.nn.layer_norm.LayerNorm2d(norm_size:int, epsilon:float = 1e-5, dtype=None, name="")
 
     在 4D 输入上进行层归一化。具体方式如论文所述:
     `Layer Normalization <https://arxiv.org/abs/1607.06450>`__。
@@ -962,7 +961,6 @@ LayerNorm2d
 
     :param norm_size: `float` - 归一化大小,应该等于 C * H * W。
     :param epsilon: `float` - 数值稳定性常数,默认为 1e-5。
-    :param affine: `bool` - 是否使用应用仿射变换，默认为 True。
     :param dtype: 参数的数据类型，defaults：None，使用默认数据类型:kfloat32,代表32位浮点数。
     :param name: 这个模块的名字， 默认为""。
 
@@ -1003,7 +1001,7 @@ LayerNorm2d
 LayerNorm1d
 =================================
 
-.. py:class:: pyvqnet.nn.layer_norm.LayerNorm1d(norm_size:int, epsilon:float = 1e-5, affine: bool = True, dtype=None, name="")
+.. py:class:: pyvqnet.nn.layer_norm.LayerNorm1d(norm_size:int, epsilon:float = 1e-5, dtype=None, name="")
     
     在 2D 输入上进行层归一化。具体方式如论文所述:
     `Layer Normalization <https://arxiv.org/abs/1607.06450>`__。
@@ -1015,7 +1013,6 @@ LayerNorm1d
 
     :param norm_size: `float` - 归一化大小,应该等于最后一维大小。
     :param epsilon: `float` - 数值稳定性常数,默认为 1e-5。
-    :param affine: `bool` - 是否使用应用仿射变换，默认为 True。
     :param dtype: 参数的数据类型，defaults：None，使用默认数据类型:kfloat32,代表32位浮点数。
     :param name: 这个模块的名字， 默认为""。
 
@@ -4107,6 +4104,7 @@ PipelineParallelTrainingWrapper
     此外，每个进程需要在 `__main__` 函数中配置环境变量的 `LOCAL_RANK`。
     
     .. code-block::
+
         os.environ["LOCAL_RANK"] = str(dist.get_local_rank())
 
     调用 `train_batch` 进行训练。
