@@ -1445,7 +1445,7 @@ binomial
 ==============================
 .. py:function:: pyvqnet.tensor.binomial(total_countst, probs)
 
-    创建一个由 :attr:total_count 和 :attr:probs 参数化的二项分布。
+    创建一个由 :attr:`total_count` 和 :attr:`probs` 参数化的二项分布。
 
     :param total_counts: 伯努利试验的次数。
     :param probs: 事件概率。

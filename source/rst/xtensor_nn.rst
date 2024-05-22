@@ -2628,6 +2628,7 @@ QuantumBatchAsyncQcloudLayer
 .. py:class:: pyvqnet.xtensor.qcloud.QuantumBatchAsyncQcloudLayer(origin_qprog_func,qcloud_token,para_num,num_qubits,num_cubits,pauli_str_dict=None,shots=1000,initializer=None,dtype=None,name="",diff_method="parameter_shift",submit_kwargs={},query_kwargs={})
     
     用于本源量子计算机的量子计算的变分线路训练模块，使用pyqpanda QCLOUD从版本3.8.2.2开始。它提交参数化量子电路到真实芯片并获取测量结果。
+    
     :param origin_qprog_func: 由QPanda构建的可调用量子电路函数。
     :param qcloud_token: str - 量子机器的类型或者执行的云令牌。
     :param para_num: int - 参数的数量；参数是一维的。
