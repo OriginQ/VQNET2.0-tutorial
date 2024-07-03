@@ -7,7 +7,7 @@
 CPU下模型训练
 =================================
 
-以下的经典神经网络模块均支持自动反向传播计算。当您运行前传函数以后，再执行反向函数就可以计算梯度。一个卷积层的简单例子如下:
+以下的经典神经网络模块均支持自动反向传播计算。当您运行前传函数以后,再执行反向函数就可以计算梯度。一个卷积层的简单例子如下:
 
 .. code-block::
 
@@ -50,9 +50,9 @@ CPU下模型训练
 GPU下模型训练
 =================================
 
-您需要安装linux版本下的pyvqnet才能使用GPU。需要保证数据QTensor以及Module均在GPU上。可使用 `toGPU` 转移数据或者 `gpu` 创建副本，或者在数据创建函数中使用device指定。
+您需要安装linux版本下的pyvqnet才能使用GPU。需要保证数据QTensor以及Module均在GPU上。可使用 `toGPU` 转移数据或者 `gpu` 创建副本,或者在数据创建函数中使用device指定。
 
-请参考以下例子：
+请参考以下例子:
 
 .. code-block::
 
@@ -73,7 +73,7 @@ GPU下模型训练
     # input of shape [b,ic,hw,hw]
     x0 = arange(1,b*ic*hw*hw+1,requires_grad=True,dtype=kfloat32).reshape([b,ic,hw,hw])
 
-    #使用gpu 复制数据到DEV_GPU_0，亦可以在函数内指定ID，也可以使用相关tensor接口的device进行指定
+    #使用gpu 复制数据到DEV_GPU_0,亦可以在函数内指定ID,也可以使用相关tensor接口的device进行指定
     x0 = x0.GPU(DEV_GPU_0)
     x0.requires_grad = True
     #forward function
@@ -184,14 +184,14 @@ toGPU
 
     将模块和其子模块的参数和缓冲数据移动到指定的 GPU 设备中。
 
-    device 指定存储其内部数据的设备。 当device >= DEV_GPU_0时，数据存储在GPU上。如果您的计算机有多个GPU，
+    device 指定存储其内部数据的设备。 当device >= DEV_GPU_0时,数据存储在GPU上。如果您的计算机有多个GPU,
     则可以指定不同的设备来存储数据。例如device = DEV_GPU_1 , DEV_GPU_2, DEV_GPU_3, ... 表示存储在不同序列号的GPU上。
     
     .. note::
         Module在不同GPU上无法进行计算。
-        如果您尝试在 ID 超过验证 GPU 最大数量的 GPU 上创建 QTensor，将引发 Cuda 错误。
+        如果您尝试在 ID 超过验证 GPU 最大数量的 GPU 上创建 QTensor,将引发 Cuda 错误。
 
-    :param device: 当前保存QTensor的设备，默认=DEV_GPU_0。device= pyvqnet.DEV_GPU_0，存储在第一个 GPU 中，devcie = DEV_GPU_1，存储在第二个 GPU 中，依此类推
+    :param device: 当前保存QTensor的设备,默认=DEV_GPU_0。device= pyvqnet.DEV_GPU_0,存储在第一个 GPU 中,devcie = DEV_GPU_1,存储在第二个 GPU 中,依此类推
     :return: Module 移动到 GPU 设备。
 
     Examples::
@@ -224,7 +224,7 @@ toCPU
 模型参数保存和载入
 *********************************************************
 
-以下接口可以进行模型参数保存到文件中，或从文件中读取参数文件。但请注意，文件中不保存模型结构，需要用户手动构建模型结构。
+以下接口可以进行模型参数保存到文件中,或从文件中读取参数文件。但请注意,文件中不保存模型结构,需要用户手动构建模型结构。
 
 save_parameters
 =================================
@@ -293,7 +293,7 @@ ModuleList
 .. py:class:: pyvqnet.nn.module.ModuleList([pyvqnet.nn.module.Module])
 
 
-    将子模块保存在列表中。 ModuleList 可以像普通的 Python 列表一样被索引， 它包含的Module的内部参数等可以被保存起来。
+    将子模块保存在列表中。 ModuleList 可以像普通的 Python 列表一样被索引, 它包含的Module的内部参数等可以被保存起来。
 
     :param modules: nn.Modules 列表
 
@@ -357,7 +357,7 @@ ParameterList
 .. py:class:: pyvqnet.nn.module.ParameterList([pyvqnet.nn.module.Module])
 
 
-    将参数保存在列表中, ParameterList 可以像普通的 Python 列表一样被索引， 它包含的Parameter的内部参数等可以被保存起来。
+    将参数保存在列表中, ParameterList 可以像普通的 Python 列表一样被索引, 它包含的Parameter的内部参数等可以被保存起来。
 
     :param modules: nn.Parameter 列表
 
@@ -385,7 +385,7 @@ Sequential
 *********************************************************
 .. py:class:: pyvqnet.nn.module.Sequential([pyvqnet.nn.module.Module])
 
-    模块将按照传递的顺序添加模块。或者，也可以将模块的 ``OrderedDict`` 传入。``Sequential`` 的 ``forward()`` 方法接受任何输入，并将其转发给它的第一个模块。
+    模块将按照传递的顺序添加模块。或者,也可以将模块的 ``OrderedDict`` 传入。``Sequential`` 的 ``forward()`` 方法接受任何输入,并将其转发给它的第一个模块。
     然后将输出依次 "链 "到其后每个模块的输入、最后返回最后一个模块的输出。
 
     :param modules: 添加的Module
@@ -419,7 +419,7 @@ Sequential
 经典神经网络层
 *********************************************************
 
-以下实现了一些经典神经网络层：卷积，转置卷积，池化，归一化，循环神经网络等。
+以下实现了一些经典神经网络层:卷积,转置卷积,池化,归一化,循环神经网络等。
 
 
 Conv1D
@@ -433,13 +433,13 @@ Conv1D
     :param output_channels: `int` - 输出数据的通道数。
     :param kernel_size: `int` - 卷积核的尺寸. 卷积核形状 = [output_channels,input_channels/group,kernel_size,1]。
     :param stride: `int` - 步长, 默认为1。
-    :param padding: `str|int` - 填充选项, 它可以是一个字符串 {'valid', 'same'} 或一个整数，给出应用在输入上的填充量。 默认 "valid"。
+    :param padding: `str|int` - 填充选项, 它可以是一个字符串 {'valid', 'same'} 或一个整数,给出应用在输入上的填充量。 默认 "valid"。
     :param use_bias: `bool` - 是否使用偏置项, 默认使用。
     :param kernel_initializer: `callable` - 卷积核初始化方法。默认为空,使用kaiming_uniform。
     :param bias_initializer: `callable` - 偏置初始化方法。默认为空,使用kaiming_uniform。
     :param dilation_rate: `int` - 空洞大小,defaults: 1。
     :param group: `int` -  分组卷积的分组数. Default: 1。
-    :param dtype: 参数的数据类型，defaults：None，使用默认数据类型:kfloat32,代表32位浮点数。
+    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
     :param name: 模块的名字,default:""。
 
     :return: 一维卷积实例。
@@ -482,13 +482,13 @@ Conv2D
     :param output_channels: `int` - 输出数据的通道数。
     :param kernel_size: `tuple|list` - 卷积核的尺寸. 卷积核形状 = [output_channels,input_channels/group,kernel_size,kernel_size]。
     :param stride: `tuple|list` - 步长, 默认为 (1, 1)|[1,1]。
-    :param padding: `str|tuple` - 填充选项, 它可以是一个字符串 {'valid', 'same'} 或一个整数元组，给出在两边应用的隐式填充量。 默认 "valid"。
+    :param padding: `str|tuple` - 填充选项, 它可以是一个字符串 {'valid', 'same'} 或一个整数元组,给出在两边应用的隐式填充量。 默认 "valid"。
     :param use_bias: `bool` - 是否使用偏置项, 默认使用。
     :param kernel_initializer: `callable` - 卷积核初始化方法。默认为空,使用kaiming_uniform。
     :param bias_initializer: `callable` - 偏置初始化方法。默认为空,使用kaiming_uniform。
     :param dilation_rate: `int` - 空洞大小,defaults: 1。
     :param group: `int` -  分组卷积的分组数. Default: 1。
-    :param dtype: 参数的数据类型，defaults：None，使用默认数据类型:kfloat32,代表32位浮点数。
+    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
     :param name: 模块的名字,default:""。
 
     :return: 二维卷积实例。
@@ -539,13 +539,13 @@ ConvT2D
     :param output_channels: `int` - 输出数据的通道数。
     :param kernel_size: `tuple|list` - 卷积核的尺寸,卷积核形状 = [input_channels,output_channels/group,kernel_size,kernel_size]。 
     :param stride: `tuple|list` - 步长, 默认为 (1, 1)|[1,1]。
-    :param padding: `str|tuple` - 填充选项, 它可以是一个字符串 {'valid', 'same'} 或一个整数元组，给出在两边应用的隐式填充量。 默认 "valid"。
+    :param padding: `str|tuple` - 填充选项, 它可以是一个字符串 {'valid', 'same'} 或一个整数元组,给出在两边应用的隐式填充量。 默认 "valid"。
     :param use_bias: `bool` - 是否使用偏置项, 默认使用。
     :param kernel_initializer: `callable` - 卷积核初始化方法。默认为空,使用kaiming_uniform。
     :param bias_initializer: `callable` - 偏置项初始化方法。默认为空,使用kaiming_uniform。
     :param dilation_rate: `int` - 空洞大小,defaults: 1。
     :param group: `int` -  分组卷积的分组数. Default: 1。
-    :param dtype: 参数的数据类型，defaults：None，使用默认数据类型:kfloat32,代表32位浮点数。
+    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
     :param name: 模块的名字,default:""。
 
     :return: 二维转置卷积实例。
@@ -674,7 +674,7 @@ AvgPool2D
 
     :param kernel: 平均池化的窗口大小。
     :param strides: 窗口移动的步长。
-    :param padding: 填充选项, "valid" or "same" 或包含2个整数的元组，整数为两个维度上的填充长度。 默认 "valid"。
+    :param padding: 填充选项, "valid" or "same" 或包含2个整数的元组,整数为两个维度上的填充长度。 默认 "valid"。
     :param name: 命名,默认为""。
 
     :return: 二维平均池化层实例。
@@ -711,7 +711,7 @@ MaxPool2D
 
     :param kernel: 最大池化的窗口大小。
     :param strides: 窗口移动的步长。
-    :param padding: 填充选项, "valid" or "same" 或包含2个整数的元组，整数为两个维度上的填充长度。 默认 "valid"。
+    :param padding: 填充选项, "valid" or "same" 或包含2个整数的元组,整数为两个维度上的填充长度。 默认 "valid"。
     :param name: 命名,默认为""。
 
     :return: 二维最大池化层实例。
@@ -751,7 +751,7 @@ Embedding
     :param num_embeddings: `int` - 嵌入字典的大小。
     :param embedding_dim: `int` - 每个嵌入向量的大小
     :param weight_initializer: `callable` - 参数初始化方式,默认正态分布。
-    :param dtype: 参数的数据类型，defaults：None，使用默认数据类型:kfloat32,代表32位浮点数。
+    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
     :param name: 嵌入层的命名,默认为""。
 
     :return: a Embedding 实例。
@@ -799,7 +799,7 @@ Embedding
 BatchNorm2d
 =================================
 
-.. py:class:: pyvqnet.nn.BatchNorm2d(channel_num:int, momentum:float=0.1, epsilon:float = 1e-5,beta_initializer=zeros, gamma_initializer=ones, dtype=None, name="")
+.. py:class:: pyvqnet.nn.BatchNorm2d(channel_num:int, momentum:float=0.1, epsilon:float = 1e-5,affine = True, beta_initializer=zeros, gamma_initializer=ones, dtype=None, name="")
     
     在 4D 输入(B、C、H、W)上应用批归一化。参照论文
     `Batch Normalization: Accelerating Deep Network Training by Reducing
@@ -813,10 +813,11 @@ BatchNorm2d
 
     :param channel_num: `int` - 输入通道数。
     :param momentum: `float` - 计算指数加权平均时的动量,默认为 0.1。
+    :param epsilon: `float` - 数值稳定参数, 默认 1e-5。
+    :param affine: `bool` - 一个布尔值,当设置为 ``True`` 时,此模块具有可学习的每通道仿射参数,初始化为 1(用于权重）和 0(用于偏差）。默认值:``True``。
     :param beta_initializer: `callable` - beta的初始化方式,默认全零初始化。
     :param gamma_initializer: `callable` - gamma的的初始化方式,默认全一初始化。
-    :param epsilon: `float` - 数值稳定参数, 默认 1e-5。
-    :param dtype: 参数的数据类型，defaults：None，使用默认数据类型:kfloat32,代表32位浮点数。
+    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
     :param name: 批归一化层命名,默认为""。
 
     :return: 二维批归一化层实例。
@@ -860,7 +861,7 @@ BatchNorm2d
 BatchNorm1d
 =================================
 
-.. py:class:: pyvqnet.nn.BatchNorm1d(channel_num:int, momentum:float=0.1, epsilon:float = 1e-5, beta_initializer=zeros, gamma_initializer=ones, dtype=None, name="")
+.. py:class:: pyvqnet.nn.BatchNorm1d(channel_num:int, momentum:float=0.1, epsilon:float = 1e-5, affine = True, beta_initializer=zeros, gamma_initializer=ones, dtype=None, name="")
 
     在 2D 输入 (B,C) 上进行批归一化操作。 参照论文
     `Batch Normalization: Accelerating Deep Network Training by Reducing
@@ -875,11 +876,11 @@ BatchNorm1d
 
     :param channel_num: `int` - 输入通道数。
     :param momentum: `float` - 计算指数加权平均时的动量,默认为 0.1。
+    :param epsilon: `float` - 数值稳定性常数,默认为 1e-5。
+    :param affine: `bool` - 一个布尔值,当设置为 ``True`` 时,此模块具有可学习的每通道仿射参数,初始化为 1(用于权重）和 0(用于偏差）。默认值:``True``。
     :param beta_initializer: `callable` - beta的初始化方式,默认全零初始化。
     :param gamma_initializer: `callable` - gamma的的初始化方式,默认全一初始化。
-    :param epsilon: `float` - 数值稳定性常数,默认为 1e-5。
-    :param dtype: 参数的数据类型，defaults：None，使用默认数据类型:kfloat32,代表32位浮点数。
-    
+    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
     :param name: 批归一化层命名,默认为""。
 
     :return: 一维批归一化层实例。
@@ -908,7 +909,7 @@ BatchNorm1d
 LayerNormNd
 =================================
 
-.. py:class:: pyvqnet.nn.layer_norm.LayerNormNd(normalized_shape: list, epsilon: float = 1e-5, dtype=None, name="")
+.. py:class:: pyvqnet.nn.layer_norm.LayerNormNd(normalized_shape: list, epsilon: float = 1e-5,affine=True, dtype=None, name="")
 
     在任意输入的后D个维度上进行层归一化。具体方式如论文所述:
     `Layer Normalization <https://arxiv.org/abs/1607.06450>`__。
@@ -916,12 +917,13 @@ LayerNormNd
     .. math::
         y = \frac{x - \mathrm{E}[x]}{ \sqrt{\mathrm{Var}[x] + \epsilon}} * \gamma + \beta
 
-    对于像 (B,C,H,W,D) 这样的输入， ``norm_shape`` 可以是 [C,H,W,D],[H,W,D],[W,D] 或 [D] .
+    对于像 (B,C,H,W,D) 这样的输入, ``norm_shape`` 可以是 [C,H,W,D],[H,W,D],[W,D] 或 [D] .
 
     :param norm_shape: `float` - 标准化形状。
-    :param epsilon: `float` - 数值稳定性常数，默认为 1e-5。
-    :param dtype: 参数的数据类型，defaults：None，使用默认数据类型:kfloat32,代表32位浮点数。
-    :param name: 这个模块的名字， 默认为""。
+    :param epsilon: `float` - 数值稳定性常数,默认为 1e-5。
+    :param affine: `bool` - 一个布尔值,当设置为 ``True`` 时,此模块具有可学习的每通道仿射参数,初始化为 1(用于权重）和 0(用于偏差）。默认值:``True``。
+    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
+    :param name: 这个模块的名字, 默认为""。
 
     :return: 一个 LayerNormNd 类
 
@@ -949,7 +951,7 @@ LayerNormNd
 LayerNorm2d
 =================================
 
-.. py:class:: pyvqnet.nn.layer_norm.LayerNorm2d(norm_size:int, epsilon:float = 1e-5, dtype=None, name="")
+.. py:class:: pyvqnet.nn.layer_norm.LayerNorm2d(norm_size:int, epsilon:float = 1e-5, affine=True, dtype=None, name="")
 
     在 4D 输入上进行层归一化。具体方式如论文所述:
     `Layer Normalization <https://arxiv.org/abs/1607.06450>`__。
@@ -961,8 +963,9 @@ LayerNorm2d
 
     :param norm_size: `float` - 归一化大小,应该等于 C * H * W。
     :param epsilon: `float` - 数值稳定性常数,默认为 1e-5。
-    :param dtype: 参数的数据类型，defaults：None，使用默认数据类型:kfloat32,代表32位浮点数。
-    :param name: 这个模块的名字， 默认为""。
+    :param affine: `bool` - 一个布尔值,当设置为 ``True`` 时,此模块具有可学习的每通道仿射参数,初始化为 1(用于权重）和 0(用于偏差）。默认值:``True``。
+    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
+    :param name: 这个模块的名字, 默认为""。
 
     :return: 二维层归一化实例。
 
@@ -1001,7 +1004,7 @@ LayerNorm2d
 LayerNorm1d
 =================================
 
-.. py:class:: pyvqnet.nn.layer_norm.LayerNorm1d(norm_size:int, epsilon:float = 1e-5, dtype=None, name="")
+.. py:class:: pyvqnet.nn.layer_norm.LayerNorm1d(norm_size:int, epsilon:float = 1e-5, affine=True, dtype=None, name="")
     
     在 2D 输入上进行层归一化。具体方式如论文所述:
     `Layer Normalization <https://arxiv.org/abs/1607.06450>`__。
@@ -1013,8 +1016,9 @@ LayerNorm1d
 
     :param norm_size: `float` - 归一化大小,应该等于最后一维大小。
     :param epsilon: `float` - 数值稳定性常数,默认为 1e-5。
-    :param dtype: 参数的数据类型，defaults：None，使用默认数据类型:kfloat32,代表32位浮点数。
-    :param name: 这个模块的名字， 默认为""。
+    :param affine: `bool` - 一个布尔值,当设置为 ``True`` 时,此模块具有可学习的每通道仿射参数,初始化为 1(用于权重）和 0(用于偏差）。默认值:``True``。
+    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
+    :param name: 这个模块的名字, 默认为""。
 
     :return: 一维层归一化实例。
 
@@ -1035,7 +1039,43 @@ LayerNorm1d
         # [-1.3416355, -0.4472118, 0.4472118, 1.3416355],
         # [-1.3416355, -0.4472118, 0.4472118, 1.3416355]
         # ]
+
+
+GroupNorm
+===========================================================
+
+.. py:class:: pyvqnet.nn.group_norm.GroupNorm(num_groups: int, num_channels: int, epsilon = 1e-5, affine = True, dtype = None, name = ""）
+
+    对小批量输入应用组归一化。
+
+    此层实现论文“组归一化 <https://arxiv.org/abs/1803.08494>`__ 中描述的操作
+
+    .. math::
         
+        y = \frac{x - \mathrm{E}[x]}{ \sqrt{\mathrm{Var}[x] + \epsilon}} * \gamma + \beta
+
+    输入通道被分成 :attr:`num_groups` 组,每组包含 ``num_channels / num_groups`` 个通道。:attr:`num_channels` 必须能被 :attr:`num_groups` 整除。平均值和标准差是在每个组中分别计算的。如果 :attr:`affine` 为 ``True``,则 :math:`\gamma` 和 :math:`\beta` 是可学习的。每个通道仿射变换参数向量,大小为 :attr:`num_channels`。
+
+    :param num_groups (int):将通道分成的组数
+    :param num_channels (int):输入中预期的通道数
+    :param eps:添加到分母的值,以实现数值稳定性。默认值:1e-5
+    :param affine:一个布尔值,当设置为 ``True`` 时,此模块具有可学习的每通道仿射参数,初始化为 1(用于权重）和 0(用于偏差）。默认值:``True``。
+
+    形状:
+    - 输入::math:`(N, C, *)`,其中:math:`C=\text{num\_channels}`
+    - 输出::math:`(N, C, *)`(与输入形状相同）
+
+    :返回:GroupNorm 类
+
+    Example::
+
+        import numpy as np
+        from pyvqnet.tensor import QTensor,kfloat32
+        from pyvqnet.nn import GroupNorm
+        test_conv = GroupNorm(2,10)
+        x = QTensor(np.arange(0,60*2*5).reshape([2,10,3,2,5]),requires_grad=True,dtype=kfloat32)
+        y = test_conv.forward(x)
+        print(y)
 
 Linear
 =================================
@@ -1050,7 +1090,7 @@ Linear
     :param weight_initializer: `callable` - 权重初始化函数,默认为空,使用he_uniform。
     :param bias_initializer: `callable` - 偏置初始化参数,默认为空,使用he_uniform。
     :param use_bias: `bool` - 是否使用偏置项, 默认使用。
-    :param dtype: 参数的数据类型，defaults：None，使用默认数据类型:kfloat32,代表32位浮点数。
+    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
     :param name: 线性层的命名,默认为""。
 
     :return: 线性层实例。
@@ -1089,7 +1129,7 @@ Dropout
     Dropout 模块。dropout 模块将一些单元的输出随机设置为零,同时根据给定的 dropout_rate 概率升级其他单元。
 
     :param dropout_rate: `float` - 神经元被设置为零的概率。
-    :param name: 这个模块的名字， 默认为""。
+    :param name: 这个模块的名字, 默认为""。
 
     :return: Dropout实例。
 
@@ -1125,10 +1165,10 @@ DropPath
 
 .. py:class:: pyvqnet.nn.dropout.DropPath(dropout_rate = 0.5,name="")
 
-    DropPath 模块将逐样本丢弃路径（随机深度）。
+    DropPath 模块将逐样本丢弃路径(随机深度）。
 
     :param dropout_rate: `float` - 神经元被设置为零的概率。
-    :param name: 这个模块的名字， 默认为""。
+    :param name: 这个模块的名字, 默认为""。
 
     :return: DropPath实例。
 
@@ -1150,11 +1190,11 @@ Pixel_Shuffle
 
 .. py:class:: pyvqnet.nn.pixel_shuffle.Pixel_Shuffle(upscale_factors, name="")
 
-    重新排列形状为：(*, C * r^2, H, W)  的张量
-    到形状为 (*, C, H * r, W * r) 的张量，其中 r 是尺度变换因子。
+    重新排列形状为:(*, C * r^2, H, W)  的张量
+    到形状为 (*, C, H * r, W * r) 的张量,其中 r 是尺度变换因子。
 
     :param upscale_factors: 增加尺度变换的因子
-    :param name: 这个模块的名字， 默认为""。
+    :param name: 这个模块的名字, 默认为""。
 
     :return:
             Pixel_Shuffle 模块
@@ -1175,10 +1215,10 @@ Pixel_Unshuffle
 
 .. py:class:: pyvqnet.nn.pixel_shuffle.Pixel_Unshuffle(downscale_factors, name="")
 
-    通过重新排列元素来反转 Pixel_Shuffle 操作. 将 (*, C, H * r, W * r) 形状的张量变化为 (*, C * r^2, H, W) ，其中 r 是缩小因子。
+    通过重新排列元素来反转 Pixel_Shuffle 操作. 将 (*, C, H * r, W * r) 形状的张量变化为 (*, C * r^2, H, W) ,其中 r 是缩小因子。
 
     :param downscale_factors: 增加尺度变换的因子
-    :param name: 这个模块的名字， 默认为""。
+    :param name: 这个模块的名字, 默认为""。
 
     :return:
             Pixel_Unshuffle 模块
@@ -1201,7 +1241,7 @@ GRU
 .. py:class:: pyvqnet.nn.gru.GRU(input_size, hidden_size, num_layers=1, nonlinearity='tanh', batch_first=True, use_bias=True, bidirectional=False, dtype=None, name: str = "")
 
 
-    门控循环单元 (GRU) 模块。支持多层堆叠，双向配置。单层单向GRU的计算公式如下:
+    门控循环单元 (GRU) 模块。支持多层堆叠,双向配置。单层单向GRU的计算公式如下:
 
     .. math::
         \begin{array}{ll}
@@ -1213,13 +1253,13 @@ GRU
 
     :param input_size: 输入特征维度。
     :param hidden_size:  隐藏特征维度。
-    :param num_layers: 堆叠GRU层数， 默认: 1。
-    :param batch_first: 如果为 True， 则输入形状为 [batch_size,seq_len,feature_dim]，
-     如果为 False， 则输入形状为 [seq_len,batch_size,feature_dim]，默认为 True。
-    :param use_bias: 如果为 False，该模块不适用偏置项，默认: True。
-    :param bidirectional: 如果为 True, 变为双向GRU， 默认: False。
-    :param dtype: 参数的数据类型，defaults：None，使用默认数据类型:kfloat32,代表32位浮点数。
-    :param name: 这个模块的名字， 默认为""。
+    :param num_layers: 堆叠GRU层数, 默认: 1。
+    :param batch_first: 如果为 True, 则输入形状为 [batch_size,seq_len,feature_dim],
+     如果为 False, 则输入形状为 [seq_len,batch_size,feature_dim],默认为 True。
+    :param use_bias: 如果为 False,该模块不适用偏置项,默认: True。
+    :param bidirectional: 如果为 True, 变为双向GRU, 默认: False。
+    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
+    :param name: 这个模块的名字, 默认为""。
 
     :return: GRU 实例
 
@@ -1274,7 +1314,7 @@ RNN
 .. py:class:: pyvqnet.nn.rnn.RNN(input_size, hidden_size, num_layers=1, nonlinearity='tanh', batch_first=True, use_bias=True, bidirectional=False, dtype=None, name: str = "")
 
 
-    循环神经网络(RNN)模块，使用 :math:`\tanh` 或 :math:`\text{ReLU}` 作为激活函数。支持双向，多层配置。
+    循环神经网络(RNN)模块,使用 :math:`\tanh` 或 :math:`\text{ReLU}` 作为激活函数。支持双向,多层配置。
     单层单向RNN计算公式如下:
 
     .. math::
@@ -1284,14 +1324,14 @@ RNN
 
     :param input_size: 输入特征维度。
     :param hidden_size:  隐藏特征维度。
-    :param num_layers: 堆叠RNN层数， 默认: 1。
-    :param nonlinearity: 非线性激活函数，默认为 ``'tanh'``。
-    :param batch_first: 如果为 True， 则输入形状为 [batch_size,seq_len,feature_dim]，
-     如果为 False， 则输入形状为 [seq_len,batch_size,feature_dim]，默认为 True。
-    :param use_bias: 如果为 False， 该模块不适用偏置项，默认: True。
-    :param bidirectional: 如果为 True，变为双向RNN，默认: False。
-    :param dtype: 参数的数据类型，defaults：None，使用默认数据类型:kfloat32,代表32位浮点数。
-    :param name: 这个模块的名字， 默认为""。
+    :param num_layers: 堆叠RNN层数, 默认: 1。
+    :param nonlinearity: 非线性激活函数,默认为 ``'tanh'``。
+    :param batch_first: 如果为 True, 则输入形状为 [batch_size,seq_len,feature_dim],
+     如果为 False, 则输入形状为 [seq_len,batch_size,feature_dim],默认为 True。
+    :param use_bias: 如果为 False, 该模块不适用偏置项,默认: True。
+    :param bidirectional: 如果为 True,变为双向RNN,默认: False。
+    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
+    :param name: 这个模块的名字, 默认为""。
 
     :return: RNN 实例
 
@@ -1365,7 +1405,7 @@ LSTM
 
 .. py:class:: pyvqnet.nn.lstm.LSTM(input_size, hidden_size, num_layers=1, batch_first=True, use_bias=True, bidirectional=False, dtype=None, name: str = "")
 
-    长短期记忆(LSTM)模块。支持双向LSTM， 堆叠多层LSTM等配置。单层单向LSTM计算公式如下:
+    长短期记忆(LSTM)模块。支持双向LSTM, 堆叠多层LSTM等配置。单层单向LSTM计算公式如下:
 
     .. math::
         \begin{array}{ll} \\
@@ -1379,13 +1419,13 @@ LSTM
 
     :param input_size: 输入特征维度。
     :param hidden_size:  隐藏特征维度。
-    :param num_layers: 堆叠LSTM层数，默认: 1。
-    :param batch_first: 如果为 True，则输入形状为 [batch_size,seq_len,feature_dim]，
-     如果为 False, 则输入形状为 [seq_len,batch_size,feature_dim]，默认为 True。
-    :param use_bias: 如果为 False，该模块不适用偏置项， 默认: True。
-    :param bidirectional: 如果为 True，变为双向LSTM， 默认: False。
-    :param dtype: 参数的数据类型，defaults：None，使用默认数据类型:kfloat32,代表32位浮点数。
-    :param name: 这个模块的名字， 默认为""。
+    :param num_layers: 堆叠LSTM层数,默认: 1。
+    :param batch_first: 如果为 True,则输入形状为 [batch_size,seq_len,feature_dim],
+     如果为 False, 则输入形状为 [seq_len,batch_size,feature_dim],默认为 True。
+    :param use_bias: 如果为 False,该模块不适用偏置项, 默认: True。
+    :param bidirectional: 如果为 True,变为双向LSTM, 默认: False。
+    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
+    :param name: 这个模块的名字, 默认为""。
 
     :return: LSTM 实例
 
@@ -1482,10 +1522,10 @@ Dynamic_GRU
     ``tensor.PackedSequence`` 类可以构造为
     连续调用下一个函数: ``pad_sequence`` 、 ``pack_pad_sequence``。
 
-    Dynamic_GRU 的第一个输出也是一个 ``tensor.PackedSequence`` 类，
+    Dynamic_GRU 的第一个输出也是一个 ``tensor.PackedSequence`` 类,
     可以使用 ``tensor.pad_pack_sequence`` 将其解压缩为普通 QTensor。
 
-    对于输入序列中的每个元素，每一层计算以下公式：
+    对于输入序列中的每个元素,每一层计算以下公式:
 
     .. math::
         \begin{array}{ll}
@@ -1498,12 +1538,12 @@ Dynamic_GRU
 
     :param input_size: 输入特征维度。
     :param hidden_size: 隐藏的特征维度。
-    :param num_layers: 循环层数。 默认值：1
-    :param batch_first: 如果为 True，输入形状提供为 [批大小,序列长度,特征维度]。如果为 False，输入形状提供为 [序列长度,批大小,特征维度]，默认为 True。
-    :param use_bias: 如果为False，则该层不使用偏置权重b_ih和b_hh。 默认值：True。
-    :param bidirectional: 如果为真，则成为双向 GRU。 默认值：False。
-    :param dtype: 参数的数据类型，defaults：None，使用默认数据类型:kfloat32,代表32位浮点数。
-    :param name: 这个模块的名字， 默认为""。
+    :param num_layers: 循环层数。 默认值:1
+    :param batch_first: 如果为 True,输入形状提供为 [批大小,序列长度,特征维度]。如果为 False,输入形状提供为 [序列长度,批大小,特征维度],默认为 True。
+    :param use_bias: 如果为False,则该层不使用偏置权重b_ih和b_hh。 默认值:True。
+    :param bidirectional: 如果为真,则成为双向 GRU。 默认值:False。
+    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
+    :param name: 这个模块的名字, 默认为""。
 
     :return: 一个 Dynamic_GRU 类
 
@@ -1573,10 +1613,10 @@ Dynamic_RNN
     ``tensor.PackedSequence`` 类可以构造为
     连续调用下一个函数: ``pad_sequence`` 、 ``pack_pad_sequence``。
 
-    Dynamic_RNN 的第一个输出也是一个 ``tensor.PackedSequence`` 类，
+    Dynamic_RNN 的第一个输出也是一个 ``tensor.PackedSequence`` 类,
     可以使用 ``tensor.pad_pack_sequence`` 将其解压缩为普通 QTensor。
 
-    循环神经网络(RNN)模块，使用 :math:`\tanh` 或 :math:`\text{ReLU}` 作为激活函数。支持双向，多层配置。
+    循环神经网络(RNN)模块,使用 :math:`\tanh` 或 :math:`\text{ReLU}` 作为激活函数。支持双向,多层配置。
     单层单向RNN计算公式如下:
 
     .. math::
@@ -1586,14 +1626,14 @@ Dynamic_RNN
 
     :param input_size: 输入特征维度。
     :param hidden_size:  隐藏特征维度。
-    :param num_layers: 堆叠RNN层数， 默认: 1。
-    :param nonlinearity: 非线性激活函数，默认为 ``'tanh'``。
-    :param batch_first: 如果为 True， 则输入形状为 [批大小,序列长度,特征维度]，
-     如果为 False， 则输入形状为 [序列长度,批大小,特征维度]，默认为 True。
-    :param use_bias: 如果为 False， 该模块不适用偏置项，默认: True。
-    :param bidirectional: 如果为 True，变为双向RNN，默认: False。
-    :param dtype: 参数的数据类型，defaults：None，使用默认数据类型:kfloat32,代表32位浮点数。
-    :param name: 这个模块的名字， 默认为""。
+    :param num_layers: 堆叠RNN层数, 默认: 1。
+    :param nonlinearity: 非线性激活函数,默认为 ``'tanh'``。
+    :param batch_first: 如果为 True, 则输入形状为 [批大小,序列长度,特征维度],
+     如果为 False, 则输入形状为 [序列长度,批大小,特征维度],默认为 True。
+    :param use_bias: 如果为 False, 该模块不适用偏置项,默认: True。
+    :param bidirectional: 如果为 True,变为双向RNN,默认: False。
+    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
+    :param name: 这个模块的名字, 默认为""。
 
     :return: Dynamic_RNN 实例
 
@@ -1667,10 +1707,10 @@ Dynamic_LSTM
     ``tensor.PackedSequence`` 类可以构造为
     连续调用下一个函数: ``pad_sequence`` 、 ``pack_pad_sequence``。
 
-    Dynamic_LSTM 的第一个输出也是一个 ``tensor.PackedSequence`` 类，
+    Dynamic_LSTM 的第一个输出也是一个 ``tensor.PackedSequence`` 类,
     可以使用 ``tensor.pad_pack_sequence`` 将其解压缩为普通 QTensor。
 
-    循环神经网络(RNN)模块，使用 :math:`\tanh` 或 :math:`\text{ReLU}` 作为激活函数。支持双向，多层配置。
+    循环神经网络(RNN)模块,使用 :math:`\tanh` 或 :math:`\text{ReLU}` 作为激活函数。支持双向,多层配置。
     单层单向RNN计算公式如下:
 
     .. math::
@@ -1685,13 +1725,13 @@ Dynamic_LSTM
 
     :param input_size: 输入特征维度。
     :param hidden_size:  隐藏特征维度。
-    :param num_layers: 堆叠LSTM层数，默认: 1。
-    :param batch_first: 如果为 True，则输入形状为 [批大小,序列长度,特征维度]，
-     如果为 False, 则输入形状为 [序列长度,批大小,特征维度]，默认为 True。
-    :param use_bias: 如果为 False，该模块不适用偏置项， 默认: True。
-    :param bidirectional: 如果为 True，变为双向LSTM， 默认: False。
-    :param dtype: 参数的数据类型，defaults：None，使用默认数据类型:kfloat32,代表32位浮点数。
-    :param name: 这个模块的名字， 默认为""。
+    :param num_layers: 堆叠LSTM层数,默认: 1。
+    :param batch_first: 如果为 True,则输入形状为 [批大小,序列长度,特征维度],
+     如果为 False, 则输入形状为 [序列长度,批大小,特征维度],默认为 True。
+    :param use_bias: 如果为 False,该模块不适用偏置项, 默认: True。
+    :param bidirectional: 如果为 True,变为双向LSTM, 默认: False。
+    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
+    :param name: 这个模块的名字, 默认为""。
 
     :return: Dynamic_LSTM 实例
 
@@ -1761,7 +1801,7 @@ Dynamic_LSTM
 
     .. note::
 
-            请注意，跟pytorch等框架不同的是，以下loss函数的前向函数中，第一个参数为标签，第二个参数为预测值。
+            请注意,跟pytorch等框架不同的是,以下loss函数的前向函数中,第一个参数为标签,第二个参数为预测值。
 
 MeanSquaredError
 =================================
@@ -1782,7 +1822,7 @@ MeanSquaredError
         \ell(x, y) =
             \operatorname{mean}(L)
 
-    :param name: 这个模块的名字， 默认为""。
+    :param name: 这个模块的名字, 默认为""。
     :return: 一个均方根误差实例。
 
     均方根误差前向计算函数的所需参数:
@@ -1794,7 +1834,7 @@ MeanSquaredError
 
     .. note::
 
-            请注意，跟pytorch等框架不同的是，以下MeanSquaredError函数的前向函数中，第一个参数为目标值，第二个参数为预测值。
+            请注意,跟pytorch等框架不同的是,以下MeanSquaredError函数的前向函数中,第一个参数为目标值,第二个参数为预测值。
 
     Example::
 
@@ -1832,7 +1872,7 @@ BinaryCrossEntropy
     .. math::
         \ell(x, y) = \operatorname{mean}(L)
 
-    :param name: 这个模块的名字， 默认为""。
+    :param name: 这个模块的名字, 默认为""。
     :return: 一个平均二元交叉熵实例。
 
     平均二元交叉熵误差前向计算函数的所需参数:
@@ -1843,7 +1883,7 @@ BinaryCrossEntropy
 
     .. note::
 
-            请注意，跟pytorch等框架不同的是，BinaryCrossEntropy函数的前向函数中，第一个参数为目标值，第二个参数为预测值。
+            请注意,跟pytorch等框架不同的是,BinaryCrossEntropy函数的前向函数中,第一个参数为目标值,第二个参数为预测值。
 
     Example::
 
@@ -1872,7 +1912,7 @@ CategoricalCrossEntropy
         \text{loss}(x, y) = -\log\left(\frac{\exp(x[class])}{\sum_j \exp(x[j])}\right)
                        = -x[class] + \log\left(\sum_j \exp(x[j])\right)
 
-    :param name: 这个模块的名字， 默认为""。
+    :param name: 这个模块的名字, 默认为""。
     :return: 平均分类交叉熵实例。
 
     误差前向计算函数的所需参数:
@@ -1883,7 +1923,7 @@ CategoricalCrossEntropy
 
     .. note::
 
-            请注意，跟pytorch等框架不同的是，CategoricalCrossEntropy函数的前向函数中，第一个参数为目标值，第二个参数为预测值。
+            请注意,跟pytorch等框架不同的是,CategoricalCrossEntropy函数的前向函数中,第一个参数为目标值,第二个参数为预测值。
 
     Example::
 
@@ -1911,7 +1951,7 @@ SoftmaxCrossEntropy
         \text{loss}(x, y) = -\log\left(\frac{\exp(x[class])}{\sum_j \exp(x[j])}\right)
                        = -x[class] + \log\left(\sum_j \exp(x[j])\right)
 
-    :param name: 这个模块的名字， 默认为""。
+    :param name: 这个模块的名字, 默认为""。
     :return: 一个Softmax交叉熵损失函数实例
 
     误差前向计算函数的所需参数:
@@ -1922,7 +1962,7 @@ SoftmaxCrossEntropy
 
     .. note::
 
-            请注意，跟pytorch等框架不同的是，SoftmaxCrossEntropy函数的前向函数中，第一个参数为目标值，第二个参数为预测值。
+            请注意,跟pytorch等框架不同的是,SoftmaxCrossEntropy函数的前向函数中,第一个参数为目标值,第二个参数为预测值。
 
     Example::
 
@@ -1948,7 +1988,7 @@ NLL_Loss
 
     平均负对数似然损失。 对C个类别的分类问题很有用。
 
-    `x` 是模型给出的概率形式的似然量。其尺寸可以是 :math:`(N, C)` or :math:`(N, C, d_1, d_2, ..., d_K)` 。 `y` 是损失函数期望的真值，包含 :math:`[0, C-1]` 的类别索引。
+    `x` 是模型给出的概率形式的似然量。其尺寸可以是 :math:`(N, C)` or :math:`(N, C, d_1, d_2, ..., d_K)` 。 `y` 是损失函数期望的真值,包含 :math:`[0, C-1]` 的类别索引。
 
     .. math::
 
@@ -1956,18 +1996,18 @@ NLL_Loss
         l_n = -  
             \sum_{n=1}^N \frac{1}{N}x_{n,y_n} \quad
 
-    :param name: 这个模块的名字， 默认为""。
+    :param name: 这个模块的名字, 默认为""。
     :return: 一个NLL_Loss损失函数实例
 
     误差前向计算函数的所需参数:
 
-        x: :math:`(N, *)`,损失函数的输出预测值，可以为多维变量。
+        x: :math:`(N, *)`,损失函数的输出预测值,可以为多维变量。
 
         y: :math:`(N, *)`,损失函数目标值。必须为64位整数,kint64。
 
     .. note::
 
-            请注意，跟pytorch等框架不同的是，NLL_Loss函数的前向函数中，第一个参数为目标值，第二个参数为预测值。
+            请注意,跟pytorch等框架不同的是,NLL_Loss函数的前向函数中,第一个参数为目标值,第二个参数为预测值。
 
     Example::
 
@@ -1981,7 +2021,7 @@ NLL_Loss
             0.9818027091583286, 0.8673569904602182, 0.9860275114020933,
             0.9232667066664217, 0.303693313961628, 0.8461034903175555
         ])
-        x.reshape_([1, 3, 1, 5])
+        x=x.reshape([1, 3, 1, 5])
         x.requires_grad = True
         y = QTensor([[[2, 1, 0, 0, 2]]], dtype=kint64)
 
@@ -2005,18 +2045,18 @@ CrossEntropyLoss
         \text{loss}(x, y) = -\log\left(\frac{\exp(x[class])}{\sum_j \exp(x[j])}\right)
                        = -x[class] + \log\left(\sum_j \exp(x[j])\right)
 
-    :param name: 这个模块的名字， 默认为""。
+    :param name: 这个模块的名字, 默认为""。
     :return: 一个CrossEntropyLoss损失函数实例
 
     误差前向计算函数的所需参数:
 
-        x: :math:`(N, *)`,损失函数的输出，可以为多维变量。
+        x: :math:`(N, *)`,损失函数的输出,可以为多维变量。
 
         y: :math:`(N, *)`,损失函数期望的真值。必须为64位整数,kint64。
 
     .. note::
 
-            请注意，跟pytorch等框架不同的是，CrossEntropyLoss函数的前向函数中，第一个参数为目标值，第二个参数为预测值。
+            请注意,跟pytorch等框架不同的是,CrossEntropyLoss函数的前向函数中,第一个参数为目标值,第二个参数为预测值。
 
     Example::
 
@@ -2029,7 +2069,7 @@ CrossEntropyLoss
             0.9818027091583286, 0.8673569904602182, 0.9860275114020933,
             0.9232667066664217, 0.303693313961628, 0.8461034903175555
         ])
-        x.reshape_([1, 3, 1, 5])
+        x=x.reshape([1, 3, 1, 5])
         x.requires_grad = True
         y = QTensor([[[2, 1, 0, 0, 2]]], dtype=kint64)
 
@@ -2239,11 +2279,11 @@ Gelu
 =================================
 .. py:class:: pyvqnet.nn.Gelu(approximate="tanh", name="")
     
-    应用高斯误差线性单元函数：
+    应用高斯误差线性单元函数:
 
     .. math:: \text{GELU}(x) = x * \Phi(x)
 
-    当近似参数为 'tanh' 时, GELU 通过以下方式估计：
+    当近似参数为 'tanh' 时, GELU 通过以下方式估计:
 
     .. math:: \text{GELU}(x) = 0.5 * x * (1 + \text{Tanh}(\sqrt{2 / \pi} * (x + 0.044715 * x^3)))
 
@@ -2436,7 +2476,7 @@ Adagrad
 
 Adam
 =================================
-.. py:class:: pyvqnet.optim.adam.Adam(params, lr=0.01, beta1=0.9, beta2=0.999, epsilon=1e-8,amsgrad: bool = False)
+.. py:class:: pyvqnet.optim.adam.Adam(params, lr=0.01, beta1=0.9, beta2=0.999, epsilon=1e-8,weight_decay=0,amsgrad: bool = False)
 
     Adam优化器,它可以使用一阶矩估计动态调整每个参数的学习率和梯度的二阶矩估计。
     
@@ -2444,6 +2484,8 @@ Adam
 
     .. math::
         t = t + 1 
+    .. math::
+        param  = param - lr*weight\_decay*param
     .. math::
         moment\_1\_new=\beta1∗moment\_1+(1−\beta1)g
     .. math::
@@ -2469,6 +2511,7 @@ Adam
     :param beta2: 用于计算梯度及其平方的运行平均值的系数(默认值:0.999)。
     :param epsilon: 添加到分母以提高数值稳定性的常数(默认值:1e-8)。
     :param amsgrad: 是否使用该算法的 AMSGrad 变体(默认值:False)。
+    :param weight_decay: 权重衰减系数(默认值0)。
     :return: 一个 Adam 优化器。
 
     Example::
@@ -2540,7 +2583,7 @@ AdamW
     :param beta1: 用于计算梯度及其平方的运行平均值的系数(默认值:0.9)。
     :param beta2: 用于计算梯度及其平方的运行平均值的系数(默认值:0.999)。
     :param epsilon: 添加到分母以提高数值稳定性的常数(默认值:1e-8)。
-    :param weight_decay: 权重衰减系数，默认0.01。
+    :param weight_decay: 权重衰减系数,默认0.01。
     :param amsgrad: 是否使用该算法的 AMSGrad 变体(默认值:False)。
     :return: 一个 AdamW 优化器。
 
@@ -2823,8 +2866,8 @@ MSE
 
     计算均方误差 (Mean Squared Error, MSE)。
 
-    :param y_true_Qtensor: 形状类似(n_samples,)或(n_samples, n_outputs)的输入，真实目标值。
-    :param y_pred_Qtensor: 形状类似(n_samples,)或(n_samples, n_outputs)的输入，估计目标值。
+    :param y_true_Qtensor: 形状类似(n_samples,)或(n_samples, n_outputs)的输入,真实目标值。
+    :param y_pred_Qtensor: 形状类似(n_samples,)或(n_samples, n_outputs)的输入,估计目标值。
 
     :return: 输出float结果。
 
@@ -2856,8 +2899,8 @@ RMSE
 
     计算均方根误差 (Root Mean Square Error, RMSE) 。
 
-    :param y_true_Qtensor: 形状类似(n_samples,)或(n_samples, n_outputs)的输入，真实目标值。
-    :param y_pred_Qtensor: 形状类似(n_samples,)或(n_samples, n_outputs)的输入，估计目标值。
+    :param y_true_Qtensor: 形状类似(n_samples,)或(n_samples, n_outputs)的输入,真实目标值。
+    :param y_pred_Qtensor: 形状类似(n_samples,)或(n_samples, n_outputs)的输入,估计目标值。
 
     :return: 输出float结果。
 
@@ -2922,11 +2965,11 @@ R_Square
 .. py:class:: pyvqnet.utils.metrics.R_Square(y_true_Qtensor, y_pred_Qtensor, sample_weight=None)
 
     计算预测值和真实值之间的R方分数。
-    可能的最佳分数为1.0，可以为负(因为模型可以任意恶化)。不考虑输入特征的常数模型，将获得0.0的R^2分数。
+    可能的最佳分数为1.0,可以为负(因为模型可以任意恶化)。不考虑输入特征的常数模型,将获得0.0的R^2分数。
 
-    :param y_true_Qtensor: 形状类似(n_samples,)或(n_samples, n_outputs)的输入，真实目标值。
-    :param y_pred_Qtensor: 形状类似(n_samples,)或(n_samples, n_outputs)的输入，估计目标值。
-    :param sample_weight: 形状类似(n_samples,)的数组，可选样本权重，默认为None。
+    :param y_true_Qtensor: 形状类似(n_samples,)或(n_samples, n_outputs)的输入,真实目标值。
+    :param y_pred_Qtensor: 形状类似(n_samples,)或(n_samples, n_outputs)的输入,估计目标值。
+    :param sample_weight: 形状类似(n_samples,)的数组,可选样本权重,默认为None。
 
     :return: 输出float结果。
 
@@ -2954,10 +2997,10 @@ precision_recall_f1_2_score
 
 .. py:class:: pyvqnet.utils.metrics.precision_recall_f1_2_score(y_true_Qtensor, y_pred_Qtensor)
 
-    计算2分类任务下预测值的精确率，召回率和F1分数。其中预测值和真值需要是形状类似(n_samples,)的QTensor，值为0或1，代表两个类的标签。
+    计算2分类任务下预测值的精确率,召回率和F1分数。其中预测值和真值需要是形状类似(n_samples,)的QTensor,值为0或1,代表两个类的标签。
 
-    :param y_true_Qtensor: 一维QTensor的输入，形状类似(n_samples,)，真实目标值。
-    :param y_pred_Qtensor: 一维QTensor的输入，形状类似(n_samples,)，估计目标值。
+    :param y_true_Qtensor: 一维QTensor的输入,形状类似(n_samples,),真实目标值。
+    :param y_pred_Qtensor: 一维QTensor的输入,形状类似(n_samples,),估计目标值。
 
     :returns: 
         - precision - 精确率
@@ -2987,18 +3030,18 @@ precision_recall_f1_N_score
 
 .. py:class:: pyvqnet.utils.metrics.precision_recall_f1_N_score(y_true_Qtensor, y_pred_Qtensor, N, average)
 
-    多分类任务的精确率，召回率，F1分数计算。其中预测值和真值是形状类似(n_samples,)的QTensor，值为0到N-1的整数，代表N个类的标签。
+    多分类任务的精确率,召回率,F1分数计算。其中预测值和真值是形状类似(n_samples,)的QTensor,值为0到N-1的整数,代表N个类的标签。
 
-    :param y_true_Qtensor: 一维QTensor的输入，真实目标值。
-    :param y_pred_Qtensor: 一维QTensor的输入，估计目标值。
+    :param y_true_Qtensor: 一维QTensor的输入,真实目标值。
+    :param y_pred_Qtensor: 一维QTensor的输入,估计目标值。
     :param N: N类(类别数)。
     :param average: string, ['micro', 'macro', 'weighted']。
             多类/多标签目标需要此参数。
-            ``'micro'``: 通过计算总真正数来全局计算指标，假阴性和假阳性。
+            ``'micro'``: 通过计算总真正数来全局计算指标,假阴性和假阳性。
 
-            ``'macro'``: 计算每个标签的指标，并找到其未加权值。意思是不考虑标签的平衡。
+            ``'macro'``: 计算每个标签的指标,并找到其未加权值。意思是不考虑标签的平衡。
 
-            ``'weighted'``: 计算每个标签的指标，并找到它们的平均值(每个标签的真实实例数)。这改变 ``'macro'`` 以解释标签不平衡; 这可能会导致F分数不在精度和召回之间。
+            ``'weighted'``: 计算每个标签的指标,并找到它们的平均值(每个标签的真实实例数)。这改变 ``'macro'`` 以解释标签不平衡; 这可能会导致F分数不在精度和召回之间。
 
     :returns: 
         - precision - 精确率
@@ -3039,18 +3082,18 @@ precision_recall_f1_Multi_score
 
 .. py:class:: pyvqnet.utils.metrics.precision_recall_f1_Multi_score(y_true_Qtensor, y_pred_Qtensor, N, average)
 
-    多分类任务的精确率，召回率，F1分数计算。其中预测值和真值是形状类似(n_samples,N)的QTensor，预测值和真实标签必须为0-1独热编码的形式。
+    多分类任务的精确率,召回率,F1分数计算。其中预测值和真值是形状类似(n_samples,N)的QTensor,预测值和真实标签必须为0-1独热编码的形式。
 
-    :param y_true_Qtensor: 二维QTensor的输入，真实目标值。
-    :param y_pred_Qtensor: 二维QTensor的输入，估计目标值。
+    :param y_true_Qtensor: 二维QTensor的输入,真实目标值。
+    :param y_pred_Qtensor: 二维QTensor的输入,估计目标值。
     :param N: N类(类别数)。
     :param average: string, ['micro', 'macro', 'weighted']。
             多类/多标签目标需要此参数。
-            ``'micro'``: 通过计算总真正数来全局计算指标，假阴性和假阳性。
+            ``'micro'``: 通过计算总真正数来全局计算指标,假阴性和假阳性。
 
-            ``'macro'``: 计算每个标签的指标，并找到其未加权值。意思是不考虑标签的平衡。
+            ``'macro'``: 计算每个标签的指标,并找到其未加权值。意思是不考虑标签的平衡。
 
-            ``'weighted'``: 计算每个标签的指标，并找到它们的平均值(每个标签的真实实例数)。这改变 ``'macro'`` 以解释标签不平衡; 这可能会导致F分数不在精度和召回之间。
+            ``'weighted'``: 计算每个标签的指标,并找到它们的平均值(每个标签的真实实例数)。这改变 ``'macro'`` 以解释标签不平衡; 这可能会导致F分数不在精度和召回之间。
 
     :returns: 
         - precision - 精确率
@@ -3109,13 +3152,13 @@ auc_calculate
     计算模型对预测值和真值之间进行分类获取的(Area Under Curve, AUC)结果。
 
     :param y_true_Qtensor: 一维QTensor的输入,shape = [n_samples]。
-                            真正的二进制标签。如果标签不是{1,1}或{0,1}，则pos_label应明确给出。
+                            真正的二进制标签。如果标签不是{1,1}或{0,1},则pos_label应明确给出。
     :param y_pred_Qtensor: 一维QTensor的输入,shape = [n_samples]。
                             目标分数,可以是正的概率估计类别、置信值或决策的非阈值度量(由某些分类器上的“决策函数”返回)
     :param pos_label: int 或 str,正类的标签。默认为None。
-                    当 ``pos_label`` 是 None 时，如果 ``y_true_Qtensor`` 位于{-1,1}或{0,1}， ``pos_label`` 设置为1，否则将引发错误。
-    :param sample_weight: 形状(n_samples,)的数组，默认为None。
-    :param drop_intermediate: boolean，是否降低一些在绘制的ROC曲线上不会出现的次优阈值。(默认为None)。
+                    当 ``pos_label`` 是 None 时,如果 ``y_true_Qtensor`` 位于{-1,1}或{0,1}, ``pos_label`` 设置为1,否则将引发错误。
+    :param sample_weight: 形状(n_samples,)的数组,默认为None。
+    :param drop_intermediate: boolean,是否降低一些在绘制的ROC曲线上不会出现的次优阈值。(默认为None)。
 
     :return: 输出float结果。
 
@@ -3170,7 +3213,7 @@ MPI为CPU间通信的常用库, VQNet中CPU的分布式计算功能则基于MPI�
     which gcc 
     which gfortran
 
-当显示了gcc和gfortran的路径，即可进行下一步的安装，若没有相应的编译器，请先安装编译器。当检查完编译器之后，使用wget命令下载。
+当显示了gcc和gfortran的路径,即可进行下一步的安装,若没有相应的编译器,请先安装编译器。当检查完编译器之后,使用wget命令下载。
 
 .. code-block::
         
@@ -3181,7 +3224,7 @@ MPI为CPU间通信的常用库, VQNet中CPU的分布式计算功能则基于MPI�
     make 
     make install 
 
-完成mpich的编译安装，配置其环境变量
+完成mpich的编译安装,配置其环境变量
 
 .. code-block::
         
@@ -3278,16 +3321,16 @@ NCCL为GPU间通信的常用库, VQNet中GPU的分布式计算功能则基于NCC
 节点间通信环境部署
 ^^^^^^^^^^^^^^^^^^^^^^
 
-在多节点上实现分布式计算，首先需要保证多节点上mpich环境的一致，python环境一致，其次，需要设置节点间的免密通信。
-假设需要设置node0（主节点）、node1、node2三个节点的免密通信。
+在多节点上实现分布式计算,首先需要保证多节点上mpich环境的一致,python环境一致,其次,需要设置节点间的免密通信。
+假设需要设置node0(主节点）、node1、node2三个节点的免密通信。
 
 .. code-block::
 
     # 在每个节点上执行
     ssh-keygen
     
-    # 之后一直回车，在.ssh文件夹下生成一个公钥（id_rsa.pub）一个私钥（id_rsa）
-    # 将其另外两个节点的公钥都添加到第一个节点的authorized_keys文件中，
+    # 之后一直回车,在.ssh文件夹下生成一个公钥(id_rsa.pub）一个私钥(id_rsa）
+    # 将其另外两个节点的公钥都添加到第一个节点的authorized_keys文件中,
     # 再将第一个节点authorized_keys文件传到另外两个节点便可以实现节点间的免密通信
     # 在子节点node1上执行
     cat ~/.ssh/id_dsa.pub >> node0:~/.ssh/authorized_keys
@@ -3295,13 +3338,13 @@ NCCL为GPU间通信的常用库, VQNet中GPU的分布式计算功能则基于NCC
     # 在子节点node2上执行
     cat ~/.ssh/id_dsa.pub >> node0:~/.ssh/authorized_keys
     
-    # 先删除node1、node2中的authorized_keys文件后，在node0上将authorized_keys文件拷贝到另外两个节点上
+    # 先删除node1、node2中的authorized_keys文件后,在node0上将authorized_keys文件拷贝到另外两个节点上
     scp ~/.ssh/authorized_keys  node1:~/.ssh/authorized_keys
     scp ~/.ssh/authorized_keys  node2:~/.ssh/authorized_keys
 
     # 保证三个不同节点生成的公钥都在authorized_keys文件中,即可实现节点间的免密通信
 
-除此外，最好还设置一个共享目录，使得改变共享目录下的文件时，不同节点中文件也会进行更改，预防多节点运行模型时不同节点中的文件不同步的问题。
+除此外,最好还设置一个共享目录,使得改变共享目录下的文件时,不同节点中文件也会进行更改,预防多节点运行模型时不同节点中的文件不同步的问题。
 使用nfs-utils和rpcbind实现共享目录。
 
 .. code-block::
@@ -3324,12 +3367,12 @@ NCCL为GPU间通信的常用库, VQNet中GPU的分布式计算功能则基于NCC
 分布式启动
 =================================
 
-使用分布式计算接口，通过 ``vqnetrun`` 命令启动, 接下来介绍 ``vqnetrun`` 的各个参数.
+使用分布式计算接口,通过 ``vqnetrun`` 命令启动, 接下来介绍 ``vqnetrun`` 的各个参数.
 
 n, np
 ^^^^^^^^^^^^^^^^^^^^^^
 
-``vqnetrun`` 接口中可以通过 ``-n``, ``-np`` 参数控制启动的进程数，执行样例如下:
+``vqnetrun`` 接口中可以通过 ``-n``, ``-np`` 参数控制启动的进程数,执行样例如下:
 
     Example::
 
@@ -3346,7 +3389,7 @@ n, np
 H, hosts
 ^^^^^^^^^^^^^^^^^^^^^^
 
-``vqnetrun`` 接口中可以通过 ``-H``, ``--hosts`` 指定节点以及进程分配来跨节点执行(在跨节点运行时必须将节点的环境配置成功, 在相同的环境，相同的路径下执行)，执行样例如下:
+``vqnetrun`` 接口中可以通过 ``-H``, ``--hosts`` 指定节点以及进程分配来跨节点执行(在跨节点运行时必须将节点的环境配置成功, 在相同的环境,相同的路径下执行),执行样例如下:
 
     Example::
 
@@ -3364,9 +3407,9 @@ H, hosts
 hostfile, f, hostfile
 ^^^^^^^^^^^^^^^^^^^^^^
 
-``vqnetrun`` 接口中可以通过指定hosts文件来指定节点以及进程分配来跨节点(在跨节点运行时必须将节点的环境配置成功, 在相同的环境，相同的路径下执行), 命令行参数为 ``-hostfile``, ``-f``, ``--hostfile``.
+``vqnetrun`` 接口中可以通过指定hosts文件来指定节点以及进程分配来跨节点(在跨节点运行时必须将节点的环境配置成功, 在相同的环境,相同的路径下执行), 命令行参数为 ``-hostfile``, ``-f``, ``--hostfile``.
 
-文件内每行的格式必须为：<hostname> slots=<slots> 如；
+文件内每行的格式必须为:<hostname> slots=<slots> 如；
 
 node0 slots=1
 
@@ -3411,7 +3454,7 @@ output-filename
 
 verbose
 ^^^^^^^^^^^^^^^^^^^^^^
-``vqnetrun`` 接口中可以通过命令行参数 ``--verbose`` 来对节点间的通信进行检测，并额外输出检测结果。
+``vqnetrun`` 接口中可以通过命令行参数 ``--verbose`` 来对节点间的通信进行检测,并额外输出检测结果。
 
 执行样例如下
 
@@ -3450,7 +3493,7 @@ start-timeout
 disable-cache
 ^^^^^^^^^^^^^^^^^^^^^^
 
-如果不设置该标记, ``vqnetrun`` 将每 60 分钟执行一次初始化检查，前提是检查成功通过。否则，每次调用 ``vqnetrun`` 时都会执行所有检查。
+如果不设置该标记, ``vqnetrun`` 将每 60 分钟执行一次初始化检查,前提是检查成功通过。否则,每次调用 ``vqnetrun`` 时都会执行所有检查。
 
 执行样例如下
 
@@ -3469,7 +3512,7 @@ disable-cache
 cb, check-build
 ^^^^^^^^^^^^^^^^^^^^^^
 
-``vqnetrun`` 接口中可以通过添加该标志后，会输出当前环境下的支持的数据通信方式。
+``vqnetrun`` 接口中可以通过添加该标志后,会输出当前环境下的支持的数据通信方式。
 
 执行代码如下
 
@@ -3482,7 +3525,7 @@ cb, check-build
 h
 ^^^^^^^^^^^^^^^^^^^^^^
 
-``vqnetrun`` 接口中可以通过该标志， 输出vqnetrun支持的所有参数以及参数的详细介绍。
+``vqnetrun`` 接口中可以通过该标志, 输出vqnetrun支持的所有参数以及参数的详细介绍。
 
 执行代码如下
 
@@ -3494,7 +3537,7 @@ h
 CommController
 =================================
 
-    分布式计算中的用于控制cpu、gpu下不同进程数据通信, 生成cpu(mpi)、gpu(nccl)不同的控制器，调用通信方法完成不同进程间数据的通信以及同步。
+    分布式计算中的用于控制cpu、gpu下不同进程数据通信, 生成cpu(mpi)、gpu(nccl)不同的控制器,调用通信方法完成不同进程间数据的通信以及同步。
 
 __init__
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -3998,7 +4041,7 @@ broadcast_model_params
 split_data
 =================================
 
-在多进程中，使用 ``split_data`` 根据进程数对数据进行切分，返回相应进程上数据。
+在多进程中,使用 ``split_data`` 根据进程数对数据进行切分,返回相应进程上数据。
 
 .. py:function:: pyvqnet.distributed.datasplit.split_data(x_train, y_train, shuffle=False)
 
@@ -4006,7 +4049,7 @@ split_data
 
     :param x_train: `np.array` - 训练数据.
     :param y_train: `np.array` -  训练数据标签.
-    :param shuffle: `bool` - 是否打乱后再进行切分，默认值是False.
+    :param shuffle: `bool` - 是否打乱后再进行切分,默认值是False.
 
     :return: 切分后的训练数据和标签。
 
@@ -4087,7 +4130,7 @@ PipelineParallelTrainingWrapper
 =================================
 .. py:class:: pyvqnet.distributed.pp.PipelineParallelTrainingWrapper(args,join_layers,trainset)
     
-    Pipeline Parallel Training Wrapper 实现了 1F1B训练。仅在 Linux 平台上，且具有 GPU 的情况下可用。
+    Pipeline Parallel Training Wrapper 实现了 1F1B训练。仅在 Linux 平台上,且具有 GPU 的情况下可用。
     更多算法细节可以在(https://www.deepspeed.ai/tutorials/pipeline/）找到。
 
     :param args: 参数字典。参见示例。
@@ -4101,7 +4144,7 @@ PipelineParallelTrainingWrapper
     本例子中分成两个流水线并行进程 `pipeline_parallel_size` = 2。
     批处理大小为 `train_batch_size` = 64, 单GPU 上为 `train_micro_batch_size_per_gpu` = 32。
     其他配置参数可见 `args`。
-    此外，每个进程需要在 `__main__` 函数中配置环境变量的 `LOCAL_RANK`。
+    此外,每个进程需要在 `__main__` 函数中配置环境变量的 `LOCAL_RANK`。
     
     .. code-block::
 

@@ -963,6 +963,40 @@ LayerNorm1d
         # [-1.3416355, -0.4472118, 0.4472118, 1.3416355]
         # ]
         
+GroupNorm
+
+===========================================================
+
+对小批量输入应用组归一化。
+
+此层实现论文“组归一化 <https://arxiv.org/abs/1803.08494>`__ 中描述的操作
+
+.. math::
+y = \frac{x - \mathrm{E}[x]}{ \sqrt{\mathrm{Var}[x] + \epsilon}} * \gamma + \beta
+
+输入通道被分成 :attr:`num_groups` 组，每组包含
+``num_channels / num_groups`` 个通道。:attr:`num_channels` 必须能被
+:attr:`num_groups` 整除。平均值和标准差是在每个组中分别计算的。如果 :attr:`affine` 为 ``True``，则 :math:`\gamma` 和 :math:`\beta` 是可学习的
+
+每个通道仿射变换参数向量，大小为 :attr:`num_channels`。
+
+:param num_groups (int)：将通道分成的组数
+
+:param num_channels (int)：输入中预期的通道数
+
+:param eps：添加到分母的值，以实现数值稳定性。默认值：1e-5
+
+:param affine：一个布尔值，当设置为 ``True`` 时，此模块
+
+具有可学习的每通道仿射参数，初始化为 1（用于权重）
+
+和 0（用于偏差）。默认值：``True``。
+
+形状：
+- 输入：:math:`(N, C, *)`，其中：math:`C=\text{num\_channels}`
+- 输出：:math:`(N, C, *)`（与输入形状相同）
+
+：返回：GroupNorm 类
 
 Linear
 ===========================================================

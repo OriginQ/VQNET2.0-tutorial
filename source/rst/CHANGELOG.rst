@@ -2,6 +2,32 @@
 VQNet Changelog
 ######################
 
+[v2.13.0] - 2024-07-30
+***************************
+
+Added
+===================
+
+- 增加 `no_grad`, `GroupNorm`, `Interpolate`, `contiguous`, `QuantumLayerV3` 接口。
+
+
+Changed
+===================
+
+- `BatchNorm`, `LayerNorm`, `GroupNorm` 增加affine接口。
+- `diag` 接口在2d输入时候现在返回对角线上的1d输出,与torch一致。
+- slice,permute等操作会尝试使用view方式返回共享内存的QTensor。
+- 所有接口支持非contiguous的输入。
+- `Adam` 支持 weight_decay 参数。
+
+Fixed
+===================
+- 修改 VQC 部分逻辑门分解函数的错误。
+- 修复部分函数的内存泄露问题。
+- 修复 `QuantumLayerMultiProcess` 不支持GPU输入的问题。
+- 修改 `Linear` 的默认参数初始化话方式
+
+
 [v2.12.0] - 2024-05-01
 ***************************
 
