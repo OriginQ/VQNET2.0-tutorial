@@ -4068,3 +4068,19 @@ pack_pad_sequence
 
         print(data.batch_sizes)
         # [3, 2, 1, 1]
+
+no_grad
+==============================
+    
+.. py:function:: pyvqnet.no_grad()
+
+    禁用前向计算时记录反向传播节点。
+
+    Example::
+
+        import pyvqnet.tensor as tensor
+        from pyvqnet import no_grad
+
+        with no_grad():
+            x = tensor.tensor([1.0, 2.0, 3.0])
+            y = tensor.tensor([4.0, 5.0, 6.0])
