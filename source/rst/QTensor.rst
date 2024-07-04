@@ -4072,5 +4072,7 @@ no_grad
         from pyvqnet import no_grad
 
         with no_grad():
-            x = tensor.tensor([1.0, 2.0, 3.0])
-            y = tensor.tensor([4.0, 5.0, 6.0])
+            x = tensor.QTensor([1.0, 2.0, 3.0],requires_grad=True)
+            y = tensor.tan(x)
+            y.backward()
+        #RuntimeError: output requires_grad is False.
