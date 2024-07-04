@@ -1046,9 +1046,9 @@ GroupNorm
 
 .. py:class:: pyvqnet.nn.group_norm.GroupNorm(num_groups: int, num_channels: int, epsilon = 1e-5, affine = True, dtype = None, name = "")
 
-    对小批量输入应用组归一化。
+    对小批量输入应用组归一化。输入: :math:`(N, C, *)` 其中 :math:`C=\text{num_channels}` , 输出: :math:`(N, C, *)` 。
 
-    此层实现论文 `组归一化 <https://arxiv.org/abs/1803.08494>`__ 中描述的操作
+    此层实现论文 `组归一化 <https://arxiv.org/abs/1803.08494>`__ 中描述的操作。
 
     .. math::
         
@@ -1060,10 +1060,8 @@ GroupNorm
     :param num_channels (int): 输入中预期的通道数
     :param eps: 添加到分母的值,以实现数值稳定性。默认值:1e-5
     :param affine: 一个布尔值,当设置为 ``True`` 时,此模块具有可学习的每通道仿射参数,初始化为 1(用于权重）和 0(用于偏差）。默认值: ``True``。
-
-    形状:
-        - 输入: :math:`(N, C, *)` 其中 :math:`C=\text{num_channels}`
-        - 输出: :math:`(N, C, *)` 
+    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
+    :param name: 这个模块的名字, 默认为""。
 
     :return: GroupNorm 类
 
