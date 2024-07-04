@@ -1044,7 +1044,7 @@ LayerNorm1d
 GroupNorm
 ===========================================================
 
-.. py:class:: pyvqnet.nn.group_norm.GroupNorm(num_groups: int, num_channels: int, epsilon = 1e-5, affine = True, dtype = None, name = ""）
+.. py:class:: pyvqnet.nn.group_norm.GroupNorm(num_groups: int, num_channels: int, epsilon = 1e-5, affine = True, dtype = None, name = "")
 
     对小批量输入应用组归一化。
 
@@ -1062,7 +1062,7 @@ GroupNorm
     :param affine: 一个布尔值,当设置为 ``True`` 时,此模块具有可学习的每通道仿射参数,初始化为 1(用于权重）和 0(用于偏差）。默认值: ``True``。
 
     形状:
-        - 输入: :math:`(N, C, *)` 其中 :math:`C=\text{num\_channels}`
+        - 输入: :math:`(N, C, *)` 其中 :math:`C=\text{num_channels}`
         - 输出: :math:`(N, C, *)` 
 
     :return: GroupNorm 类
