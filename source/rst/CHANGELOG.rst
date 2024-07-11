@@ -8,8 +8,8 @@ VQNet Changelog
 Added
 ===================
 
-- 增加 `no_grad`, `GroupNorm`, `Interpolate`, `contiguous`, `QuantumLayerV3` 接口。
-
+- 增加 `no_grad`, `GroupNorm`, `Interpolate`, `contiguous`, `QuantumLayerV3`, `fuse_model`, `SDPA`, `quantum_fisher` 接口。
+- 为解决量子机器学习过程中出现的过拟合问题添加量子Dropout样例.
 
 Changed
 ===================
