@@ -1792,6 +1792,226 @@ Dynamic_LSTM
         # ]
         # [3 4 1]
 
+
+
+Interpolate
+=================================
+.. py:class:: pyvqnet.nn.Interpolate(size = None, scale_factor = None, mode = "nearest", align_corners = None,  recompute_scale_factor = None, name = "")
+
+    向下/向上对输入进行采样。
+
+    目前只支持四维输入数据。
+
+    输入尺寸的解释形式为 `B x C x H x W`。
+
+    可用于选择的 `mode` 有 ``nearest`` 、``bilinear`` 、``bicubic``.
+
+    :param size: 输出大小，默认为None。
+    :param scale_factor: 缩放因子，默认为None。
+    :param mode: 用于上采样的算法  ``nearest`` | ``bilinear`` | ``bicubic``.
+    :param align_corners:  从几何学角度看，我们将输入和输出的像素点视为方形而不是点。输入和输出的像素点视为正方形，而不是点。
+            如果设置为 `true`，输入和输出张量将根据其角像素的中心点对齐。角像素的中心点对齐，保留角像素的值。
+            如果设置为 `false`，输入和输出张量将按其角像素的角点对齐，而角像素的值将保留。角像素的角点对齐，插值会使用边缘值填充
+            对超出边界的值进行填充，从而使此操作与输入大小无关。
+            当 ``scale_factor`` 保持不变时。这只有在 ``mode`` 为 ``bilinear`` 时才有效。
+    :param recompute_scale_factor: 重新计算缩放因子，以便在插值计算中使用。 当 ``scale_factor`` 作为参数传递时，它将用于来计算输出尺寸。
+    :param name: 模块名字.
+
+    Example::
+
+        from pyvqnet.nn import Interpolate
+        from pyvqnet.tensor import tensor 
+        import pyvqnet
+        pyvqnet.utils.set_random_seed(1)
+
+        import numpy as np
+        np.random.seed(0)
+
+        from time import time
+        np_ = np.random.randn(36).reshape((1, 1, 6, 6)).astype(np.float32)
+        mode_ = "bilinear"
+        size_ = 3
+
+        class model_vqnet(pyvqnet.nn.Module):
+
+            def __init__(self):
+                super().__init__()
+                self.inter = Interpolate(size = size_, mode=mode_)
+                self.ln = pyvqnet.nn.Linear(9, 1)
+                
+            def forward(self, x):
+                x = self.inter(x).reshape((1,-1))
+                x = self.ln(x)
+                return 2 * x 
+
+        input_vqnet = tensor.QTensor(np_,  dtype=pyvqnet.kfloat32, requires_grad=True).toGPU()
+        model = model_vqnet().toGPU()
+        loss_pyvqnet = pyvqnet.nn.MeanSquaredError()
+        time3 = time()
+        output_vqnet = model(input_vqnet)
+        time4 = time()
+        print(f"output_vqnet {output_vqnet} time {time4 - time3}")
+
+        l = loss_pyvqnet(tensor.QTensor([[1.0]]).toGPU(), output_vqnet)
+        l.backward()
+        print(model.parameters()[0].grad)
+
+
+fuse_model
+=================================
+.. py:class:: pyvqnet.nn.fuse_model(model)
+
+    用于模型在推理阶段的相应相邻模块融合成一个模块，减少模型推理阶段计算量, 增加模型推理速度。
+
+    目前支持的模块序列如下：
+
+    conv, bn
+
+    linear, bn
+
+    其他序列保持不变，对于这些序列将列表中的第一个模块替换成融合后的模块，其他的用 ``Identity`` 代替。
+
+    :param input: 包括融合模块的模型。
+
+    :return: 模块融合后的模型。
+
+    Examples::
+    
+        from pyvqnet import tensor 
+        from pyvqnet.nn import Linear
+        from pyvqnet.nn import Module, BatchNorm1d, BatchNorm2d, Conv1D, Conv2D
+
+        from pyvqnet.qnn.vqc import *
+        from pyvqnet.optim import Adam
+        from pyvqnet.nn import Module,BinaryCrossEntropy, Sigmoid
+        from pyvqnet.data import data_generator
+        import numpy as np
+        from pyvqnet.tensor import QTensor
+
+        from time import time
+        from pyvqnet.utils import set_random_seed
+        from pyvqnet.nn import fuse_module
+        
+        class Model(Module):
+            def __init__(self):
+
+                super(Model, self).__init__()
+
+                self.conv1 = Conv2D(1,2,1)
+                self.ban = BatchNorm2d(2)
+
+                self.conv2 = Conv2D(2,1,1)
+                self.li1 = Linear(64,1)
+                self.ac = Sigmoid()
+                
+            def forward(self, x):
+                x = self.conv1(x)
+                x = self.ban(x)
+                x = self.conv2(x).reshape([-1,64])
+                x = self.li1(x)
+                x = self.ac(x)
+
+                return x
+        X_train = np.random.randn(80, 1, 8, 8)
+        y_train = np.random.choice([0,1], size=(80))
+        
+        model = Model().toGPU()
+        optimizer = Adam(model.parameters(), lr = lr)
+        batch_size = 20
+        epoch = 80
+        loss = BinaryCrossEntropy()
+        print("start training..............")
+        model.train()
+        
+        loss_history = []
+        accuracy_history = []
+        time2 = time()
+        
+        for i in range(epoch):
+            count = 0
+            sum_loss = 0
+            accuary = 0
+            t = 0
+            for data, label in data_generator(X_train, y_train, batch_size, False):
+                optimizer.zero_grad()
+                data, label = QTensor(data,requires_grad=True).toGPU(), QTensor(label,
+                                                    dtype=6,
+                                                    requires_grad=False).toGPU()
+                
+                result = model(data)
+                
+                loss_b = loss(label.reshape([-1, 1]), result)
+                
+                loss_b.backward()
+                optimizer._step()
+
+                sum_loss += loss_b.item()
+                count += batch_size
+                accuary += get_accuary(result, label.reshape([-1,1]))
+                t = t + 1
+            
+            loss_history.append(sum_loss/count)
+            accuracy_history.append(accuary/count)
+            print(
+                f"epoch:{i}, #### loss:{sum_loss/count} #####accuray:{accuary/count}"
+            )
+        print(f"run time {time() - time2}")
+        
+        
+        model.eval()
+
+        input = tensor.randn((20, 1, 8, 8)).toGPU()
+        print(list(model.named_children()))
+        time_a = time()
+        a = model(input)
+        print(f"fuse before {time() - time_a}")
+        fuse_module(model)
+        model.toGPU()
+        print(list(model.named_children()))
+        time_b = time()
+        b = model(input)
+        print(f"fuse after {time() - time_b}")
+        
+        print(tensor.max(tensor.abs(a - b)).item())
+
+
+SDPA
+=================================
+.. py:class:: pyvqnet.transformer.e2eqvit.SDPA(attn_mask=None,dropout_p=0.,scale=None,is_causal=False)
+
+    SDPA 缩放点乘注意力机制,cpu下为math方法, gpu下为flash方法.
+
+    :param attn_mask: 注意力掩码；形状必须可以广播到注意力权重的形状。
+    :param dropout_p: Dropout 概率，如果大于 0.0, 则应用。
+    :param scale:  在 softmax 之前应用的缩放因子。
+    :param is_causal: 如果为 "true"，则假定存在左上因果注意屏蔽，如果同时设置了 attn_mask 和 is_causal, 则会出现错误。
+
+    Examples::
+    
+        from pyvqnet.transformer.e2eqvit.e2eqvit import SDPA, scaled_dot_product_attention_pyimpl
+        from pyvqnet import tensor
+        import pyvqnet
+        from time import time
+        import pyvqnet.nn as nn
+        import numpy as np
+
+        np.random.seed(42)
+
+        query_np = np.random.randn(3, 3, 3, 5).astype(np.float32) 
+        key_np = np.random.randn(3, 3, 3, 5).astype(np.float32)   
+        value_np = np.random.randn(3, 3, 3, 5).astype(np.float32) 
+
+        model = SDPA(tensor.QTensor([1.])).toGPU()
+
+        query_p = tensor.QTensor(query_np, dtype=pyvqnet.kfloat32, requires_grad=True).toGPU()
+        key_p = tensor.QTensor(key_np, dtype=pyvqnet.kfloat32, requires_grad=True).toGPU()
+        value_p = tensor.QTensor(value_np, dtype=pyvqnet.kfloat32, requires_grad=True).toGPU()
+
+        out_sdpa = model(query_p, key_p, value_p)
+
+        out_sdpa.backward()
+
+
 损失函数层
 *********************************************************
 
