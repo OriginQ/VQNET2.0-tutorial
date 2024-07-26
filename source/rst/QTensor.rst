@@ -607,38 +607,6 @@ QTensor.transpose
         
 
 
-transpose\_
-==============================
-
-.. py:method:: QTensor.transpose_(new_dims=None)
-
-    反转张量的轴。如果 new_dims = None，则反转所有轴。该接口改变当前张量自己的轴顺序。
-
-    :param new_dims: 列表形式储存的新的轴顺序。
-
-    :return: 无。
-
-    Example::
-
-        from pyvqnet.tensor import tensor
-        from pyvqnet.tensor import QTensor
-        import numpy as np
-        R, C = 3, 4
-        a = np.arange(R * C).reshape([2, 2, 3]).astype(np.float32)
-        t = QTensor(a)
-        t.transpose_([2, 0, 1])
-        print(t)
-
-        # [
-        # [[0., 3.],
-        #  [6., 9.]],
-        # [[1., 4.],
-        #  [7., 10.]],
-        # [[2., 5.],
-        #  [8., 11.]]
-        # ]
-        
-
 
 QTensor.reshape
 ==============================
