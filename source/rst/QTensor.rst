@@ -205,6 +205,7 @@ csr_members
 .. py:method:: QTensor.csr_members()
 
     返回Compressed Sparse Row格式的稀疏2维度矩阵的row_idx,col_idx 以及非0数值data,3个1维QTensor。具体含义见 https://en.wikipedia.org/wiki/Sparse_matrix#Compressed_sparse_row_(CSR,_CRS_or_Yale_format)。
+    
     :return:
 
         返回列表，其中第一个元素为row_idx,shape为[矩阵行数+1],第2个元素为col_idx,shape为[非0元素数]，第3个元素为data,shape为[非0元素数]

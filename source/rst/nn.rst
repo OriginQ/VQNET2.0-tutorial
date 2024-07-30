@@ -1857,9 +1857,9 @@ Interpolate
         print(model.parameters()[0].grad)
 
 
-fuse_model
+fuse_module
 =================================
-.. py:class:: pyvqnet.nn.fuse_model(model)
+.. py:class:: pyvqnet.nn.fuse_module(model)
 
     用于模型在推理阶段的相应相邻模块融合成一个模块，减少模型推理阶段计算量, 增加模型推理速度。
 
@@ -1891,7 +1891,12 @@ fuse_model
         from time import time
         from pyvqnet.utils import set_random_seed
         from pyvqnet.nn import fuse_module
-        
+
+        def get_accuary(result, label):
+            result = (result > 0.5).astype(4)
+            score = tensor.sums(result == label)
+            return score.item()
+            
         class Model(Module):
             def __init__(self):
 
@@ -1916,7 +1921,7 @@ fuse_model
         y_train = np.random.choice([0,1], size=(80))
         
         model = Model().toGPU()
-        optimizer = Adam(model.parameters(), lr = lr)
+        optimizer = Adam(model.parameters(), lr = 0.001)
         batch_size = 20
         epoch = 80
         loss = BinaryCrossEntropy()
