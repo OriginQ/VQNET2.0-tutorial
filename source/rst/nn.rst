@@ -531,7 +531,7 @@ Conv2D
 ConvT2D
 =================================
 
-.. py:class:: pyvqnet.nn.ConvT2D(input_channels,output_channels,kernel_size,stride=[1, 1],padding="valid",use_bias="True", kernel_initializer=None,bias_initializer=None, dilation_rate: int = 1, group: int = 1, dtype = None, name = "")
+.. py:class:: pyvqnet.nn.ConvT2D(input_channels,output_channels,kernel_size,stride=[1, 1],padding="valid",use_bias="True", kernel_initializer=None,bias_initializer=None, dilation_rate: int = 1, out_padding = (0,0), group: int = 1, dtype = None, name = "")
 
     在输入上进行二维转置卷积运算。 Conv2D模块的输入具有形状(batch_size, input_channels, height, width)。
 
@@ -544,6 +544,7 @@ ConvT2D
     :param kernel_initializer: `callable` - 卷积核初始化方法。默认为空,使用kaiming_uniform。
     :param bias_initializer: `callable` - 偏置项初始化方法。默认为空,使用kaiming_uniform。
     :param dilation_rate: `int` - 空洞大小,defaults: 1。
+    :param out_padding: 在输出形状中每个维度的一侧添加的额外尺寸。默认值:(0,0)
     :param group: `int` -  分组卷积的分组数. Default: 1。
     :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
     :param name: 模块的名字,default:""。
