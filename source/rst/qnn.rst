@@ -9,22 +9,22 @@
 QuantumLayer
 ============================
 
-QuantumLayer是一个支持量子含参线路作为参数的自动求导模块的封装类。用户定义一个函数作为参数 ``qprog_with_measure`` ，该函数需要包含pyQPanda定义的量子线路：一般包含量子线路的编码线路，演化线路和测量操作。
+QuantumLayer是一个支持量子含参线路作为参数的自动求导模块的封装类。用户定义一个函数作为参数 ``qprog_with_measure`` ，该函数需要包含pyQPanda定义的量子线路:一般包含量子线路的编码线路，演化线路和测量操作。
 该类可以嵌入量子经典混合机器学习模型，通过经典的梯度下降法，使得量子经典混合模型的目标函数或损失函数最小。
 用户可通过参数 ``diff_method`` 指定 ``QuantumLayer`` 层中量子线路参数的梯度计算方式，``QuantumLayer`` 当前支持有限差分法 ``finite_diff`` 以及 ``parameter-shift`` 方法。
 
-有限差分法是估算函数梯度最传统和最常用的数值方法之一。主要思想是用差分代替偏导数：
+有限差分法是估算函数梯度最传统和最常用的数值方法之一。主要思想是用差分代替偏导数:
 
 .. math::
 
     f^{\prime}(x)=\lim _{h \rightarrow 0} \frac{f(x+h)-f(x)}{h}
 
 
-若使用 ``parameter-shift`` 方法，我们使用如下目标函数：
+若使用 ``parameter-shift`` 方法，我们使用如下目标函数:
 
 .. math:: O(\theta)=\left\langle 0\left|U^{\dagger}(\theta) H U(\theta)\right| 0\right\rangle
 
-理论上可以通过 ``parameter-shift`` 这一更精确的方法计算量子线路中参数对哈密顿量的梯度：
+理论上可以通过 ``parameter-shift`` 这一更精确的方法计算量子线路中参数对哈密顿量的梯度:
 
 .. math::
 
@@ -42,7 +42,7 @@ QuantumLayer是一个支持量子含参线路作为参数的自动求导模块�
     :param num_of_cbits: 经典比特数，默认为1。
     :param diff_method: 求解量子线路参数梯度的方法，“参数位移”或“有限差分”，默认参数偏移。
     :param delta: 有限差分计算梯度时的 \delta。
-    :param dtype: 参数的数据类型，defaults：None，使用默认数据类型:kfloat32,代表32位浮点数。
+    :param dtype: 参数的数据类型，defaults:None，使用默认数据类型:kfloat32,代表32位浮点数。
     :param name: 这个模块的名字， 默认为""。
 
     :return: 一个可以计算量子线路的模块。
@@ -119,7 +119,7 @@ QuantumLayer是一个支持量子含参线路作为参数的自动求导模块�
         # [0.2500000, 0.2500000, 0.2500000, 0.2500000]
         # ]
 
-    如果使用GPU，参考下面的例子：
+    如果使用GPU，参考下面的例子:
 
 
     Example::
@@ -188,7 +188,7 @@ QuantumLayerV2
     :param para_num: `int` - 参数个数。
     :param diff_method: 求解量子线路参数梯度的方法，“参数位移”或“有限差分”，默认参数偏移。
     :param delta: 有限差分计算梯度时的 \delta。
-    :param dtype: 参数的数据类型，defaults：None，使用默认数据类型:kfloat32,代表32位浮点数。
+    :param dtype: 参数的数据类型，defaults:None，使用默认数据类型:kfloat32,代表32位浮点数。
     :param name: 这个模块的名字， 默认为""。
 
     :return: 一个可以计算量子线路的模块。
@@ -270,7 +270,7 @@ QuantumLayerV2
         # [0.2500000, 0.2500000, 0.2500000, 0.2500000]
         # ]
         
-    如果使用GPU，参考下面的例子：
+    如果使用GPU，参考下面的例子:
 
 
     Example::
@@ -332,6 +332,100 @@ QuantumLayerV2
         print(rlt)
 
 
+QuantumLayerV3
+============================
+
+.. py:class:: pyvqnet.qnn.quantumlayer.QuantumLayerV3(origin_qprog_func,para_num,num_qubits, num_cubits, pauli_str_dict=None, shots=1000, initializer=None,dtype=None,name="")
+
+
+    它将参数化的量子电路提交给 本地QPanda全振幅模拟器中计算,并训练线路中的参数。
+    它支持批量数据并使用参数移位规则来估计参数的梯度。
+    对于 CRX、CRY、CRZ，此层使用 https://iopscience.iop.org/article/10.1088/1367-2630/ac2cb3 中的公式，其余逻辑门采用默认的参数漂移法计算梯度。
+
+    :param origin_qprog_func: 由 QPanda 构建的可调用量子电路函数。
+    :param para_num: `int` - 参数数量；参数是一维的。
+    :param num_qubits: `int` - 量子电路中的量子比特数。
+    :param num_cubits: `int` - 量子电路中用于测量的经典比特数。
+    :param pauli_str_dict: `dict|list` - 表示量子电路中的泡利算子的字典或字典列表。默认值为 None。
+    :param shots: `int` - 测量镜头数。默认值为 1000。
+    :param initializer: 参数值的初始化器。默认值为 None。
+    :param dtype: 参数的数据类型。默认值为 None，即使用默认数据类型。
+    :param name: 模块名称。默认值为空字符串。
+
+    :return: 返回一个QuantumLayerV3类
+
+    .. note::
+
+        origin_qprog_func 是用户使用 pyQPanda 定义的量子电路函数:
+        https://pyqpanda-toturial.readthedocs.io/zh/latest/QCircuit.html。
+
+        该函数应包含以下输入参数，并返回 pyQPanda.QProg 或 originIR。
+
+        origin_qprog_func (input,param,m_machine,qubits,cubits)
+
+        `input`:用户定义的数组类输入 1 维经典数据。
+
+        `param`:array_like 输入用户定义的 1 维量子电路参数。
+
+        `m_machine`:QuantumLayerV3 创建的模拟器。
+
+        `qubits`:QuantumLayerV3 分配的量子比特
+
+        `cubits`:QuantumLayerV3 分配的经典比特。如果您的电路不使用经典比特，您也应该保留此参数作为函数输入。
+
+    Example::
+
+        import numpy as np
+        import pyqpanda as pq
+        import pyvqnet
+        from pyvqnet.qnn import QuantumLayerV3
+
+
+        def qfun(input, param, m_machine, m_qlist, cubits):
+            measure_qubits = [0,1, 2]
+            m_prog = pq.QProg()
+            cir = pq.QCircuit()
+
+            cir.insert(pq.RZ(m_qlist[0], input[0]))
+            cir.insert(pq.RX(m_qlist[2], input[2]))
+            
+            qcir = pq.RX(m_qlist[1], param[1])
+            qcir.set_control(m_qlist[0])
+            cir.insert(qcir)
+
+            qcir = pq.RY(m_qlist[0], param[2])
+            qcir.set_control(m_qlist[1])
+            cir.insert(qcir)
+
+            cir.insert(pq.RY(m_qlist[0], input[1]))
+
+            qcir = pq.RZ(m_qlist[0], param[3])
+            qcir.set_control(m_qlist[1])
+            cir.insert(qcir)
+            m_prog.insert(cir)
+
+            for idx, ele in enumerate(measure_qubits):
+                m_prog << pq.Measure(m_qlist[ele], cubits[idx])  # pylint: disable=expression-not-assigned
+            return m_prog
+        from pyvqnet.utils.initializer import ones
+        l = QuantumLayerV3(qfun,
+                        4,
+                        3,
+                        3,
+                        pauli_str_dict=None,
+                        shots=1000,
+                        initializer=ones,
+                        name="")
+        x = pyvqnet.tensor.QTensor(
+            [[2.56, 1.2,-3]],
+            requires_grad=True)
+        y = l(x)
+
+        y.backward()
+        print(l.m_para.grad.to_numpy())
+        print(x.grad.to_numpy())
+
+
 QuantumBatchAsyncQcloudLayer
 =================================
 
@@ -345,7 +439,7 @@ QuantumBatchAsyncQcloudLayer
 
         qcloud_token 为您到 https://qcloud.originqc.com.cn/ 中申请的api token。
         origin_qprog_func 需要返回pypqanda.QProg类型的数据，如果没有设置pauli_str_dict，需要保证该QProg中已经插入了measure。
-        origin_qprog_func 的形式必须按照如下：
+        origin_qprog_func 的形式必须按照如下:
 
         origin_qprog_func(input,param,qubits,cbits,machine)
         
@@ -372,7 +466,7 @@ QuantumBatchAsyncQcloudLayer
     :param dtype: 参数的数据类型。 默认值为 None，即使用默认数据类型pyvqnet.kfloat32。
     :param name: 模块的名称。 默认为空字符串。
     :param diff_method: 梯度计算的微分方法。 默认为“parameter_shift”,当前不支持其他微分方法。
-    :param submit_kwargs: 用于提交量子电路的附加关键字参数，默认:{"chip_id":pyqpanda.real_chip_type.origin_72,"is_amend":True,"is_mapping":True,"is_optimization":True,"compile_level":3,"default_task_group_size":200,"test_qcloud_fake":False},当设置test_qcloud_fake为True则使用随机数据验证代码正确性。
+    :param submit_kwargs: 用于提交量子电路的附加关键字参数，默认:{"chip_id":pyqpanda.real_chip_type.origin_72,"is_amend":True,"is_mapping":True,"is_optimization":True,"compile_level":3,"default_task_group_size":200,"test_qcloud_fake":False},当设置test_qcloud_fake为True则本地CPUQVM模拟。
     :param query_kwargs: 用于查询量子结果的附加关键字参数，默认:{"timeout":2,"print_query_info":True,"sub_circuits_split_size":1}。
     :return: 一个可以计算量子电路的模块。
     
@@ -455,6 +549,130 @@ QuantumBatchAsyncQcloudLayer
         print(l.m_para.grad)
         print(x.grad)
 
+QuantumBatchAsyncQcloudLayerES
+=================================
+
+当您安装最新版本pyqpanda,可以使用本接口定义一个变分线路，并提交到originqc的真实芯片上运行。
+
+.. py:class:: pyvqnet.qnn.quantumlayer.QuantumBatchAsyncQcloudLayerES(origin_qprog_func, qcloud_token, para_num, num_qubits, num_cubits, pauli_str_dict=None, shots = 1000, initializer=None, dtype=None, name="", diff_method="ES", submit_kwargs={}, query_kwargs={}, sigma = np.pi / 24)
+
+    使用 pyqpanda QCLOUD 从版本 3.8.2.2 开始的 originqc 真实芯片的抽象计算模块。 它提交参数化量子电路到真实芯片并获得测量结果。
+
+    .. note::
+
+        qcloud_token 为您到 https://qcloud.originqc.com.cn/ 中申请的api token。
+        origin_qprog_func 需要返回pypqanda.QProg类型的数据，如果没有设置pauli_str_dict，需要保证该QProg中已经插入了measure。
+        origin_qprog_func 的形式必须按照如下:
+
+        origin_qprog_func(input,param,qubits,cbits,machine)
+        
+            `input`: 输入1~2维经典数据，二维的情况下，第一个维度为批处理大小。
+            
+            `param`: 输入一维的变分量子线路的待训练参数。
+
+            `machine`: 由QuantumBatchAsyncQcloudLayerES创建的模拟器QCloud，无需用户额外在函数中定义。
+            
+            `qubits`: 由QuantumBatchAsyncQcloudLayerES创建的模拟器QCloud创建的量子比特,数量为  `num_qubits`, 类型为pyQpanda.Qubits，无需用户额外在函数中定义。
+            
+            `cbits`: 由QuantumBatchAsyncQcloudLayerES分配的经典比特, 数量为  `num_cubits`, 类型为 pyQpanda.ClassicalCondition，无需用户额外在函数中定义。。
+            
+
+
+    :param origin_qprog_func: QPanda 构建的变分量子电路函数，必须返回QProg。
+    :param qcloud_token: `str` - 量子机的类型或用于执行的云令牌。
+    :param para_num: `int` - 参数数量，参数是大小为[para_num]的QTensor。
+    :param num_qubits: `int` - 量子电路中的量子比特数量。
+    :param num_cubits: `int` - 量子电路中用于测量的经典比特数量。
+    :param pauli_str_dict: `dict|list` - 表示量子电路中泡利运算符的字典或字典列表。 默认为“无”，则进行测量操作，如果输入泡利算符的字典，则会计算单个期望或者多个期望。
+    :param shot: `int` - 测量次数。 默认值为 1000。
+    :param initializer: 参数值的初始化器。 默认为“无”，使用0~2*pi正态分布。
+    :param dtype: 参数的数据类型。 默认值为 None，即使用默认数据类型pyvqnet.kfloat32。
+    :param name: 模块的名称。 默认为空字符串。
+    :param diff_method: 梯度计算的微分方法。 默认为“ES”, 源自论文"Learning to learn with an evolutionary strategy Learning to learn with an evolutionary strategy", 当前不支持其他微分方法。
+    :param submit_kwargs: 用于提交量子电路的附加关键字参数，默认:{"chip_id":pyqpanda.real_chip_type.origin_72,"is_amend":True,"is_mapping":True,"is_optimization":True,"compile_level":3,"default_task_group_size":200,"test_qcloud_fake":False},当设置test_qcloud_fake为True则本地CPUQVM模拟。
+    :param query_kwargs: 用于查询量子结果的附加关键字参数，默认:{"timeout":2,"print_query_info":True,"sub_circuits_split_size":1}。
+    :param sigma:  多元非三维分布的采样方差, 一般取pi/6, pi/12, pi/24, 默认为pi/24。
+    :return: 一个可以计算量子电路的模块。
+    
+    Example::
+
+        import numpy as np
+        import pyqpanda as pq
+        import pyvqnet
+        from pyvqnet.qnn import QuantumLayer,QuantumBatchAsyncQcloudLayerES
+        from pyvqnet.qnn import expval_qcloud
+
+        def qfun(input,param, m_machine, m_qlist,cubits):
+            measure_qubits = [0,2]
+            m_prog = pq.QProg()
+            cir = pq.QCircuit()
+            cir.insert(pq.RZ(m_qlist[0],input[0]))
+            cir.insert(pq.CNOT(m_qlist[0],m_qlist[1]))
+            cir.insert(pq.RY(m_qlist[1],param[0]))
+            cir.insert(pq.CNOT(m_qlist[0],m_qlist[2]))
+            cir.insert(pq.RZ(m_qlist[1],input[1]))
+            cir.insert(pq.RY(m_qlist[2],param[1]))
+            cir.insert(pq.H(m_qlist[2]))
+            m_prog.insert(cir)
+
+            for idx, ele in enumerate(measure_qubits):
+                m_prog << pq.Measure(m_qlist[ele], cubits[idx])  # pylint: disable=expression-not-assigned
+            return m_prog
+
+        l = QuantumBatchAsyncQcloudLayerES(qfun,
+                        "3047DE8A59764BEDAC9C3282093B16AF1",
+                        2,
+                        6,
+                        6,
+                        pauli_str_dict=None,
+                        shots = 1000,
+                        initializer=None,
+                        dtype=None,
+                        name="",
+                        diff_method="ES",
+                        submit_kwargs={},
+                        query_kwargs={},
+                        sigma=np.pi/24)
+        x = pyvqnet.tensor.QTensor([[0.56,1.2],[0.56,1.2],[0.56,1.2],[0.56,1.2],[0.56,1.2]],requires_grad= True)
+        y = l(x)
+        print(f"y {y}")
+        y.backward()
+        print(f"l.m_para.grad {l.m_para.grad}")
+        print(f"x.grad {x.grad}")
+
+        def qfun2(input,param, m_machine, m_qlist,cubits):
+            measure_qubits = [0,2]
+            m_prog = pq.QProg()
+            cir = pq.QCircuit()
+            cir.insert(pq.RZ(m_qlist[0],input[0]))
+            cir.insert(pq.CNOT(m_qlist[0],m_qlist[1]))
+            cir.insert(pq.RY(m_qlist[1],param[0]))
+            cir.insert(pq.CNOT(m_qlist[0],m_qlist[2]))
+            cir.insert(pq.RZ(m_qlist[1],input[1]))
+            cir.insert(pq.RY(m_qlist[2],param[1]))
+            cir.insert(pq.H(m_qlist[2]))
+            m_prog.insert(cir)
+
+            return m_prog
+        l = QuantumBatchAsyncQcloudLayerES(qfun2,
+                    "3047DE8A59764BEDAC9C3282093B16AF",
+                    2,
+                    6,
+                    6,
+                    pauli_str_dict={'Z0 X1':10,'':-0.5,'Y2':-0.543},
+                    shots = 1000,
+                    initializer=None,
+                    dtype=None,
+                    name="",
+                    diff_method="ES",
+                    submit_kwargs={},
+                    query_kwargs={})
+        x = pyvqnet.tensor.QTensor([[0.56,1.2],[0.56,1.2],[0.56,1.2],[0.56,1.2]],requires_grad= True)
+        y = l(x)
+        print(f"y {y}")
+        y.backward()
+        print(f"l.m_para.grad {l.m_para.grad}")
+        print(f"x.grad {x.grad}")
 
 QuantumLayerMultiProcess
 ============================
@@ -473,7 +691,7 @@ QuantumLayerMultiProcess
     :param num_of_cbits: 经典比特数，默认为1。
     :param diff_method: 求解量子线路参数梯度的方法，“参数位移”或“有限差分”，默认参数偏移。
     :param delta: 有限差分计算梯度时的 \delta。
-    :param dtype: 参数的数据类型，defaults：None，使用默认数据类型:kfloat32,代表32位浮点数。
+    :param dtype: 参数的数据类型，defaults:None，使用默认数据类型:kfloat32,代表32位浮点数。
     :param name: 这个模块的名字， 默认为""。
 
     :return: 一个可以计算量子线路的模块。
@@ -579,7 +797,7 @@ NoiseQuantumLayer
     :param diff_method: 求解量子线路参数梯度的方法，“参数位移”或“有限差分”，默认参数偏移。
     :param delta: 有限差分计算梯度时的 \delta。
     :param noise_set_config: 噪声设置函数。
-    :param dtype: 参数的数据类型，defaults：None，使用默认数据类型:kfloat32,代表32位浮点数。
+    :param dtype: 参数的数据类型，defaults:None，使用默认数据类型:kfloat32,代表32位浮点数。
     :param name: 这个模块的名字， 默认为""。
 
     :return: 一个可以计算含噪声量子线路的模块。
@@ -773,7 +991,7 @@ VQCLayer
 
 .. py:class:: pyvqnet.qnn.quantumlayer.VQCLayer(vqc_wrapper,para_num,machine_type_or_cloud_token,num_of_qubits:int,num_of_cbits:int = 1,diff_method:str = "parameter_shift",delta:float = 0.01, dtype=None,name="")
 
-    pyQPanda中变分量子线路的抽象计算模块。详情请访问： https://pyqpanda-toturial.readthedocs.io/zh/latest/VQG.html。
+    pyQPanda中变分量子线路的抽象计算模块。详情请访问: https://pyqpanda-toturial.readthedocs.io/zh/latest/VQG.html。
     
     :param vqc_wrapper: VQC_wrapper类。
     :param para_num: `int` - 参数个数。
@@ -782,7 +1000,7 @@ VQCLayer
     :param num_of_cbits: 经典比特数，默认为1。
     :param diff_method: 求解量子线路参数梯度的方法，“参数位移”或“有限差分”，默认参数偏移。
     :param delta: 有限差分计算梯度时的 \delta。
-    :param dtype: 参数的数据类型，defaults：None，使用默认数据类型:kfloat32,代表32位浮点数。
+    :param dtype: 参数的数据类型，defaults:None，使用默认数据类型:kfloat32,代表32位浮点数。
     :param name: 这个模块的名字， 默认为""。
 
     :return: 一个可以计算量子VQC线路的模块。
@@ -886,7 +1104,7 @@ Qconv是一种量子卷积算法接口。
     :param padding: `tuple` - 填充，默认为（0，0）。
     :param kernel_initializer: `callable` - 默认为正态分布。
     :param machine: `str` - 使用的虚拟机，默认使用CPU模拟。
-    :param dtype: 参数的数据类型，defaults：None，使用默认数据类型:kfloat32,代表32位浮点数。
+    :param dtype: 参数的数据类型，defaults:None，使用默认数据类型:kfloat32,代表32位浮点数。
     :param name: 这个模块的名字， 默认为""。
 
 
@@ -1004,7 +1222,7 @@ grad
 
 在VQNet中，我们使用本源量子自研的 `pyQPanda <https://pyqpanda-toturial.readthedocs.io/zh/latest/>`_ 的各个逻辑门搭建量子线路，进行量子模拟。
 当前pyQPanda支持的逻辑门可参考pyQPanda `量子逻辑门 <https://pyqpanda-toturial.readthedocs.io/zh/latest/>`_ 部分的定义。
-此外VQNet还封装了部分在量子机器学习中常用的量子逻辑门组合：
+此外VQNet还封装了部分在量子机器学习中常用的量子逻辑门组合:
 
 
 BasicEmbeddingCircuit
@@ -1554,7 +1772,7 @@ UCCSD
 
     实现酉耦合簇单激发和双激发拟设（UCCSD）。UCCSD 是 VQE 拟设，通常用于运行量子化学模拟。
 
-    在一阶 Trotter 近似内，UCCSD 酉函数由下式给出：
+    在一阶 Trotter 近似内，UCCSD 酉函数由下式给出:
 
     .. math::
 
@@ -1675,14 +1893,14 @@ HardwareEfficientAnsatz
 
 .. py:class:: pyvqnet.qnn.ansatz.HardwareEfficientAnsatz(n_qubits,single_rot_gate_list,qubits,entangle_gate="CNOT",entangle_rules='linear',depth=1)
 
-    论文介绍的Hardware Efficient Ansatz的实现： `Hardware-efficient Variational Quantum Eigensolver for Small Molecules <https://arxiv.org/pdf/1704.05018.pdf>`__ 。
+    论文介绍的Hardware Efficient Ansatz的实现: `Hardware-efficient Variational Quantum Eigensolver for Small Molecules <https://arxiv.org/pdf/1704.05018.pdf>`__ 。
 
     :param n_qubits: 量子比特数。
     :param single_rot_gate_list: 单个量子位旋转门列表由一个或多个作用于每个量子位的旋转门构成。目前支持 Rx、Ry、Rz。
     :param qubits: 由 pyqpanda 分配的量子位。
     :param entangle_gate: 非参数化纠缠门。支持CNOT、CZ。默认: CNOT。
-    :param entangle_rules: 电路中如何使用纠缠门。 ``linear`` 意味着纠缠门将作用于每个相邻的量子位。 ``all`` 意味着纠缠门将作用于任何两个 qbuits。 默认值：``linear``。
-    :param depth: ansatz 的深度，默认：1。
+    :param entangle_rules: 电路中如何使用纠缠门。 ``linear`` 意味着纠缠门将作用于每个相邻的量子位。 ``all`` 意味着纠缠门将作用于任何两个 qbuits。 默认值:``linear``。
+    :param depth: ansatz 的深度，默认:1。
 
     Example::
 
@@ -1722,7 +1940,7 @@ BasicEntanglerTemplate
 
     层数 :math:`L` 由参数 ``weights`` 的第一个维度决定。
 
-    :param weights: 形状的权重张量 `(L, len(qubits))`。 每个权重都用作量子含参门中的参数。默认值为： ``None`` ，则使用 `(1,1)` 正态分布随机数作为权重。
+    :param weights: 形状的权重张量 `(L, len(qubits))`。 每个权重都用作量子含参门中的参数。默认值为: ``None`` ，则使用 `(1,1)` 正态分布随机数作为权重。
     :param num_qubits: 量子比特数,默认为1。
     :param rotation: 使用单参数单量子比特门，``pyqpanda.RX`` 被用作默认值。
 
@@ -1773,9 +1991,9 @@ StronglyEntanglingTemplate
 
     其包含2-qubit CNOT 门，作用于 :math:`M` 个量子比特上，:math:`i = 1,...,M`。 每个门的第二个量子位标号由公式 :math:`(i+r)\mod M` 给出，其中 :math:`r` 是一个称为 ``range``  的超参数，并且 :math:`0 < r < M`。
 
-    :param weights: 形状为 ``(L, M, 3)`` 的权重张量，默认值：None，使用形状为 ``(1,1,3)`` 的随机张量。
-    :param num_qubits: 量子比特数，默认值：1。
-    :param ranges: 确定每个后续层的范围超参数的序列； 默认值：None，使用 :math:`r=l \ mod M` 作为ranges 的值。
+    :param weights: 形状为 ``(L, M, 3)`` 的权重张量，默认值:None，使用形状为 ``(1,1,3)`` 的随机张量。
+    :param num_qubits: 量子比特数，默认值:1。
+    :param ranges: 确定每个后续层的范围超参数的序列； 默认值:None，使用 :math:`r=l \ mod M` 作为ranges 的值。
 
     Example::
 
@@ -1823,7 +2041,7 @@ ComplexEntangelingTemplate
 
 
     由 U3 门和 CNOT 门组成的强纠缠层。
-    此线路模板来自以下论文：https://arxiv.org/abs/1804.00633。
+    此线路模板来自以下论文:https://arxiv.org/abs/1804.00633。
 
     :param weights: 参数，[depth,num_qubits,3]的形状
     :param num_qubits: 量子比特数。
@@ -2032,7 +2250,7 @@ expval_qcloud
     :param pauli_str_dict: 哈密顿可观测量
     :param qlists: pyQPanda 分配的量子位
     :param clists: pyQPanda 分配的 cbit
-    :param shots: 测量次数，默认：1000。
+    :param shots: 测量次数，默认:1000。
     :param qtype: 设置qmachine测量的类型，默认为""表示非qcloud。 为真实芯片设置`pq.real_chip_type.origin_72`。
     :return: 期望值.
 
@@ -2579,20 +2797,20 @@ QGAN使用经典的GAN模型结构，分为Generator生成器与Discriminator鉴
     同时扰动随机近似 (SPSA) 优化器。
 
     SPSA 提供了一种用于逼近多元可微成本函数梯度的随机方法。
-    为实现这一点，使用扰动参数向量对成本函数进行两次评估：原始参数向量的每个分量同时随随机生成的值移动。
+    为实现这一点，使用扰动参数向量对成本函数进行两次评估:原始参数向量的每个分量同时随随机生成的值移动。
     `SPSA 网站 <http://www.jhuapl.edu/SPSA>`__ 上提供了进一步的介绍。
 
-    :param maxiter: 要执行的最大迭代次数。默认值：1000。
+    :param maxiter: 要执行的最大迭代次数。默认值:1000。
     :param last_avg: last_avg 迭代的平均参数。
-        如果 last_avg = 1，则只考虑最后一次迭代。默认值：1。
-    :param c0: 初始a。更新参数的步长。默认值：0.2*pi
-    :param c1: 初始的c。用于近似梯度的步长。默认值：0.1。
-    :param c2: 论文中的alpha，用于在每次迭代时调整a(c0)。默认值：0.602。
-    :param c3: 论文中的gamma，每次迭代时用来调整c(c1)。默认值：0.101。
-    :param c4: 同样用来控制a的参数。默认值：0。
-    :param init_para: 初始化参数。默认值：无。
-    :param model: 参数模型：模型。默认值：无。
-    :param calibrate_flag: 是否校准超参数 a 和 c，默认值：False。
+        如果 last_avg = 1，则只考虑最后一次迭代。默认值:1。
+    :param c0: 初始a。更新参数的步长。默认值:0.2*pi
+    :param c1: 初始的c。用于近似梯度的步长。默认值:0.1。
+    :param c2: 论文中的alpha，用于在每次迭代时调整a(c0)。默认值:0.602。
+    :param c3: 论文中的gamma，每次迭代时用来调整c(c1)。默认值:0.101。
+    :param c4: 同样用来控制a的参数。默认值:0。
+    :param init_para: 初始化参数。默认值:无。
+    :param model: 参数模型:模型。默认值:无。
+    :param calibrate_flag: 是否校准超参数 a 和 c，默认值:False。
 
     :return: 一个SPSA优化器实例
 
@@ -2651,9 +2869,9 @@ QGAN使用经典的GAN模型结构，分为Generator生成器与Discriminator鉴
     :param input_data: 输入训练数据QTensor
     :return:
 
-        train_para：最终参数。
+        train_para:最终参数。
 
-        theta_best：最后 `last_avg` 次优化后的平均参数。
+        theta_best:最后 `last_avg` 次优化后的平均参数。
 
     Example::
 
@@ -2718,6 +2936,159 @@ QGAN使用经典的GAN模型结构，分为Generator生成器与Discriminator鉴
         print(y)
 
 
+量子fisher信息计算矩阵
+============================
+
+.. py:class:: pyvqnet.qnn.opt.quantum_fisher(py_qpanda_config, params, target_gate_type_lists,target_gate_bits_lists, qcir_lists, wires)
+    
+    返回一个量子线路的量子fisher信息矩阵.
+
+    .. math::
+
+        \mathrm{QFIM}_{i, j}=4 \operatorname{Re}\left[\left\langle\partial_i \psi(\boldsymbol{\theta}) \mid \partial_j \psi(\boldsymbol{\theta})\right\rangle-\left\langle\partial_i \psi(\boldsymbol{\theta}) \mid \psi(\boldsymbol{\theta})\right\rangle\left\langle\psi(\boldsymbol{\theta}) \mid \partial_j \psi(\boldsymbol{\theta})\right\rangle\right]
+
+    简短表示为 :math:`\left|\partial_j \psi(\boldsymbol{\theta})\right\rangle:=\frac{\partial}{\partial \theta_j}|\psi(\boldsymbol{\theta})\rangle`.
+
+    .. note:: 
+
+        目前仅支持 RX,RY,RZ.
+
+    :param params: 电路中的可变参数.
+    :param target_gate_type_lists: 支持 "RX"、"RY"、"RZ" 或列表.
+    :param target_gate_bits_lists:  参数化门作用于哪个或哪些量子比特.
+    :param qcir_lists: 目标参数化门之前的量子圈列表，以计算度量张量，请参见下面的示例.
+    :param wires: 量子电路的总量子比特指数.
+
+    Example::
+    
+        import pyqpanda as pq
+
+        from pyvqnet import *
+        from pyvqnet.qnn.opt import pyqpanda_config_wrapper, insert_pauli_for_mt, quantum_fisher
+        from pyvqnet.qnn import ProbsMeasure
+        import numpy as np
+        import pennylane as qml
+        import pennylane.numpy as pnp
+
+        n_wires = 4
+        def layer_subcircuit_new(config: pyqpanda_config_wrapper, params):
+            qcir = pq.QCircuit()
+            qcir.insert(pq.RX(config._qubits[0], params[0]))
+            qcir.insert(pq.RY(config._qubits[1], params[1]))
+            
+            qcir.insert(pq.CNOT(config._qubits[0], config._qubits[1]))
+            
+            qcir.insert(pq.RZ(config._qubits[2], params[2]))
+            qcir.insert(pq.RZ(config._qubits[3], params[3]))
+            return qcir
+
+
+        def get_p1_diagonal_new(config, params, target_gate_type, target_gate_bits,
+                            wires):
+            qcir = layer_subcircuit_new(config, params)
+            qcir2 = insert_pauli_for_mt(config._qubits, target_gate_type,
+                                        target_gate_bits)
+            qcir3 = pq.QCircuit()
+            qcir3.insert(qcir)
+            qcir3.insert(qcir2)
+            
+            m_prog = pq.QProg()
+            m_prog.insert(qcir3)
+            return ProbsMeasure(wires, m_prog, config._machine, config._qubits)
+
+        config = pyqpanda_config_wrapper(n_wires)
+        qcir = []
+        
+        qcir.append(get_p1_diagonal_new)
+
+        params2 = QTensor([0.5, 0.5, 0.5, 0.25], requires_grad=True)
+
+        mt = quantum_fisher(config, params2, [['RX', 'RY', 'RZ', 'RZ']],
+                                [[0, 1, 2, 3]], qcir, [0, 1, 2, 3])
+
+        # The above example shows that there are no identical gates in the same layer, 
+        # but in the same layer you need to modify the logic gates according to the following example.
+        
+        n_wires = 3
+        def layer_subcircuit_01(config: pyqpanda_config_wrapper, params):
+            qcir = pq.QCircuit()
+            qcir.insert(pq.RX(config._qubits[0], params[0]))
+            qcir.insert(pq.RY(config._qubits[1], params[1]))
+            qcir.insert(pq.CNOT(config._qubits[0], config._qubits[1]))
+            
+            return qcir
+
+        def layer_subcircuit_02(config: pyqpanda_config_wrapper, params):
+            qcir = pq.QCircuit()
+            qcir.insert(pq.RX(config._qubits[0], params[0]))
+            qcir.insert(pq.RY(config._qubits[1], params[1]))
+            qcir.insert(pq.CNOT(config._qubits[0], config._qubits[1]))
+            qcir.insert(pq.RZ(config._qubits[1], params[2]))
+            return qcir
+
+        def layer_subcircuit_03(config: pyqpanda_config_wrapper, params):
+            qcir = pq.QCircuit()
+            qcir.insert(pq.RX(config._qubits[0], params[0]))
+            qcir.insert(pq.RY(config._qubits[1], params[1]))
+            qcir.insert(pq.CNOT(config._qubits[0], config._qubits[1])) #  01 part
+            
+            qcir.insert(pq.RZ(config._qubits[1], params[2]))  #  02 part
+            
+            qcir.insert(pq.RZ(config._qubits[1], params[3]))
+            return qcir
+
+        def get_p1_diagonal_01(config, params, target_gate_type, target_gate_bits,
+                            wires):
+            qcir = layer_subcircuit_01(config, params)
+            qcir2 = insert_pauli_for_mt(config._qubits, target_gate_type,
+                                        target_gate_bits)
+            qcir3 = pq.QCircuit()
+            qcir3.insert(qcir)
+            qcir3.insert(qcir2)
+            
+            m_prog = pq.QProg()
+            m_prog.insert(qcir3)
+            return ProbsMeasure(wires, m_prog, config._machine, config._qubits)
+        
+        def get_p1_diagonal_02(config, params, target_gate_type, target_gate_bits,
+                            wires):
+            qcir = layer_subcircuit_02(config, params)
+            qcir2 = insert_pauli_for_mt(config._qubits, target_gate_type,
+                                        target_gate_bits)
+            qcir3 = pq.QCircuit()
+            qcir3.insert(qcir)
+            qcir3.insert(qcir2)
+            
+            m_prog = pq.QProg()
+            m_prog.insert(qcir3)
+            return ProbsMeasure(wires, m_prog, config._machine, config._qubits)
+        
+        def get_p1_diagonal_03(config, params, target_gate_type, target_gate_bits,
+                            wires):
+            qcir = layer_subcircuit_03(config, params)
+            qcir2 = insert_pauli_for_mt(config._qubits, target_gate_type,
+                                        target_gate_bits)
+            qcir3 = pq.QCircuit()
+            qcir3.insert(qcir)
+            qcir3.insert(qcir2)
+            
+            m_prog = pq.QProg()
+            m_prog.insert(qcir3)
+            return ProbsMeasure(wires, m_prog, config._machine, config._qubits)
+        
+        config = pyqpanda_config_wrapper(n_wires)
+        qcir = []
+        
+        qcir.append(get_p1_diagonal_01)
+        qcir.append(get_p1_diagonal_02)
+        qcir.append(get_p1_diagonal_03)
+        
+        params2 = QTensor([0.5, 0.5, 0.5, 0.25], requires_grad=True)
+
+        mt = quantum_fisher(config, params2, [['RX', 'RY'], ['RZ'], ['RZ']], # rx,ry counts as layer one, first rz as layer two, second rz as layer three.
+                                [[0, 1], [1], [1]], qcir, [0, 1])
+
+
 变分量子线路自动微分模拟
 ***********************************
 
@@ -2770,7 +3141,7 @@ VQNet基于自动微分算子构建以及一些常用量子逻辑门、量子线
         print(y)
 
 
-    如果要使用一些带训练参数的变分量子线路逻辑门，而不止像上例一样将数据编码到线路上，可以参考下面例子：
+    如果要使用一些带训练参数的变分量子线路逻辑门，而不止像上例一样将数据编码到线路上，可以参考下面例子:
 
     Example::
 
@@ -5808,7 +6179,7 @@ VQC_UCCSD
 
     实现酉耦合簇单激发和双激发拟设（UCCSD）。UCCSD 是 VQE 拟设，通常用于运行量子化学模拟。
 
-    在一阶 Trotter 近似内，UCCSD 酉函数由下式给出：
+    在一阶 Trotter 近似内，UCCSD 酉函数由下式给出:
 
     .. math::
 
@@ -5865,7 +6236,7 @@ VQC_ZFeatureMap
 
     一阶泡利 Z 演化电路。
 
-    对于 3 个量子位和 2 次重复，电路表示为：
+    对于 3 个量子位和 2 次重复，电路表示为:
 
     .. parsed-literal::
 
@@ -5881,7 +6252,7 @@ VQC_ZFeatureMap
 
     :param input_feat: 表示输入参数的数组。
     :param q_machine: 量子虚拟机。
-    :param data_map_func: 参数映射矩阵, 为可调用函数, 设计方式为： ``data_map_func = lambda x: x``。
+    :param data_map_func: 参数映射矩阵, 为可调用函数, 设计方式为: ``data_map_func = lambda x: x``。
     :param rep: 模块重复次数。
     
     Example::
@@ -5908,7 +6279,7 @@ VQC_ZZFeatureMap
 
     二阶 Pauli-Z 演化电路。
 
-    对于 3 个量子位、1 个重复和线性纠缠，电路表示为：
+    对于 3 个量子位、1 个重复和线性纠缠，电路表示为:
 
     .. parsed-literal::
 
@@ -5920,7 +6291,7 @@ VQC_ZZFeatureMap
         ┤ H ├┤ U1(2.0*φ(x[2])) ├──────────────────────────────────┤ X ├┤ U1(2.0*φ(x[1],x[2])) ├┤ X ├
         └───┘└─────────────────┘                                  └───┘└──────────────────────┘└───┘
     
-    其中 ``φ`` 是经典的非线性函数，如果输入两个值则 ``φ(x,y) = (pi - x)(pi - y)``, 输入一个则为 ``φ(x) = x``, 用 ``data_map_func`` 表示如下：
+    其中 ``φ`` 是经典的非线性函数，如果输入两个值则 ``φ(x,y) = (pi - x)(pi - y)``, 输入一个则为 ``φ(x) = x``, 用 ``data_map_func`` 表示如下:
     
     .. code-block::
         
@@ -5966,7 +6337,7 @@ VQC_AllSinglesDoubles
     :param singles: 具有single_exitation操作所作用的两个量子位索引的列表序列。
     :param doubles: 具有double_exitation操作所作用的两个量子位索引的列表序列。
 
-    例如，两个电子和六个量子位情况下的量子电路如下图所示：
+    例如，两个电子和六个量子位情况下的量子电路如下图所示:
     
 .. image:: ./images/all_singles_doubles.png
     :width: 600 px
@@ -6200,7 +6571,7 @@ Probability
     计算量子线路在特定比特上概率测量结果。
 
     :param wires: 测量比特的索引，列表、元组或者整数。
-    :param name: 模块的名字，默认：""。
+    :param name: 模块的名字，默认:""。
     :return: 测量结果，QTensor。
 
     Example::
@@ -6228,16 +6599,16 @@ MeasureAll
 .. py:class:: pyvqnet.qnn.vqc.MeasureAll(obs=None, name="")
 
     计算量子线路的测量结果，支持输入obs为多个或单个泡利算子或这哈密顿量。
-    例如：
+    例如:
 
     {\'wires\': [0,  1], \'observables\': [\'x\', \'i\'],\'coefficient\':[0.23,-3.5]}
-    或：
+    或:
     {\'X0\': 0.23}
-    或：
+    或:
     [{\'wires\': [0, 2, 3],\'observables\': [\'X\', \'Y\', \'Z\'],\'coefficient\': [1, 0.5, 0.4]}, {\'wires\': [0, 1, 2],\'observables\': [\'X\', \'Y\', \'Z\'],\'coefficient\': [1, 0.5, 0.4]}]
 
     :param obs: observable。
-    :param name: 模块的名字，默认：""。
+    :param name: 模块的名字，默认:""。
     :return: 测量结果，QTensor。
 
     Example::
@@ -6278,7 +6649,7 @@ SparseHamiltonian
     计算观测量的稀疏哈密顿量，例如 {"observables":H,"wires":[0,2,3]}。
 
     :param obs: 稀疏哈密顿量,使用 `tensor.dense_to_csr()` 函数获取稠密函数的稀疏格式。
-    :param name: 模块的名字，默认：""。
+    :param name: 模块的名字，默认:""。
     :return: 期望结果，QTensor。
 
     Example::
@@ -6360,7 +6731,7 @@ HermitianExpval
     计算量子线路某个厄密特量的期望。
 
     :param obs: 厄密特量。
-    :param name: 模块的名字，默认：""。
+    :param name: 模块的名字，默认:""。
     :return: 期望结果，QTensor。
 
     Example::
@@ -6430,13 +6801,13 @@ VQC_HardwareEfficientAnsatz
 
 .. py:class:: pyvqnet.qnn.vqc.VQC_HardwareEfficientAnsatz(n_qubits,single_rot_gate_list,entangle_gate="CNOT",entangle_rules='linear',depth=1)
 
-    论文介绍的Hardware Efficient Ansatz的实现： `Hardware-efficient Variational Quantum Eigensolver for Small Molecules <https://arxiv.org/pdf/1704.05018.pdf>`__ 。
+    论文介绍的Hardware Efficient Ansatz的实现: `Hardware-efficient Variational Quantum Eigensolver for Small Molecules <https://arxiv.org/pdf/1704.05018.pdf>`__ 。
 
     :param n_qubits: 量子比特数。
     :param single_rot_gate_list: 单个量子位旋转门列表由一个或多个作用于每个量子位的旋转门构成。目前支持 Rx、Ry、Rz。
     :param entangle_gate: 非参数化纠缠门。支持CNOT、CZ。默认: CNOT。
-    :param entangle_rules: 电路中如何使用纠缠门。 ``linear`` 意味着纠缠门将作用于每个相邻的量子位。 ``all`` 意味着纠缠门将作用于任何两个 qbuits。 默认值：``linear``。
-    :param depth: ansatz 的深度，默认：1。
+    :param entangle_rules: 电路中如何使用纠缠门。 ``linear`` 意味着纠缠门将作用于每个相邻的量子位。 ``all`` 意味着纠缠门将作用于任何两个 qbuits。 默认值:``linear``。
+    :param depth: ansatz 的深度，默认:1。
 
     Example::
 
@@ -6536,9 +6907,9 @@ VQC_StronglyEntanglingTemplate
 
     其包含2-qubit CNOT 门，作用于 :math:`M` 个量子比特上，:math:`i = 1,...,M`。 每个门的第二个量子位标号由公式 :math:`(i+r)\mod M` 给出，其中 :math:`r` 是一个称为 ``range``  的超参数，并且 :math:`0 < r < M`。
 
-    :param weights: 形状为 ``(L, M, 3)`` 的权重张量，默认值：None，使用形状为 ``(1,1,3)`` 的随机张量。
-    :param num_qubits: 量子比特数，默认值：1。
-    :param ranges: 确定每个后续层的范围超参数的序列； 默认值：None，使用 :math:`r=l \ mod M` 作为ranges 的值。
+    :param weights: 形状为 ``(L, M, 3)`` 的权重张量，默认值:None，使用形状为 ``(1,1,3)`` 的随机张量。
+    :param num_qubits: 量子比特数，默认值:1。
+    :param ranges: 确定每个后续层的范围超参数的序列； 默认值:None，使用 :math:`r=l \ mod M` 作为ranges 的值。
 
     Example::
 
@@ -7245,7 +7616,7 @@ QNG
     空间中执行梯度下降，它相对于参数化是无量纲和不变的. 因此，无论参数化如何，每个优化步骤总是会为每个参数选择最佳步长。
     在量子机器学习任务中，量子态空间拥有一个独特的不变度量张量，称为 Fubini-Study 度量张量 :math:`g_{ij}`。
     该张量将量子线路参数空间中的最速下降转换为分布空间中的最速下降。
-    量子自然梯度的公式如下：
+    量子自然梯度的公式如下:
 
     .. math:: \theta_{t+1} = \theta_t - \eta g^{+}(\theta_t)\nabla \mathcal{L}(\theta),
 

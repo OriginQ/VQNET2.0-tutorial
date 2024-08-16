@@ -2,6 +2,60 @@
 VQNet Changelog
 ######################
 
+[v2.13.0] - 2024-07-30
+***************************
+
+Added
+===================
+
+- 增加 `no_grad`, `GroupNorm`, `Interpolate`, `contiguous`, `QuantumLayerV3`, `fuse_model`, `SDPA`, `quantum_fisher` 接口。
+- 为解决量子机器学习过程中出现的过拟合问题添加量子Dropout样例.
+
+Changed
+===================
+
+- `BatchNorm`, `LayerNorm`, `GroupNorm` 增加affine接口。
+- `diag` 接口在2d输入时候现在返回对角线上的1d输出,与torch一致。
+- slice,permute等操作会尝试使用view方式返回共享内存的QTensor。
+- 所有接口支持非contiguous的输入。
+- `Adam` 支持 weight_decay 参数。
+
+Fixed
+===================
+- 修改 VQC 部分逻辑门分解函数的错误。
+- 修复部分函数的内存泄露问题。
+- 修复 `QuantumLayerMultiProcess` 不支持GPU输入的问题。
+- 修改 `Linear` 的默认参数初始化话方式
+
+
+[v2.12.0] - 2024-05-01
+***************************
+
+Added
+===================
+
+- 添加流水线并行PipelineParallelTrainingWrapper接口。
+- 添加 `Gelu`, `DropPath`, `binomial`, `adamW` 接口。
+- 添加 `QuantumBatchAsyncQcloudLayer` 支持pyqpanda的本地虚拟机模拟计算。
+- 添加 xtensor的 `QuantumBatchAsyncQcloudLayer` 支持pyqpanda的本地虚拟机模拟计算以及真机计算。
+- 使得QTensor 可以被deepcopy以及pickle。
+- 添加分布式计算启动命令 `vqnetrun`, 使用分布式计算接口时使用。
+- 添加ES梯度计算方法真机接口 `QuantumBatchAsyncQcloudLayerES` 支持pyqpanda的本地虚拟机模拟计算以及真机计算。
+- 添加在分布式计算中支持QTensor的数据通信接口 `allreduce`, `reduce`, `broadcast`, `allgather`, `send`, `recv` 等。
+
+Changed
+===================
+
+- 安装包新加入依赖 "Pillow", "hjson", linux系统下安装包添加新依赖 "psutil"。 "cloudpickle"。
+- 优化softmax以及tranpose在GPU下运行速度。
+- 使用cuda11.8编译。
+- 整合了基于cpu、gpu下的分布式计算接口。
+
+Fixed
+===================
+- 降低Linux-GPU版本启动时候的显存消耗。
+- 修复select以及power函数的内存泄露问题。
+- 删除了cpu、gpu下基于reduce方法的模型参数以及梯度更新方法 `nccl_average_parameters_reduce`, `nccl_average_grad_reduce`。
 
 [v2.11.0] - 2024-03-01
 ***************************
@@ -11,11 +65,11 @@ Added
 
 - 添加新的 `QNG` （量子自然梯度）API 和演示。
 - 添加量子电路优化，例如 `wrapper_single_qubit_op_fuse` , `wrapper_commute_controlled` , `wrapper_merge_rotations` api 和 demo。
-- 添加 `CY``, `SparseHamiltonian` , `HermitianExpval` 。
+- 添加 `CY`, `SparseHamiltonian` , `HermitianExpval` 。
 - 添加 `is_csr`、 `is_dense`、 `dense_to_csr` 、 `csr_to_dense` 。
 - 添加 `QuantumBatchAsyncQcloudLayer` 支持pyqpanda的QCloud真实芯片计算， `expval_qcloud`。
 - 添加基于NCCL的单节点下多GPU分布式计算数据并行模型训练的相关接口实现 `nccl_average_parameters_allreduce`, `nccl_average_parameters_reduce`, `nccl_average_grad_allreduce`, `nccl_average_grad_reduce` 以及控制NCCL初始化以及相关操作的类 `NCCL_api`。
-- 添加量子线路进化策略梯度计算方法 `QuantumLayerES`接口。
+- 添加量子线路进化策略梯度计算方法 `QuantumLayerES` 接口。
 
 Changed
 ===================

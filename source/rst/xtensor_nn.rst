@@ -963,6 +963,40 @@ LayerNorm1d
         # [-1.3416355, -0.4472118, 0.4472118, 1.3416355]
         # ]
         
+GroupNorm
+
+===========================================================
+
+对小批量输入应用组归一化。
+
+此层实现论文“组归一化 <https://arxiv.org/abs/1803.08494>`__ 中描述的操作
+
+.. math::
+y = \frac{x - \mathrm{E}[x]}{ \sqrt{\mathrm{Var}[x] + \epsilon}} * \gamma + \beta
+
+输入通道被分成 :attr:`num_groups` 组，每组包含
+``num_channels / num_groups`` 个通道。:attr:`num_channels` 必须能被
+:attr:`num_groups` 整除。平均值和标准差是在每个组中分别计算的。如果 :attr:`affine` 为 ``True``，则 :math:`\gamma` 和 :math:`\beta` 是可学习的
+
+每个通道仿射变换参数向量，大小为 :attr:`num_channels`。
+
+:param num_groups (int)：将通道分成的组数
+
+:param num_channels (int)：输入中预期的通道数
+
+:param eps：添加到分母的值，以实现数值稳定性。默认值：1e-5
+
+:param affine：一个布尔值，当设置为 ``True`` 时，此模块
+
+具有可学习的每通道仿射参数，初始化为 1（用于权重）
+
+和 0（用于偏差）。默认值：``True``。
+
+形状：
+- 输入：:math:`(N, C, *)`，其中：math:`C=\text{num\_channels}`
+- 输出：:math:`(N, C, *)`（与输入形状相同）
+
+：返回：GroupNorm 类
 
 Linear
 ===========================================================
@@ -1698,6 +1732,7 @@ Dynamic_LSTM
         <XTensor 4x3x4 cpu(0) kfloat32>
         [3 4 1]
         """
+
 
 损失函数层
 ******************************************
@@ -2614,3 +2649,104 @@ SGD
         """
 
 
+本源量子云接口
+******************************************
+
+自2.12.0版本起，当用户同时安装了3.8.2.3以上pyQpanda，可使用QuantumBatchAsyncQcloudLayer 调用真实芯片或本地CPU虚拟机进行模拟。
+
+
+
+
+QuantumBatchAsyncQcloudLayer
+===========================================
+.. py:class:: pyvqnet.xtensor.qcloud.QuantumBatchAsyncQcloudLayer(origin_qprog_func,qcloud_token,para_num,num_qubits,num_cubits,pauli_str_dict=None,shots=1000,initializer=None,dtype=None,name="",diff_method="parameter_shift",submit_kwargs={},query_kwargs={})
+    
+    用于本源量子计算机的量子计算的变分线路训练模块，使用pyqpanda QCLOUD从版本3.8.2.2开始。它提交参数化量子电路到真实芯片并获取测量结果。
+    
+    :param origin_qprog_func: 由QPanda构建的可调用量子电路函数。
+    :param qcloud_token: str - 量子机器的类型或者执行的云令牌。
+    :param para_num: int - 参数的数量；参数是一维的。
+    :param num_qubits: int - 量子电路中的量子比特数。
+    :param num_cubits: int - 量子电路中用于测量的经典比特数。
+    :param pauli_str_dict: dict|list - 表示量子电路中Pauli算符的字典或字典列表。默认为None。
+    :param shots: int - 测量次数。默认为1000。
+    :param initializer: 参数值的初始化器。默认为None。
+    :param dtype: 参数的数据类型。默认为None，即使用默认数据类型。
+    :param name: 模块的名称。默认为空字符串。
+    :param diff_method: 用于梯度计算的微分方法。默认为"parameter_shift"。
+    :param submit_kwargs: 提交量子电路的额外关键字参数，默认为{"chip_id":pyqpanda.real_chip_type.origin_72,"is_amend":True,"is_mapping":True,"is_optimization": True,"default_task_group_size":200,"test_qcloud_fake":True}。
+    :param query_kwargs: 查询量子结果的额外关键字参数，默认为{"timeout":2,"print_query_info":True,"sub_circuits_split_size":1}。
+    
+    :return: 一个能够计算量子电路的模块。
+
+    .. note::
+
+        submit_kwargs 的 `test_qcloud_fake` 默认为 True, 调用本地模拟。如果设为 False,则提交真机计算。
+    Example::
+
+        from pyqpanda import *
+
+        import pyqpanda as pq
+        from pyvqnet.xtensor.qcloud import QuantumBatchAsyncQcloudLayer
+        from pyvqnet.xtensor.autograd import tape
+        from pyvqnet.xtensor import arange,XTensor,ones,ones_like
+
+
+        def qfun(input,param, m_machine, m_qlist,cubits):
+                measure_qubits = [0,2]
+                m_prog = pq.QProg()
+                cir = pq.QCircuit()
+                cir.insert(pq.RZ(m_qlist[0],input[0]))
+                cir.insert(pq.CNOT(m_qlist[0],m_qlist[1]))
+                cir.insert(pq.RY(m_qlist[1],param[0]))
+                cir.insert(pq.CNOT(m_qlist[0],m_qlist[2]))
+                cir.insert(pq.RZ(m_qlist[1],input[1]))
+                cir.insert(pq.RY(m_qlist[2],param[1]))
+                cir.insert(pq.RZ(m_qlist[2],param[2]))
+                cir.insert(pq.RZ(m_qlist[2],param[3]))
+                cir.insert(pq.RZ(m_qlist[1],param[4]))
+
+                cir.insert(pq.H(m_qlist[2]))
+                m_prog.insert(cir)
+
+
+                return m_prog
+
+        l = QuantumBatchAsyncQcloudLayer(qfun,
+                    "302e020100301006072a8648ce3d020106052b8104001c041730150201010410def6ef7286d4a2fd143ea10e2de4638f/12570",
+                    5,
+                    6,
+                    6,
+                    pauli_str_dict=[{'Z0 X1':1,'Y2':1},{'Y2':1},{'Z0 X1':1,'Y2':1,'X2':1}],#{'Z0 X1':1,'Y2':1},#,
+                    shots = 1000,
+                    initializer=None,
+                    dtype=None,
+                    name="",
+                    diff_method="parameter_shift",
+                    submit_kwargs={"test_qcloud_fake":True},
+                    query_kwargs={})
+
+
+        x = XTensor([[0.56,1.2],[0.56,1.2],[0.56,1.2]],requires_grad= True)
+
+        with tape():
+            y = l(x)
+
+        print(y)
+        y.backward(ones_like(y))
+
+        print(x.grad)
+        print(l.m_para.grad)
+
+        # [[-0.2554    -0.2038    -1.1429999]
+        #  [-0.2936    -0.2082    -1.127    ]
+        #  [-0.3144    -0.1812    -1.1208   ]]
+        # <XTensor 3x3 cpu(0) kfloat32>
+
+        # [[ 0.0241    -0.6001   ]
+        #  [-0.0017    -0.5624   ]
+        #  [ 0.0029999 -0.6071001]]
+        # <XTensor 3x2 cpu(0) kfloat32>
+
+        # [-1.5474    -1.0477002 -4.5562    -4.6365    -1.7573001]
+        # <XTensor 5 cpu(0) kfloat32>

@@ -178,6 +178,26 @@ is_csr
         print(b.is_csr)
         #1
 
+is_contiguous
+==============================
+
+.. py:attribute:: QTensor.is_contiguous
+
+    是否是contiguous的多维数组。
+
+    :return: 如果是contiguous，返回True，否则返回False。
+
+    Example::
+
+        from pyvqnet.tensor import QTensor
+
+        a = QTensor([[2, 3, 4, 5],[2, 3, 4, 5]])
+        b = a.is_contiguous
+        print(b)
+        #True
+        c= a.permute((1,0))
+        print(c.is_contiguous)
+        #False
 
 csr_members
 ==============================
@@ -185,6 +205,7 @@ csr_members
 .. py:method:: QTensor.csr_members()
 
     返回Compressed Sparse Row格式的稀疏2维度矩阵的row_idx,col_idx 以及非0数值data,3个1维QTensor。具体含义见 https://en.wikipedia.org/wiki/Sparse_matrix#Compressed_sparse_row_(CSR,_CRS_or_Yale_format)。
+    
     :return:
 
         返回列表，其中第一个元素为row_idx,shape为[矩阵行数+1],第2个元素为col_idx,shape为[非0元素数]，第3个元素为data,shape为[非0元素数]
@@ -271,6 +292,24 @@ item
         print(t.item())
 
         # 1.0
+
+
+contiguous
+==============================
+
+.. py:method:: QTensor.contiguous()
+
+    返回当前QTensor的contiguous形式 ,如果已经是contiguous，则返回自身。
+
+    :return: 返回当前QTensor的contiguous形式 ,如果已经是contiguous，则返回自身。
+
+    Example::
+
+        from pyvqnet.tensor import tensor
+
+        t = tensor.ones([1])
+        print(t.contiguous())
+
 
 argmax
 ==============================
@@ -569,38 +608,6 @@ QTensor.transpose
         
 
 
-transpose\_
-==============================
-
-.. py:method:: QTensor.transpose_(new_dims=None)
-
-    反转张量的轴。如果 new_dims = None，则反转所有轴。该接口改变当前张量自己的轴顺序。
-
-    :param new_dims: 列表形式储存的新的轴顺序。
-
-    :return: 无。
-
-    Example::
-
-        from pyvqnet.tensor import tensor
-        from pyvqnet.tensor import QTensor
-        import numpy as np
-        R, C = 3, 4
-        a = np.arange(R * C).reshape([2, 2, 3]).astype(np.float32)
-        t = QTensor(a)
-        t.transpose_([2, 0, 1])
-        print(t)
-
-        # [
-        # [[0., 3.],
-        #  [6., 9.]],
-        # [[1., 4.],
-        #  [7., 10.]],
-        # [[2., 5.],
-        #  [8., 11.]]
-        # ]
-        
-
 
 QTensor.reshape
 ==============================
@@ -636,7 +643,11 @@ reshape\_
 
 .. py:method:: QTensor.reshape_(new_shape)
 
-    改变当前 QTensor 的形状。
+    原地改变当前 QTensor 的形状。该接口会首先尝试在不改变原始内存数据情况下进行变换，如果无法成功，则复制当前数据到新的内存。
+
+    .. warning::
+
+        建议使用reshape接口，该接口在部分情况下，实际的底层内存位置会被复制而不是原地修改。
 
     :param new_shape: 新的形状。
 
@@ -710,7 +721,7 @@ __getitem__
 
         from pyvqnet.tensor import tensor, QTensor
         aaa = tensor.arange(1, 61)
-        aaa.reshape_([4, 5, 3])
+        aaa = aaa.reshape([4, 5, 3])
         print(aaa[0:2, 3, :2])
         # [
         # [10., 11.],
@@ -801,7 +812,7 @@ __setitem__
 
         from pyvqnet.tensor import tensor
         aaa = tensor.arange(1, 61)
-        aaa.reshape_([4, 5, 3])
+        aaa = aaa.reshape([4, 5, 3])
         vqnet_a2 = aaa[3, 4, 1]
         aaa[3, 4, 1] = tensor.arange(10001,
                                         10001 + vqnet_a2.size).reshape(vqnet_a2.shape)
@@ -829,7 +840,7 @@ __setitem__
         #  [58., 10001., 60.]]
         # ]
         aaa = tensor.arange(1, 61)
-        aaa.reshape_([4, 5, 3])
+        aaa = aaa.reshape([4, 5, 3])
         vqnet_a3 = aaa[:, 2, :]
         aaa[:, 2, :] = tensor.arange(10001,
                                         10001 + vqnet_a3.size).reshape(vqnet_a3.shape)
@@ -857,7 +868,7 @@ __setitem__
         #  [58., 59., 60.]]
         # ]
         aaa = tensor.arange(1, 61)
-        aaa.reshape_([4, 5, 3])
+        aaa = aaa.reshape([4, 5, 3])
         vqnet_a4 = aaa[2, :]
         aaa[2, :] = tensor.arange(10001,
                                     10001 + vqnet_a4.size).reshape(vqnet_a4.shape)
@@ -885,7 +896,7 @@ __setitem__
         #  [58., 59., 60.]]
         # ]
         aaa = tensor.arange(1, 61)
-        aaa.reshape_([4, 5, 3])
+        aaa = aaa.reshape([4, 5, 3])
         vqnet_a5 = aaa[0:2, ::2, 1:2]
         aaa[0:2, ::2,
             1:2] = tensor.arange(10001,
@@ -1331,8 +1342,9 @@ diag
 
     构造对角矩阵。
 
-    输入一个 2-D QTensor，则返回一个与此相同的新张量，除了
-    选定对角线中的元素以外的元素设置为零。
+    输入一个 2-D QTensor，则返回一个1D的新张量，包含
+    选定对角线中的元素。
+    输入一个 1-D QTensor,则返回一个2D新张量，其选定对角线元素为输入值，其余为0
 
     :param t: 输入 QTensor。
     :param k: 偏移量（主对角线为 0，正数为向上偏移，负数为向下偏移），默认为0。
@@ -1350,36 +1362,26 @@ diag
         for k in range(-3, 4):
             u = tensor.diag(t,k=k)
             print(u)
+        # [12.]
+        # <QTensor [1] DEV_CPU kfloat32>
 
+        # [ 8.,13.]
+        # <QTensor [2] DEV_CPU kfloat32>
 
-        # [[ 0.  0.  0.  0.]
-        #  [ 0.  0.  0.  0.]
-        #  [ 0.  0.  0.  0.]
-        #  [12.  0.  0.  0.]]
-        # [[ 0.  0.  0.  0.]
-        #  [ 0.  0.  0.  0.]
-        #  [ 8.  0.  0.  0.]
-        #  [ 0. 13.  0.  0.]]
-        # [[ 0.  0.  0.  0.]
-        #  [ 4.  0.  0.  0.]
-        #  [ 0.  9.  0.  0.]
-        #  [ 0.  0. 14.  0.]]
-        # [[ 0.  0.  0.  0.]
-        #  [ 0.  5.  0.  0.]
-        #  [ 0.  0. 10.  0.]
-        #  [ 0.  0.  0. 15.]]
-        # [[ 0.  1.  0.  0.]
-        #  [ 0.  0.  6.  0.]
-        #  [ 0.  0.  0. 11.]
-        #  [ 0.  0.  0.  0.]]
-        # [[0. 0. 2. 0.]
-        #  [0. 0. 0. 7.]
-        #  [0. 0. 0. 0.]
-        #  [0. 0. 0. 0.]]
-        # [[0. 0. 0. 3.]
-        #  [0. 0. 0. 0.]
-        #  [0. 0. 0. 0.]
-        #  [0. 0. 0. 0.]]
+        # [ 4., 9.,14.]
+        # <QTensor [3] DEV_CPU kfloat32>
+
+        # [ 0., 5.,10.,15.]
+        # <QTensor [4] DEV_CPU kfloat32>
+
+        # [ 1., 6.,11.]
+        # <QTensor [3] DEV_CPU kfloat32>
+
+        # [2.,7.]
+        # <QTensor [2] DEV_CPU kfloat32>
+
+        # [3.]
+        # <QTensor [1] DEV_CPU kfloat32>
 
 
 randu
@@ -1440,6 +1442,32 @@ randn
         # [-0.9529880, -0.4947567, -0.6399882],
         # [-0.6987777, -0.0089036, -0.5084590]
         # ]
+
+binomial
+==============================
+.. py:function:: pyvqnet.tensor.binomial(total_countst, probs)
+
+    创建一个由 :attr:`total_count` 和 :attr:`probs` 参数化的二项分布。
+
+    :param total_counts: 伯努利试验的次数。
+    :param probs: 事件概率。
+
+    :return:
+        二项分布的 QTensor。
+
+    Example::
+
+        import pyvqnet.tensor as tensor
+
+        a = tensor.randu([3,4])
+        b = 1000
+
+        c = tensor.binomial(b,a)
+        print(c)
+
+        # [[221.,763., 30.,339.],
+        #  [803.,899.,105.,356.],
+        #  [550.,688.,828.,493.]]
 
 
 multinomial
@@ -1682,7 +1710,7 @@ topK
             24., 13., 15., 4., 3., 8., 11., 3., 6., 15., 24., 13., 15., 3., 3., 8., 7.,
             3., 6., 11.
         ])
-        x.reshape_([2, 5, 1, 2])
+        x=x.reshape([2, 5, 1, 2])
         x.requires_grad = True
         y = tensor.topK(x, 3, 1)
         print(y)
@@ -1718,7 +1746,7 @@ argtopK
             24., 13., 15., 4., 3., 8., 11., 3., 6., 15., 24., 13., 15., 3., 3., 8., 7.,
             3., 6., 11.
         ])
-        x.reshape_([2, 5, 1, 2])
+        x=x.reshape([2, 5, 1, 2])
         x.requires_grad = True
         y = tensor.argtopK(x, 3, 1)
         print(y)
@@ -3999,3 +4027,21 @@ pack_pad_sequence
 
         print(data.batch_sizes)
         # [3, 2, 1, 1]
+
+no_grad
+==============================
+    
+.. py:function:: pyvqnet.no_grad()
+
+    禁用前向计算时记录反向传播节点。
+
+    Example::
+
+        import pyvqnet.tensor as tensor
+        from pyvqnet import no_grad
+
+        with no_grad():
+            x = tensor.QTensor([1.0, 2.0, 3.0],requires_grad=True)
+            y = tensor.tan(x)
+            y.backward()
+        #RuntimeError: output requires_grad is False.

@@ -7305,6 +7305,322 @@ VQNet当前提供4种方式对用户自定义的变分量子线路中的量子�
     # #################################################
 
 
+量子dropout实现
+===================================
+
+神经网络（NN）通常需要具有大量可训练参数的高度灵活的模型，以便学习特定的基础函数（或数据分布）。然而，仅仅能够以较低的样本内误差进行学习是不够的；泛化能力也是非常重要的。
+
+表现力强的模型可能会出现过拟合问题，这意味着它们在训练数据上训练得太好，结果在新的未见数据上表现不佳。出现这种情况的原因是，模型学会了训练数据中的噪声，而不是可泛化到新数据的基本模式。
+
+Dropout是经典深度神经网络（DNN）的一种常用技术，可防止计算单元过于专业化，降低过拟合风险。
+
+论文 `A General Approach to Dropout in Quantum Neural Networks` 表明，使用过度参数化的 QNN 模型可以消除大量局部极小值，从而改变优化格局。一方面，参数数量的增加会使训练更快、更容易，但另一方面，它可能会使模型过度拟合数据。这也与重复编码经典数据以实现计算的非线性密切相关。正因如此，受经典 DNN 的启发，我们可以考虑在 QNN 中应用某种 "dropout" 技术。这相当于在训练过程中随机丢弃一些（组）参数化门，以达到更好的泛化效果。
+
+接下来我将通过下面样例了展示如何利用量子dropout来避免在量子机器学习算法在训练中出现的过拟合问题，我们将dropout掉的逻辑门的参数设置为0来进行dropout。
+
+首先是导入相应包
+
+.. code-block::
+
+    import pyvqnet 
+    from pyvqnet.qnn.vqc import *
+    import numpy as np
+    from pyvqnet import tensor
+    from pyvqnet.qnn.vqc.qmeasure import expval
+    from sklearn.model_selection import train_test_split
+    from matplotlib import ticker
+    import matplotlib.pyplot as plt
+    from sklearn.preprocessing import MinMaxScaler
+
+搭建简单的量子线路
+
+.. code-block::
+
+    def embedding(x, wires, qmachine):
+        # Encodes the datum multiple times in the register,
+        for i in wires:
+            ry(qmachine, i, tensor.asin(x[i]))
+        for i in wires:
+            rz(qmachine, i, tensor.acos(x[i] ** 2))
+
+
+    def var_ansatz(
+        theta, wires, qmachine, rotations=[ry, rz, rx], entangler=cnot, keep_rotation=None
+    ):
+
+        # the length of `rotations` defines the number of inner layers
+        N = len(wires)
+        wires = list(wires)
+
+        counter = 0
+        # keep_rotations contains a list per each inner_layer
+        for rots in keep_rotation:
+            # we cicle over the elements of the lists inside keep_rotation
+            for qb, keep_or_drop in enumerate(rots):
+                rot = rotations[counter]  # each inner layer can have a different rotation
+
+                angle = theta[counter * N + qb]
+                # conditional statement implementing dropout
+                # if `keep_or_drop` is negative the rotation is dropped
+                if keep_or_drop < 0:
+                    angle_drop = tensor.QTensor(0.0)
+                else:
+                    angle_drop = angle
+                    
+                rot(qmachine, wires[qb], angle_drop)
+            for qb in wires[:-1]:
+                entangler(qmachine, wires=[wires[qb], wires[qb + 1]])
+            counter += 1
+
+    # quantum circuit qubits and params
+    n_qubits = 5
+    inner_layers = 3
+    params_per_layer = n_qubits * inner_layers
+
+
+    def qnn_circuit(x, theta, keep_rot, n_qubits, layers, qm):
+        for i in range(layers):
+            embedding(x, wires=range(n_qubits), qmachine=qm)
+
+            keep_rotation = keep_rot[i]
+
+            var_ansatz(
+                theta[i * params_per_layer : (i + 1) * params_per_layer],
+                wires=range(n_qubits),qmachine=qm,
+                entangler=cnot,
+                keep_rotation=keep_rotation,
+            )
+        
+        return expval(qm, 0, PauliZ()) 
+
+生成dropout列表，根据dropout列表来对量子线路中的逻辑门随机dropout
+
+.. code-block::
+
+    def make_dropout(rng, layer_drop_rate, rot_drop_rate, layers):
+        drop_layers = []
+
+        for lay in range(layers):
+            out = np.random.choice(np.array(range(2)), p=np.array([1 - layer_drop_rate, layer_drop_rate]))
+
+            if out == 1:  # 需dropout的层
+                drop_layers.append(lay)
+
+        keep_rot = []
+
+        for i in range(layers):
+            # 每个列表分为层
+            # 这与我们使用的 QNN 相关
+            keep_rot_layer = [list(range(n_qubits)) for j in range(1, inner_layers + 1)]
+
+            if i in drop_layers:  # 如果需要在这一层应用 dropout
+                keep_rot_layer = [] 
+                inner_keep_r = [] 
+                for param in range(params_per_layer):
+                    # 每个旋转在层内有概率 p=rot_drop_rate 被丢弃
+                    # 根据这个概率，我们为每个参数（旋转）采样
+                    # 是否需要丢弃它
+                    out = np.random.choice(np.array(range(2)), p=np.array([1 - rot_drop_rate, rot_drop_rate]))
+
+                    if out == 0:  # 如果需要保留
+                        inner_keep_r.append(param % n_qubits)  # % 是必须的，因为我们逐层工作
+                    else:  # 如果旋转需要丢弃
+                        inner_keep_r.append(-1)
+
+                    if param % n_qubits == n_qubits - 1:  # 如果是寄存器的最后一个量子比特
+                        keep_rot_layer.append(inner_keep_r)
+                        inner_keep_r = []
+
+            keep_rot.append(keep_rot_layer)
+
+        return np.array(keep_rot)
+
+    seed = 42
+    layer_drop_rate = 0.5
+    rot_drop_rate = 0.5
+    layers = 5
+    n_qubits = 4
+    inner_layers = 3
+    params_per_layer = 12
+
+    result = make_dropout(seed, layer_drop_rate, rot_drop_rate, layers)
+
+将量子线路添加至量子神经网络模块
+
+.. code-block::
+
+    class QNN(pyvqnet.nn.Module):
+        
+        def __init__(self, layers):
+            super(QNN, self).__init__()
+            self.qm = QMachine(n_qubits, dtype=pyvqnet.kcomplex64)
+            self.para = Parameter((params_per_layer * layers,))
+            
+        def forward(self, x:QTensor, keep_rot):
+            self.qm.reset_states(x.shape[0])
+            x = qnn_circuit(x, self.para, keep_rot, n_qubits, layers, self.qm)
+            
+            return x
+
+制作sin数据集
+
+.. code-block::
+
+    def make_sin_dataset(dataset_size=100, test_size=0.4, noise_value=0.4, plot=False):
+        """1D regression problem y=sin(x*\pi)"""
+        # x-axis
+        x_ax = np.linspace(-1, 1, dataset_size)
+        y = [[np.sin(x * np.pi)] for x in x_ax]
+        np.random.seed(123)
+        # noise vector
+        noise = np.array([np.random.normal(0, 0.5, 1) for i in y]) * noise_value
+        X = np.array(x_ax)
+        y = np.array(y + noise)  # apply noise
+
+        # split the dataset
+        X_train, X_test, y_train, y_test = train_test_split(
+            X, y, test_size=test_size, random_state=40, shuffle=True
+        )
+
+        X_train = X_train.reshape(-1, 1)
+        X_test = X_test.reshape(-1, 1)
+
+        y_train = y_train.reshape(-1, 1)
+        y_test = y_test.reshape(-1, 1)
+
+        return X_train, X_test, y_train, y_test
+
+    X, X_test, y, y_test = make_sin_dataset(dataset_size=20, test_size=0.25)
+
+
+    scaler = MinMaxScaler(feature_range=(-1, 1))
+    y = scaler.fit_transform(y)
+    y_test = scaler.transform(y_test)
+
+    # reshaping for computation
+    y = y.reshape(-1,)
+    y_test = y_test.reshape(-1,)
+
+
+    fig, ax = plt.subplots()
+    plt.plot(X, y, "o", label="Training")
+    plt.plot(X_test, y_test, "o", label="Test")
+
+    plt.plot(
+        np.linspace(-1, 1, 100),
+        [np.sin(x * np.pi) for x in np.linspace(-1, 1, 100)],
+        linestyle="dotted",
+        label=r"$\sin(x)$",
+    )
+    plt.ylabel(r"$y = \sin(\pi\cdot x) + \epsilon$")
+    plt.xlabel(r"$x$")
+    ax.xaxis.set_major_locator(ticker.MultipleLocator(0.5))
+    ax.yaxis.set_major_locator(ticker.MultipleLocator(0.5))
+    plt.legend()
+
+    plt.show()
+
+
+.. image:: ./images/dropout_sin.png
+   :width: 600 px
+   :align: center
+
+|
+
+模型训练代码
+
+.. code-block::
+
+    epochs = 700
+
+    n_run = 3
+    seed =1234
+    drop_rates = [(0.0, 0.0), (0.3, 0.2), (0.7, 0.7)]
+
+    train_history = {}
+    test_history = {}
+    opt_params = {}
+    layers = 3
+
+    for layer_drop_rate, rot_drop_rate in drop_rates:
+        costs_per_comb = []
+        test_costs_per_comb = []
+        opt_params_per_comb = []
+        # 多次执行
+        for tmp_seed in range(seed, seed + n_run):
+            
+            rng = np.random.default_rng(tmp_seed)
+            assert len(X.shape) == 2  # X must be a matrix
+            assert len(y.shape) == 1  # y must be an array
+            assert X.shape[0] == y.shape[0]  # compatibility check
+
+            # lists for saving single run training and test cost trend
+            costs = []
+            test_costs = []
+            model = QNN(layers)
+            optimizer = pyvqnet.optim.Adam(model.parameters(), lr=0.001)
+            loss = pyvqnet.nn.loss.MeanSquaredError()
+            
+            for epoch in range(epochs):
+                # 生成dropout列表
+                keep_rot = make_dropout(rng, layer_drop_rate, rot_drop_rate, layers)
+                # 更新rng
+                rng = np.random.default_rng(tmp_seed)
+                
+                optimizer.zero_grad()
+                data, label = QTensor(X,requires_grad=True,dtype=6), QTensor(y,
+                                                    dtype=6,
+                                                    requires_grad=False)
+
+                result = model(data, keep_rot)
+                cost = loss(label, result)
+                costs.append(cost)
+                cost.backward()
+                optimizer._step()
+
+                ## 测试
+                keep_rot = np.array(
+                    [
+                        [list(range((n_qubits))) for j in range(1, inner_layers + 1)]
+                        for i in range(layers)
+                    ]
+                )
+                
+                
+                data_test, label_test = QTensor(X_test,requires_grad=True,dtype=6), QTensor(y_test,
+                                                    dtype=6,
+                                                    requires_grad=False)
+                result_test = model(data_test, keep_rot)
+                test_cost = loss(label_test, result_test)
+                test_costs.append(test_cost)
+                
+                if epoch % 5 == 0:
+                    print(
+                        f"{layer_drop_rate:.1f}-{rot_drop_rate:.1f} ",
+                        f"run {tmp_seed-seed} - epoch {epoch}/{epochs}",
+                        f"--- Train cost:{cost}",
+                        f"--- Test cost:{test_cost}",
+                        end="\r",
+                    )
+
+            costs_per_comb.append(costs)
+            test_costs_per_comb.append(test_costs)
+            opt_params_per_comb.append(model.parameters())
+
+        train_history[(layer_drop_rate, rot_drop_rate)] = costs_per_comb
+        test_history[(layer_drop_rate, rot_drop_rate)] = test_costs_per_comb
+        opt_params[(layer_drop_rate, rot_drop_rate)] = opt_params_per_comb
+
+    ## 0.0-0.0  run 0 - epoch 695/700 --- Train cost:0.3917597 --- Test cost:0.2427316
+    ## 0.0-0.0  run 1 - epoch 695/700 --- Train cost:0.3917596 --- Test cost:0.2349882
+    ## 0.0-0.0  run 2 - epoch 695/700 --- Train cost:0.3917597 --- Test cost:0.2103992
+    ## 0.3-0.2  run 0 - epoch 695/700 --- Train cost:0.3920721 --- Test cost:0.2155183
+    ## 0.3-0.2  run 1 - epoch 695/700 --- Train cost:0.3932508 --- Test cost:0.2353068
+    ## 0.3-0.2  run 2 - epoch 695/700 --- Train cost:0.392473 --- Test cost:0.20580922
+    ## 0.7-0.7  run 0 - epoch 695/700 --- Train cost:0.3922218 --- Test cost:0.2057379
+
+通过在训练时对模型的参数们进行随机dropout方式，能够预防模型的过拟合问题，不过需要对dropout的概率进行合适的设计，不然也会导致模型训练结果不佳。
+
 
 在VQNet使用量子计算层进行模型训练
 ***************************************

@@ -7,7 +7,7 @@
 CPU下模型训练
 =================================
 
-以下的经典神经网络模块均支持自动反向传播计算。当您运行前传函数以后，再执行反向函数就可以计算梯度。一个卷积层的简单例子如下:
+以下的经典神经网络模块均支持自动反向传播计算。当您运行前传函数以后,再执行反向函数就可以计算梯度。一个卷积层的简单例子如下:
 
 .. code-block::
 
@@ -50,9 +50,9 @@ CPU下模型训练
 GPU下模型训练
 =================================
 
-您需要安装linux版本下的pyvqnet才能使用GPU。需要保证数据QTensor以及Module均在GPU上。可使用 `toGPU` 转移数据或者 `gpu` 创建副本，或者在数据创建函数中使用device指定。
+您需要安装linux版本下的pyvqnet才能使用GPU。需要保证数据QTensor以及Module均在GPU上。可使用 `toGPU` 转移数据或者 `gpu` 创建副本,或者在数据创建函数中使用device指定。
 
-请参考以下例子：
+请参考以下例子:
 
 .. code-block::
 
@@ -73,7 +73,7 @@ GPU下模型训练
     # input of shape [b,ic,hw,hw]
     x0 = arange(1,b*ic*hw*hw+1,requires_grad=True,dtype=kfloat32).reshape([b,ic,hw,hw])
 
-    #使用gpu 复制数据到DEV_GPU_0，亦可以在函数内指定ID，也可以使用相关tensor接口的device进行指定
+    #使用gpu 复制数据到DEV_GPU_0,亦可以在函数内指定ID,也可以使用相关tensor接口的device进行指定
     x0 = x0.GPU(DEV_GPU_0)
     x0.requires_grad = True
     #forward function
@@ -184,14 +184,14 @@ toGPU
 
     将模块和其子模块的参数和缓冲数据移动到指定的 GPU 设备中。
 
-    device 指定存储其内部数据的设备。 当device >= DEV_GPU_0时，数据存储在GPU上。如果您的计算机有多个GPU，
+    device 指定存储其内部数据的设备。 当device >= DEV_GPU_0时,数据存储在GPU上。如果您的计算机有多个GPU,
     则可以指定不同的设备来存储数据。例如device = DEV_GPU_1 , DEV_GPU_2, DEV_GPU_3, ... 表示存储在不同序列号的GPU上。
     
     .. note::
         Module在不同GPU上无法进行计算。
-        如果您尝试在 ID 超过验证 GPU 最大数量的 GPU 上创建 QTensor，将引发 Cuda 错误。
+        如果您尝试在 ID 超过验证 GPU 最大数量的 GPU 上创建 QTensor,将引发 Cuda 错误。
 
-    :param device: 当前保存QTensor的设备，默认=DEV_GPU_0。device= pyvqnet.DEV_GPU_0，存储在第一个 GPU 中，devcie = DEV_GPU_1，存储在第二个 GPU 中，依此类推
+    :param device: 当前保存QTensor的设备,默认=DEV_GPU_0。device= pyvqnet.DEV_GPU_0,存储在第一个 GPU 中,devcie = DEV_GPU_1,存储在第二个 GPU 中,依此类推
     :return: Module 移动到 GPU 设备。
 
     Examples::
@@ -224,7 +224,7 @@ toCPU
 模型参数保存和载入
 *********************************************************
 
-以下接口可以进行模型参数保存到文件中，或从文件中读取参数文件。但请注意，文件中不保存模型结构，需要用户手动构建模型结构。
+以下接口可以进行模型参数保存到文件中,或从文件中读取参数文件。但请注意,文件中不保存模型结构,需要用户手动构建模型结构。
 
 save_parameters
 =================================
@@ -293,7 +293,7 @@ ModuleList
 .. py:class:: pyvqnet.nn.module.ModuleList([pyvqnet.nn.module.Module])
 
 
-    将子模块保存在列表中。 ModuleList 可以像普通的 Python 列表一样被索引， 它包含的Module的内部参数等可以被保存起来。
+    将子模块保存在列表中。 ModuleList 可以像普通的 Python 列表一样被索引, 它包含的Module的内部参数等可以被保存起来。
 
     :param modules: nn.Modules 列表
 
@@ -357,7 +357,7 @@ ParameterList
 .. py:class:: pyvqnet.nn.module.ParameterList([pyvqnet.nn.module.Module])
 
 
-    将参数保存在列表中, ParameterList 可以像普通的 Python 列表一样被索引， 它包含的Parameter的内部参数等可以被保存起来。
+    将参数保存在列表中, ParameterList 可以像普通的 Python 列表一样被索引, 它包含的Parameter的内部参数等可以被保存起来。
 
     :param modules: nn.Parameter 列表
 
@@ -385,7 +385,7 @@ Sequential
 *********************************************************
 .. py:class:: pyvqnet.nn.module.Sequential([pyvqnet.nn.module.Module])
 
-    模块将按照传递的顺序添加模块。或者，也可以将模块的 ``OrderedDict`` 传入。``Sequential`` 的 ``forward()`` 方法接受任何输入，并将其转发给它的第一个模块。
+    模块将按照传递的顺序添加模块。或者,也可以将模块的 ``OrderedDict`` 传入。``Sequential`` 的 ``forward()`` 方法接受任何输入,并将其转发给它的第一个模块。
     然后将输出依次 "链 "到其后每个模块的输入、最后返回最后一个模块的输出。
 
     :param modules: 添加的Module
@@ -419,7 +419,7 @@ Sequential
 经典神经网络层
 *********************************************************
 
-以下实现了一些经典神经网络层：卷积，转置卷积，池化，归一化，循环神经网络等。
+以下实现了一些经典神经网络层:卷积,转置卷积,池化,归一化,循环神经网络等。
 
 
 Conv1D
@@ -433,13 +433,13 @@ Conv1D
     :param output_channels: `int` - 输出数据的通道数。
     :param kernel_size: `int` - 卷积核的尺寸. 卷积核形状 = [output_channels,input_channels/group,kernel_size,1]。
     :param stride: `int` - 步长, 默认为1。
-    :param padding: `str|int` - 填充选项, 它可以是一个字符串 {'valid', 'same'} 或一个整数，给出应用在输入上的填充量。 默认 "valid"。
+    :param padding: `str|int` - 填充选项, 它可以是一个字符串 {'valid', 'same'} 或一个整数,给出应用在输入上的填充量。 默认 "valid"。
     :param use_bias: `bool` - 是否使用偏置项, 默认使用。
     :param kernel_initializer: `callable` - 卷积核初始化方法。默认为空,使用kaiming_uniform。
     :param bias_initializer: `callable` - 偏置初始化方法。默认为空,使用kaiming_uniform。
     :param dilation_rate: `int` - 空洞大小,defaults: 1。
     :param group: `int` -  分组卷积的分组数. Default: 1。
-    :param dtype: 参数的数据类型，defaults：None，使用默认数据类型:kfloat32,代表32位浮点数。
+    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
     :param name: 模块的名字,default:""。
 
     :return: 一维卷积实例。
@@ -482,13 +482,13 @@ Conv2D
     :param output_channels: `int` - 输出数据的通道数。
     :param kernel_size: `tuple|list` - 卷积核的尺寸. 卷积核形状 = [output_channels,input_channels/group,kernel_size,kernel_size]。
     :param stride: `tuple|list` - 步长, 默认为 (1, 1)|[1,1]。
-    :param padding: `str|tuple` - 填充选项, 它可以是一个字符串 {'valid', 'same'} 或一个整数元组，给出在两边应用的隐式填充量。 默认 "valid"。
+    :param padding: `str|tuple` - 填充选项, 它可以是一个字符串 {'valid', 'same'} 或一个整数元组,给出在两边应用的隐式填充量。 默认 "valid"。
     :param use_bias: `bool` - 是否使用偏置项, 默认使用。
     :param kernel_initializer: `callable` - 卷积核初始化方法。默认为空,使用kaiming_uniform。
     :param bias_initializer: `callable` - 偏置初始化方法。默认为空,使用kaiming_uniform。
     :param dilation_rate: `int` - 空洞大小,defaults: 1。
     :param group: `int` -  分组卷积的分组数. Default: 1。
-    :param dtype: 参数的数据类型，defaults：None，使用默认数据类型:kfloat32,代表32位浮点数。
+    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
     :param name: 模块的名字,default:""。
 
     :return: 二维卷积实例。
@@ -531,7 +531,7 @@ Conv2D
 ConvT2D
 =================================
 
-.. py:class:: pyvqnet.nn.ConvT2D(input_channels,output_channels,kernel_size,stride=[1, 1],padding="valid",use_bias="True", kernel_initializer=None,bias_initializer=None, dilation_rate: int = 1, group: int = 1, dtype = None, name = "")
+.. py:class:: pyvqnet.nn.ConvT2D(input_channels,output_channels,kernel_size,stride=[1, 1],padding="valid",use_bias="True", kernel_initializer=None,bias_initializer=None, dilation_rate: int = 1, out_padding = (0,0), group: int = 1, dtype = None, name = "")
 
     在输入上进行二维转置卷积运算。 Conv2D模块的输入具有形状(batch_size, input_channels, height, width)。
 
@@ -539,13 +539,14 @@ ConvT2D
     :param output_channels: `int` - 输出数据的通道数。
     :param kernel_size: `tuple|list` - 卷积核的尺寸,卷积核形状 = [input_channels,output_channels/group,kernel_size,kernel_size]。 
     :param stride: `tuple|list` - 步长, 默认为 (1, 1)|[1,1]。
-    :param padding: `str|tuple` - 填充选项, 它可以是一个字符串 {'valid', 'same'} 或一个整数元组，给出在两边应用的隐式填充量。 默认 "valid"。
+    :param padding: `str|tuple` - 填充选项, 它可以是一个字符串 {'valid', 'same'} 或一个整数元组,给出在两边应用的隐式填充量。 默认 "valid"。
     :param use_bias: `bool` - 是否使用偏置项, 默认使用。
     :param kernel_initializer: `callable` - 卷积核初始化方法。默认为空,使用kaiming_uniform。
     :param bias_initializer: `callable` - 偏置项初始化方法。默认为空,使用kaiming_uniform。
     :param dilation_rate: `int` - 空洞大小,defaults: 1。
+    :param out_padding: 在输出形状中每个维度的一侧添加的额外尺寸。默认值:(0,0)
     :param group: `int` -  分组卷积的分组数. Default: 1。
-    :param dtype: 参数的数据类型，defaults：None，使用默认数据类型:kfloat32,代表32位浮点数。
+    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
     :param name: 模块的名字,default:""。
 
     :return: 二维转置卷积实例。
@@ -674,7 +675,7 @@ AvgPool2D
 
     :param kernel: 平均池化的窗口大小。
     :param strides: 窗口移动的步长。
-    :param padding: 填充选项, "valid" or "same" 或包含2个整数的元组，整数为两个维度上的填充长度。 默认 "valid"。
+    :param padding: 填充选项, "valid" or "same" 或包含2个整数的元组,整数为两个维度上的填充长度。 默认 "valid"。
     :param name: 命名,默认为""。
 
     :return: 二维平均池化层实例。
@@ -711,7 +712,7 @@ MaxPool2D
 
     :param kernel: 最大池化的窗口大小。
     :param strides: 窗口移动的步长。
-    :param padding: 填充选项, "valid" or "same" 或包含2个整数的元组，整数为两个维度上的填充长度。 默认 "valid"。
+    :param padding: 填充选项, "valid" or "same" 或包含2个整数的元组,整数为两个维度上的填充长度。 默认 "valid"。
     :param name: 命名,默认为""。
 
     :return: 二维最大池化层实例。
@@ -751,7 +752,7 @@ Embedding
     :param num_embeddings: `int` - 嵌入字典的大小。
     :param embedding_dim: `int` - 每个嵌入向量的大小
     :param weight_initializer: `callable` - 参数初始化方式,默认正态分布。
-    :param dtype: 参数的数据类型，defaults：None，使用默认数据类型:kfloat32,代表32位浮点数。
+    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
     :param name: 嵌入层的命名,默认为""。
 
     :return: a Embedding 实例。
@@ -799,7 +800,7 @@ Embedding
 BatchNorm2d
 =================================
 
-.. py:class:: pyvqnet.nn.BatchNorm2d(channel_num:int, momentum:float=0.1, epsilon:float = 1e-5,beta_initializer=zeros, gamma_initializer=ones, dtype=None, name="")
+.. py:class:: pyvqnet.nn.BatchNorm2d(channel_num:int, momentum:float=0.1, epsilon:float = 1e-5,affine = True, beta_initializer=zeros, gamma_initializer=ones, dtype=None, name="")
     
     在 4D 输入(B、C、H、W)上应用批归一化。参照论文
     `Batch Normalization: Accelerating Deep Network Training by Reducing
@@ -813,10 +814,11 @@ BatchNorm2d
 
     :param channel_num: `int` - 输入通道数。
     :param momentum: `float` - 计算指数加权平均时的动量,默认为 0.1。
+    :param epsilon: `float` - 数值稳定参数, 默认 1e-5。
+    :param affine: `bool` - 一个布尔值,当设置为 ``True`` 时,此模块具有可学习的每通道仿射参数,初始化为 1(用于权重）和 0(用于偏差）。默认值:``True``。
     :param beta_initializer: `callable` - beta的初始化方式,默认全零初始化。
     :param gamma_initializer: `callable` - gamma的的初始化方式,默认全一初始化。
-    :param epsilon: `float` - 数值稳定参数, 默认 1e-5。
-    :param dtype: 参数的数据类型，defaults：None，使用默认数据类型:kfloat32,代表32位浮点数。
+    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
     :param name: 批归一化层命名,默认为""。
 
     :return: 二维批归一化层实例。
@@ -860,7 +862,7 @@ BatchNorm2d
 BatchNorm1d
 =================================
 
-.. py:class:: pyvqnet.nn.BatchNorm1d(channel_num:int, momentum:float=0.1, epsilon:float = 1e-5, beta_initializer=zeros, gamma_initializer=ones, dtype=None, name="")
+.. py:class:: pyvqnet.nn.BatchNorm1d(channel_num:int, momentum:float=0.1, epsilon:float = 1e-5, affine = True, beta_initializer=zeros, gamma_initializer=ones, dtype=None, name="")
 
     在 2D 输入 (B,C) 上进行批归一化操作。 参照论文
     `Batch Normalization: Accelerating Deep Network Training by Reducing
@@ -875,11 +877,11 @@ BatchNorm1d
 
     :param channel_num: `int` - 输入通道数。
     :param momentum: `float` - 计算指数加权平均时的动量,默认为 0.1。
+    :param epsilon: `float` - 数值稳定性常数,默认为 1e-5。
+    :param affine: `bool` - 一个布尔值,当设置为 ``True`` 时,此模块具有可学习的每通道仿射参数,初始化为 1(用于权重）和 0(用于偏差）。默认值:``True``。
     :param beta_initializer: `callable` - beta的初始化方式,默认全零初始化。
     :param gamma_initializer: `callable` - gamma的的初始化方式,默认全一初始化。
-    :param epsilon: `float` - 数值稳定性常数,默认为 1e-5。
-    :param dtype: 参数的数据类型，defaults：None，使用默认数据类型:kfloat32,代表32位浮点数。
-    
+    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
     :param name: 批归一化层命名,默认为""。
 
     :return: 一维批归一化层实例。
@@ -908,7 +910,7 @@ BatchNorm1d
 LayerNormNd
 =================================
 
-.. py:class:: pyvqnet.nn.layer_norm.LayerNormNd(normalized_shape: list, epsilon: float = 1e-5, affine: bool = True, dtype=None, name="")
+.. py:class:: pyvqnet.nn.layer_norm.LayerNormNd(normalized_shape: list, epsilon: float = 1e-5,affine=True, dtype=None, name="")
 
     在任意输入的后D个维度上进行层归一化。具体方式如论文所述:
     `Layer Normalization <https://arxiv.org/abs/1607.06450>`__。
@@ -916,13 +918,13 @@ LayerNormNd
     .. math::
         y = \frac{x - \mathrm{E}[x]}{ \sqrt{\mathrm{Var}[x] + \epsilon}} * \gamma + \beta
 
-    对于像 (B,C,H,W,D) 这样的输入， ``norm_shape`` 可以是 [C,H,W,D],[H,W,D],[W,D] 或 [D] .
+    对于像 (B,C,H,W,D) 这样的输入, ``norm_shape`` 可以是 [C,H,W,D],[H,W,D],[W,D] 或 [D] .
 
     :param norm_shape: `float` - 标准化形状。
-    :param epsilon: `float` - 数值稳定性常数，默认为 1e-5。
-    :param affine: `bool` - 是否使用应用仿射变换，默认为 True。
-    :param dtype: 参数的数据类型，defaults：None，使用默认数据类型:kfloat32,代表32位浮点数。
-    :param name: 这个模块的名字， 默认为""。
+    :param epsilon: `float` - 数值稳定性常数,默认为 1e-5。
+    :param affine: `bool` - 一个布尔值,当设置为 ``True`` 时,此模块具有可学习的每通道仿射参数,初始化为 1(用于权重）和 0(用于偏差）。默认值:``True``。
+    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
+    :param name: 这个模块的名字, 默认为""。
 
     :return: 一个 LayerNormNd 类
 
@@ -950,7 +952,7 @@ LayerNormNd
 LayerNorm2d
 =================================
 
-.. py:class:: pyvqnet.nn.layer_norm.LayerNorm2d(norm_size:int, epsilon:float = 1e-5,  affine: bool = True, dtype=None, name="")
+.. py:class:: pyvqnet.nn.layer_norm.LayerNorm2d(norm_size:int, epsilon:float = 1e-5, affine=True, dtype=None, name="")
 
     在 4D 输入上进行层归一化。具体方式如论文所述:
     `Layer Normalization <https://arxiv.org/abs/1607.06450>`__。
@@ -962,9 +964,9 @@ LayerNorm2d
 
     :param norm_size: `float` - 归一化大小,应该等于 C * H * W。
     :param epsilon: `float` - 数值稳定性常数,默认为 1e-5。
-    :param affine: `bool` - 是否使用应用仿射变换，默认为 True。
-    :param dtype: 参数的数据类型，defaults：None，使用默认数据类型:kfloat32,代表32位浮点数。
-    :param name: 这个模块的名字， 默认为""。
+    :param affine: `bool` - 一个布尔值,当设置为 ``True`` 时,此模块具有可学习的每通道仿射参数,初始化为 1(用于权重）和 0(用于偏差）。默认值:``True``。
+    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
+    :param name: 这个模块的名字, 默认为""。
 
     :return: 二维层归一化实例。
 
@@ -1003,7 +1005,7 @@ LayerNorm2d
 LayerNorm1d
 =================================
 
-.. py:class:: pyvqnet.nn.layer_norm.LayerNorm1d(norm_size:int, epsilon:float = 1e-5, affine: bool = True, dtype=None, name="")
+.. py:class:: pyvqnet.nn.layer_norm.LayerNorm1d(norm_size:int, epsilon:float = 1e-5, affine=True, dtype=None, name="")
     
     在 2D 输入上进行层归一化。具体方式如论文所述:
     `Layer Normalization <https://arxiv.org/abs/1607.06450>`__。
@@ -1015,9 +1017,9 @@ LayerNorm1d
 
     :param norm_size: `float` - 归一化大小,应该等于最后一维大小。
     :param epsilon: `float` - 数值稳定性常数,默认为 1e-5。
-    :param affine: `bool` - 是否使用应用仿射变换，默认为 True。
-    :param dtype: 参数的数据类型，defaults：None，使用默认数据类型:kfloat32,代表32位浮点数。
-    :param name: 这个模块的名字， 默认为""。
+    :param affine: `bool` - 一个布尔值,当设置为 ``True`` 时,此模块具有可学习的每通道仿射参数,初始化为 1(用于权重）和 0(用于偏差）。默认值:``True``。
+    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
+    :param name: 这个模块的名字, 默认为""。
 
     :return: 一维层归一化实例。
 
@@ -1038,7 +1040,41 @@ LayerNorm1d
         # [-1.3416355, -0.4472118, 0.4472118, 1.3416355],
         # [-1.3416355, -0.4472118, 0.4472118, 1.3416355]
         # ]
+
+
+GroupNorm
+===========================================================
+
+.. py:class:: pyvqnet.nn.group_norm.GroupNorm(num_groups: int, num_channels: int, epsilon = 1e-5, affine = True, dtype = None, name = "")
+
+    对小批量输入应用组归一化。输入: :math:`(N, C, *)` 其中 :math:`C=\text{num_channels}` , 输出: :math:`(N, C, *)` 。
+
+    此层实现论文 `组归一化 <https://arxiv.org/abs/1803.08494>`__ 中描述的操作。
+
+    .. math::
         
+        y = \frac{x - \mathrm{E}[x]}{ \sqrt{\mathrm{Var}[x] + \epsilon}} * \gamma + \beta
+
+    输入通道被分成 :attr:`num_groups` 组,每组包含 ``num_channels / num_groups`` 个通道。:attr:`num_channels` 必须能被 :attr:`num_groups` 整除。平均值和标准差是在每个组中分别计算的。如果 :attr:`affine` 为 ``True``,则 :math:`\gamma` 和 :math:`\beta` 是可学习的。每个通道仿射变换参数向量,大小为 :attr:`num_channels`。
+
+    :param num_groups (int): 将通道分成的组数
+    :param num_channels (int): 输入中预期的通道数
+    :param eps: 添加到分母的值,以实现数值稳定性。默认值:1e-5
+    :param affine: 一个布尔值,当设置为 ``True`` 时,此模块具有可学习的每通道仿射参数,初始化为 1(用于权重）和 0(用于偏差）。默认值: ``True``。
+    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
+    :param name: 这个模块的名字, 默认为""。
+
+    :return: GroupNorm 类
+
+    Example::
+
+        import numpy as np
+        from pyvqnet.tensor import QTensor,kfloat32
+        from pyvqnet.nn import GroupNorm
+        test_conv = GroupNorm(2,10)
+        x = QTensor(np.arange(0,60*2*5).reshape([2,10,3,2,5]),requires_grad=True,dtype=kfloat32)
+        y = test_conv.forward(x)
+        print(y)
 
 Linear
 =================================
@@ -1053,7 +1089,7 @@ Linear
     :param weight_initializer: `callable` - 权重初始化函数,默认为空,使用he_uniform。
     :param bias_initializer: `callable` - 偏置初始化参数,默认为空,使用he_uniform。
     :param use_bias: `bool` - 是否使用偏置项, 默认使用。
-    :param dtype: 参数的数据类型，defaults：None，使用默认数据类型:kfloat32,代表32位浮点数。
+    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
     :param name: 线性层的命名,默认为""。
 
     :return: 线性层实例。
@@ -1092,7 +1128,7 @@ Dropout
     Dropout 模块。dropout 模块将一些单元的输出随机设置为零,同时根据给定的 dropout_rate 概率升级其他单元。
 
     :param dropout_rate: `float` - 神经元被设置为零的概率。
-    :param name: 这个模块的名字， 默认为""。
+    :param name: 这个模块的名字, 默认为""。
 
     :return: Dropout实例。
 
@@ -1122,16 +1158,42 @@ Dropout
         #  [0., 14.]]]
         # ]
 
+
+DropPath
+=================================
+
+.. py:class:: pyvqnet.nn.dropout.DropPath(dropout_rate = 0.5,name="")
+
+    DropPath 模块将逐样本丢弃路径(随机深度）。
+
+    :param dropout_rate: `float` - 神经元被设置为零的概率。
+    :param name: 这个模块的名字, 默认为""。
+
+    :return: DropPath实例。
+
+    Example::
+
+        import pyvqnet.nn as nn
+        import pyvqnet.tensor as tensor
+
+        x = tensor.randu([4])
+        y = nn.DropPath()(x)
+        print(y)
+        #[0.9074978,0.9350062,0.6896403,0.3541051]
+
+
+
+
 Pixel_Shuffle 
 =================================
 
 .. py:class:: pyvqnet.nn.pixel_shuffle.Pixel_Shuffle(upscale_factors, name="")
 
-    重新排列形状为：(*, C * r^2, H, W)  的张量
-    到形状为 (*, C, H * r, W * r) 的张量，其中 r 是尺度变换因子。
+    重新排列形状为:(*, C * r^2, H, W)  的张量
+    到形状为 (*, C, H * r, W * r) 的张量,其中 r 是尺度变换因子。
 
     :param upscale_factors: 增加尺度变换的因子
-    :param name: 这个模块的名字， 默认为""。
+    :param name: 这个模块的名字, 默认为""。
 
     :return:
             Pixel_Shuffle 模块
@@ -1152,10 +1214,10 @@ Pixel_Unshuffle
 
 .. py:class:: pyvqnet.nn.pixel_shuffle.Pixel_Unshuffle(downscale_factors, name="")
 
-    通过重新排列元素来反转 Pixel_Shuffle 操作. 将 (*, C, H * r, W * r) 形状的张量变化为 (*, C * r^2, H, W) ，其中 r 是缩小因子。
+    通过重新排列元素来反转 Pixel_Shuffle 操作. 将 (*, C, H * r, W * r) 形状的张量变化为 (*, C * r^2, H, W) ,其中 r 是缩小因子。
 
     :param downscale_factors: 增加尺度变换的因子
-    :param name: 这个模块的名字， 默认为""。
+    :param name: 这个模块的名字, 默认为""。
 
     :return:
             Pixel_Unshuffle 模块
@@ -1178,7 +1240,7 @@ GRU
 .. py:class:: pyvqnet.nn.gru.GRU(input_size, hidden_size, num_layers=1, nonlinearity='tanh', batch_first=True, use_bias=True, bidirectional=False, dtype=None, name: str = "")
 
 
-    门控循环单元 (GRU) 模块。支持多层堆叠，双向配置。单层单向GRU的计算公式如下:
+    门控循环单元 (GRU) 模块。支持多层堆叠,双向配置。单层单向GRU的计算公式如下:
 
     .. math::
         \begin{array}{ll}
@@ -1190,13 +1252,13 @@ GRU
 
     :param input_size: 输入特征维度。
     :param hidden_size:  隐藏特征维度。
-    :param num_layers: 堆叠GRU层数， 默认: 1。
-    :param batch_first: 如果为 True， 则输入形状为 [batch_size,seq_len,feature_dim]，
-     如果为 False， 则输入形状为 [seq_len,batch_size,feature_dim]，默认为 True。
-    :param use_bias: 如果为 False，该模块不适用偏置项，默认: True。
-    :param bidirectional: 如果为 True, 变为双向GRU， 默认: False。
-    :param dtype: 参数的数据类型，defaults：None，使用默认数据类型:kfloat32,代表32位浮点数。
-    :param name: 这个模块的名字， 默认为""。
+    :param num_layers: 堆叠GRU层数, 默认: 1。
+    :param batch_first: 如果为 True, 则输入形状为 [batch_size,seq_len,feature_dim],
+     如果为 False, 则输入形状为 [seq_len,batch_size,feature_dim],默认为 True。
+    :param use_bias: 如果为 False,该模块不适用偏置项,默认: True。
+    :param bidirectional: 如果为 True, 变为双向GRU, 默认: False。
+    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
+    :param name: 这个模块的名字, 默认为""。
 
     :return: GRU 实例
 
@@ -1251,7 +1313,7 @@ RNN
 .. py:class:: pyvqnet.nn.rnn.RNN(input_size, hidden_size, num_layers=1, nonlinearity='tanh', batch_first=True, use_bias=True, bidirectional=False, dtype=None, name: str = "")
 
 
-    循环神经网络(RNN)模块，使用 :math:`\tanh` 或 :math:`\text{ReLU}` 作为激活函数。支持双向，多层配置。
+    循环神经网络(RNN)模块,使用 :math:`\tanh` 或 :math:`\text{ReLU}` 作为激活函数。支持双向,多层配置。
     单层单向RNN计算公式如下:
 
     .. math::
@@ -1261,14 +1323,14 @@ RNN
 
     :param input_size: 输入特征维度。
     :param hidden_size:  隐藏特征维度。
-    :param num_layers: 堆叠RNN层数， 默认: 1。
-    :param nonlinearity: 非线性激活函数，默认为 ``'tanh'``。
-    :param batch_first: 如果为 True， 则输入形状为 [batch_size,seq_len,feature_dim]，
-     如果为 False， 则输入形状为 [seq_len,batch_size,feature_dim]，默认为 True。
-    :param use_bias: 如果为 False， 该模块不适用偏置项，默认: True。
-    :param bidirectional: 如果为 True，变为双向RNN，默认: False。
-    :param dtype: 参数的数据类型，defaults：None，使用默认数据类型:kfloat32,代表32位浮点数。
-    :param name: 这个模块的名字， 默认为""。
+    :param num_layers: 堆叠RNN层数, 默认: 1。
+    :param nonlinearity: 非线性激活函数,默认为 ``'tanh'``。
+    :param batch_first: 如果为 True, 则输入形状为 [batch_size,seq_len,feature_dim],
+     如果为 False, 则输入形状为 [seq_len,batch_size,feature_dim],默认为 True。
+    :param use_bias: 如果为 False, 该模块不适用偏置项,默认: True。
+    :param bidirectional: 如果为 True,变为双向RNN,默认: False。
+    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
+    :param name: 这个模块的名字, 默认为""。
 
     :return: RNN 实例
 
@@ -1342,7 +1404,7 @@ LSTM
 
 .. py:class:: pyvqnet.nn.lstm.LSTM(input_size, hidden_size, num_layers=1, batch_first=True, use_bias=True, bidirectional=False, dtype=None, name: str = "")
 
-    长短期记忆(LSTM)模块。支持双向LSTM， 堆叠多层LSTM等配置。单层单向LSTM计算公式如下:
+    长短期记忆(LSTM)模块。支持双向LSTM, 堆叠多层LSTM等配置。单层单向LSTM计算公式如下:
 
     .. math::
         \begin{array}{ll} \\
@@ -1356,13 +1418,13 @@ LSTM
 
     :param input_size: 输入特征维度。
     :param hidden_size:  隐藏特征维度。
-    :param num_layers: 堆叠LSTM层数，默认: 1。
-    :param batch_first: 如果为 True，则输入形状为 [batch_size,seq_len,feature_dim]，
-     如果为 False, 则输入形状为 [seq_len,batch_size,feature_dim]，默认为 True。
-    :param use_bias: 如果为 False，该模块不适用偏置项， 默认: True。
-    :param bidirectional: 如果为 True，变为双向LSTM， 默认: False。
-    :param dtype: 参数的数据类型，defaults：None，使用默认数据类型:kfloat32,代表32位浮点数。
-    :param name: 这个模块的名字， 默认为""。
+    :param num_layers: 堆叠LSTM层数,默认: 1。
+    :param batch_first: 如果为 True,则输入形状为 [batch_size,seq_len,feature_dim],
+     如果为 False, 则输入形状为 [seq_len,batch_size,feature_dim],默认为 True。
+    :param use_bias: 如果为 False,该模块不适用偏置项, 默认: True。
+    :param bidirectional: 如果为 True,变为双向LSTM, 默认: False。
+    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
+    :param name: 这个模块的名字, 默认为""。
 
     :return: LSTM 实例
 
@@ -1459,10 +1521,10 @@ Dynamic_GRU
     ``tensor.PackedSequence`` 类可以构造为
     连续调用下一个函数: ``pad_sequence`` 、 ``pack_pad_sequence``。
 
-    Dynamic_GRU 的第一个输出也是一个 ``tensor.PackedSequence`` 类，
+    Dynamic_GRU 的第一个输出也是一个 ``tensor.PackedSequence`` 类,
     可以使用 ``tensor.pad_pack_sequence`` 将其解压缩为普通 QTensor。
 
-    对于输入序列中的每个元素，每一层计算以下公式：
+    对于输入序列中的每个元素,每一层计算以下公式:
 
     .. math::
         \begin{array}{ll}
@@ -1475,12 +1537,12 @@ Dynamic_GRU
 
     :param input_size: 输入特征维度。
     :param hidden_size: 隐藏的特征维度。
-    :param num_layers: 循环层数。 默认值：1
-    :param batch_first: 如果为 True，输入形状提供为 [批大小,序列长度,特征维度]。如果为 False，输入形状提供为 [序列长度,批大小,特征维度]，默认为 True。
-    :param use_bias: 如果为False，则该层不使用偏置权重b_ih和b_hh。 默认值：True。
-    :param bidirectional: 如果为真，则成为双向 GRU。 默认值：False。
-    :param dtype: 参数的数据类型，defaults：None，使用默认数据类型:kfloat32,代表32位浮点数。
-    :param name: 这个模块的名字， 默认为""。
+    :param num_layers: 循环层数。 默认值:1
+    :param batch_first: 如果为 True,输入形状提供为 [批大小,序列长度,特征维度]。如果为 False,输入形状提供为 [序列长度,批大小,特征维度],默认为 True。
+    :param use_bias: 如果为False,则该层不使用偏置权重b_ih和b_hh。 默认值:True。
+    :param bidirectional: 如果为真,则成为双向 GRU。 默认值:False。
+    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
+    :param name: 这个模块的名字, 默认为""。
 
     :return: 一个 Dynamic_GRU 类
 
@@ -1550,10 +1612,10 @@ Dynamic_RNN
     ``tensor.PackedSequence`` 类可以构造为
     连续调用下一个函数: ``pad_sequence`` 、 ``pack_pad_sequence``。
 
-    Dynamic_RNN 的第一个输出也是一个 ``tensor.PackedSequence`` 类，
+    Dynamic_RNN 的第一个输出也是一个 ``tensor.PackedSequence`` 类,
     可以使用 ``tensor.pad_pack_sequence`` 将其解压缩为普通 QTensor。
 
-    循环神经网络(RNN)模块，使用 :math:`\tanh` 或 :math:`\text{ReLU}` 作为激活函数。支持双向，多层配置。
+    循环神经网络(RNN)模块,使用 :math:`\tanh` 或 :math:`\text{ReLU}` 作为激活函数。支持双向,多层配置。
     单层单向RNN计算公式如下:
 
     .. math::
@@ -1563,14 +1625,14 @@ Dynamic_RNN
 
     :param input_size: 输入特征维度。
     :param hidden_size:  隐藏特征维度。
-    :param num_layers: 堆叠RNN层数， 默认: 1。
-    :param nonlinearity: 非线性激活函数，默认为 ``'tanh'``。
-    :param batch_first: 如果为 True， 则输入形状为 [批大小,序列长度,特征维度]，
-     如果为 False， 则输入形状为 [序列长度,批大小,特征维度]，默认为 True。
-    :param use_bias: 如果为 False， 该模块不适用偏置项，默认: True。
-    :param bidirectional: 如果为 True，变为双向RNN，默认: False。
-    :param dtype: 参数的数据类型，defaults：None，使用默认数据类型:kfloat32,代表32位浮点数。
-    :param name: 这个模块的名字， 默认为""。
+    :param num_layers: 堆叠RNN层数, 默认: 1。
+    :param nonlinearity: 非线性激活函数,默认为 ``'tanh'``。
+    :param batch_first: 如果为 True, 则输入形状为 [批大小,序列长度,特征维度],
+     如果为 False, 则输入形状为 [序列长度,批大小,特征维度],默认为 True。
+    :param use_bias: 如果为 False, 该模块不适用偏置项,默认: True。
+    :param bidirectional: 如果为 True,变为双向RNN,默认: False。
+    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
+    :param name: 这个模块的名字, 默认为""。
 
     :return: Dynamic_RNN 实例
 
@@ -1644,10 +1706,10 @@ Dynamic_LSTM
     ``tensor.PackedSequence`` 类可以构造为
     连续调用下一个函数: ``pad_sequence`` 、 ``pack_pad_sequence``。
 
-    Dynamic_LSTM 的第一个输出也是一个 ``tensor.PackedSequence`` 类，
+    Dynamic_LSTM 的第一个输出也是一个 ``tensor.PackedSequence`` 类,
     可以使用 ``tensor.pad_pack_sequence`` 将其解压缩为普通 QTensor。
 
-    循环神经网络(RNN)模块，使用 :math:`\tanh` 或 :math:`\text{ReLU}` 作为激活函数。支持双向，多层配置。
+    循环神经网络(RNN)模块,使用 :math:`\tanh` 或 :math:`\text{ReLU}` 作为激活函数。支持双向,多层配置。
     单层单向RNN计算公式如下:
 
     .. math::
@@ -1662,13 +1724,13 @@ Dynamic_LSTM
 
     :param input_size: 输入特征维度。
     :param hidden_size:  隐藏特征维度。
-    :param num_layers: 堆叠LSTM层数，默认: 1。
-    :param batch_first: 如果为 True，则输入形状为 [批大小,序列长度,特征维度]，
-     如果为 False, 则输入形状为 [序列长度,批大小,特征维度]，默认为 True。
-    :param use_bias: 如果为 False，该模块不适用偏置项， 默认: True。
-    :param bidirectional: 如果为 True，变为双向LSTM， 默认: False。
-    :param dtype: 参数的数据类型，defaults：None，使用默认数据类型:kfloat32,代表32位浮点数。
-    :param name: 这个模块的名字， 默认为""。
+    :param num_layers: 堆叠LSTM层数,默认: 1。
+    :param batch_first: 如果为 True,则输入形状为 [批大小,序列长度,特征维度],
+     如果为 False, 则输入形状为 [序列长度,批大小,特征维度],默认为 True。
+    :param use_bias: 如果为 False,该模块不适用偏置项, 默认: True。
+    :param bidirectional: 如果为 True,变为双向LSTM, 默认: False。
+    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
+    :param name: 这个模块的名字, 默认为""。
 
     :return: Dynamic_LSTM 实例
 
@@ -1731,6 +1793,231 @@ Dynamic_LSTM
         # ]
         # [3 4 1]
 
+
+
+Interpolate
+=================================
+.. py:class:: pyvqnet.nn.Interpolate(size = None, scale_factor = None, mode = "nearest", align_corners = None,  recompute_scale_factor = None, name = "")
+
+    向下/向上对输入进行采样。
+
+    目前只支持四维输入数据。
+
+    输入尺寸的解释形式为 `B x C x H x W`。
+
+    可用于选择的 `mode` 有 ``nearest`` 、``bilinear`` 、``bicubic``.
+
+    :param size: 输出大小，默认为None。
+    :param scale_factor: 缩放因子，默认为None。
+    :param mode: 用于上采样的算法  ``nearest`` | ``bilinear`` | ``bicubic``.
+    :param align_corners:  从几何学角度看，我们将输入和输出的像素点视为方形而不是点。输入和输出的像素点视为正方形，而不是点。
+            如果设置为 `true`，输入和输出张量将根据其角像素的中心点对齐。角像素的中心点对齐，保留角像素的值。
+            如果设置为 `false`，输入和输出张量将按其角像素的角点对齐，而角像素的值将保留。角像素的角点对齐，插值会使用边缘值填充
+            对超出边界的值进行填充，从而使此操作与输入大小无关。
+            当 ``scale_factor`` 保持不变时。这只有在 ``mode`` 为 ``bilinear`` 时才有效。
+    :param recompute_scale_factor: 重新计算缩放因子，以便在插值计算中使用。 当 ``scale_factor`` 作为参数传递时，它将用于来计算输出尺寸。
+    :param name: 模块名字.
+
+    Example::
+
+        from pyvqnet.nn import Interpolate
+        from pyvqnet.tensor import tensor 
+        import pyvqnet
+        pyvqnet.utils.set_random_seed(1)
+
+        import numpy as np
+        np.random.seed(0)
+
+        from time import time
+        np_ = np.random.randn(36).reshape((1, 1, 6, 6)).astype(np.float32)
+        mode_ = "bilinear"
+        size_ = 3
+
+        class model_vqnet(pyvqnet.nn.Module):
+
+            def __init__(self):
+                super().__init__()
+                self.inter = Interpolate(size = size_, mode=mode_)
+                self.ln = pyvqnet.nn.Linear(9, 1)
+                
+            def forward(self, x):
+                x = self.inter(x).reshape((1,-1))
+                x = self.ln(x)
+                return 2 * x 
+
+        input_vqnet = tensor.QTensor(np_,  dtype=pyvqnet.kfloat32, requires_grad=True).toGPU()
+        model = model_vqnet().toGPU()
+        loss_pyvqnet = pyvqnet.nn.MeanSquaredError()
+        time3 = time()
+        output_vqnet = model(input_vqnet)
+        time4 = time()
+        print(f"output_vqnet {output_vqnet} time {time4 - time3}")
+
+        l = loss_pyvqnet(tensor.QTensor([[1.0]]).toGPU(), output_vqnet)
+        l.backward()
+        print(model.parameters()[0].grad)
+
+
+fuse_module
+=================================
+.. py:class:: pyvqnet.nn.fuse_module(model)
+
+    用于模型在推理阶段的相应相邻模块融合成一个模块，减少模型推理阶段计算量, 增加模型推理速度。
+
+    目前支持的模块序列如下：
+
+    conv, bn
+
+    linear, bn
+
+    其他序列保持不变，对于这些序列将列表中的第一个模块替换成融合后的模块，其他的用 ``Identity`` 代替。
+
+    :param input: 包括融合模块的模型。
+
+    :return: 模块融合后的模型。
+
+    Examples::
+    
+        from pyvqnet import tensor 
+        from pyvqnet.nn import Linear
+        from pyvqnet.nn import Module, BatchNorm1d, BatchNorm2d, Conv1D, Conv2D
+
+        from pyvqnet.qnn.vqc import *
+        from pyvqnet.optim import Adam
+        from pyvqnet.nn import Module,BinaryCrossEntropy, Sigmoid
+        from pyvqnet.data import data_generator
+        import numpy as np
+        from pyvqnet.tensor import QTensor
+
+        from time import time
+        from pyvqnet.utils import set_random_seed
+        from pyvqnet.nn import fuse_module
+
+        def get_accuary(result, label):
+            result = (result > 0.5).astype(4)
+            score = tensor.sums(result == label)
+            return score.item()
+            
+        class Model(Module):
+            def __init__(self):
+
+                super(Model, self).__init__()
+
+                self.conv1 = Conv2D(1,2,1)
+                self.ban = BatchNorm2d(2)
+
+                self.conv2 = Conv2D(2,1,1)
+                self.li1 = Linear(64,1)
+                self.ac = Sigmoid()
+                
+            def forward(self, x):
+                x = self.conv1(x)
+                x = self.ban(x)
+                x = self.conv2(x).reshape([-1,64])
+                x = self.li1(x)
+                x = self.ac(x)
+
+                return x
+        X_train = np.random.randn(80, 1, 8, 8)
+        y_train = np.random.choice([0,1], size=(80))
+        
+        model = Model().toGPU()
+        optimizer = Adam(model.parameters(), lr = 0.001)
+        batch_size = 20
+        epoch = 80
+        loss = BinaryCrossEntropy()
+        print("start training..............")
+        model.train()
+        
+        loss_history = []
+        accuracy_history = []
+        time2 = time()
+        
+        for i in range(epoch):
+            count = 0
+            sum_loss = 0
+            accuary = 0
+            t = 0
+            for data, label in data_generator(X_train, y_train, batch_size, False):
+                optimizer.zero_grad()
+                data, label = QTensor(data,requires_grad=True).toGPU(), QTensor(label,
+                                                    dtype=6,
+                                                    requires_grad=False).toGPU()
+                
+                result = model(data)
+                
+                loss_b = loss(label.reshape([-1, 1]), result)
+                
+                loss_b.backward()
+                optimizer._step()
+
+                sum_loss += loss_b.item()
+                count += batch_size
+                accuary += get_accuary(result, label.reshape([-1,1]))
+                t = t + 1
+            
+            loss_history.append(sum_loss/count)
+            accuracy_history.append(accuary/count)
+            print(
+                f"epoch:{i}, #### loss:{sum_loss/count} #####accuray:{accuary/count}"
+            )
+        print(f"run time {time() - time2}")
+        
+        
+        model.eval()
+
+        input = tensor.randn((20, 1, 8, 8)).toGPU()
+        print(list(model.named_children()))
+        time_a = time()
+        a = model(input)
+        print(f"fuse before {time() - time_a}")
+        fuse_module(model)
+        model.toGPU()
+        print(list(model.named_children()))
+        time_b = time()
+        b = model(input)
+        print(f"fuse after {time() - time_b}")
+        
+        print(tensor.max(tensor.abs(a - b)).item())
+
+
+SDPA
+=================================
+.. py:class:: pyvqnet.transformer.e2eqvit.SDPA(attn_mask=None,dropout_p=0.,scale=None,is_causal=False)
+
+    SDPA 缩放点乘注意力机制,cpu下为math方法, gpu下为flash方法.
+
+    :param attn_mask: 注意力掩码；形状必须可以广播到注意力权重的形状。
+    :param dropout_p: Dropout 概率，如果大于 0.0, 则应用。
+    :param scale:  在 softmax 之前应用的缩放因子。
+    :param is_causal: 如果为 "true"，则假定存在左上因果注意屏蔽，如果同时设置了 attn_mask 和 is_causal, 则会出现错误。
+
+    Examples::
+    
+        from pyvqnet.transformer.e2eqvit.e2eqvit import SDPA, scaled_dot_product_attention_pyimpl
+        from pyvqnet import tensor
+        import pyvqnet
+        from time import time
+        import pyvqnet.nn as nn
+        import numpy as np
+
+        np.random.seed(42)
+
+        query_np = np.random.randn(3, 3, 3, 5).astype(np.float32) 
+        key_np = np.random.randn(3, 3, 3, 5).astype(np.float32)   
+        value_np = np.random.randn(3, 3, 3, 5).astype(np.float32) 
+
+        model = SDPA(tensor.QTensor([1.])).toGPU()
+
+        query_p = tensor.QTensor(query_np, dtype=pyvqnet.kfloat32, requires_grad=True).toGPU()
+        key_p = tensor.QTensor(key_np, dtype=pyvqnet.kfloat32, requires_grad=True).toGPU()
+        value_p = tensor.QTensor(value_np, dtype=pyvqnet.kfloat32, requires_grad=True).toGPU()
+
+        out_sdpa = model(query_p, key_p, value_p)
+
+        out_sdpa.backward()
+
+
 损失函数层
 *********************************************************
 
@@ -1738,7 +2025,7 @@ Dynamic_LSTM
 
     .. note::
 
-            请注意，跟pytorch等框架不同的是，以下loss函数的前向函数中，第一个参数为标签，第二个参数为预测值。
+            请注意,跟pytorch等框架不同的是,以下loss函数的前向函数中,第一个参数为标签,第二个参数为预测值。
 
 MeanSquaredError
 =================================
@@ -1759,7 +2046,7 @@ MeanSquaredError
         \ell(x, y) =
             \operatorname{mean}(L)
 
-    :param name: 这个模块的名字， 默认为""。
+    :param name: 这个模块的名字, 默认为""。
     :return: 一个均方根误差实例。
 
     均方根误差前向计算函数的所需参数:
@@ -1771,7 +2058,7 @@ MeanSquaredError
 
     .. note::
 
-            请注意，跟pytorch等框架不同的是，以下MeanSquaredError函数的前向函数中，第一个参数为目标值，第二个参数为预测值。
+            请注意,跟pytorch等框架不同的是,以下MeanSquaredError函数的前向函数中,第一个参数为目标值,第二个参数为预测值。
 
     Example::
 
@@ -1809,7 +2096,7 @@ BinaryCrossEntropy
     .. math::
         \ell(x, y) = \operatorname{mean}(L)
 
-    :param name: 这个模块的名字， 默认为""。
+    :param name: 这个模块的名字, 默认为""。
     :return: 一个平均二元交叉熵实例。
 
     平均二元交叉熵误差前向计算函数的所需参数:
@@ -1820,7 +2107,7 @@ BinaryCrossEntropy
 
     .. note::
 
-            请注意，跟pytorch等框架不同的是，BinaryCrossEntropy函数的前向函数中，第一个参数为目标值，第二个参数为预测值。
+            请注意,跟pytorch等框架不同的是,BinaryCrossEntropy函数的前向函数中,第一个参数为目标值,第二个参数为预测值。
 
     Example::
 
@@ -1849,7 +2136,7 @@ CategoricalCrossEntropy
         \text{loss}(x, y) = -\log\left(\frac{\exp(x[class])}{\sum_j \exp(x[j])}\right)
                        = -x[class] + \log\left(\sum_j \exp(x[j])\right)
 
-    :param name: 这个模块的名字， 默认为""。
+    :param name: 这个模块的名字, 默认为""。
     :return: 平均分类交叉熵实例。
 
     误差前向计算函数的所需参数:
@@ -1860,7 +2147,7 @@ CategoricalCrossEntropy
 
     .. note::
 
-            请注意，跟pytorch等框架不同的是，CategoricalCrossEntropy函数的前向函数中，第一个参数为目标值，第二个参数为预测值。
+            请注意,跟pytorch等框架不同的是,CategoricalCrossEntropy函数的前向函数中,第一个参数为目标值,第二个参数为预测值。
 
     Example::
 
@@ -1888,7 +2175,7 @@ SoftmaxCrossEntropy
         \text{loss}(x, y) = -\log\left(\frac{\exp(x[class])}{\sum_j \exp(x[j])}\right)
                        = -x[class] + \log\left(\sum_j \exp(x[j])\right)
 
-    :param name: 这个模块的名字， 默认为""。
+    :param name: 这个模块的名字, 默认为""。
     :return: 一个Softmax交叉熵损失函数实例
 
     误差前向计算函数的所需参数:
@@ -1899,7 +2186,7 @@ SoftmaxCrossEntropy
 
     .. note::
 
-            请注意，跟pytorch等框架不同的是，SoftmaxCrossEntropy函数的前向函数中，第一个参数为目标值，第二个参数为预测值。
+            请注意,跟pytorch等框架不同的是,SoftmaxCrossEntropy函数的前向函数中,第一个参数为目标值,第二个参数为预测值。
 
     Example::
 
@@ -1925,7 +2212,7 @@ NLL_Loss
 
     平均负对数似然损失。 对C个类别的分类问题很有用。
 
-    `x` 是模型给出的概率形式的似然量。其尺寸可以是 :math:`(N, C)` or :math:`(N, C, d_1, d_2, ..., d_K)` 。 `y` 是损失函数期望的真值，包含 :math:`[0, C-1]` 的类别索引。
+    `x` 是模型给出的概率形式的似然量。其尺寸可以是 :math:`(N, C)` or :math:`(N, C, d_1, d_2, ..., d_K)` 。 `y` 是损失函数期望的真值,包含 :math:`[0, C-1]` 的类别索引。
 
     .. math::
 
@@ -1933,18 +2220,18 @@ NLL_Loss
         l_n = -  
             \sum_{n=1}^N \frac{1}{N}x_{n,y_n} \quad
 
-    :param name: 这个模块的名字， 默认为""。
+    :param name: 这个模块的名字, 默认为""。
     :return: 一个NLL_Loss损失函数实例
 
     误差前向计算函数的所需参数:
 
-        x: :math:`(N, *)`,损失函数的输出预测值，可以为多维变量。
+        x: :math:`(N, *)`,损失函数的输出预测值,可以为多维变量。
 
         y: :math:`(N, *)`,损失函数目标值。必须为64位整数,kint64。
 
     .. note::
 
-            请注意，跟pytorch等框架不同的是，NLL_Loss函数的前向函数中，第一个参数为目标值，第二个参数为预测值。
+            请注意,跟pytorch等框架不同的是,NLL_Loss函数的前向函数中,第一个参数为目标值,第二个参数为预测值。
 
     Example::
 
@@ -1958,7 +2245,7 @@ NLL_Loss
             0.9818027091583286, 0.8673569904602182, 0.9860275114020933,
             0.9232667066664217, 0.303693313961628, 0.8461034903175555
         ])
-        x.reshape_([1, 3, 1, 5])
+        x=x.reshape([1, 3, 1, 5])
         x.requires_grad = True
         y = QTensor([[[2, 1, 0, 0, 2]]], dtype=kint64)
 
@@ -1982,18 +2269,18 @@ CrossEntropyLoss
         \text{loss}(x, y) = -\log\left(\frac{\exp(x[class])}{\sum_j \exp(x[j])}\right)
                        = -x[class] + \log\left(\sum_j \exp(x[j])\right)
 
-    :param name: 这个模块的名字， 默认为""。
+    :param name: 这个模块的名字, 默认为""。
     :return: 一个CrossEntropyLoss损失函数实例
 
     误差前向计算函数的所需参数:
 
-        x: :math:`(N, *)`,损失函数的输出，可以为多维变量。
+        x: :math:`(N, *)`,损失函数的输出,可以为多维变量。
 
         y: :math:`(N, *)`,损失函数期望的真值。必须为64位整数,kint64。
 
     .. note::
 
-            请注意，跟pytorch等框架不同的是，CrossEntropyLoss函数的前向函数中，第一个参数为目标值，第二个参数为预测值。
+            请注意,跟pytorch等框架不同的是,CrossEntropyLoss函数的前向函数中,第一个参数为目标值,第二个参数为预测值。
 
     Example::
 
@@ -2006,7 +2293,7 @@ CrossEntropyLoss
             0.9818027091583286, 0.8673569904602182, 0.9860275114020933,
             0.9232667066664217, 0.303693313961628, 0.8461034903175555
         ])
-        x.reshape_([1, 3, 1, 5])
+        x=x.reshape([1, 3, 1, 5])
         x.requires_grad = True
         y = QTensor([[[2, 1, 0, 0, 2]]], dtype=kint64)
 
@@ -2209,7 +2496,33 @@ LeakyReLu
         print(y)
 
         # [-0.0100000, 2., -0.0300000, 4.]
-        
+
+
+
+Gelu
+=================================
+.. py:class:: pyvqnet.nn.Gelu(approximate="tanh", name="")
+    
+    应用高斯误差线性单元函数:
+
+    .. math:: \text{GELU}(x) = x * \Phi(x)
+
+    当近似参数为 'tanh' 时, GELU 通过以下方式估计:
+
+    .. math:: \text{GELU}(x) = 0.5 * x * (1 + \text{Tanh}(\sqrt{2 / \pi} * (x + 0.044715 * x^3)))
+
+    Examples::
+
+        from pyvqnet.tensor import randu, ones_like
+        from pyvqnet.nn import Gelu
+        qa = randu([5,4])
+        qb = Gelu()(qa)
+        print(qb)
+        # [[0.0292515,0.0668998,0.4036024,0.8369502],
+        #  [0.1929213,0.1981275,0.2358531,0.7790835],
+        #  [0.1754935,0.6204091,0.2354677,0.2409406],
+        #  [0.4238827,0.804715 ,0.1633414,0.2853   ],
+        #  [0.1959854,0.590143 ,0.553995 ,0.0008423]]
 
 
 ELU
@@ -2387,7 +2700,7 @@ Adagrad
 
 Adam
 =================================
-.. py:class:: pyvqnet.optim.adam.Adam( params, lr=0.01, beta1=0.9, beta2=0.999, epsilon=1e-8,amsgrad: bool = False)
+.. py:class:: pyvqnet.optim.adam.Adam(params, lr=0.01, beta1=0.9, beta2=0.999, epsilon=1e-8,weight_decay=0,amsgrad: bool = False)
 
     Adam优化器,它可以使用一阶矩估计动态调整每个参数的学习率和梯度的二阶矩估计。
     
@@ -2395,6 +2708,8 @@ Adam
 
     .. math::
         t = t + 1 
+    .. math::
+        param  = param - lr*weight\_decay*param
     .. math::
         moment\_1\_new=\beta1∗moment\_1+(1−\beta1)g
     .. math::
@@ -2420,6 +2735,7 @@ Adam
     :param beta2: 用于计算梯度及其平方的运行平均值的系数(默认值:0.999)。
     :param epsilon: 添加到分母以提高数值稳定性的常数(默认值:1e-8)。
     :param amsgrad: 是否使用该算法的 AMSGrad 变体(默认值:False)。
+    :param weight_decay: 权重衰减系数(默认值0)。
     :return: 一个 Adam 优化器。
 
     Example::
@@ -2454,6 +2770,69 @@ Adam
         #  [15.9799995, 16.9799995, 17.9799995, 18.9799995],
         #  [19.9799995, 20.9799995, 21.9799995, 22.9799995]]]
         # ]
+
+AdamW
+=================================
+.. py:class:: pyvqnet.optim.adam.AdamW(params, lr=0.01, beta1=0.9, beta2=0.999, epsilon=1e-8, weight_decay=0.01, amsgrad: bool = False)
+
+    实现 AdamW 算法.
+
+
+    .. math::
+        t = t + 1
+    
+    .. math::
+        param\_new  = param - lr*weight\_decay*param
+    .. math::
+        moment\_1\_new=\beta1∗moment\_1+(1−\beta1)g
+    .. math::
+        moment\_2\_new=\beta2∗moment\_2+(1−\beta2)g*g
+    .. math::
+        lr = lr*\frac{\sqrt{1-\beta2^t}}{1-\beta1^t}
+
+    如果参数 amsgrad 为 True
+
+    .. math::
+        moment\_2\_max = max(moment\_2\_max,moment\_2)
+    .. math::
+        param\_new=param\_new-lr*\frac{moment\_1}{\sqrt{moment\_2\_max}+\epsilon} 
+
+    否则
+
+    .. math::
+        param\_new=param\_new-lr*\frac{moment\_1}{\sqrt{moment\_2}+\epsilon} 
+
+    :param params: 需要优化的模型参数。
+    :param lr: 学习率(默认值:0.01)。
+    :param beta1: 用于计算梯度及其平方的运行平均值的系数(默认值:0.9)。
+    :param beta2: 用于计算梯度及其平方的运行平均值的系数(默认值:0.999)。
+    :param epsilon: 添加到分母以提高数值稳定性的常数(默认值:1e-8)。
+    :param weight_decay: 权重衰减系数,默认0.01。
+    :param amsgrad: 是否使用该算法的 AMSGrad 变体(默认值:False)。
+    :return: 一个 AdamW 优化器。
+
+    Example::
+
+        from pyvqnet.optim import adam
+        import numpy as np
+        from pyvqnet.tensor import QTensor
+        w = np.arange(24).reshape(1,2,3,4).astype(np.float64)
+        param = QTensor(w)
+        param.grad = QTensor(np.arange(24).reshape(1,2,3,4).astype(np.float64))
+        params = [param]
+        opti = adam.AdamW(params, lr=0.5)
+
+        for i in range(1,3):
+            opti.step()
+        print(param)
+        # [[[[ 0.       ,-0.007475 , 0.98255  , 1.972575 ],
+        #    [ 2.9626   , 3.952625 , 4.9426501, 5.9326751],
+        #    [ 6.9227001, 7.9127251, 8.9027501, 9.8927751]],
+
+        #   [[10.8828001,11.8728251,12.8628501,13.8528751],
+        #    [14.8429002,15.8329252,16.8229502,17.8129752],
+        #    [18.8030002,19.7930252,20.7830502,21.7730752]]]]
+
 
 Adamax
 =================================
@@ -2711,8 +3090,8 @@ MSE
 
     计算均方误差 (Mean Squared Error, MSE)。
 
-    :param y_true_Qtensor: 形状类似(n_samples,)或(n_samples, n_outputs)的输入，真实目标值。
-    :param y_pred_Qtensor: 形状类似(n_samples,)或(n_samples, n_outputs)的输入，估计目标值。
+    :param y_true_Qtensor: 形状类似(n_samples,)或(n_samples, n_outputs)的输入,真实目标值。
+    :param y_pred_Qtensor: 形状类似(n_samples,)或(n_samples, n_outputs)的输入,估计目标值。
 
     :return: 输出float结果。
 
@@ -2744,8 +3123,8 @@ RMSE
 
     计算均方根误差 (Root Mean Square Error, RMSE) 。
 
-    :param y_true_Qtensor: 形状类似(n_samples,)或(n_samples, n_outputs)的输入，真实目标值。
-    :param y_pred_Qtensor: 形状类似(n_samples,)或(n_samples, n_outputs)的输入，估计目标值。
+    :param y_true_Qtensor: 形状类似(n_samples,)或(n_samples, n_outputs)的输入,真实目标值。
+    :param y_pred_Qtensor: 形状类似(n_samples,)或(n_samples, n_outputs)的输入,估计目标值。
 
     :return: 输出float结果。
 
@@ -2810,11 +3189,11 @@ R_Square
 .. py:class:: pyvqnet.utils.metrics.R_Square(y_true_Qtensor, y_pred_Qtensor, sample_weight=None)
 
     计算预测值和真实值之间的R方分数。
-    可能的最佳分数为1.0，可以为负(因为模型可以任意恶化)。不考虑输入特征的常数模型，将获得0.0的R^2分数。
+    可能的最佳分数为1.0,可以为负(因为模型可以任意恶化)。不考虑输入特征的常数模型,将获得0.0的R^2分数。
 
-    :param y_true_Qtensor: 形状类似(n_samples,)或(n_samples, n_outputs)的输入，真实目标值。
-    :param y_pred_Qtensor: 形状类似(n_samples,)或(n_samples, n_outputs)的输入，估计目标值。
-    :param sample_weight: 形状类似(n_samples,)的数组，可选样本权重，默认为None。
+    :param y_true_Qtensor: 形状类似(n_samples,)或(n_samples, n_outputs)的输入,真实目标值。
+    :param y_pred_Qtensor: 形状类似(n_samples,)或(n_samples, n_outputs)的输入,估计目标值。
+    :param sample_weight: 形状类似(n_samples,)的数组,可选样本权重,默认为None。
 
     :return: 输出float结果。
 
@@ -2842,10 +3221,10 @@ precision_recall_f1_2_score
 
 .. py:class:: pyvqnet.utils.metrics.precision_recall_f1_2_score(y_true_Qtensor, y_pred_Qtensor)
 
-    计算2分类任务下预测值的精确率，召回率和F1分数。其中预测值和真值需要是形状类似(n_samples,)的QTensor，值为0或1，代表两个类的标签。
+    计算2分类任务下预测值的精确率,召回率和F1分数。其中预测值和真值需要是形状类似(n_samples,)的QTensor,值为0或1,代表两个类的标签。
 
-    :param y_true_Qtensor: 一维QTensor的输入，形状类似(n_samples,)，真实目标值。
-    :param y_pred_Qtensor: 一维QTensor的输入，形状类似(n_samples,)，估计目标值。
+    :param y_true_Qtensor: 一维QTensor的输入,形状类似(n_samples,),真实目标值。
+    :param y_pred_Qtensor: 一维QTensor的输入,形状类似(n_samples,),估计目标值。
 
     :returns: 
         - precision - 精确率
@@ -2875,18 +3254,18 @@ precision_recall_f1_N_score
 
 .. py:class:: pyvqnet.utils.metrics.precision_recall_f1_N_score(y_true_Qtensor, y_pred_Qtensor, N, average)
 
-    多分类任务的精确率，召回率，F1分数计算。其中预测值和真值是形状类似(n_samples,)的QTensor，值为0到N-1的整数，代表N个类的标签。
+    多分类任务的精确率,召回率,F1分数计算。其中预测值和真值是形状类似(n_samples,)的QTensor,值为0到N-1的整数,代表N个类的标签。
 
-    :param y_true_Qtensor: 一维QTensor的输入，真实目标值。
-    :param y_pred_Qtensor: 一维QTensor的输入，估计目标值。
+    :param y_true_Qtensor: 一维QTensor的输入,真实目标值。
+    :param y_pred_Qtensor: 一维QTensor的输入,估计目标值。
     :param N: N类(类别数)。
     :param average: string, ['micro', 'macro', 'weighted']。
             多类/多标签目标需要此参数。
-            ``'micro'``: 通过计算总真正数来全局计算指标，假阴性和假阳性。
+            ``'micro'``: 通过计算总真正数来全局计算指标,假阴性和假阳性。
 
-            ``'macro'``: 计算每个标签的指标，并找到其未加权值。意思是不考虑标签的平衡。
+            ``'macro'``: 计算每个标签的指标,并找到其未加权值。意思是不考虑标签的平衡。
 
-            ``'weighted'``: 计算每个标签的指标，并找到它们的平均值(每个标签的真实实例数)。这改变 ``'macro'`` 以解释标签不平衡; 这可能会导致F分数不在精度和召回之间。
+            ``'weighted'``: 计算每个标签的指标,并找到它们的平均值(每个标签的真实实例数)。这改变 ``'macro'`` 以解释标签不平衡; 这可能会导致F分数不在精度和召回之间。
 
     :returns: 
         - precision - 精确率
@@ -2927,18 +3306,18 @@ precision_recall_f1_Multi_score
 
 .. py:class:: pyvqnet.utils.metrics.precision_recall_f1_Multi_score(y_true_Qtensor, y_pred_Qtensor, N, average)
 
-    多分类任务的精确率，召回率，F1分数计算。其中预测值和真值是形状类似(n_samples,N)的QTensor，预测值和真实标签必须为0-1独热编码的形式。
+    多分类任务的精确率,召回率,F1分数计算。其中预测值和真值是形状类似(n_samples,N)的QTensor,预测值和真实标签必须为0-1独热编码的形式。
 
-    :param y_true_Qtensor: 二维QTensor的输入，真实目标值。
-    :param y_pred_Qtensor: 二维QTensor的输入，估计目标值。
+    :param y_true_Qtensor: 二维QTensor的输入,真实目标值。
+    :param y_pred_Qtensor: 二维QTensor的输入,估计目标值。
     :param N: N类(类别数)。
     :param average: string, ['micro', 'macro', 'weighted']。
             多类/多标签目标需要此参数。
-            ``'micro'``: 通过计算总真正数来全局计算指标，假阴性和假阳性。
+            ``'micro'``: 通过计算总真正数来全局计算指标,假阴性和假阳性。
 
-            ``'macro'``: 计算每个标签的指标，并找到其未加权值。意思是不考虑标签的平衡。
+            ``'macro'``: 计算每个标签的指标,并找到其未加权值。意思是不考虑标签的平衡。
 
-            ``'weighted'``: 计算每个标签的指标，并找到它们的平均值(每个标签的真实实例数)。这改变 ``'macro'`` 以解释标签不平衡; 这可能会导致F分数不在精度和召回之间。
+            ``'weighted'``: 计算每个标签的指标,并找到它们的平均值(每个标签的真实实例数)。这改变 ``'macro'`` 以解释标签不平衡; 这可能会导致F分数不在精度和召回之间。
 
     :returns: 
         - precision - 精确率
@@ -2997,13 +3376,13 @@ auc_calculate
     计算模型对预测值和真值之间进行分类获取的(Area Under Curve, AUC)结果。
 
     :param y_true_Qtensor: 一维QTensor的输入,shape = [n_samples]。
-                            真正的二进制标签。如果标签不是{1,1}或{0,1}，则pos_label应明确给出。
+                            真正的二进制标签。如果标签不是{1,1}或{0,1},则pos_label应明确给出。
     :param y_pred_Qtensor: 一维QTensor的输入,shape = [n_samples]。
                             目标分数,可以是正的概率估计类别、置信值或决策的非阈值度量(由某些分类器上的“决策函数”返回)
     :param pos_label: int 或 str,正类的标签。默认为None。
-                    当 ``pos_label`` 是 None 时，如果 ``y_true_Qtensor`` 位于{-1,1}或{0,1}， ``pos_label`` 设置为1，否则将引发错误。
-    :param sample_weight: 形状(n_samples,)的数组，默认为None。
-    :param drop_intermediate: boolean，是否降低一些在绘制的ROC曲线上不会出现的次优阈值。(默认为None)。
+                    当 ``pos_label`` 是 None 时,如果 ``y_true_Qtensor`` 位于{-1,1}或{0,1}, ``pos_label`` 设置为1,否则将引发错误。
+    :param sample_weight: 形状(n_samples,)的数组,默认为None。
+    :param drop_intermediate: boolean,是否降低一些在绘制的ROC曲线上不会出现的次优阈值。(默认为None)。
 
     :return: 输出float结果。
 
@@ -3039,11 +3418,12 @@ auc_calculate
 
 分布式计算模块
 *********************************************************
+该模块仅在linux操作系统下能够使用!
 
 环境部署
 =================================
 
-以下介绍分别分别基于CPU、GPU分布式计算Linux系统下环境的部署.
+以下介绍VQNet分别基于CPU、GPU分布式计算所需的Linux系统下环境的部署.
 
 MPI安装
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -3057,7 +3437,7 @@ MPI为CPU间通信的常用库, VQNet中CPU的分布式计算功能则基于MPI�
     which gcc 
     which gfortran
 
-当显示了gcc和gfortran的路径，即可进行下一步的安装，若没有相应的编译器，请先安装编译器。当检查完编译器之后，使用wget命令下载。
+当显示了gcc和gfortran的路径,即可进行下一步的安装,若没有相应的编译器,请先安装编译器。当检查完编译器之后,使用wget命令下载。
 
 .. code-block::
         
@@ -3068,7 +3448,7 @@ MPI为CPU间通信的常用库, VQNet中CPU的分布式计算功能则基于MPI�
     make 
     make install 
 
-完成mpich的编译安装，配置其环境变量
+完成mpich的编译安装,配置其环境变量
 
 .. code-block::
         
@@ -3165,16 +3545,16 @@ NCCL为GPU间通信的常用库, VQNet中GPU的分布式计算功能则基于NCC
 节点间通信环境部署
 ^^^^^^^^^^^^^^^^^^^^^^
 
-在多节点上实现分布式计算，首先需要保证多节点上mpich环境的一致，python环境一致，其次，需要设置节点间的免密通信。
-假设需要设置node0（主节点）、node1、node2三个节点的免密通信。
+在多节点上实现分布式计算,首先需要保证多节点上mpich环境的一致,python环境一致,其次,需要设置节点间的免密通信。
+假设需要设置node0(主节点）、node1、node2三个节点的免密通信。
 
 .. code-block::
 
     # 在每个节点上执行
     ssh-keygen
     
-    # 之后一直回车，在.ssh文件夹下生成一个公钥（id_rsa.pub）一个私钥（id_rsa）
-    # 将其另外两个节点的公钥都添加到第一个节点的authorized_keys文件中，
+    # 之后一直回车,在.ssh文件夹下生成一个公钥(id_rsa.pub）一个私钥(id_rsa）
+    # 将其另外两个节点的公钥都添加到第一个节点的authorized_keys文件中,
     # 再将第一个节点authorized_keys文件传到另外两个节点便可以实现节点间的免密通信
     # 在子节点node1上执行
     cat ~/.ssh/id_dsa.pub >> node0:~/.ssh/authorized_keys
@@ -3182,13 +3562,13 @@ NCCL为GPU间通信的常用库, VQNet中GPU的分布式计算功能则基于NCC
     # 在子节点node2上执行
     cat ~/.ssh/id_dsa.pub >> node0:~/.ssh/authorized_keys
     
-    # 先删除node1、node2中的authorized_keys文件后，在node0上将authorized_keys文件拷贝到另外两个节点上
+    # 先删除node1、node2中的authorized_keys文件后,在node0上将authorized_keys文件拷贝到另外两个节点上
     scp ~/.ssh/authorized_keys  node1:~/.ssh/authorized_keys
     scp ~/.ssh/authorized_keys  node2:~/.ssh/authorized_keys
 
     # 保证三个不同节点生成的公钥都在authorized_keys文件中,即可实现节点间的免密通信
 
-除此外，最好还设置一个共享目录，使得改变共享目录下的文件时，不同节点中文件也会进行更改，预防多节点运行模型时不同节点中的文件不同步的问题。
+除此外,最好还设置一个共享目录,使得改变共享目录下的文件时,不同节点中文件也会进行更改,预防多节点运行模型时不同节点中的文件不同步的问题。
 使用nfs-utils和rpcbind实现共享目录。
 
 .. code-block::
@@ -3208,771 +3588,587 @@ NCCL为GPU间通信的常用库, VQNet中GPU的分布式计算功能则基于NCC
     mount node1:/data/mpi/ /data/mpi
     mount node2:/data/mpi/ /data/mpi
 
-CPU分布式计算接口及样例
+分布式启动
 =================================
 
-本块介绍如何在cpu硬件平台上, 利用VQNet分布式计算接口实现数据并行训练模型(目前仅支持在Linux系统上)。
+使用分布式计算接口,通过 ``vqnetrun`` 命令启动, 接下来介绍 ``vqnetrun`` 的各个参数.
 
-init_process
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-使用 ``init_process`` 对分布式计算参数进行初始化。
-
-.. py:function:: pyvqnet.distributed.init.init_process(size, path, hostpath=None, train_size=None, test_size=None, shuffle=False)
-
-    设置分布式计算参数。
-
-    :param size: 进程数。
-    :param path: 当前运行文件绝对路径。
-    :param hostpath: 多节点配置文件绝对路径。
-    :param train_size: 训练集大小。
-    :param test_size: 测试集大小。
-    :param shuffle: 是否随机采样。
-
-    Example::
-
-        import argparse
-        import os
-        from pyvqnet.distributed import *
-
-        parser = argparse.ArgumentParser(description='parser example')
-        parser.add_argument('--init', default=False, type=bool, help='whether to use multiprocessing')
-        parser.add_argument('--np', default=1, type=int, help='number of processes')
-        parser.add_argument('--hostpath', default=None, type=str, help='multi node configuration files')
-        parser.add_argument('--shuffle', default=False, type=bool, help='shuffle')
-        parser.add_argument('--train_size', default=120, type=int, help='train_size')
-        parser.add_argument('--test_size', default=50, type=int, help='test_size')
-        args = parser.parse_args()
-
-        if(args.init):
-            init_process(args.np, os.path.realpath(__file__))
-        else:
-            break
-
-        # python run.py --init true --np 2 
-
-average_parameters_allreduce
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-使用 ``average_parameters_allreduce`` 以allreduce的方式对不同进程上模型参数进行传递并以平均值更新。
-
-.. py:function:: pyvqnet.distributed.comm.average_parameters_allreduce(model)
-
-    设置分布式计算参数。
-
-    :param model: `Module` - 训练的模型.
-    
-    :return: 参数更新后的模型.
-
-    Example::
-
-        from pyvqnet.distributed import average_parameters_allreduce
-        import numpy as np
-        from pyvqnet.nn.module import Module
-        from pyvqnet.nn.linear import Linear
-        from pyvqnet.nn import activation as F
-        from pyvqnet.distributed import *
-
-        class Net(Module):
-            def __init__(self):
-                super(Net, self).__init__()
-                self.fc = Linear(input_channels=5, output_channels=1)
-
-            def forward(self, x):
-                x = F.ReLu()(self.fc(x))
-                return x
-
-        model = Net()
-        print(f"rank {get_rank()} parameters is {model.parameters()}")
-        model = average_parameters_allreduce(model)
-
-        if get_rank() == 0:
-            print(model.parameters())
-        
-        # mpirun -n 2 python run.py
-
-average_grad_allreduce
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-使用 ``average_grad_allreduce`` 以allreduce的方式对不同进程上模型参数梯度进行传递并以平均值更新.
-
-.. py:function:: pyvqnet.distributed.comm.average_grad_allreduce(optimizer)
-
-    设置分布式计算参数。
-
-    :param optimizer: optimizer.
-    
-    :return: 梯度更新后的优化器。
-
-    Example::
-
-        from pyvqnet.distributed import average_grad_allreduce
-        import numpy as np
-        from pyvqnet.nn.module import Module
-        from pyvqnet.nn.linear import Linear
-        from pyvqnet.nn import activation as F
-        from pyvqnet.distributed import *
-        from pyvqnet.nn.loss import MeanSquaredError
-        from pyvqnet.optim import Adam
-        
-        class Net(Module):
-            def __init__(self):
-                super(Net, self).__init__()
-                self.fc = Linear(input_channels=5, output_channels=1)
-
-            def forward(self, x):
-                x = F.ReLu()(self.fc(x))
-                return x
-        model = Net()
-        opti = Adam(model.parameters(), lr=0.01)
-        actual = tensor.QTensor([1,1,1,1,1,0,0,0,0,0],dtype=6).reshape((10,1))
-                
-        x = tensor.randn((10, 5))
-        for i in range(10):
-            opti.zero_grad()
-            model.train()
-            
-            result = model(x)
-            loss = MeanSquaredError()(actual, result)
-            loss.backward()
-            
-            print(f"rank {get_rank()} grad is {model.parameters()[0].grad}")
-            opti = average_grad_allreduce(opti)
-            # if get_rank() == 0 :
-            print(f"rank {get_rank()} grad is {model.parameters()[0].grad}")
-            opti.step()
-        
-        
-        # mpirun -n 2 python run.py
-
-
-average_parameters_reduce
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-使用 ``average_parameters_reduce`` 以reduce的方式对进程上模型参数进行传递, 并对指定进程上的参数进行更新。
-
-.. py:function:: pyvqnet.distributed.comm.average_parameters_reduce(model, root = 0)
-
-    设置分布式计算参数。
-
-    :param model: `Module` - 训练的模型.
-    :param root: 指定的进程号.
-
-    :return: 参数更新后的模型。
-
-    Example::
-
-        from pyvqnet.distributed import average_parameters_reduce
-        import numpy as np
-        from pyvqnet.nn.module import Module
-        from pyvqnet.nn.linear import Linear
-        from pyvqnet.nn import activation as F
-        from pyvqnet.distributed import *
-
-        class Net(Module):
-            def __init__(self):
-                super(Net, self).__init__()
-                self.fc = Linear(input_channels=5, output_channels=1)
-
-            def forward(self, x):
-                x = F.ReLu()(self.fc(x))
-                return x
-
-
-        model = Net()
-        print(f"rank {get_rank()} parameters is {model.parameters()}")
-        model = average_parameters_reduce(model)
-
-        if get_rank() == 0:
-            print(model.parameters())
-
-        # mpirun -n 2 python run.py
-
-
-average_grad_reduce
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-使用 ``average_grad_reduce`` 以reduce的方式对进程上参数的梯度进行传递， 并对指定进程上的参数梯度更新。
-
-.. py:function:: pyvqnet.distributed.comm.average_grad_reduce(optimizer, root = 0)
-
-    设置分布式计算参数。
-
-    :param optimizer: optimizer.
-    :param root: 指定的进程号.
-
-    :return: 梯度更新后的优化器.
-
-    Example::
-
-        from pyvqnet.distributed import average_grad_reduce
-        import numpy as np
-        from pyvqnet.nn.module import Module
-        from pyvqnet.nn.linear import Linear
-        from pyvqnet.nn import activation as F
-        from pyvqnet.distributed import *
-        from pyvqnet.nn.loss import MeanSquaredError
-        from pyvqnet.optim import Adam
-        
-        class Net(Module):
-            def __init__(self):
-                super(Net, self).__init__()
-                self.fc = Linear(input_channels=5, output_channels=1)
-
-            def forward(self, x):
-                x = F.ReLu()(self.fc(x))
-                return x
-        model = Net()
-        opti = Adam(model.parameters(), lr=0.01)
-        actual = tensor.QTensor([1,1,1,1,1,0,0,0,0,0],dtype=6).reshape((10,1))
-                
-        x = tensor.randn((10, 5))
-        for i in range(10):
-            opti.zero_grad()
-            model.train()
-            
-            result = model(x)
-            loss = MeanSquaredError()(actual, result)
-            loss.backward()
-            
-            print(f"rank {get_rank()} grad is {model.parameters()[0].grad}")
-            opti = average_grad_reduce(opti)
-            # if get_rank() == 0 :
-            print(f"rank {get_rank()} grad is {model.parameters()[0].grad}")
-            opti.step()
-        
-        # mpirun -n 2 python run.py
-
-
-
-样例
+n, np
 ^^^^^^^^^^^^^^^^^^^^^^
 
-导入相关库
-
-.. code-block::
-
-    import sys
-    sys.path.insert(0,"../")
-    import time
-    import os
-    import struct
-    import gzip
-    from pyvqnet.nn.module import Module
-    from pyvqnet.nn.linear import Linear
-    from pyvqnet.nn.conv import Conv2D
-
-    from pyvqnet.nn import activation as F
-    from pyvqnet.nn.pooling import MaxPool2D
-    from pyvqnet.nn.loss import CategoricalCrossEntropy
-    from pyvqnet.optim.adam import Adam
-    from pyvqnet.data.data import data_generator
-    from pyvqnet.tensor import tensor
-    from pyvqnet.tensor.tensor import QTensor
-    import pyqpanda as pq
-    import time
-    import numpy as np
-    import matplotlib
-    from pyvqnet.distributed import *  # 分布式计算模块
-    import argparse 
-
-数据获取
-
-.. code-block::
-
-    url_base = "http://yann.lecun.com/exdb/mnist/"
-    key_file = {
-        "train_img": "train-images-idx3-ubyte.gz",
-        "train_label": "train-labels-idx1-ubyte.gz",
-        "test_img": "t10k-images-idx3-ubyte.gz",
-        "test_label": "t10k-labels-idx1-ubyte.gz"
-    }
-    if_show_sample = 0
-    grad_time = []
-    forward_time = []
-    forward_time_sum = []
-
-    def _download(dataset_dir, file_name):
-        """
-        Download mnist data if needed.
-        """
-        file_path = dataset_dir + "/" + file_name
-
-        if os.path.exists(file_path):
-            with gzip.GzipFile(file_path) as file:
-                file_path_ungz = file_path[:-3].replace("\\", "/")
-                if not os.path.exists(file_path_ungz):
-                    open(file_path_ungz, "wb").write(file.read())
-            return
-
-        print("Downloading " + file_name + " ... ")
-        urllib.request.urlretrieve(url_base + file_name, file_path)
-        if os.path.exists(file_path):
-            with gzip.GzipFile(file_path) as file:
-                file_path_ungz = file_path[:-3].replace("\\", "/")
-                file_path_ungz = file_path_ungz.replace("-idx", ".idx")
-                if not os.path.exists(file_path_ungz):
-                    open(file_path_ungz, "wb").write(file.read())
-        print("Done")
-
-
-    def download_mnist(dataset_dir):
-        for v in key_file.values():
-            _download(dataset_dir, v)
-
-    def load_mnist(dataset="training_data", digits=np.arange(2), path="./"):
-        """
-        load mnist data
-        """
-        from array import array as pyarray
-        download_mnist(path)
-        if dataset == "training_data":
-            fname_image = os.path.join(path, "train-images.idx3-ubyte").replace(
-                "\\", "/")
-            fname_label = os.path.join(path, "train-labels.idx1-ubyte").replace(
-                "\\", "/")
-        elif dataset == "testing_data":
-            fname_image = os.path.join(path, "t10k-images.idx3-ubyte").replace(
-                "\\", "/")
-            fname_label = os.path.join(path, "t10k-labels.idx1-ubyte").replace(
-                "\\", "/")
-        else:
-            raise ValueError("dataset must be 'training_data' or 'testing_data'")
-
-        flbl = open(fname_label, "rb")
-        _, size = struct.unpack(">II", flbl.read(8))
-        lbl = pyarray("b", flbl.read())
-        flbl.close()
-
-        fimg = open(fname_image, "rb")
-        _, size, rows, cols = struct.unpack(">IIII", fimg.read(16))
-        img = pyarray("B", fimg.read())
-        fimg.close()
-
-        ind = [k for k in range(size) if lbl[k] in digits]
-        num = len(ind)
-        images = np.zeros((num, rows, cols))
-        labels = np.zeros((num, 1), dtype=int)
-        for i in range(len(ind)):
-            images[i] = np.array(img[ind[i] * rows * cols:(ind[i] + 1) * rows *
-                                     cols]).reshape((rows, cols))
-            labels[i] = lbl[ind[i]]
-
-        return images, labels
-
-
-    def data_select(train_num, test_num):
-        """
-        Select data from mnist dataset.
-        """
-
-        x_train, y_train = load_mnist("training_data")  # 下载训练数据
-        x_test, y_test = load_mnist("testing_data")
-        idx_train = np.append(
-                np.where(y_train == 0)[0][0:train_num],
-                np.where(y_train == 1)[0][0:train_num])
-        x_train = x_train[idx_train]
-        y_train = y_train[idx_train]
-        x_train = x_train / 255
-        y_train = np.eye(2)[y_train].reshape(-1, 2)
-
-        idx_test = np.append(
-                np.where(y_test == 0)[0][:test_num],
-                np.where(y_test == 1)[0][:test_num])
-        x_test = x_test[idx_test]
-        y_test = y_test[idx_test]
-        x_test = x_test / 255
-        y_test = np.eye(2)[y_test].reshape(-1, 2)
-
-        return x_train, y_train, x_test, y_test
-
-模型定义
-
-.. code-block::
-
-    def circuit_func(weights):
-        """
-        A function using QPanda to create quantum circuits and run.
-        """
-        num_qubits = 1
-        machine = pq.CPUQVM()
-        machine.init_qvm()
-        qubits = machine.qAlloc_many(num_qubits)
-        cbits = machine.cAlloc_many(num_qubits)
-        circuit = pq.QCircuit()
-        circuit.insert(pq.H(qubits[0]))
-        circuit.insert(pq.RY(qubits[0], weights[0]))
-        prog = pq.QProg()
-        prog.insert(circuit)
-        prog << pq.measure_all(qubits, cbits)  #pylint:disable=expression-not-assigned
-
-        result = machine.run_with_configuration(prog, cbits, 1000)
-
-        counts = np.array(list(result.values()))
-        states = np.array(list(result.keys())).astype(float)
-        # Compute probabilities for each state
-        probabilities = counts / 100
-        # Get state expectation
-        expectation = np.sum(states * probabilities)
-        return expectation
-
-    class Hybrid(Module):
-        """ Hybrid quantum - Quantum layer definition """
-        def __init__(self, shift):
-            super(Hybrid, self).__init__()
-            self.shift = shift
-            self.input = None
-
-        def forward(self, x):
-            self.input = x
-            expectation_z = circuit_func(np.array(x.data))
-            result = [[expectation_z]]
-            # requires_grad = x.requires_grad and not QTensor.NO_GRAD
-            requires_grad = x.requires_grad
-            def _backward_mnist(g, x):
-                """ Backward pass computation """
-                start_grad_time = time.time()
-                input_list = np.array(x.data)
-                shift_right = input_list + np.ones(input_list.shape) * self.shift
-                shift_left = input_list - np.ones(input_list.shape) * self.shift
-
-                gradients = []
-                for i in range(len(input_list)):
-                    expectation_right = circuit_func(shift_right[i])
-                    expectation_left = circuit_func(shift_left[i])
-                    gradient = expectation_right - expectation_left
-                    gradients.append(gradient)
-                gradients = np.array([gradients]).T
-
-                end_grad_time = time.time()
-                grad_time.append(end_grad_time - start_grad_time)
-                in_g = gradients * np.array(g)
-                return in_g
-
-            nodes = []
-            if x.requires_grad:
-                nodes.append(
-                    QTensor.GraphNode(tensor=x,
-                                      df=lambda g: _backward_mnist(g, x)))
-            return QTensor(data=result, requires_grad=requires_grad, nodes=nodes)
-
-
-    class Net(Module):
-        """
-        Hybird Quantum Classci Neural Network Module
-        """
-        def __init__(self):
-            super(Net, self).__init__()
-            self.conv1 = Conv2D(input_channels=1,
-                                output_channels=6,
-                                kernel_size=(5, 5),
-                                stride=(1, 1),
-                                padding="valid")
-            self.maxpool1 = MaxPool2D([2, 2], [2, 2], padding="valid")
-            self.conv2 = Conv2D(input_channels=6,
-                                output_channels=16,
-                                kernel_size=(5, 5),
-                                stride=(1, 1),
-                                padding="valid")
-            self.maxpool2 = MaxPool2D([2, 2], [2, 2], padding="valid")
-
-            self.fc1 = Linear(input_channels=256, output_channels=64)
-            self.fc2 = Linear(input_channels=64, output_channels=1)
-
-            self.hybrid = Hybrid(np.pi / 2)
-            self.fc3 = Linear(input_channels=1, output_channels=2)
-
-        def forward(self, x):
-            start_time_forward = time.time()
-            x = F.ReLu()(self.conv1(x))
-
-            x = self.maxpool1(x)
-            x = F.ReLu()(self.conv2(x))
-
-            x = self.maxpool2(x)
-            x = tensor.flatten(x, 1)
-
-            x = F.ReLu()(self.fc1(x))
-            x = self.fc2(x)
-
-            start_time_hybrid = time.time()
-            x = self.hybrid(x)
-
-            end_time_hybrid = time.time()
-
-            forward_time.append(end_time_hybrid - start_time_hybrid)
-
-            x = self.fc3(x)
-            end_time_forward = time.time()
-            forward_time_sum.append(end_time_forward - start_time_forward)
-            return x
-
-
-在训练时引用split_data、average_parameters_allreduce、init_process实现基于CPU数据并行的分布式计算。
-
-使用方法如下
-
-.. code-block::
-
-    def run(args):
-        """
-        Run mnist train function
-        """
-        x_train, y_train, x_test, y_test = data_select(args.train_size, args.test_size)
-
-        x_train, y_train= split_data(x_train, y_train) # 分布式模块接口对数据切分
-        print(get_rank())
-        model = Net()
-        optimizer = Adam(model.parameters(), lr=0.001)
-        loss_func = CategoricalCrossEntropy()
-
-        epochs = 10
-        train_loss_list = []
-        val_loss_list = []
-        train_acc_list = []
-        val_acc_list = []
-        model.train()
-
-        for epoch in range(1, epochs):
-            total_loss = []
-            model.train()
-            batch_size = 1
-            correct = 0
-            n_train = 0
-
-            for x, y in data_generator(x_train,
-                                       y_train,
-                                       batch_size=1,
-                                       shuffle=False):
-
-                x = x.reshape(-1, 1, 28, 28)
-
-                optimizer.zero_grad()
-                output = model(x)
-                loss = loss_func(y, output)
-                loss_np = np.array(loss.data)
-
-                np_output = np.array(output.data, copy=False)
-                mask = (np_output.argmax(1) == y.argmax(1))
-                correct += np.sum(np.array(mask))
-                n_train += batch_size
-
-                loss.backward()
-                # optimizer = average_grad_allreduce(optimizer) 以allreduce方式对优化器中参数梯度进行传递, 并更新
-                optimizer._step()
-
-                total_loss.append(loss_np)
-            model = average_parameters_allreduce(model) # 对不同rank的模型参数以allreduce方式通信, 并对参数更新
-
-
-            train_loss_list.append(np.sum(total_loss) / len(total_loss))
-            train_acc_list.append(np.sum(correct) / n_train)
-            print("{:.0f} loss is : {:.10f}".format(epoch, train_loss_list[-1]))
-
-            model.eval()
-            correct = 0
-            n_eval = 0
-
-            for x, y in data_generator(x_test, y_test, batch_size=1, shuffle=True):
-                x = x.reshape(-1, 1, 28, 28)
-                output = model(x)
-                loss = loss_func(y, output)
-                loss_np = np.array(loss.data)
-                np_output = np.array(output.data, copy=False)
-                mask = (np_output.argmax(1) == y.argmax(1))
-                correct += np.sum(np.array(mask))
-                n_eval += 1
-
-                total_loss.append(loss_np)
-            print(f"Eval Accuracy: {correct / n_eval}")
-            val_loss_list.append(np.sum(total_loss) / len(total_loss))
-            val_acc_list.append(np.sum(correct) / n_eval)
-
-    if __name__ == "__main__":
-
-        parser = argparse.ArgumentParser(description='parser example')
-        parser.add_argument('--init', default=False, type=bool, help='whether to use multiprocessing')
-        parser.add_argument('--np', default=1, type=int, help='number of processes')
-        parser.add_argument('--hostpath', default=None, type=str, help='hosts absolute path')
-        parser.add_argument('--shuffle', default=False, type=bool, help='shuffle')
-        parser.add_argument('--train_size', default=120, type=int, help='train_size')
-        parser.add_argument('--test_size', default=50, type=int, help='test_size')
-        args = parser.parse_args()
-        # p_path = os.path.realpath (__file__)
-
-        if(args.init):
-            init_process(args.np, os.path.realpath(__file__), args.hostpath, args.train_size,args.test_size, args.shuffle)
-        else:
-            a = time.time()
-            run(args)
-            b=time.time()
-            if(get_rank()==0):
-                print("time: {}",format(b-a))
-                
-其中init代表是否基于分布式训练模型，np代表进程数，另外hostpath文件代码在多节点上运行模型时的配置文件的绝对路径，配置文件内容包括多节点的ip以及进程分配情况,如下
-
-.. code-block::
-
-    node0:1
-    node1:1
-    node2:1
-
-
-在命令行输入
-
-.. code-block::
-
-    python test_mdis.py --init true
-
-    0
-    1 loss is : 0.8230862300
-    Eval Accuracy: 0.5
-            ...
-    9 loss is : 0.5660219193
-    Eval Accuracy: 0.46
-    time: {} 15.132369756698608
-
-
-    python test_mdis.py --init true --np 2
-
-    得到结果
-
-    1
-    1 loss is : 0.0316730281
-    Eval Accuracy: 0.5
-            ...
-    9 loss is : 0.0006756162
-    Eval Accuracy: 0.5
-
-    0
-    1 loss is : 0.0072183679
-    Eval Accuracy: 0.85
-            ...
-    9 loss is : 0.0001979264
-    Eval Accuracy: 0.82
-    time: {} 9.132536888122559
-
-以上是在单节点上多进程模型训练，可以明显看出训练时间缩短
-
-在多节点上训练，命令如下
-
-.. code-block::
-
-    python3 test_mdis.py --init true --np 4 --hostpath ~/example/host.txt
-
-    0
-    1 loss is : 0.8609524409
-    Eval Accuracy: 0.5
-            ...
-    9 loss is : 0.4251357079
-    Eval Accuracy: 0.5
-    time: {} 6.5950517654418945
-    
-    3
-    1 loss is : 0.0034498004
-    Eval Accuracy: 0.5
-            ...
-    9 loss is : 0.0001483827
-    Eval Accuracy: 0.5
-    
-    1
-    1 loss is : 0.0990966797
-    Eval Accuracy: 0.5
-            ...
-    9 loss is : 0.0037492002
-    Eval Accuracy: 0.5
-    
-    2
-    1 loss is : 0.8468652089
-    Eval Accuracy: 0.5
-            ...
-    Eval Accuracy: 0.53
-    9 loss is : 0.4186156909
-    Eval Accuracy: 0.52
-
-GPU分布式计算接口及样例
+``vqnetrun`` 接口中可以通过 ``-n``, ``-np`` 参数控制启动的进程数,执行样例如下:
+
+    Example::
+
+        from pyvqnet.distributed import CommController
+        Comm_OP = CommController("mpi") # init mpi controller
+        
+        rank = Comm_OP.getRank()
+        size = Comm_OP.getSize()
+        print(f"rank: {rank}, size {size}")
+
+        # vqnetrun -n 2 python test.py
+        # vqnetrun -np 2 python test.py
+
+H, hosts
+^^^^^^^^^^^^^^^^^^^^^^
+
+``vqnetrun`` 接口中可以通过 ``-H``, ``--hosts`` 指定节点以及进程分配来跨节点执行(在跨节点运行时必须将节点的环境配置成功, 在相同的环境,相同的路径下执行),执行样例如下:
+
+    Example::
+
+        from pyvqnet.distributed import CommController, get_host_name
+        Comm_OP = CommController("mpi") # init mpi controller
+        
+        rank = Comm_OP.getRank()
+        size = Comm_OP.getSize()
+        print(f"rank: {rank}, size {size}")
+        print(f"LocalRank {Comm_OP.getLocalRank()} hosts name {get_host_name()}")
+
+        # vqnetrun -np 4 -H node0:1,node2:1 python test.py
+        # vqnetrun -np 4 --hosts node0:1,node2:1 python test.py
+
+hostfile, f, hostfile
+^^^^^^^^^^^^^^^^^^^^^^
+
+``vqnetrun`` 接口中可以通过指定hosts文件来指定节点以及进程分配来跨节点(在跨节点运行时必须将节点的环境配置成功, 在相同的环境,相同的路径下执行), 命令行参数为 ``-hostfile``, ``-f``, ``--hostfile``.
+
+文件内每行的格式必须为:<hostname> slots=<slots> 如；
+
+node0 slots=1
+
+node2 slots=1
+
+执行样例如下
+
+    Example::
+
+        from pyvqnet.distributed import CommController, get_host_name
+        Comm_OP = CommController("mpi") # init mpi controller
+        
+        rank = Comm_OP.getRank()
+        size = Comm_OP.getSize()
+        print(f"rank: {rank}, size {size}")
+        print(f"LocalRank {Comm_OP.getLocalRank()} hosts name {get_host_name()}")
+
+        # vqnetrun -np 4 -f hosts python test.py
+        # vqnetrun -np 4 -hostfile hosts python test.py
+        # vqnetrun -np 4 --hostfile hosts python test.py
+
+
+output-filename
+^^^^^^^^^^^^^^^^^^^^^^
+
+``vqnetrun`` 接口中可以通过命令行参数 ``--output-filename`` 来将输出结果保存到指定文件.
+
+执行样例如下
+
+    Example::
+
+        from pyvqnet.distributed import CommController, get_host_name
+        Comm_OP = CommController("mpi") # init mpi controller
+        
+        rank = Comm_OP.getRank()
+        size = Comm_OP.getSize()
+        print(f"rank: {rank}, size {size}")
+        print(f"LocalRank {Comm_OP.getLocalRank()} hosts name {get_host_name()}")
+
+        # vqnetrun -np 4 --hostfile hosts --output-filename output  python test.py
+
+
+verbose
+^^^^^^^^^^^^^^^^^^^^^^
+``vqnetrun`` 接口中可以通过命令行参数 ``--verbose`` 来对节点间的通信进行检测,并额外输出检测结果。
+
+执行样例如下
+
+    Example::
+
+        from pyvqnet.distributed import CommController, get_host_name
+        Comm_OP = CommController("mpi") # init mpi controller
+        
+        rank = Comm_OP.getRank()
+        size = Comm_OP.getSize()
+        print(f"rank: {rank}, size {size}")
+        print(f"LocalRank {Comm_OP.getLocalRank()} hosts name {get_host_name()}")
+
+        # vqnetrun -np 4 --hostfile hosts --verbose python test.py
+
+
+start-timeout
+^^^^^^^^^^^^^^^^^^^^^^
+``vqnetrun`` 接口中可以通过命令行参数 ``--start-timeout`` 来指定超时前执行所有检查并启动进程。默认值为 30 秒。
+
+执行样例如下
+
+    Example::
+
+        from pyvqnet.distributed import CommController, get_host_name
+        Comm_OP = CommController("mpi") # init mpi controller
+        
+        rank = Comm_OP.getRank()
+        size = Comm_OP.getSize()
+        print(f"rank: {rank}, size {size}")
+        print(f"LocalRank {Comm_OP.getLocalRank()} hosts name {get_host_name()}")
+
+        # vqnetrun -np 4 --start-timeout 10 python test.py
+
+
+disable-cache
+^^^^^^^^^^^^^^^^^^^^^^
+
+如果不设置该标记, ``vqnetrun`` 将每 60 分钟执行一次初始化检查,前提是检查成功通过。否则,每次调用 ``vqnetrun`` 时都会执行所有检查。
+
+执行样例如下
+
+    Example::
+
+        from pyvqnet.distributed import CommController, get_host_name
+        Comm_OP = CommController("mpi") # init mpi controller
+        
+        rank = Comm_OP.getRank()
+        size = Comm_OP.getSize()
+        print(f"rank: {rank}, size {size}")
+        print(f"LocalRank {Comm_OP.getLocalRank()} hosts name {get_host_name()}")
+
+        # vqnetrun -np 4 --disable-cache python test.py
+
+cb, check-build
+^^^^^^^^^^^^^^^^^^^^^^
+
+``vqnetrun`` 接口中可以通过添加该标志后,会输出当前环境下的支持的数据通信方式。
+
+执行代码如下
+
+    .. code-block::
+
+        # vqnetrun -cb
+        # vqnetrun --check-build
+
+
+h
+^^^^^^^^^^^^^^^^^^^^^^
+
+``vqnetrun`` 接口中可以通过该标志, 输出vqnetrun支持的所有参数以及参数的详细介绍。
+
+执行代码如下
+
+    .. code-block::
+
+        # vqnetrun -h
+
+
+CommController
 =================================
 
-nccl_average_parameters_allreduce
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-使用 ``nccl_average_parameters_allreduce`` 以allreduce的方式对不同进程上模型参数进行传递并更新。
+    分布式计算中的用于控制cpu、gpu下不同进程数据通信, 生成cpu(mpi)、gpu(nccl)不同的控制器,调用通信方法完成不同进程间数据的通信以及同步。
 
-.. py:function:: pyvqnet.distributed.nccl_api.nccl_average_parameters_allreduce(optimizer, Ncclop:NCCL_api, c_op = "avg")
+__init__
+^^^^^^^^^^^^^^^^^^^^^^
+.. py:function:: CommController.__init__(backend="mpi")
+    
+    CommController用于控制在cpu、gpu下数据通信的控制器, 通过设置参数 `backend` 来生成cpu(mpi)、gpu(nccl)的控制器。(目前分布式计算的功能仅支持linux操作系系统下使用)
 
-    设置分布式计算参数。
+    :param backend: 用于生成cpu或者gpu的数据通信控制器。
 
-    :param model: `Module` - 训练的模型.
-    :param Ncclop: `NCCL_api`.
+    :return:
+        CommController 实例。
+
+    Examples::
+
+        from pyvqnet.distributed import CommController
+        Comm_OP = CommController("nccl") # init nccl controller
+
+        # Comm_OP = CommController("mpi") # init mpi controller
+
+getRank
+^^^^^^^^^^^^^^^^^^^^^^
+.. py:function:: CommController.getRank()
+    
+    用于获得当前进程的进程号。
+
+
+    :return: 返回当前进程的进程号。
+
+    Examples::
+
+        from pyvqnet.distributed import CommController
+        Comm_OP = CommController("nccl") # init nccl controller
+        
+        Comm_OP.getRank()
+
+getSize
+^^^^^^^^^^^^^^^^^^^^^^
+.. py:function:: CommController.getSize()
+    
+    用于获得总共启动的进程数。
+
+
+    :return: 返回总共进程的数量。
+
+    Examples::
+
+        from pyvqnet.distributed import CommController
+        Comm_OP = CommController("nccl") # init nccl controller
+        
+        Comm_OP.getSize()
+        # vqnetrun -n 2 python test.py 
+        # 2
+
+
+getLocalRank
+^^^^^^^^^^^^^^^^^^^^^^
+.. py:function:: CommController.getLocalRank()
+    
+    用于获得当前机器上的当前进程号。
+
+
+    :return: 当前机器上的当前进程号。
+
+    Examples::
+
+        from pyvqnet.distributed import CommController
+        Comm_OP = CommController("nccl") # init nccl controller
+        
+        Comm_OP.getLocalRank()
+        # vqnetrun -n 2 python test.py 
+
+
+ncclSplitGroup
+^^^^^^^^^^^^^^^^^^^^^^
+.. py:function:: CommController.ncclSplitGroup(rankL)
+    
+    用于划分gpu上的通信组。
+
+    :param rankL: 进程组列表。
+
+    Examples::
+
+        from pyvqnet.distributed import CommController
+        Comm_OP = CommController("nccl")
+        
+        Comm_OP.ncclSplitGroup([[0, 1]])
+        # vqnetrun -n 2 python test.py 
+
+
+barrier
+^^^^^^^^^^^^^^^^^^^^^^
+.. py:function:: CommController.barrier()
+    
+    同步。
+
+    :return: 同步操作。
+
+    Examples::
+
+        from pyvqnet.distributed import CommController
+        Comm_OP = CommController("nccl")
+        
+        Comm_OP.barrier()
+
+
+GetDeviceNum
+^^^^^^^^^^^^^^^^^^^^^^
+.. py:function:: CommController.GetDeviceNum()
+    
+    用于获得当前节点上的显卡数量, (仅支持gpu下使用)。
+
+    :return: 返回当前节点上显卡数量。
+
+    Examples::
+
+        from pyvqnet.distributed import CommController
+        Comm_OP = CommController("nccl")
+        
+        Comm_OP.GetDeviceNum()
+        # python test.py
+
+
+allreduce
+^^^^^^^^^^^^^^^^^^^^^^
+.. py:function:: CommController.allreduce(tensor, c_op = "avg")
+    
+    支持对数据作allreduce通信。
+
+    :param tensor: 输入数据.
     :param c_op: 计算方式.
 
-    Example::
+    Examples::
 
+        from pyvqnet.distributed import CommController
+        from pyvqnet.tensor import tensor
         import numpy as np
-        from pyvqnet.nn.module import Module
-        from pyvqnet.nn.linear import Linear
-        from pyvqnet.nn import activation as F
-        from pyvqnet.distributed.nccl_api import *
+        Comm_OP = CommController("mpi")
+
+        num = tensor.to_tensor(np.random.rand(1, 5))
+        print(f"rank {Comm_OP.getRank()}  {num}")
+
+        Comm_OP.allreduce(num, "sum")
+        print(f"rank {Comm_OP.getRank()}  {num}")
+        # vqnetrun -n 2 python test.py
+
+
+reduce
+^^^^^^^^^^^^^^^^^^^^^^
+.. py:function:: CommController.reduce(tensor, root = 0, c_op = "avg")
+    
+    支持对数据作reduce通信。
+
+    :param tensor: 输入数据。
+    :param root: 指定数据返回的节点。
+    :param c_op: 计算方式。
+
+    Examples::
+
+        from pyvqnet.distributed import CommController
+        from pyvqnet.tensor import tensor
+        import numpy as np
+        Comm_OP = CommController("mpi")
+
+        num = tensor.to_tensor(np.random.rand(1, 5))
+        print(f"rank {Comm_OP.getRank()}  {num}")
         
-        nccl_op = NCCL_api()
-        nccl_op.ncclCommInitRank()
+        Comm_OP.reduce(num, 1)
+        print(f"rank {Comm_OP.getRank()}  {num}")
+        # vqnetrun -n 2 python test.py
+
+
+broadcast
+^^^^^^^^^^^^^^^^^^^^^^
+.. py:function:: CommController.broadcast(tensor, root = 0)
+    
+    将指定进程root上的数据广播到所有进程上。
+
+    :param tensor: 输入数据。
+    :param root: 指定的节点。
+
+    Examples::
+
+        from pyvqnet.distributed import CommController
+        from pyvqnet.tensor import tensor
+        import numpy as np
+        Comm_OP = CommController("mpi")
+
+        num = tensor.to_tensor(np.random.rand(1, 5))
+        print(f"rank {Comm_OP.getRank()}  {num}")
         
-        class Net(Module):
-            def __init__(self):
-                super(Net, self).__init__()
-                self.fc = Linear(input_channels=5, output_channels=1)
-            def forward(self, x):
-                x = F.ReLu()(self.fc(x))
-                return x
-        model = Net().toGPU(1000 + get_rank())
-        print(f"rank {get_rank()} parameters is {model.parameters()}")
-        nccl_average_parameters_allreduce(model, nccl_op)
-        
+        Comm_OP.broadcast(num, 1)
+        print(f"rank {Comm_OP.getRank()}  {num}")
+        # vqnetrun -n 2 python test.py
+
+allgather
+^^^^^^^^^^^^^^^^^^^^^^
+.. py:function:: CommController.allgather(tensor)
+    
+    将所有进程上数据allgather到一起。
+
+    :param tensor: 输入数据。
+
+    Examples::
+
+        from pyvqnet.distributed import CommController
+        from pyvqnet.tensor import tensor
+        import numpy as np
+        Comm_OP = CommController("mpi")
+
+        num = tensor.to_tensor(np.random.rand(1, 5))
+        print(f"rank {Comm_OP.getRank()}  {num}")
+
+        num = Comm_OP.allgather(num)
+        print(f"rank {Comm_OP.getRank()}  {num}")
+        # vqnetrun -n 2 python test.py
+
+send
+^^^^^^^^^^^^^^^^^^^^^^
+.. py:function:: CommController.send(tensor, dest)
+    
+    p2p通信接口。
+
+    :param tensor: 输入数据.
+    :param dest: 目的进程.
+
+    Examples::
+
+        from pyvqnet.distributed import CommController,get_rank
+        from pyvqnet.tensor import tensor
+        import numpy as np
+        Comm_OP = CommController("mpi")
+
+        num = tensor.to_tensor(np.random.rand(1, 5))
+        recv = tensor.zeros_like(num)
+
         if get_rank() == 0:
-            print(model.parameters())
-            
-        # mpirun -n 2 python test.py
+            Comm_OP.send(num, 1)
+        elif get_rank() == 1:
+            Comm_OP.recv(recv, 0)
+        print(f"rank {Comm_OP.getRank()}  {num}")
+        print(f"rank {Comm_OP.getRank()}  {recv}")
+        
+        # vqnetrun -n 2 python test.py
 
-        # rank 1 parameters is [[[ 0.8647987],
-        #  [ 0.8910748],
-        #  [-0.3896213],
-        #  [-0.871486 ],
-        #  [-0.8997867]], [0.4014191]]
-        # rank 0 parameters is [[[-0.6880538],
-        #  [ 0.0963508],
-        #  [-0.3776291],
-        #  [ 0.1773794],
-        #  [ 0.6670241]], [-0.1019871]]
-        # [[[ 0.0883724],
-        #  [ 0.4937128],
-        #  [-0.3836252],
-        #  [-0.3470533],
-        #  [-0.1163813]], [0.149716]]
 
-nccl_average_parameters_reduce
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+recv
+^^^^^^^^^^^^^^^^^^^^^^
+.. py:function:: CommController.recv(tensor, source)
+    
+    p2p通信接口。
 
-使用 ``nccl_average_parameters_reduce`` 以reduce的方式对不同进程上模型参数进行传递并更新。
+    :param tensor: 输入数据.
+    :param source: 接受进程.
 
-.. py:function:: pyvqnet.distributed.nccl_api.nccl_average_parameters_reduce(model, Ncclop:NCCL_api, root = 0, c_op = "avg")
+    Examples::
 
-    设置分布式计算参数。
+        from pyvqnet.distributed import CommController,get_rank
+        from pyvqnet.tensor import tensor
+        import numpy as np
+        Comm_OP = CommController("mpi")
 
-    :param: model: `Module` - 训练的模型.
-    :param Ncclop: `NCCL_api`.
+        num = tensor.to_tensor(np.random.rand(1, 5))
+        recv = tensor.zeros_like(num)
+
+        if get_rank() == 0:
+            Comm_OP.send(num, 1)
+        elif get_rank() == 1:
+            Comm_OP.recv(recv, 0)
+        print(f"rank {Comm_OP.getRank()}  {num}")
+        print(f"rank {Comm_OP.getRank()}  {recv}")
+        
+        # vqnetrun -n 2 python test.py
+
+
+allreduce_group
+^^^^^^^^^^^^^^^^^^^^^^
+.. py:function:: CommController.allreduce_group(tensor, c_op = "avg", GroupComm = None)
+    
+    组内allreduce通信接口。
+
+    :param tensor: 输入数据.
+    :param c_op: 计算方法.
+    :param GroupComm: 通信组, 仅mpi进行组内通信时需要.
+
+    Examples::
+
+        from pyvqnet.distributed import CommController,get_rank,get_local_rank
+        from pyvqnet.tensor import tensor
+        import numpy as np
+        Comm_OP = CommController("nccl")
+
+        Comm_OP.ncclSplitGroup([[0, 1]])
+
+        complex_data = tensor.QTensor([3+1j, 2, 1 + get_rank()],dtype=8).reshape((3,1)).toGPU(1000+ get_local_rank())
+
+        print(f"allreduce_group before rank {get_rank()}: {complex_data}")
+
+        Comm_OP.allreduce_group(complex_data, c_op="sum")
+        print(f"allreduce_group after rank {get_rank()}: {complex_data}")
+        # vqnetrun -n 2 python test.py
+
+
+reduce_group
+^^^^^^^^^^^^^^^^^^^^^^
+.. py:function:: CommController.reduce_group(tensor, root = 0, c_op = "avg", GroupComm = None)
+    
+    组内reduce通信接口。
+
+    :param tensor: 输入数据.
     :param root: 指定进程号.
-    :param c_op: 计算方式.
+    :param c_op: 计算方法.
+    :param GroupComm: 通信组, 仅mpi进行组内通信时需要.
 
-    Example::
-
+    Examples::
+        
+        from pyvqnet.distributed import CommController,get_rank,get_local_rank
+        from pyvqnet.tensor import tensor
         import numpy as np
+        Comm_OP = CommController("nccl")
+
+        Comm_OP.ncclSplitGroup([[0, 1]])
+
+        complex_data = tensor.QTensor([3+1j, 2, 1 + get_rank()],dtype=8).reshape((3,1)).toGPU(1000+ get_local_rank())
+
+        print(f"reduce_group before rank {get_rank()}: {complex_data}")
+
+        Comm_OP.reduce_group(complex_data, c_op="sum")
+        print(f"reduce_group after rank {get_rank()}: {complex_data}")
+        # vqnetrun -n 2 python test.py
+
+
+broadcast_group
+^^^^^^^^^^^^^^^^^^^^^^
+.. py:function:: CommController.broadcast_group(tensor, root = 0, GroupComm = None)
+    
+    组内broadcast通信接口。
+
+    :param tensor: 输入数据.
+    :param root: 指定进程号.
+    :param GroupComm: 通信组, 仅mpi进行组内通信时需要.
+
+    Examples::
+        
+        from pyvqnet.distributed import CommController,get_rank,get_local_rank
+        from pyvqnet.tensor import tensor
+        import numpy as np
+        Comm_OP = CommController("nccl")
+
+        Comm_OP.ncclSplitGroup([[0, 1]])
+
+        complex_data = tensor.QTensor([3+1j, 2, 1 + get_rank()],dtype=8).reshape((3,1)).toGPU(1000+ get_local_rank())
+
+        print(f"broadcast_group before rank {get_rank()}: {complex_data}")
+
+        Comm_OP.broadcast_group(complex_data)
+        Comm_OP.barrier()
+        print(f"broadcast_group after rank {get_rank()}: {complex_data}")
+        # vqnetrun -n 2 python test.py
+
+
+allgather_group
+^^^^^^^^^^^^^^^^^^^^^^
+.. py:function:: CommController.allgather_group(tensor, GroupComm = None)
+    
+    组内allgather通信接口。
+
+    :param tensor: 输入数据.
+    :param GroupComm: 通信组, 仅mpi进行组内通信时需要.
+
+    Examples::
+        
+        from pyvqnet.distributed import CommController,get_rank,get_local_rank
+        from pyvqnet.tensor import tensor
+        import numpy as np
+        Comm_OP = CommController("nccl")
+
+        Comm_OP.ncclSplitGroup([[0, 1]])
+
+        complex_data = tensor.QTensor([3+1j, 2, 1 + get_rank()],dtype=8).reshape((3,1)).toGPU(1000+ get_local_rank())
+
+        print(f"allgather_group before rank {get_rank()}: {complex_data}")
+
+        complex_data = Comm_OP.allgather_group(complex_data)
+        print(f"allgather_group after rank {get_rank()}: {complex_data}")
+        # vqnetrun -n 2 python test.py
+
+
+grad_allreduce
+^^^^^^^^^^^^^^^^^^^^^^
+.. py:function:: CommController.grad_allreduce(optimizer)
+    
+    以allreduce的方式对优化器中参数的梯度进行更新。
+
+    :param optimizer: 优化器.
+
+    Examples::
+        
+        from pyvqnet.distributed import CommController,get_rank,get_local_rank
+        from pyvqnet.tensor import tensor
         from pyvqnet.nn.module import Module
         from pyvqnet.nn.linear import Linear
+        from pyvqnet.nn.loss import MeanSquaredError
+        from pyvqnet.optim import Adam
         from pyvqnet.nn import activation as F
-        from pyvqnet.distributed.nccl_api import *
-        
-        nccl_op = NCCL_api()
-        nccl_op.ncclCommInitRank()
-        
+        import numpy as np
+        Comm_OP = CommController("nccl")
+
         class Net(Module):
             def __init__(self):
                 super(Net, self).__init__()
@@ -3980,361 +4176,96 @@ nccl_average_parameters_reduce
             def forward(self, x):
                 x = F.ReLu()(self.fc(x))
                 return x
-        model = Net().toGPU(1000 + get_rank())
-        print(f"rank {get_rank()} parameters is {model.parameters()}")
-        
-        nccl_average_parameters_reduce(model, nccl_op)
+            
+        model = Net().toGPU(1000+ get_local_rank())
+        opti = Adam(model.parameters(), lr=0.01)
+        actual = tensor.QTensor([1,1,1,1,1,0,0,0,0,0],dtype=6).reshape((10,1)).toGPU(1000+ get_local_rank())
+        x = tensor.randn((10, 5)).toGPU(1000+ get_local_rank())
+        for i in range(10):
+            opti.zero_grad()
+            model.train()
+            result = model(x)
+            loss = MeanSquaredError()(actual, result)
+            loss.backward()
+            # print(f"rank {get_rank()} grad is {model.parameters()[0].grad} para {model.parameters()[0]}")
+            Comm_OP.grad_allreduce(opti)
+            # print(Comm_OP._allgather(model.parameters()[0]))
+            if get_rank() == 0 :
+                print(f"rank {get_rank()} grad is {model.parameters()[0].grad} para {model.parameters()[0]} after")
+            opti.step()
+        # vqnetrun -n 2 python test.py
 
+param_allreduce
+^^^^^^^^^^^^^^^^^^^^^^
+.. py:function:: CommController.param_allreduce(model)
+    
+    以allreduce的方式对模型中参数进行更新。
+
+    :param model: 模型.
+
+    Examples::
+    
+        from pyvqnet.distributed import CommController,get_rank,get_local_rank
+        from pyvqnet.tensor import tensor
+        from pyvqnet.nn.module import Module
+        from pyvqnet.nn.linear import Linear
+        from pyvqnet.nn import activation as F
+        import numpy as np
+        Comm_OP = CommController("nccl")
+
+        class Net(Module):
+            def __init__(self):
+                super(Net, self).__init__()
+                self.fc = Linear(input_channels=5, output_channels=1)
+            def forward(self, x):
+                x = F.ReLu()(self.fc(x))
+                return x
+            
+        model = Net().toGPU(1000+ get_local_rank())
+        print(f"rank {get_rank()} parameters is {model.parameters()}")
+        Comm_OP.param_allreduce(model)
+            
         if get_rank() == 0:
             print(model.parameters())
+
+broadcast_model_params
+^^^^^^^^^^^^^^^^^^^^^^
+.. py:function:: CommController.broadcast_model_params(model, root = 0)
+    
+    将指定进程号上的模型参数进行广播。
+
+    :param model: 模型.
+    :param root: 指定进程号.
+
+    Examples::
+    
+        from pyvqnet.distributed import CommController,get_rank,get_local_rank
+        from pyvqnet.tensor import tensor
+        from pyvqnet.nn.module import Module
+        from pyvqnet.nn.linear import Linear
+        from pyvqnet.nn import activation as F
+        import numpy as np
+        Comm_OP = CommController("nccl")
+
+        class Net(Module):
+            def __init__(self):
+                super(Net, self).__init__()
+                self.fc = Linear(input_channels=5, output_channels=1)
+            def forward(self, x):
+                x = F.ReLu()(self.fc(x))
+                return x
             
-        # mpirun -n 2 python test.py
-
-        # rank 1 parameters is [[[-0.7666817],
-        #  [ 0.3023796],
-        #  [-0.6021696],
-        #  [ 0.5293468],
-        #  [-0.1318247]], [0.4162451]]
-        # rank 0 parameters is [[[ 0.1145883],
-        #  [-0.3539237],
-        #  [ 0.8672745],
-        #  [ 0.5483069],
-        #  [-0.5038487]], [0.4179307]]
-        # [[[-0.3260467],
-        #  [-0.025772 ],
-        #  [ 0.1325525],
-        #  [ 0.5388269],
-        #  [-0.3178367]], [0.4170879]]
+        model = Net().toGPU(1000+ get_local_rank())
+        print(f"bcast before rank {get_rank()}:{model.parameters()}")
+        Comm_OP.broadcast_model_params(model, 0)
+        # model = model
+        print(f"bcast after rank {get_rank()}: {model.parameters()}")
         
-nccl_average_grad_allreduce
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-使用 ``nccl_average_grad_allreduce`` 以allreduce的方式对不同进程上参数梯度进行传递并更新。
-
-.. py:function:: pyvqnet.distributed.nccl_api.nccl_average_grad_allreduce(optimizer, Ncclop:NCCL_api, c_op = "avg")
-
-    设置分布式计算参数。
-
-    :param optimizer: Optimizer.
-    :param Ncclop: `NCCL_api`.
-    :param root: 指定的进程号.
-
-    Example::
-        
-        import numpy as np
-        from pyvqnet.nn.module import Module
-        from pyvqnet.nn.linear import Linear
-        from pyvqnet.nn import activation as F
-        from pyvqnet.distributed.nccl_api import *
-        from pyvqnet.nn.loss import MeanSquaredError
-        from pyvqnet.optim import Adam
-        from pyvqnet.tensor import tensor
-
-        nccl_op = NCCL_api()
-        nccl_op.ncclCommInitRank()
-
-        class Net(Module):
-            def __init__(self):
-                super(Net, self).__init__()
-                self.fc = Linear(input_channels=5, output_channels=1)
-            def forward(self, x):
-                x = F.ReLu()(self.fc(x))
-                return x
-
-        model = Net().toGPU(1000+ get_rank())
-        opti = Adam(model.parameters(), lr=0.01)
-
-        actual = tensor.QTensor([1,1,1,1,1,0,0,0,0,0],dtype=6).reshape((10,1)).toGPU(1000+get_rank())
-
-        x = tensor.randn((10, 5)).toGPU(1000+get_rank())
-
-        for i in range(10):
-            opti.zero_grad()
-            model.train()
-
-            result = model(x)
-            loss = MeanSquaredError()(actual, result)
-            loss.backward()
-
-            print(f"rank {get_rank()} grad is {model.parameters()[0].grad}")
-
-            nccl_average_grad_allreduce(opti, nccl_op)
-            if get_rank() == 0 :
-                print(f"rank {get_rank()} grad is {model.parameters()[0].grad}")
-            opti.step()
-
-            exit()
-
-        # mpirun -n 2 python test.py
-        # rank 1 grad is [[-0.2537998],
-        #  [-0.0411504],
-        #  [-0.3565139],
-        #  [ 0.5702319],
-        #  [ 0.0177623]]
-        # rank 0 grad is [[-0.1322807],
-        #  [ 0.481559 ],
-        #  [-0.8823745],
-        #  [ 0.211081 ],
-        #  [-0.0234532]]
-        # rank 0 grad is [[-0.1930403],
-        #  [ 0.2202043],
-        #  [-0.6194442],
-        #  [ 0.3906564],
-        #  [-0.0028455]]
-        
-
-nccl_average_grad_reduce
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-使用 ``nccl_average_grad_reduce`` 以reduce的方式对不同进程上参数梯度进行传递并更新。
-
-.. py:function:: pyvqnet.distributed.nccl_api.nccl_average_grad_reduce(optimizer, Ncclop:NCCL_api, root = 0, c_op = "avg")
-
-    设置分布式计算参数。
-
-    :param optimizer: `Optimizer`.
-    :param Ncclop: `NCCL_api`.
-    :param root: 在指定的节点上更新参数梯度.
-    :param c_op: 计算方式.
-
-    Example::
-
-        import numpy as np
-        from pyvqnet.nn.module import Module
-        from pyvqnet.nn.linear import Linear
-        from pyvqnet.nn import activation as F
-        from pyvqnet.distributed.nccl_api import *
-        from pyvqnet.nn.loss import MeanSquaredError
-        from pyvqnet.optim import Adam
-        from pyvqnet.tensor import tensor
-
-        nccl_op = NCCL_api()
-        nccl_op.ncclCommInitRank()
-
-        class Net(Module):
-            def __init__(self):
-                super(Net, self).__init__()
-                self.fc = Linear(input_channels=5, output_channels=1)
-            def forward(self, x):
-                x = F.ReLu()(self.fc(x))
-                return x
-
-        model = Net().toGPU(1000+ get_rank())
-        opti = Adam(model.parameters(), lr=0.01)
-
-        actual = tensor.QTensor([1,1,1,1,1,0,0,0,0,0],dtype=6).reshape((10,1)).toGPU(1000+get_rank())
-
-        x = tensor.randn((10, 5)).toGPU(1000+get_rank())
-
-        for i in range(10):
-            opti.zero_grad()
-            model.train()
-
-            result = model(x)
-            loss = MeanSquaredError()(actual, result)
-            loss.backward()
-
-            print(f"rank {get_rank()} grad is {model.parameters()[0].grad}")
-
-            nccl_average_grad_reduce(opti, nccl_op)
-            if get_rank() == 0 :
-                print(f"rank {get_rank()} grad is {model.parameters()[0].grad}")
-            opti.step()
-
-            exit()
-
-        # mpirun -n 2 python test.py
-        
-        # rank 1 grad is [[ 0.2536973],
-        #  [ 0.1971456],
-        #  [ 0.2229966],
-        #  [-0.1126524],
-        #  [-0.4308025]]
-        # rank 0 grad is [[-0.7967089],
-        #  [ 0.3266841],
-        #  [ 0.087491 ],
-        #  [-2.0684564],
-        #  [ 1.0999191]]
-        # rank 0 grad is [[-0.2715058],
-        #  [ 0.2619148],
-        #  [ 0.1552438],
-        #  [-1.0905544],
-        #  [ 0.3345583]]
-
-
-案例
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-.. code-block::
-
-    from pyvqnet.qnn.vqc import *
-    from pyvqnet.optim import Adam
-    from pyvqnet.nn import Module, BinaryCrossEntropy, Sigmoid
-    from pyvqnet.data import data_generator
-    import numpy as np
-    from sklearn import datasets
-    from sklearn.model_selection import train_test_split
-    from pyvqnet.tensor import QTensor
-
-    from pyvqnet.distributed.nccl_api import *
-    from pyvqnet.distributed import split_data, broadcast_model_params
-
-    from time import time
-
-
-    # NCCL 初始化
-    nccl_op = NCCL_api()
-    nccl_op.ncclCommInitRank()
-
-    iris_dataset = datasets.load_iris()
-
-    X1 = iris_dataset.data[:100, :].astype(
-        np.float32)  # 选取iris_dataset的data的前100个数据，将其数据类型转换为float32，并储存在X中
-    X_feature_names = iris_dataset.feature_names  # 将iris_dataset的特征名称储存在X_feature_names中
-    y = iris_dataset.target[:100].astype(
-        int)  # 选取iris_dataset的target的前100个数据，将其数据类型转换为int，并储存在y中
-    y_target_names = iris_dataset.target_names[:
-                                               2]  # 选取iris_dataset的target_names的前2个数据，并储存在y_target_names中
-
-    alpha = X1[:, :
-               3] * X1[:,
-                       1:]  # 每一个样本中，利用相邻两个特征值计算出一个参数，即每一个样本会多出3个参数（因为有4个特征值），并储存在alpha中
-    X1 = np.append(X1, alpha, axis=1)  # 在axis=1的维度上，将alpha的数据值添加到X的特征值中
-    print(X1.shape)
-    # exit()
-    X_train, X_test, y_train, y_test = train_test_split(X1,
-                                                        y,
-                                                        test_size=0.2,
-                                                        random_state=0,
-                                                        shuffle=True)
-
-    class Q_model(Module):
-        def __init__(self):
-            super(Q_model, self).__init__()
-
-            self.hardward = VQC_HardwareEfficientAnsatz(
-                n_qubits=4,
-                single_rot_gate_list=["ry"],
-                entangle_gate="cnot",
-                depth=15)
-            obs_list = [{
-                'wires': [2, 3],
-                'observables': ['Z', 'Z'],
-                'coefficient': [1, 1]
-            }]
-            # print(obs_list)
-            self.ma = MeasureAll(obs=obs_list)
-            self.ac = Sigmoid()
-            self.qm = QMachine(4)
-
-        def forward(self, input):
-            qm = self.qm
-            qm.reset_states(input.shape[0])
-
-            def cir(qm, x):
-                for i in range(4):
-                    hadamard(qm, i)
-
-                for i in range(4):
-                    rz(qm, i, x[:, [i]])
-
-                for i in range(3):
-                    cnot(qm, [i, i + 1])
-                    rz(qm, i + 1, x[:, [4 + i]])
-                return qm
-
-            qm = cir(qm, input)
-            self.hardward(q_machine=qm)
-            y = self.ma(q_machine=qm)
-            y = self.ac(y)
-
-            return y
-
-    def run():
-        """
-        Main run function
-        """
-
-        model = Q_model()
-        model = broadcast_model_params(model)
-        model = model.toGPU(1000 + get_rank())
-        # print(model.parameters())
-        optimizer = Adam(model.parameters(), lr=0.1)
-        batch_size = 20
-        epoch = 20
-        loss = BinaryCrossEntropy()
-        print("start training..............")
-        model.train()
-
-        datas, labels= split_data(X_train, y_train)
-
-        def get_accuary(result, label):
-            result = (result > 0.5).astype(4)
-            score = tensor.sums(result == label)
-            return score
-
-        time2 = time()
-        runtime = 0
-        for i in range(epoch):
-            count = 0
-            sum_loss = 0
-            accuary = 0
-            t = 0
-            for data, label in data_generator(datas, labels, batch_size, False):
-                time3 = time()
-                optimizer.zero_grad()
-                data, label = QTensor(data,requires_grad=True).toGPU(1000 + get_rank()), QTensor(label,
-                                                     dtype=6,
-                                                     requires_grad=False).toGPU(1000 + get_rank())
-
-                result = model(data)
-
-                loss_b = loss(label.reshape([-1, 1]), result)
-
-                loss_b.backward()
-
-                nccl_average_grad_allreduce(optimizer, nccl_op)
-                optimizer._step()
-
-                sum_loss += loss_b.item()
-                count += batch_size
-                accuary += get_accuary(result, label.reshape([-1,1]))
-                t = t + 1
-                runtime += time() - time3
-
-            # nccl_average_parameters_reduce(model, nccl_op)
-            if get_rank()==0:
-                print(
-                    f"epoch:{i}, #### loss:{sum_loss/count} #####accuray:{accuary/count}"
-                )
-
-        print("start testing..............")
-        model.eval()
-        count = 0
-        if get_rank() == 0:
-            print(time() - time2)
-        test_data, test_label = X_test, y_test
-        test_batch_size = 5
-        accuary = 0
-        sum_loss = 0
-        for testd, testl in data_generator(test_data, test_label, test_batch_size):
-            testd = QTensor(testd).toGPU(1000+get_rank())
-            testl = QTensor(testl, dtype=6).toGPU(1000+get_rank())
-            test_result = model(testd)
-            test_loss = loss(testl.reshape([-1, 1]), test_result)
-            sum_loss += test_loss
-            count += test_batch_size
-            accuary += get_accuary(test_result, testl.reshape([-1, 1]))
-        if get_rank()==0:
-            print(
-                f"test:--------------->loss:{sum_loss/count} #####accuray:{accuary/count}"
-            )
-    run()
 
 split_data
 =================================
 
-在多进程中，使用 ``split_data`` 根据进程数对数据进行切分，返回相应进程上数据。
+在多进程中,使用 ``split_data`` 根据进程数对数据进行切分,返回相应进程上数据。
 
 .. py:function:: pyvqnet.distributed.datasplit.split_data(x_train, y_train, shuffle=False)
 
@@ -4342,7 +4273,7 @@ split_data
 
     :param x_train: `np.array` - 训练数据.
     :param y_train: `np.array` -  训练数据标签.
-    :param shuffle: `bool` - 是否打乱后再进行切分，默认值是False.
+    :param shuffle: `bool` - 是否打乱后再进行切分,默认值是False.
 
     :return: 切分后的训练数据和标签。
 
@@ -4356,37 +4287,195 @@ split_data
 
         x_train, y_train= split_data(x_train, y_train)
 
-broadcast_model_params
+get_local_rank
 =================================
 
-使用 ``broadcast_model_params`` 在模型训练前将指定进程上的模型参数广播到其他进程，使模型训练前的参数保持一致。
+使用 ``get_local_rank`` 得到当前机器上进程号。
 
-.. py:function:: pyvqnet.distributed.comm.broadcast_model_params(model, root = 0)
+.. py:function:: pyvqnet.distributed.ControllComm.get_local_rank()
 
-    设置分布式计算参数。
+    用于获得当前机器上的当前进程号。
 
-    :param model: `Module` - 训练的模型.
-    :param root: 指定的进程号.
+    :return: 当前机器上的当前进程号。
 
     Example::
 
-        from pyvqnet.nn.module import Module
-        from pyvqnet.nn.linear import Linear
-        from pyvqnet.nn import activation as F
-        from pyvqnet.distributed import broadcast_model_params, get_rank
+        from pyvqnet.distributed.ControllComm import get_local_rank
+
+        print(get_local_rank())
+        # vqnetrun -n 2 python test.py
+
+get_rank
+=================================
+使用 ``get_rank`` 得到当前机器上进程号。
+
+.. py:function:: pyvqnet.distributed.ControllComm.get_rank()
+
+    用于获得当前进程的进程号。
+
+    :return: 当前进程的进程号。
+
+    Example::
+
+        from pyvqnet.distributed.ControllComm import get_rank
+
+        print(get_rank())
+        # vqnetrun -n 2 python test.py
+
+init_group
+=================================
+使用 ``init_group`` 根据给出的进程数列表来对基于cpu下的进程组进行初始化。
+
+.. py:function:: pyvqnet.distributed.ControllComm.init_group(rank_lists)
+
+    用于初始化进程通信组。
+
+    :param rank_lists: 通信进程组列表.
+    :return: 初始化后的进程组列表。
+
+    Example::
+
+        from pyvqnet.distributed import *
+
+        Comm_OP = CommController("mpi")
+        num = tensor.to_tensor(np.random.rand(1, 5))
+        print(f"rank {Comm_OP.getRank()}  {num}")
         
-        class Net(Module):
+        group_l = init_group([[0,2], [1]])
+
+        for comm_ in group_l:
+            if Comm_OP.getRank() in comm_[1]:
+                Comm_OP.allreduce_group(num, "sum", GroupComm = comm_[0])
+                print(f"rank {Comm_OP.getRank()}  {num} after")
+        
+        # vqnetrun -n 3 python test.py
+        
+PipelineParallelTrainingWrapper
+=================================
+.. py:class:: pyvqnet.distributed.pp.PipelineParallelTrainingWrapper(args,join_layers,trainset)
+    
+    Pipeline Parallel Training Wrapper 实现了 1F1B训练。仅在 Linux 平台上,且具有 GPU 的情况下可用。
+    更多算法细节可以在(https://www.deepspeed.ai/tutorials/pipeline/）找到。
+
+    :param args: 参数字典。参见示例。
+    :param join_layers: Sequential 模块的列表。
+    :param trainset: 数据集。
+
+    :return:
+        PipelineParallelTrainingWrapper 实例。
+
+    以下使用 CIFAR10数据库 `CIFAR10_Dataset`,在2块GPU上训练AlexNet上的分类任务。
+    本例子中分成两个流水线并行进程 `pipeline_parallel_size` = 2。
+    批处理大小为 `train_batch_size` = 64, 单GPU 上为 `train_micro_batch_size_per_gpu` = 32。
+    其他配置参数可见 `args`。
+    此外,每个进程需要在 `__main__` 函数中配置环境变量的 `LOCAL_RANK`。
+    
+    .. code-block::
+
+        os.environ["LOCAL_RANK"] = str(dist.get_local_rank())
+
+    调用 `train_batch` 进行训练。
+
+    Examples::
+
+        import os
+        import pyvqnet
+
+        from pyvqnet.nn import Module,Sequential,CrossEntropyLoss
+        from pyvqnet.nn import Linear
+        from pyvqnet.nn import Conv2D
+        from pyvqnet.nn import activation as F
+        from pyvqnet.nn import MaxPool2D
+        from pyvqnet.nn import CrossEntropyLoss
+
+        from pyvqnet.tensor import tensor
+        from pyvqnet.distributed.pp import PipelineParallelTrainingWrapper
+        from pyvqnet.distributed.pp import comm as dist
+        from pyvqnet.distributed import *
+
+
+        pipeline_parallel_size = 2
+
+        num_steps = 1000
+
+        def cifar_trainset_vqnet(local_rank, dl_path='./cifar10-data'):
+            transform = pyvqnet.data.TransformCompose([
+                pyvqnet.data.TransformResize(256),
+                pyvqnet.data.TransformCenterCrop(224),
+                pyvqnet.data.TransformToTensor(),
+                pyvqnet.data.TransformNormalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+            ])
+
+            trainset = pyvqnet.data.CIFAR10_Dataset(root=dl_path,
+                                                    mode="train",
+                                                    transform=transform,layout="HWC")
+
+            return trainset
+
+        class Model(Module):
             def __init__(self):
-                super(Net, self).__init__()
-                self.fc = Linear(input_channels=5, output_channels=1)
+                super(Model, self).__init__()
+                self.features = Sequential( 
+                Conv2D(input_channels=3, output_channels=8, kernel_size=(3, 3), stride=(1, 1), padding='same'),
+                F.ReLu(),
+                MaxPool2D([2, 2], [2, 2]),
+
+                Conv2D(input_channels=8, output_channels=16, kernel_size=(3, 3), stride=(1, 1), padding='same'),
+                F.ReLu(),
+                MaxPool2D([2, 2], [2, 2]),
+
+                Conv2D(input_channels=16, output_channels=32, kernel_size=(3, 3), stride=(1, 1), padding='same'),
+                F.ReLu(),
+
+                Conv2D(input_channels=32, output_channels=64, kernel_size=(3, 3), stride=(1, 1), padding='same'),
+                F.ReLu(),
+
+                Conv2D(input_channels=64, output_channels=64, kernel_size=(3, 3), stride=(1, 1), padding='same'),
+                F.ReLu(),
+                MaxPool2D([3, 3], [2, 2]),)
+                
+                self.cls = Sequential( 
+                Linear(64 * 27 * 27, 512),
+                F.ReLu(),
+
+                Linear(512, 256),
+                F.ReLu(),
+                Linear(256, 10) )
+
             def forward(self, x):
-                x = F.ReLu()(self.fc(x))
+                x = self.features(x)
+                x = tensor.flatten(x,1)
+                x = self.cls(x)
+
                 return x
+            
+        def join_layers(vision_model):
+            layers = [
+                *vision_model.features,
+                lambda x: tensor.flatten(x, 1),
+                *vision_model.cls,
+            ]
+            return layers
 
-        model = Net()
-        print(f"bcast before rank {get_rank()}:{model.parameters()}")
-        model = broadcast_model_params(model)
-        model = model.toGPU(1000+ get_rank())
-        print(f"bcast after rank {get_rank()}: {model.parameters()}")
 
-        # mpirun -n 2 python run.py
+        if __name__ == "__main__":
+
+
+            args = {
+            "backend":'nccl',  
+            "train_batch_size" : 64,
+            "train_micro_batch_size_per_gpu" : 32,
+        "optimizer": {
+            "type": "Adam",
+            "params": {
+            "lr": 0.001
+            }}, 
+            "local_rank":dist.get_local_rank(), 
+            "pipeline_parallel_size":pipeline_parallel_size, "seed":42, "steps":num_steps,
+            "loss":CrossEntropyLoss(),
+            }
+            os.environ["LOCAL_RANK"] = str(dist.get_local_rank())
+            trainset = cifar_trainset_vqnet(args["local_rank"])
+            w = PipelineParallelTrainingWrapper(args,join_layers(Model()),trainset)
+
+            w.train_batch()
