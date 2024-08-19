@@ -13,6 +13,12 @@ VQNet python包安装
 
     pip install pyvqnet --index-url https://pypi.originqc.com.cn
 
+如果您遇到网络问题导致无法下载，可尝试增加timeout。
+
+.. code-block::
+
+    pip install pyvqnet --index-url https://pypi.originqc.com.cn --default-timeout=100
+
 VQNet 测试安装成功
 ----------------------------------
 
