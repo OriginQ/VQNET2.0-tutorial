@@ -66,6 +66,11 @@ QuantumLayer是一个支持量子含参线路作为参数的自动求导模块�
 
         使用QuantumLayer的 `m_para` 属性获取变分量子线路的训练参数。该参数为QTensor类，可使用to_numpy()接口转化为numpy数组。
 
+
+    .. note::
+
+        该类具有别名 `QpandaQCircuitVQCLayer` 。
+
     Example::
 
         import pyqpanda as pq
@@ -178,7 +183,7 @@ QuantumLayer是一个支持量子含参线路作为参数的自动求导模块�
 QuantumLayerV2
 ============================
 
-如您更加熟悉pyQPanda语法，可以使用QuantumLayerV2，自定义量子比特 ``qubits`` ,经典比特 ``cbits`` ,后端模拟器 ``machine`` 加入QuantumLayerV2的参数 ``qprog_with_measure`` 函数中。
+如您更加熟悉pyQPanda语法，可以使用该接口QuantumLayerV2，自定义量子比特 ``qubits`` ,经典比特 ``cbits`` ,后端模拟器 ``machine`` 加入QuantumLayerV2的参数 ``qprog_with_measure`` 函数中。
 
 .. py:class:: pyvqnet.qnn.quantumlayer.QuantumLayerV2(qprog_with_measure,para_num,diff_method:str = "parameter_shift",delta:float = 0.01,dtype=None,name="")
 
@@ -207,6 +212,10 @@ QuantumLayerV2
         `input`: 输入一维经典数据。如果没有，输入 None。
         
         `param`: 输入一维的变分量子线路的待训练参数。
+
+    .. note::
+
+        该类具有别名 `QpandaQCircuitVQCLayerLite` 。
 
     Example::
 
@@ -372,6 +381,10 @@ QuantumLayerV3
         `qubits`:QuantumLayerV3 分配的量子比特
 
         `cubits`:QuantumLayerV3 分配的经典比特。如果您的电路不使用经典比特，您也应该保留此参数作为函数输入。
+
+    .. note::
+
+        该类具有别名 `QpandaQProgVQCLayer` 。
 
     Example::
 

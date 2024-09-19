@@ -2,8 +2,7 @@
 变分量子线路自动微分模拟
 ***********************************
 
-VQNet基于自动微分算子构建以及一些常用量子逻辑门、量子线路以及测量方法，可使用自动微分代替量子线路parameter-shift方法计算梯度。
-我们可以像其他 `Module` 一样,使用VQC算子构成复杂神经网络。在 `Module` 中需要定义虚拟机 `QMachine`,并且需要对machine中 `states` 根据输入的batchsize进行reset_states。请具体看下例:
+VQNet基于自动微分算子构建以及一些常用量子逻辑门、量子线路以及测量方法，可使用自动微分代替量子线路parameter-shift方法计算梯度。我们可以像其他 `Module` 一样,使用VQC算子构成复杂神经网络。在 `Module` 中需要定义虚拟机 `QMachine`,并且需要对machine中 `states` 根据输入的batchsize进行reset_states。请具体看下例:
 
     Example::
 
@@ -109,16 +108,19 @@ VQNet基于自动微分算子构建以及一些常用量子逻辑门、量子线
 QMachine
 ---------------------------------------------------------------
 
-.. py:class:: pyvqnet.qnn.vqc.QMachine(num_wires, dtype=pyvqnet.kcomplex64)
+.. py:class:: pyvqnet.qnn.vqc.QMachine(num_wires, dtype=pyvqnet.kcomplex64，grad_mode="",save_ir=False)
 
     变分量子计算的模拟器类，包含states属性为量子线路的statevectors。
 
     .. note::
         
-        使用 `pyvqnet.qnn.vqc.QMachine.reset_states(batchsize)` 方法可以使模拟器支持批量数据处理
+        在每次运行一个完整的量子线路之前，必须使用 `pyvqnet.qnn.vqc.QMachine.reset_states(batchsize)` 将模拟器里面初态重新初始化，并且广播为
+        (batchsize,*) 维度从而适应批量数据训练。
 
-    :param num_wires: 量子比特的个数。
-    :param dtype: 计算数据的数据类型，默认pyvqnet.kcomplex64,对应参数精度为pyvqnet.kfloat32。
+    :param num_wires: 量子比特数。
+    :param dtype: 计算数据的数据类型。默认值是pyvqnet。kcomplex64，对应的参数精度为pyvqnet.kfloat32。
+    :param grad_mode: 梯度计算模式，可为 "adjoint"，默认值:"",使用自动微分。
+    :param save_ir: 设置为True时，将操作保存到originIR，默认值:False。
 
     :return: 输出QMachine。
 
@@ -142,6 +144,13 @@ QMachine
         #    [[0.+0.j 0.+0.j]
         #     [0.+0.j 0.+0.j]]]]]
 
+    .. py:method:: reset_states(batchsize)
+
+        将模拟器里面初态重新初始化，并且广播为
+        (batchsize,*) 维度从而适应批量数据训练。
+
+        :param batchsize: 批处理维度。
+
 
 量子逻辑门接口
 ============================
@@ -157,7 +166,7 @@ i
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
-    :return: 输出QTensor。
+    
 
     Example::
         
@@ -216,7 +225,7 @@ hadamard
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
-    :return: 输出QTensor。
+    
 
     Example::
         
@@ -276,7 +285,7 @@ t
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
-    :return: 输出QTensor。
+    
 
     Example::
         
@@ -334,7 +343,7 @@ s
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
-    :return: 输出QTensor。
+    
 
     Example::
         
@@ -393,7 +402,7 @@ paulix
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
-    :return: 输出QTensor。
+    
 
     Example::
         
@@ -451,7 +460,7 @@ pauliy
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
-    :return: 输出QTensor。
+    
 
     Example::
         
@@ -511,7 +520,7 @@ pauliz
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
-    :return: 输出QTensor。
+    
 
     Example::
         
@@ -571,7 +580,7 @@ x1
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
-    :return: 输出QTensor。
+    
 
     Example::
         
@@ -631,7 +640,7 @@ rx
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
-    :return: 输出QTensor。
+    
 
     Example::
         
@@ -692,7 +701,7 @@ ry
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
-    :return: 输出QTensor。
+    
 
     Example::
         
@@ -753,7 +762,7 @@ rz
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
-    :return: 输出QTensor。
+    
 
     Example::
         
@@ -814,7 +823,7 @@ crx
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
-    :return: 输出QTensor。
+    
 
     Example::
 
@@ -877,7 +886,7 @@ cry
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
-    :return: 输出QTensor。
+    
 
     Example::
 
@@ -939,7 +948,7 @@ crz
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
-    :return: 输出QTensor。
+    
 
     Example::
 
@@ -1001,7 +1010,7 @@ p
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
-    :return: 输出QTensor。
+    
 
     Example::
         
@@ -1038,7 +1047,7 @@ u1
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
-    :return: 输出QTensor。
+    
 
     Example::
         
@@ -1099,7 +1108,7 @@ u2
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
-    :return: 输出QTensor。
+    
 
     Example::
         
@@ -1160,7 +1169,7 @@ u3
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
-    :return: 输出QTensor。
+    
 
     Example::
         
@@ -1280,7 +1289,7 @@ cnot
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
-    :return: 输出QTensor。
+    
 
     Example::
         
@@ -1340,7 +1349,7 @@ cr
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
-    :return: 输出QTensor。
+    
 
     Example::
         
@@ -1401,7 +1410,7 @@ swap
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
-    :return: 输出QTensor。
+    
 
     Example::
         
@@ -1463,7 +1472,7 @@ cswap
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
-    :return: 输出QTensor。
+    
 
     Example::
 
@@ -1561,7 +1570,7 @@ iswap
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
-    :return: 输出QTensor。
+    
 
     Example::
 
@@ -1597,7 +1606,7 @@ cz
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
-    :return: 输出QTensor。
+    
 
     Example::
         
@@ -1658,7 +1667,7 @@ rxx
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
-    :return: 输出QTensor。
+    
 
     Example::
         
@@ -1719,7 +1728,7 @@ ryy
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
-    :return: 输出QTensor。
+    
 
     Example::
         
@@ -1780,7 +1789,7 @@ rzz
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
-    :return: 输出QTensor。
+    
 
     Example::
         
@@ -1842,7 +1851,7 @@ rzx
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
-    :return: 输出QTensor。
+    
 
     Example::
         
@@ -1902,7 +1911,7 @@ toffoli
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
-    :return: 输出QTensor。
+    
 
     Example::
         
@@ -1963,7 +1972,7 @@ isingxx
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
-    :return: 输出QTensor。
+    
 
     Example::
     
@@ -2026,7 +2035,7 @@ isingyy
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
-    :return: 输出QTensor。
+    
 
     Example::
     
@@ -2089,7 +2098,7 @@ isingzz
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
-    :return: 输出QTensor。
+    
 
     Example::
     
@@ -2150,7 +2159,7 @@ isingxy
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
-    :return: 输出QTensor。
+    
 
     Example::
     
@@ -2212,7 +2221,7 @@ phaseshift
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
-    :return: 输出QTensor。
+    
 
     Example::
     
@@ -2274,7 +2283,7 @@ multirz
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
-    :return: 输出QTensor。
+    
 
     Example::
     
@@ -2336,7 +2345,7 @@ sdg
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
-    :return: 输出QTensor。
+    
 
     Example::
     
@@ -2399,7 +2408,7 @@ tdg
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
-    :return: 输出QTensor。
+    
 
     Example::
     
@@ -2460,7 +2469,7 @@ controlledphaseshift
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
-    :return: 输出QTensor。
+    
 
     Example::
     
@@ -2526,7 +2535,7 @@ multicnot
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
-    :return: 输出QTensor。
+    
 
     Example::
     
@@ -2553,7 +2562,6 @@ multicnot
 MultiCnot
 ---------------------------------------------------------------
 
-
 .. py:class:: pyvqnet.qnn.vqc.MultiCnot(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
     定义一个MultiCnot逻辑门类 。
@@ -2575,10 +2583,11 @@ MultiCnot
         device.reset_states(batchsize)
         layer(q_machine = device)
         print(device.states)
-        
+
+
+
 multixcnot
 ---------------------------------------------------------------
-
 
 .. py:function:: pyvqnet.qnn.vqc.multixcnot(q_machine, wires, params=None, use_dagger=False)
     
@@ -2588,7 +2597,7 @@ multixcnot
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
-    :return: 输出QTensor。
+
 
     Example::
     
@@ -2612,10 +2621,8 @@ multixcnot
         #    [[0.+0.j 0.+0.j]
         #     [0.+0.j 0.+0.j]]]]]
 
-
 MultiXcnot
 ---------------------------------------------------------------
-
 
 .. py:class:: pyvqnet.qnn.vqc.MultiXcnot(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
@@ -2639,6 +2646,119 @@ MultiXcnot
         layer(q_machine = device)
         print(device.states)
 
+
+multicontrolledx
+---------------------------------------------------------------
+
+
+.. py:function:: pyvqnet.qnn.vqc.multicontrolledx(q_machine, wires, params=None, use_dagger=False,control_values=None)
+    
+    对q_machine中的态矢作用量子逻辑门 multicontrolledx 。
+
+    :param q_machine:  量子虚拟机设备。
+    :param wires: 量子比特索引。
+    :param params: 参数矩阵，默认为None。
+    :param use_dagger: 是否共轭转置，默认为False。
+    :param control_values: 控制值，默认为None，当比特位为1时控制。
+
+
+    Example::
+ 
+
+
+        from pyvqnet.qnn.vqc import QMachine
+        import pyvqnet.qnn.vqc as vqc
+        from pyvqnet.tensor import QTensor
+        qm = QMachine(4)
+        for i in range(4):
+            vqc.hadamard(q_machine=qm, wires=i)
+        vqc.phaseshift(q_machine=qm,wires=[0], params = QTensor([0.5]))
+        vqc.phaseshift(q_machine=qm,wires=[1], params = QTensor([2]))
+        vqc.phaseshift(q_machine=qm,wires=[3], params = QTensor([3]))
+        vqc.multicontrolledx(qm, wires=[0, 1, 3, 2])
+        print(qm.states)
+
+        # [[[[[ 0.25     +0.j       ,-0.2474981+0.03528j  ],
+        #     [ 0.25     +0.j       ,-0.2474981+0.03528j  ]],
+
+        #    [[-0.1040367+0.2273243j, 0.0709155-0.239731j ],
+        #     [-0.1040367+0.2273243j, 0.0709155-0.239731j ]]],
+
+
+        #   [[[ 0.2193956+0.1198564j,-0.2341141-0.0876958j],
+        #     [ 0.2193956+0.1198564j,-0.2341141-0.0876958j]],
+
+        #    [[-0.2002859+0.149618j , 0.1771674-0.176385j ],
+        #     [-0.2002859+0.149618j , 0.1771674-0.176385j ]]]]]
+
+
+MultiControlledX
+---------------------------------------------------------------
+
+.. py:class:: pyvqnet.qnn.vqc.MultiControlledX(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False,control_values=None)
+    
+    定义一个MultiXcnot逻辑门类 。
+
+    :param has_params:  是否具有参数，例如RX,RY等门需要设置为True，不含参数的需要设置为False，默认为False。
+    :param trainable: 是否自带含待训练参数，如果该层使用外部输入数据构建逻辑门矩阵，设置为False，如果待训练参数需要从该层初始化，则为True，默认为False。
+    :param init_params: 初始化参数，用来编码经典数据QTensor，默认为None。
+    :param wires: 线路作用的比特索引，默认为None。
+    :param dtype: 逻辑门内部矩阵的数据精度，可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
+    :param use_dagger: 是否使用该门的转置共轭版本，默认为False。
+    :param control_values: 控制值，默认为None，当比特位为1时控制。
+
+    :return: 一个Module，可以用来训练模型。
+
+    Example::
+
+        from pyvqnet.qnn.vqc import QMachine
+        import pyvqnet.qnn.vqc as vqc
+        from pyvqnet.tensor import QTensor,kcomplex64
+
+        qm = QMachine(4,dtype=kcomplex64)
+        qm.reset_states(2)
+        for i in range(4):
+            vqc.hadamard(q_machine=qm, wires=i)
+        vqc.isingzz(q_machine=qm, params=QTensor([0.25]), wires=[1,0])
+        vqc.double_excitation(q_machine=qm, params=QTensor([0.55]), wires=[0,1,2,3])
+
+        mcx = vqc.MultiControlledX( 
+                        init_params=None,
+                        wires=[2,3,0,1],
+                        dtype=kcomplex64,
+                        use_dagger=False,control_values=[1,0,0])
+        y = mcx(q_machine = qm)
+        print(qm.states)
+        """
+        [[[[[0.2480494-0.0311687j,0.2480494-0.0311687j],
+            [0.2480494+0.0311687j,0.1713719-0.0215338j]],
+
+        [[0.2480494+0.0311687j,0.2480494+0.0311687j],
+            [0.2480494-0.0311687j,0.2480494+0.0311687j]]],
+
+
+        [[[0.2480494+0.0311687j,0.2480494+0.0311687j],
+            [0.2480494+0.0311687j,0.2480494+0.0311687j]],
+
+        [[0.306086 -0.0384613j,0.2480494-0.0311687j],
+            [0.2480494-0.0311687j,0.2480494-0.0311687j]]]],
+
+
+
+        [[[[0.2480494-0.0311687j,0.2480494-0.0311687j],
+            [0.2480494+0.0311687j,0.1713719-0.0215338j]],
+
+        [[0.2480494+0.0311687j,0.2480494+0.0311687j],
+            [0.2480494-0.0311687j,0.2480494+0.0311687j]]],
+
+
+        [[[0.2480494+0.0311687j,0.2480494+0.0311687j],
+            [0.2480494+0.0311687j,0.2480494+0.0311687j]],
+
+        [[0.306086 -0.0384613j,0.2480494-0.0311687j],
+            [0.2480494-0.0311687j,0.2480494-0.0311687j]]]]]
+        """
+
 single_excitation
 ---------------------------------------------------------------
 
@@ -2651,7 +2771,7 @@ single_excitation
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
-    :return: 输出QTensor。
+    
 
     Example::
     
@@ -2687,7 +2807,7 @@ double_excitation
     :param wires: 量子比特索引。
     :param params: 参数矩阵，默认为None。
     :param use_dagger: 是否共轭转置，默认为False。
-    :return: 输出QTensor。
+    
 
     Example::
     
@@ -3399,7 +3519,7 @@ VQC_BasisEmbedding
 
     :param basis_state:  ``(n)`` 大小的二进制输入。
     :param q_machine: 量子虚拟机设备。
-    :return: 输出QTensor。
+    
 
     Example::
         
@@ -3437,7 +3557,7 @@ VQC_AngleEmbedding
     :param wires: 量子比特idx。
     :param q_machine: 量子虚拟机设备。
     :param rotation: 旋转门，默认为“X”。
-    :return: 输出QTensor。
+    
 
     Example::
 
@@ -3472,7 +3592,7 @@ VQC_AmplitudeEmbedding
 
     :param input_feature: 表示参数的numpy数组。
     :param q_machine: 量子虚拟机设备。
-    :return: 输出QTensor。
+    
 
     Example::
 
@@ -3503,7 +3623,7 @@ VQC_IQPEmbedding
     :param input_feat: 表示参数的数组。
     :param q_machine: 量子虚拟机设备。
     :param rep: 重复量子线路块次数,默认次数为1。
-    :return: 输出QTensor。
+    
 
     Example::
 
@@ -3539,7 +3659,7 @@ VQC_RotCircuit
     :param q_machine: 量子虚拟机设备。
     :param wire: 量子比特索引。
     :param params: 表示参数  :math:`[\phi, \theta, \omega]`。
-    :return: 输出QTensor。
+    
 
     Example::
 
@@ -3574,7 +3694,7 @@ VQC_CRotCircuit
     :param control_qubits: 控制量子比特索引。
     :param rot_wire: Rot量子比特索引。
     :param q_machine: 量子虚拟机设备。
-    :return: 输出QTensor。
+    
 
     Example::
 
@@ -3610,7 +3730,7 @@ VQC_Controlled_Hadamard
 
     :param wires: 量子比特索引列表, 第一位是控制比特, 列表长度为2。
     :param q_machine: 量子虚拟机设备。
-    :return: 输出QTensor。
+    
 
     Examples::
 
@@ -3652,7 +3772,7 @@ VQC_CCZ
     
     :param wires: 量子比特下标列表,第一位是控制比特。列表长度为3。
     :param q_machine: 量子虚拟机设备。
-    :return: 输出QTensor。
+    
 
     Example::
 
@@ -3689,7 +3809,7 @@ VQC_FermionicSingleExcitation
                 中间的索引被CNOT门作用，以计算量子位集的奇偶校验。
     :param q_machine: 量子虚拟机设备。
 
-    :return: 输出QTensor。
+    
 
     Examples::
 
@@ -3740,7 +3860,7 @@ VQC_FermionicDoubleExcitation
     :param wires2: 代表的量子比特的索引列表区间 [q, p] 中占据量子比特的子集。第一根索引被解释为 q，最后一索引被解释为 p。 CNOT 门对中间的索引进行操作，以计算一组量子位的奇偶性。
     :param q_machine: 量子虚拟机设备。
 
-    :return: 输出QTensor。
+    
 
     Examples::
 
@@ -3795,7 +3915,7 @@ VQC_UCCSD
     :param init_state: 长度 ``len(wires)`` occupation-number vector 表示
         高频状态。 ``init_state`` 在量子比特初始化状态。
     :param q_machine: 量子虚拟机设备。
-    :return: 输出QTensor。
+    
     
     Examples::
 
@@ -4002,7 +4122,6 @@ VQC_BasisRotation
 VQC_QuantumPoolingCircuit
 ---------------------------------------------------------------
 
-
 .. py:function:: pyvqnet.qnn.vqc.VQC_QuantumPoolingCircuit(ignored_wires, sinks_wires, params, q_machine)
 
     对数据进行降采样的量子电路。
@@ -4014,7 +4133,7 @@ VQC_QuantumPoolingCircuit
     :param params: 输入参数。
     :param q_machine: 量子虚拟机设备。
 
-    :return: 输出QTensor。
+    
 
     Examples:: 
 
@@ -4030,8 +4149,251 @@ VQC_QuantumPoolingCircuit
         exp = m(q_machine=qm)
         print(exp)
 
-        # 
 
+vqc_qft_add_to_register
+-------------------------------------
+
+.. py:function:: pyvqnet.qnn.vqc.vqc_qft_add_to_register(q_machine, m, k)
+
+    将无符号整数 `m` 编码到量子比特中，然后将 `k` 加到此量子比特上。
+
+    .. math:: \text{Sum(k)}\vert m \rangle = \vert m + k \rangle.
+
+    实现此幺正运算的过程如下：
+    (1). 通过 将 QFT 应用于 :math:`\vert m \rangle` 状态，将状态从计算基础转换为傅里叶基础。
+    (2). 使用 :math:`R_Z` 门将 :math:`j` 个量子比特旋转角度 :math:`\frac{2k\pi}{2^{j}}`，从而得到新相 :math:`\frac{2(m + k)\pi}{2^{j}}`。
+    (3). 应用 QFT 逆返回计算基础并得到 :math:`m+k`。
+
+    :param q_machine: 用于模拟的量子机。
+    :param m: 嵌入寄存器的经典整数。
+    :param k: 添加到寄存器的经典整数。
+
+    :retrun: 返回目标和的二进制表示。
+
+    .. note::
+
+        请注意 ``q_machine`` 使用的比特数量需要足够使用X基态编码结果和的二进制值。
+
+    Example::
+
+        import numpy as np
+        from pyvqnet.qnn.vqc import QMachine,Samples, vqc_qft_add_to_register
+        dev = QMachine(4)
+        vqc_qft_add_to_register(dev,3, 7)
+        ma = Samples()
+        y = ma(q_machine=dev)
+        print(y)
+        #[[1,0,1,0]]
+
+
+vqc_qft_add_two_register
+-------------------------------------
+
+.. py:function:: vqc_qft_add_two_register(q_machine, m, k, wires_m, wires_k, wires_solution)
+
+    将两个量子比特中编码的无符号整数进行加法。
+
+    .. math:: \text{Sum}_2\vert m \rangle \vert k \rangle \vert 0 \rangle = \vert m \rangle \vert k \rangle \vert m+k \rangle
+
+    在这种情况下，我们可以将第三个寄存器（最初位于 :math:`0`）理解为一个计数器，它将计算出 :math:`m` 和 :math:`k` 加起来的单位数。二进制分解将使这变得简单。如果我们有 :math:`\vert m \rangle = \vert \overline{q_0q_1q_2} \rangle`，则如果 :math:`q_2 = 1`，则我们必须将 :math:`1` 添加到计数器，否则不添加任何内容。一般来说，如果 :math:`i`-th 量子位处于 :math:`\vert 1 \rangle` 状态，则我们应该添加 :math:`2^{n-i-1}` 个单位，否则添加 0。
+
+    :param q_machine: 用于模拟的量子机。
+    :param m: 嵌入寄存器中的经典整数作为 lhs。
+    :param k: 嵌入到寄存器中的经典整数作为 rhs。
+    :param wires_m: 要编码 m 的量子比特的索引。
+    :param wires_k: 要编码 k 的量子比特的索引。
+    :param wires_solution: 要编码解决方案的量子比特的索引。
+
+    :retrun: 返回目标和的二进制表示。
+
+
+    .. note::
+
+        ``wires_m`` 使用的比特数量需要足够使用X基态编码 `m` 的二进制值。
+        ``wires_k`` 使用的比特数量需要足够使用X基态编码 `k` 的二进制值。
+        ``wires_solution`` 使用的比特数量需要足够使用X基态编码结果的二进制值。
+
+    Example::
+
+        import numpy as np
+        from pyvqnet.qnn.vqc import QMachine,Samples, vqc_qft_add_two_register
+        wires_m = [0, 1, 2]           # qubits needed to encode m
+        wires_k = [3, 4, 5]           # qubits needed to encode k
+        wires_solution = [6, 7, 8, 9, 10]  # qubits needed to encode the solution
+
+        wires_m = [0, 1, 2]             # qubits needed to encode m
+        wires_k = [3, 4, 5]             # qubits needed to encode k
+        wires_solution = [6, 7, 8, 9]   # qubits needed to encode the solution
+        dev = QMachine(len(wires_m) + len(wires_k) + len(wires_solution))
+
+        vqc_qft_add_two_register(dev,3, 7, wires_m, wires_k, wires_solution)
+
+        ma = Samples(wires=wires_solution)
+        y = ma(q_machine=dev)
+        print(y)
+
+
+vqc_qft_mul
+-------------------------------------
+
+.. py:function:: vqc_qft_mul(q_machine, m, k, wires_m, wires_k, wires_solution)
+
+    将两个量子比特中编码的数值进行加法。
+
+    .. math:: \text{Mul}\vert m \rangle \vert k \rangle \vert 0 \rangle = \vert m \rangle \vert k \rangle \vert m\cdot k \rangle
+
+    :param q_machine: 用于模拟的量子机。
+    :param m: 嵌入寄存器中的经典整数，作为左侧。
+    :param k: 嵌入寄存器中的经典整数，作为右侧。
+    :param wires_m: 要编码 m 的量子比特索引。
+    :param wires_k: 要编码 k 的量子比特索引。
+    :param wires_solution: 要编码解决方案的量子比特索引。
+
+    :retrun: 返回目标乘积的二进制表示。
+
+    .. note::
+
+        ``wires_m`` 使用的比特数量需要足够使用X基态编码 `m` 的二进制值。
+        ``wires_k`` 使用的比特数量需要足够使用X基态编码 `k` 的二进制值。
+        ``wires_solution`` 使用的比特数量需要足够使用X基态编码结果的二进制值。
+
+    Example::
+
+        import numpy as np
+        from pyvqnet.qnn.vqc import QMachine,Samples, vqc_qft_mul
+        wires_m = [0, 1, 2]           # qubits needed to encode m
+        wires_k = [3, 4, 5]           # qubits needed to encode k
+        wires_solution = [6, 7, 8, 9, 10]  # qubits needed to encode the solution
+        
+        dev = QMachine(len(wires_m) + len(wires_k) + len(wires_solution))
+
+        vqc_qft_mul(dev,3, 7, wires_m, wires_k, wires_solution)
+
+
+        ma = Samples(wires=wires_solution)
+        y = ma(q_machine=dev)
+        print(y)
+        #[[1,0,1,0,1]]
+
+VQC_FABLE
+--------------------
+
+.. py:class:: pyvqnet.qnn.vqc.VQC_FABLE(wires)
+
+    使用快速近似块编码方法构建基于 VQC 的 QCircuit。对于特定结构的矩阵 [`arXiv:2205.00081 <https://arxiv.org/abs/2205.00081>`_], FABLE 方法可以简化块编码电路而不降低准确性。
+
+    :param wires: 运算符作用的 qlist 索引。
+
+    :return: 返回一个基于VQC的FABLE类实例。
+
+    Examples::
+
+        from pyvqnet.qnn.vqc import VQC_FABLE
+        from pyvqnet.qnn.vqc import QMachine
+        from pyvqnet.dtype import float_dtype_to_complex_dtype
+        import numpy as np
+        from pyvqnet import QTensor
+        
+        A = QTensor(np.array([[0.1, 0.2 ], [0.3, 0.4 ]]) )
+        qf = VQC_FABLE(list(range(3)))
+        qm = QMachine(3,dtype=float_dtype_to_complex_dtype(A.dtype))
+        qm.reset_states(1)
+        z1 = qf(qm,A,0.001)
+ 
+        """
+        [[[[0.05     +0.j,0.15     +0.j],
+        [0.05     +0.j,0.15     +0.j]],
+
+        [[0.4974937+0.j,0.4769696+0.j],
+        [0.4974937+0.j,0.4769696+0.j]]]]
+        """
+
+
+VQC_LCU
+--------------------
+
+.. py:class:: pyvqnet.qnn.vqc.VQC_LCU(wires)
+
+    使用线性组合单元 (LCU) 构建基于 VQC 的 QCircuit，`通过量子比特化进行哈密顿模拟 <https://arxiv.org/abs/1610.06546>`_。
+    输入 dtype 可以是 kfloat32、kfloat64、kcomplex64、kcomplex128
+    输入应为 Hermitian。
+
+    :param wires: 运算符作用的 qlist 索引，可能需要辅助量子位。
+    :param check_hermitian: 检查输入是否为 Hermitian，默认值：True。
+
+    Examples::
+
+        from pyvqnet.qnn.vqc import VQC_LCU
+        from pyvqnet.qnn.vqc import QMachine
+        from pyvqnet.dtype import float_dtype_to_complex_dtype,kfloat64
+
+        from pyvqnet import QTensor
+
+        A = QTensor([[0.25,0,0,0.75],[0,-0.25,0.75,0],[0,0.75,0.25,0],[0.75,0,0,-0.25]],device=1001,dtype=kfloat64)
+        qf = VQC_LCU(list(range(3)))
+        qm = QMachine(3,dtype=float_dtype_to_complex_dtype(A.dtype))
+        qm.reset_states(2)
+        z1 = qf(qm,A)
+        print(z1)
+        """
+        [[[[ 0.25     +0.j, 0.       +0.j],
+        [ 0.       +0.j, 0.75     +0.j]],
+
+        [[-0.4330127+0.j, 0.       +0.j],
+        [ 0.       +0.j, 0.4330127+0.j]]],
+
+
+        [[[ 0.25     +0.j, 0.       +0.j],
+        [ 0.       +0.j, 0.75     +0.j]],
+
+        [[-0.4330127+0.j, 0.       +0.j],
+        [ 0.       +0.j, 0.4330127+0.j]]]]
+        <QTensor [2, 2, 2, 2] DEV_CPU kcomplex128>
+        """
+
+
+VQC_QSVT
+--------------------
+
+.. py:class:: pyvqnet.qnn.vqc.VQC_QSVT(A, angles, wires)
+
+    Implements the
+    `quantum singular value transformation <https://arxiv.org/abs/1806.01838>`__ (QSVT) circuit.
+
+
+    :param A: 要编码的一般 :math:`(n \times m)` 矩阵。
+    :param angles: 要移动以获得所需多项式的角度列表。
+    :param wires: A 作用于的量子比特索引。
+
+    Example::
+
+        from pyvqnet import DEV_GPU
+        from pyvqnet.qnn.vqc import QMachine,VQC_QSVT
+        from pyvqnet.dtype import float_dtype_to_complex_dtype,kfloat64
+        import numpy as np
+        from pyvqnet import QTensor
+
+        A = QTensor([[0.1, 0.2], [0.3, 0.4]])
+        angles = QTensor([0.1, 0.2, 0.3])
+        qm = QMachine(4,dtype=float_dtype_to_complex_dtype(A.dtype))
+        qm.reset_states(1)
+        qf = VQC_QSVT(A,angles,wires=[2,1,3])
+        z1 = qf(qm)
+        print(z1)
+        """
+        [[[[[ 0.9645935+0.2352667j,-0.0216623+0.0512362j],
+        [-0.0062613+0.0308878j,-0.0199871+0.0985996j]],
+
+        [[ 0.       +0.j       , 0.       +0.j       ],
+            [ 0.       +0.j       , 0.       +0.j       ]]],
+
+
+        [[[ 0.       +0.j       , 0.       +0.j       ],
+            [ 0.       +0.j       , 0.       +0.j       ]],
+
+        [[ 0.       +0.j       , 0.       +0.j       ],
+            [ 0.       +0.j       , 0.       +0.j       ]]]]]
+        """
 
 
 其他函数
