@@ -4403,11 +4403,10 @@ VQC_QSVT
 HybirdVQCQpandaQVMLayer
 -----------------------------------------------------------
 
-.. py:class:: pyvqnet.qnn.vqc.HybirdVQCQpandaQVMLayer(vqc_module: Module,qcloud_token: str,para_num: int,num_qubits: int,num_cubits: int,pauli_str_dict: Union[List[Dict], Dict, None] = None,shots: int = 1000,initializer: Callable = None,dtype: Union[int, None] = None,name: str = "",diff_method: str = "parameter_shift",submit_kwargs: Dict = {},query_kwargs: Dict = {})
+.. py:class:: pyvqnet.qnn.vqc.HybirdVQCQpandaQVMLayer(vqc_module: Module,qcloud_token: str,para_num: int,num_qubits: int,num_cubits: int,pauli_str_dict: Union[List[Dict], Dict, None] = None,shots: int = 1000,initializer: Callable = None,dtype: Union[int, None] = None,name: str = "",submit_kwargs: Dict = {},query_kwargs: Dict = {})
 
 
     混合 vqc 和 qpanda QVM 层。该层将用户 `forward` 函数定义的量子线路计算转化为QPanda线路,可在QPanda 本地虚拟机或者云端服务上进行前向运行,并在本地CPU上模拟计算线路参数梯度,降低了使用参数漂移法计算的时间复杂度。
-    如果 diff_method == "random_coordinate_descent" ,该层将随机选择单个参数来计算梯度,其他参数将保持为零。参考:https://arxiv.org/abs/2311.00088
 
     :param vqc_module: 带有 forward() 的 vqc_module,qmachine 设置正确。
     :param qcloud_token: `str` - 量子机器的类型或用于执行的云令牌。
@@ -4419,7 +4418,6 @@ HybirdVQCQpandaQVMLayer
     :param initializer: 参数值的初始化器。默认值为 None。
     :param dtype: 参数的数据类型。默认值为 None,即使用默认数据类型。
     :param name: 模块名称。默认值为空字符串。
-    :param diff_method: 梯度计算的微分方法。默认值为“parameter_shift”。如果 diff_method == "random_coordinate_descent" ,我们将随机选择单个参数来计算梯度,其他参数将保持为零。参考:https://arxiv.org/abs/2311.00088 。
     :param submit_kwargs: 提交量子电路的附加关键字参数,默认值:
         {"chip_id":pyqpanda.real_chip_type.origin_72,
         "is_amend":True,"is_mapping":True,
@@ -4542,7 +4540,6 @@ HybirdVQCQpandaQVMLayer
                     initializer=None,
                     dtype=None,
                     name="",
-            diff_method="random_coordinate_descent",
             submit_kwargs={"test_qcloud_fake":True},
                     query_kwargs={})
     
