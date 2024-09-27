@@ -2,6 +2,30 @@
 VQNet Changelog
 ######################
 
+[v2.14.0] - 2024-09-30
+***************************
+
+Added
+===================
+
+- 增加 `VQC_LCU`, `VQC_FABLE`, `VQC_QSVT`, block-encoding算法, 以及qpanda算法实现 `QPANDA_QSVT`, `QPANDA_LCU`, `QPANDA_FABLE`接口.
+- 增加整数加到量子比特上 `vqc_qft_add_to_register`, 两个量子比特上的数加法 `vqc_qft_add_two_register`，两个量子比特上的数乘法的 `vqc_qft_mul`.
+- 增加量子启发式微调方法 `quanTA`.
+- 增加混合qpanda与vqc的训练模块 `HybirdVQCQpandaQVMLayer`.
+- 增加 `einsum`, `moveaxis`, `eigh`, `dignoal` 等接口实现.
+- 增加分布式计算中张量并行计算功能 `ColumnParallelLinear`, `RowParallelLinear`.
+- 增加分布式计算中Zero stage-1 功能 `ZeroModelInitial`.
+
+Changed
+===================
+- 删除了xtensor部分。
+
+Fixed
+===================
+- 修改分布式计算功能中底层通信接口 `allreduce`, `allgather`, `reduce`, `broadcas`t, 添加对 `core.Tensor` 数据通信支持
+- api文档进行部分修改。
+- `QuantumBatchAsyncQcloudLayer` 指定 diff_method == "random_coordinate_descent" 时候不会使用PSR而是随机对量子参数选择一个进行梯度计算.
+
 [v2.13.0] - 2024-07-30
 ***************************
 
