@@ -1,4 +1,4 @@
-量子机器学习模块
+使用pyQPanda量子机器学习模块
 #################################
 
 量子计算层
@@ -65,7 +65,6 @@ QuantumLayer是一个支持量子含参线路作为参数的自动求导模块�
             `machine`: 由QuantumLayer创建的模拟器，例如CPUQVM,GPUQVM,QCloud等。
 
         使用QuantumLayer的 `m_para` 属性获取变分量子线路的训练参数。该参数为QTensor类，可使用to_numpy()接口转化为numpy数组。
-
 
     .. note::
 
@@ -187,7 +186,7 @@ QuantumLayerV2
 
 .. py:class:: pyvqnet.qnn.quantumlayer.QuantumLayerV2(qprog_with_measure,para_num,diff_method:str = "parameter_shift",delta:float = 0.01,dtype=None,name="")
 
-	变分量子层的抽象计算模块。对一个参数化的量子线路进行仿真，得到测量结果。该变分量子层继承了VQNet框架的梯度计算模块，可以计算线路参数的梯度，训练变分量子线路模型或将变分量子线路嵌入混合量子和经典模型。
+	变分量子层的抽象计算模块。对一个参数化的量子线路使用pyQPanda进行仿真，得到测量结果。该变分量子层继承了VQNet框架的梯度计算模块，可以使用参数漂移法等计算线路参数的梯度，训练变分量子线路模型或将变分量子线路嵌入混合量子和经典模型。
     
     :param qprog_with_measure: 用pyQPand构建的量子线路运行和测量函数。
     :param para_num: `int` - 参数个数。
