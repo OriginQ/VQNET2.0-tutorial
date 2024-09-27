@@ -8,23 +8,27 @@ VQNet Changelog
 Added
 ===================
 
-- 增加 `VQC_LCU`, `VQC_FABLE`, `VQC_QSVT`, block-encoding算法, 以及qpanda算法实现 `QPANDA_QSVT`, `QPANDA_LCU`, `QPANDA_FABLE`接口.
+- 增加 `VQC_LCU`, `VQC_FABLE`, `VQC_QSVT` 的block-encoding算法, 以及qpanda算法实现 `QPANDA_QSVT`, `QPANDA_LCU`, `QPANDA_FABLE` 接口.
 - 增加整数加到量子比特上 `vqc_qft_add_to_register`, 两个量子比特上的数加法 `vqc_qft_add_two_register`，两个量子比特上的数乘法的 `vqc_qft_mul`.
-- 增加量子启发式微调方法 `quanTA`.
 - 增加混合qpanda与vqc的训练模块 `HybirdVQCQpandaQVMLayer`.
 - 增加 `einsum`, `moveaxis`, `eigh`, `dignoal` 等接口实现.
 - 增加分布式计算中张量并行计算功能 `ColumnParallelLinear`, `RowParallelLinear`.
 - 增加分布式计算中Zero stage-1 功能 `ZeroModelInitial`.
+- `QuantumBatchAsyncQcloudLayer` 指定 diff_method == "random_coordinate_descent" 时候不会使用PSR而是随机对量子参数选择一个进行梯度计算.
 
 Changed
 ===================
 - 删除了xtensor部分。
+- api文档进行部分修改。区分了基于自动微分的量子机器学习示例以及基于qpanda的机器学习示例,区别基于自动微分的量子机器学习接口以及基于qpanda的机器学习示例接口。
+- `matmul` 支持1d@1d,2d@1d,1d@2d。
+- 增加了一些量子计算层别名: `QpandaQCircuitVQCLayer`` = `QuantumLayer` , `QpandaQCircuitVQCLayerLite` = `QuantumLayerV2`, `QpandaQProgVQCLayer` = `QuantumLayerV3`.
 
 Fixed
 ===================
-- 修改分布式计算功能中底层通信接口 `allreduce`, `allgather`, `reduce`, `broadcas`t, 添加对 `core.Tensor` 数据通信支持
-- api文档进行部分修改。
-- `QuantumBatchAsyncQcloudLayer` 指定 diff_method == "random_coordinate_descent" 时候不会使用PSR而是随机对量子参数选择一个进行梯度计算.
+- 修改分布式计算功能中底层通信接口 `allreduce`, `allgather`, `reduce`, `broadcast` , 添加对 `core.Tensor` 数据通信支持
+- 解决随机数生成的bug。
+- 解决了 VQC的 `RXX`, `RYY`, `RZZ`, `RZX` 转换成originIR的错误。
+
 
 [v2.13.0] - 2024-07-30
 ***************************
