@@ -566,8 +566,9 @@ QuantumBatchAsyncQcloudLayerES
 =================================
 
 当您安装最新版本pyqpanda,可以使用本接口定义一个变分线路，并提交到originqc的真实芯片上运行。
+该接口以 "进化策略" 的方式来对参数梯度进行估计，并对参数进行更新，该方法可参照论文 `Learning to learn with an evolutionary strategy Learning to learn with an evolutionary strategy <https://arxiv.org/abs/2310.17402>`_ .
 
-.. py:class:: pyvqnet.qnn.quantumlayer.QuantumBatchAsyncQcloudLayerES(origin_qprog_func, qcloud_token, para_num, num_qubits, num_cubits, pauli_str_dict=None, shots = 1000, initializer=None, dtype=None, name="", diff_method="ES", submit_kwargs={}, query_kwargs={}, sigma = np.pi / 24)
+.. py:class:: pyvqnet.qnn.quantumlayer.QuantumBatchAsyncQcloudLayerES(origin_qprog_func, qcloud_token, para_num, num_qubits, num_cubits, pauli_str_dict=None, shots = 1000, initializer=None, dtype=None, name="", submit_kwargs={}, query_kwargs={}, sigma = np.pi / 24)
 
     使用 pyqpanda QCLOUD 从版本 3.8.2.2 开始的 originqc 真实芯片的抽象计算模块。 它提交参数化量子电路到真实芯片并获得测量结果。
 
@@ -601,7 +602,6 @@ QuantumBatchAsyncQcloudLayerES
     :param initializer: 参数值的初始化器。 默认为“无”，使用0~2*pi正态分布。
     :param dtype: 参数的数据类型。 默认值为 None，即使用默认数据类型pyvqnet.kfloat32。
     :param name: 模块的名称。 默认为空字符串。
-    :param diff_method: 梯度计算的微分方法。 默认为“ES”, 源自论文"Learning to learn with an evolutionary strategy Learning to learn with an evolutionary strategy", 当前不支持其他微分方法。
     :param submit_kwargs: 用于提交量子电路的附加关键字参数，默认:{"chip_id":pyqpanda.real_chip_type.origin_72,"is_amend":True,"is_mapping":True,"is_optimization":True,"compile_level":3,"default_task_group_size":200,"test_qcloud_fake":False},当设置test_qcloud_fake为True则本地CPUQVM模拟。
     :param query_kwargs: 用于查询量子结果的附加关键字参数，默认:{"timeout":2,"print_query_info":True,"sub_circuits_split_size":1}。
     :param sigma:  多元非三维分布的采样方差, 一般取pi/6, pi/12, pi/24, 默认为pi/24。
@@ -642,7 +642,6 @@ QuantumBatchAsyncQcloudLayerES
                         initializer=None,
                         dtype=None,
                         name="",
-                        diff_method="ES",
                         submit_kwargs={},
                         query_kwargs={},
                         sigma=np.pi/24)
@@ -677,7 +676,6 @@ QuantumBatchAsyncQcloudLayerES
                     initializer=None,
                     dtype=None,
                     name="",
-                    diff_method="ES",
                     submit_kwargs={},
                     query_kwargs={})
         x = pyvqnet.tensor.QTensor([[0.56,1.2],[0.56,1.2],[0.56,1.2],[0.56,1.2]],requires_grad= True)
