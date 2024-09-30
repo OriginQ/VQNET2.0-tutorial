@@ -874,7 +874,7 @@
 .. code-block::
 
 
-    url_base = "http://yann.lecun.com/exdb/mnist/"
+    url_base = 'https://ossci-datasets.s3.amazonaws.com/mnist/'
     key_file = {
         "train_img": "train-images-idx3-ubyte.gz",
         "train_label": "train-labels-idx1-ubyte.gz",
@@ -1603,7 +1603,7 @@ Circuit-centric quantum classifiers算法示例
 
 .. code-block::
 
-    url_base = "http://yann.lecun.com/exdb/mnist/"
+    url_base = 'https://ossci-datasets.s3.amazonaws.com/mnist/'
     key_file = {
         "train_img": "train-images-idx3-ubyte.gz",
         "train_label": "train-labels-idx1-ubyte.gz",
@@ -2121,7 +2121,7 @@ VSQL量子整体模型如下：
 
 .. code-block::
 
-    url_base = "http://yann.lecun.com/exdb/mnist/"
+    url_base = 'https://ossci-datasets.s3.amazonaws.com/mnist/'
     key_file = {
         "train_img": "train-images-idx3-ubyte.gz",
         "train_label": "train-labels-idx1-ubyte.gz",
@@ -2645,7 +2645,7 @@ QMLP模型示例
 .. code-block::
 
 
-    url_base = "http://yann.lecun.com/exdb/mnist/"
+    url_base = 'https://ossci-datasets.s3.amazonaws.com/mnist/'
     key_file = {
         "train_img": "train-images-idx3-ubyte.gz",
         "train_label": "train-labels-idx1-ubyte.gz",

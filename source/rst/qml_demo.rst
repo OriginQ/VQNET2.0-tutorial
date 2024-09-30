@@ -462,7 +462,7 @@ VSQL中各个量子比特上的局部量子线路图如下：
         except ImportError:
             raise ImportError("You should use Python 3.x")
 
-        url_base = "http://yann.lecun.com/exdb/mnist/"
+        url_base = 'https://ossci-datasets.s3.amazonaws.com/mnist/'
         key_file = {
             "train_img": "train-images-idx3-ubyte.gz",
             "train_label": "train-labels-idx1-ubyte.gz",
@@ -815,7 +815,7 @@ Mnist数据集定义
     except ImportError:
         raise ImportError("You should use Python 3.x")
 
-    url_base = "http://yann.lecun.com/exdb/mnist/"
+    url_base = 'https://ossci-datasets.s3.amazonaws.com/mnist/'
     key_file = {
         "train_img": "train-images-idx3-ubyte.gz",
         "train_label": "train-labels-idx1-ubyte.gz",
@@ -1932,7 +1932,7 @@ Quantum circuit structure learning任务的核心目标就是找到最优的带�
     except ImportError:
         raise ImportError("You should use Python 3.x")
 
-    url_base = "http://yann.lecun.com/exdb/mnist/"
+    url_base = 'https://ossci-datasets.s3.amazonaws.com/mnist/'
     key_file = {
         "train_img": "train-images-idx3-ubyte.gz",
         "train_label": "train-labels-idx1-ubyte.gz",
@@ -3244,7 +3244,7 @@ QUnet主要是用于解决图像分割的技术。
     except ImportError:
         raise ImportError("You should use Python 3.x")
 
-    url_base = "http://yann.lecun.com/exdb/mnist/"
+    url_base = 'https://ossci-datasets.s3.amazonaws.com/mnist/'
     key_file = {
         "train_img": "train-images-idx3-ubyte.gz",
         "train_label": "train-labels-idx1-ubyte.gz",
