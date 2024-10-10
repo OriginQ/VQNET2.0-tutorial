@@ -4647,7 +4647,7 @@ QuantumLayerES
     :param general_module: 一个仅使用 ``pyvqnet.qnn.vqc`` 下量子线路接口搭建的 `pyvqnet.nn.QModule` 实例。
     :param q_machine: 来自general_module中定义的QMachine。
     :param name: 该层名字,默认为""。
-    :param sigma: 多元正太分布的采样方差.
+    :param sigma: 多元正态分布的采样方差.
 
     .. note::
 
