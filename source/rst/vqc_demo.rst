@@ -465,7 +465,7 @@
     from pyqpanda import *
     from pyvqnet.qnn.vqc.qcircuit import isingxx,isingyy,isingzz,u3,cnot,VQC_AmplitudeEmbedding,rxx,ryy,rzz,rzx
     from pyvqnet.qnn.vqc.qmachine import QMachine
-    from pyvqnet.qnn.vqc.qmeasure import probs
+    from pyvqnet.qnn.vqc.utils import probs
     from pyvqnet.nn import Module, Parameter
     from pyvqnet.tensor import tensor,kfloat32
     from pyvqnet.tensor import QTensor
@@ -630,12 +630,12 @@
             train_acc = tensor.sums(result[tensor.arange(0, len(y_train)), y_train] > 0.5) / result.shape[0]
             # print(train_acc)
             # print(f"step {step}, train_acc {train_acc}")
-            train_acc_epochs.append(train_acc.to_numpy()[0])
+            train_acc_epochs.append(train_acc.to_numpy())
 
             # compute accuracy and cost on testing data
             test_out = model(QTensor(x_test))
             test_acc = tensor.sums(test_out[tensor.arange(0, len(y_test)), y_test] > 0.5) / test_out.shape[0]
-            test_acc_epochs.append(test_acc.to_numpy()[0])
+            test_acc_epochs.append(test_acc.to_numpy())
             test_cost = 1.0 - tensor.sums(test_out[tensor.arange(0, len(y_test)), y_test]) / len(y_test)
             test_cost_epochs.append(test_cost.to_numpy()[0])
 
@@ -2864,7 +2864,7 @@ QMLP模型示例
 使用量子经典混合神经网络模型实现一种强化学习算法的示例
 ================================================================
 
-载入必要库，定义全局变量
+载入必要库，定义全局变量,其中 `pygame==2.1.3，gym==0.23.0` 。
 
 .. code-block::
 
@@ -3563,17 +3563,17 @@ QMLP模型示例
         num = 0
         for _ in range(20):
             for i in range(3):
-                ry(q_machine=qm, params=para[num], wires=i, num_wires=3)
+                ry(q_machine=qm, params=para[num], wires=i)
                 num += 1 
 
             for i in range(3):
-                rz(q_machine=qm, params=para[num], wires=i, num_wires=3)
+                rz(q_machine=qm, params=para[num], wires=i)
                 num += 1
 
             for i in range(2):
-                cnot(q_machine=qm, wires=[i, i+1], num_wires=3)
+                cnot(q_machine=qm, wires=[i, i+1])
 
-            cnot(q_machine=qm, wires=[2, 0], num_wires=3)
+            cnot(q_machine=qm, wires=[2, 0])
 
         return qm.states
 
@@ -4072,8 +4072,6 @@ Dropout是经典深度神经网络（DNN）的一种常用技术，可防止计�
         X_train = X_train.reshape(-1, 1)
         X_test = X_test.reshape(-1, 1)
 
-        y_train = y_train.reshape(-1, 1)
-        y_test = y_test.reshape(-1, 1)
 
         return X_train, X_test, y_train, y_test
 
@@ -4138,7 +4136,7 @@ Dropout是经典深度神经网络（DNN）的一种常用技术，可防止计�
             
             rng = np.random.default_rng(tmp_seed)
             assert len(X.shape) == 2  # X must be a matrix
-            assert len(y.shape) == 1  # y must be an array
+
             assert X.shape[0] == y.shape[0]  # compatibility check
 
             # lists for saving single run training and test cost trend

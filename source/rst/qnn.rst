@@ -2267,12 +2267,12 @@ expval_qcloud
 
     Example::
 
-        from pyqpanda import *
+        import pyqpanda as pq
         input = [0.56, 0.1]
 
-        m_machine = QCloud()
+        m_machine = pq.QCloud()
 
-        m_machine.init_qvm("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
+        m_machine.init_qvm("your api token")
 
         m_prog = pq.QProg()
         m_qlist = m_machine.qAlloc_many(4)
