@@ -4082,11 +4082,6 @@ Dropout是经典深度神经网络（DNN）的一种常用技术，可防止计�
     y = scaler.fit_transform(y)
     y_test = scaler.transform(y_test)
 
-    # reshaping for computation
-    y = y.reshape(-1,)
-    y_test = y_test.reshape(-1,)
-
-
     fig, ax = plt.subplots()
     plt.plot(X, y, "o", label="Training")
     plt.plot(X_test, y_test, "o", label="Test")
