@@ -1983,39 +1983,55 @@ fuse_module
 
 SDPA
 =================================
-.. py:class:: pyvqnet.transformer.e2eqvit.SDPA(attn_mask=None,dropout_p=0.,scale=None,is_causal=False)
+.. py:class:: pyvqnet.transformer.SDPA(attn_mask=None,dropout_p=0.,scale=None,is_causal=False)
 
-    SDPA 缩放点乘注意力机制,cpu下为math方法, gpu下为flash方法.
+    构造计算查询、键和值张量的缩放点积注意力的类。如果输入为cpu下的QTensor,则使用数学公式计算, 如果输入在gpu下QTensor，则使用flash-attention方法计算。
 
     :param attn_mask: 注意力掩码；形状必须可以广播到注意力权重的形状。
     :param dropout_p: Dropout 概率，如果大于 0.0, 则应用。
     :param scale:  在 softmax 之前应用的缩放因子。
     :param is_causal: 如果为 "true"，则假定存在左上因果注意屏蔽，如果同时设置了 attn_mask 和 is_causal, 则会出现错误。
+    :return: 一个SDPA类
 
     Examples::
     
-        from pyvqnet.transformer.e2eqvit.e2eqvit import SDPA, scaled_dot_product_attention_pyimpl
+        from pyvqnet.transformer import SDPA
         from pyvqnet import tensor
-        import pyvqnet
-        from time import time
-        import pyvqnet.nn as nn
-        import numpy as np
-
-        np.random.seed(42)
-
-        query_np = np.random.randn(3, 3, 3, 5).astype(np.float32) 
-        key_np = np.random.randn(3, 3, 3, 5).astype(np.float32)   
-        value_np = np.random.randn(3, 3, 3, 5).astype(np.float32) 
-
         model = SDPA(tensor.QTensor([1.])).toGPU()
 
-        query_p = tensor.QTensor(query_np, dtype=pyvqnet.kfloat32, requires_grad=True).toGPU()
-        key_p = tensor.QTensor(key_np, dtype=pyvqnet.kfloat32, requires_grad=True).toGPU()
-        value_p = tensor.QTensor(value_np, dtype=pyvqnet.kfloat32, requires_grad=True).toGPU()
+    .. py:method:: forward(query,key,value)
 
-        out_sdpa = model(query_p, key_p, value_p)
+        进行前向计算，如果输入为cpu下的QTensor,则使用数学公式计算, 如果输入在gpu下QTensor，则使用flash-attention方法计算。
 
-        out_sdpa.backward()
+        :param query: query输入QTensor。
+        :param key: key输入QTensor。
+        :param value: key输入QTensor。
+        :return: SDPA计算返回的QTensor。
+
+        Examples::
+        
+            from pyvqnet.transformer import SDPA
+            from pyvqnet import tensor
+            import pyvqnet
+            from time import time
+            import pyvqnet.nn as nn
+            import numpy as np
+
+            np.random.seed(42)
+
+            model = SDPA(tensor.QTensor([1.])).toGPU()
+
+            query_np = np.random.randn(3, 3, 3, 5).astype(np.float32) 
+            key_np = np.random.randn(3, 3, 3, 5).astype(np.float32)   
+            value_np = np.random.randn(3, 3, 3, 5).astype(np.float32) 
+
+            query_p = tensor.QTensor(query_np, dtype=pyvqnet.kfloat32, requires_grad=True).toGPU()
+            key_p = tensor.QTensor(key_np, dtype=pyvqnet.kfloat32, requires_grad=True).toGPU()
+            value_p = tensor.QTensor(value_np, dtype=pyvqnet.kfloat32, requires_grad=True).toGPU()
+
+            out_sdpa = model(query_p, key_p, value_p)
+
+            out_sdpa.backward()
 
 
 损失函数层

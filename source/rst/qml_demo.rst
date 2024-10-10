@@ -1094,7 +1094,7 @@ QAE量子线路：
     import os.path
     import gzip
 
-    url_base = 'http://yann.lecun.com/exdb/mnist/'
+    url_base = 'https://ossci-datasets.s3.amazonaws.com/mnist/'
     key_file = {
         'train_img':'train-images-idx3-ubyte.gz',
         'train_label':'train-labels-idx1-ubyte.gz',
@@ -1496,7 +1496,7 @@ Quantum circuit structure learning任务的核心目标就是找到最优的带�
     except ImportError:
         raise ImportError("You should use Python 3.x")
 
-    url_base = 'http://yann.lecun.com/exdb/mnist/'
+    url_base = 'https://ossci-datasets.s3.amazonaws.com/mnist/'
     key_file = {
         'train_img':'train-images-idx3-ubyte.gz',
         'train_label':'train-labels-idx1-ubyte.gz',
@@ -5926,7 +5926,7 @@ vqe_func_analytic()函数是使用参数偏移计算理论梯度，vqe_func_shot
     import os.path
     import gzip
 
-    url_base = 'http://yann.lecun.com/exdb/mnist/'
+    url_base = 'https://ossci-datasets.s3.amazonaws.com/mnist/'
     key_file = {
         'train_img':'train-images-idx3-ubyte.gz',
         'train_label':'train-labels-idx1-ubyte.gz',
