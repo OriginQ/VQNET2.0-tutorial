@@ -4569,6 +4569,7 @@ QuantumLayerAdjoint
         当前支持由如下含参逻辑门 `RX`, `RY`, `RZ`, `PhaseShift`, `RXX`, `RYY`, `RZZ`, `RZX`, `U1`, `U2`, `U3` 以及其他不含参逻辑门构成的变分线路。
 
     Example::
+
         import pyvqnet
         from pyvqnet import tensor
         from pyvqnet.qnn.vqc import QuantumLayerAdjoint, QMachine, RX, RY, CNOT, PauliX, qmatrix, PauliZ, T, MeasureAll, RZ, VQC_RotCircuit, VQC_HardwareEfficientAnsatz
@@ -4704,7 +4705,7 @@ QuantumLayerES
 
         input_x = tensor.QTensor([[0.1, 0.2, 0.3]])
 
-        input_x = tensor.broadcast_to(input_x, [40, 3])
+        input_x = tensor.broadcast_to(input_x, [4, 3])
 
         input_x.requires_grad = True
 
