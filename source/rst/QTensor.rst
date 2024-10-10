@@ -3627,14 +3627,15 @@ moveaxis
     :param source: （整数或整数元组）要移动的维度的原始位置。这些位置必须是唯一的。
     :param destination: （整数或整数元组）每个原始维度的目标位置。这些位置也必须是唯一的。
 
-    :return 新的QTensor
+    :return: 新的QTensor
 
     Example::
 
         from pyvqnet import QTensor,tensor
-        a = tensor.arange(24).reshape(2,3,4)
+        a = tensor.arange(0,24).reshape((2,3,4))
         b = tensor.moveaxis(a,(1, 2), (0, 1))
         print(b.shape)
+        #[3, 4, 2]
 
 
 swapaxis
