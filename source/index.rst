@@ -78,6 +78,7 @@ VQNet是由本源量子开发的量子机器学习计算框架，它可以用于
     :caption: 其他
     :maxdepth: 2
 
+    rst/torch_api.rst
     rst/FAQ.rst
     rst/CHANGELOG.rst
 
