@@ -71,5 +71,55 @@ TorchModule
     当用户使用 `torch` 后端时候，定义模型 `Module` 应该继承的基类。该类继承于 ``pyvqnet.nn.Module`` 以及 ``torch.nn.Module``。
     该类可以作为 ``torch.nn.Module`` 的一个子模块加入torch的模型中。
 
-    该类的 ``_buffers`` 中的数据为 ``torch.Tensor``。
-    该类的 ``_parmeters`` 中的数据为 ``torch.nn.Parameters``。
+    该类的 ``_buffers`` 中的数据为 ``torch.Tensor``类型。
+    该类的 ``_parmeters`` 中的数据为 ``torch.nn.Parameters``类型。
+
+
+QModule
+===============================
+
+.. py:class:: pyvqnet.nn.torch.QModule(name="")
+
+    当用户使用 `torch` 后端时候，定义量子变分线路模型 `Module` 应该继承的基类。该类继承于 ``pyvqnet.nn.torch.TorchModule`` 以及 ``torch.nn.Module``。
+    该类可以作为 ``torch.nn.Module`` 的一个子模块加入torch的模型中。
+
+    该类的 ``_buffers`` 中的数据为 ``torch.Tensor``类型。
+    该类的 ``_parmeters`` 中的数据为 ``torch.nn.Parameters``类型。
+
+Linear
+=================================
+
+.. py:class:: pyvqnet.nn.torch.Linear(input_channels, output_channels, weight_initializer=None, bias_initializer=None,use_bias=True, dtype=None, name: str = "")
+
+    线性模块(全连接层),:math:`y = Ax + b` 。
+    该类继承于 ``pyvqnet.nn.Module`` 以及 ``torch.nn.Module``，可以作为 ``torch.nn.Module`` 的一个子模块加入torch的模型中。
+
+    该类的 ``_buffers`` 中的数据为 ``torch.Tensor``类型。
+    该类的 ``_parmeters`` 中的数据为 ``torch.nn.Parameters``类型。
+    
+
+    :param input_channels: `int` - 输入数据通道数。
+    :param output_channels: `int` - 输出数据通道数。
+    :param weight_initializer: `callable` - 权重初始化函数,默认为空,使用he_uniform。
+    :param bias_initializer: `callable` - 偏置初始化参数,默认为空,使用he_uniform。
+    :param use_bias: `bool` - 是否使用偏置项, 默认使用。
+    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
+    :param name: 线性层的命名,默认为""。
+
+    :return: 线性层实例。
+
+    Example::
+
+        import numpy as np
+        import pyvqnet
+        from pyvqnet.tensor import QTensor
+        from pyvqnet.nn.torch import Linear
+        c1 =2
+        c2 = 3
+        cin = 7
+        cout = 5
+        n = Linear(cin,cout)
+        input = QTensor(np.arange(1,c1*c2*cin+1).reshape((c1,c2,cin)),requires_grad=True,dtype=pyvqnet.kfloat32)
+        y = n.forward(input)
+        print(y)
+ 
