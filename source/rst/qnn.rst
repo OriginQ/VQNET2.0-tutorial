@@ -1229,14 +1229,15 @@ HybirdVQCQpandaQVMLayer
 
 
     混合 vqc 和 qpanda QVM 层。该层将用户 `forward` 函数定义的VQNet编写的量子线路计算转化为QPanda OriginIR,可在QPanda 本地虚拟机或者云端服务上进行前向运行,并在本地CPU上模拟计算线路参数梯度,降低了使用参数漂移法计算的时间复杂度。
+    其中 ``vqc_module`` 为用户自定义的量子变分线路模型,其中的QMachine设置 ``save_ir= True`` 。
 
-    :param vqc_module: 带有 forward() 的 vqc_module,qmachine 设置正确。
+    :param vqc_module: 带有 forward() 的 vqc_module。
     :param qcloud_token: `str` - 量子机器的类型或用于执行的云令牌。
     :param num_qubits: `int` - 量子电路中的量子比特数。
     :param num_cubits: `int` - 量子电路中用于测量的经典比特数。
     :param pauli_str_dict: `dict|list` - 表示量子电路中泡利算子的字典或字典列表。默认值为 None。
-    :param shots: `int` - 测量镜头数。默认值为 1000。
-    :param dtype: 参数的数据类型。默认值为 None,即使用默认数据类型。
+    :param shots: `int` - 量子线路测量次数。默认值为 1000。
+    :param dtype: 参数的数据类型。默认值为 None,即使用默认数据类型4字节浮点数。
     :param name: 模块名称。默认值为空字符串。
     :param submit_kwargs: 提交量子电路的附加关键字参数,默认值:
         {"chip_id":pyqpanda.real_chip_type.origin_72,
@@ -1373,22 +1374,21 @@ DataParallelHybirdVQCQpandaQVMLayer
 
 .. py:class:: pyvqnet.qnn.DataParallelHybirdVQCQpandaQVMLayer(vqc_module: Module,qcloud_token: str,num_qubits: int,num_cubits: int,pauli_str_dict: Union[List[Dict], Dict, None] = None,shots: int = 1000,dtype: Union[int, None] = None,name: str = "",submit_kwargs: Dict = {},query_kwargs: Dict = {})
 
-
+    ``HybirdVQCQpandaQVMLayer`` 的数据并行版本，其中 ``vqc_module`` 为用户自定义的量子变分线路模型,其中的QMachine设置 ``save_ir= True`` 。
     使用数据并行将输入数据第一个维度 批处理数量 根据 `CommController` 中分配的进程数进行分割，在多个进程中基于 `mpi` 或者 `nccl` 进行数据并行。请注意一个进程对应一个节点上的GPU设备。
-
     每个进程中的该模块在前向计算时提交 批处理数量/节点数 个数据产生的量子线路，反向计算中计算 批处理数量/节点数 个数据贡献的梯度，并通过all_reduce计算多个节点上参数的平均梯度。
 
     .. note::
 
         该模块内部对输入切分,并将数据移动到对应设备上。第0个进程计算[0,批处理数量/节点数]数据，第k个进程计算[(k-1)批处理数量/节点数,k*批处理数量/节点数]
 
-    :param vqc_module: 带有 forward() 的 vqc_module,qmachine 设置正确。
+    :param vqc_module: 带有 forward() 的 vqc_module。
     :param qcloud_token: `str` - 量子机器的类型或用于执行的云令牌。
     :param num_qubits: `int` - 量子电路中的量子比特数。
     :param num_cubits: `int` - 量子电路中用于测量的经典比特数。
     :param pauli_str_dict: `dict|list` - 表示量子电路中泡利算子的字典或字典列表。默认值为 None。
-    :param shots: `int` - 测量镜头数。默认值为 1000。
-    :param dtype: 参数的数据类型。默认值为 None,即使用默认数据类型。
+    :param shots: `int` - 量子线路测量次数。默认值为 1000。
+    :param dtype: 参数的数据类型。默认值为 None,即使用默认数据类型4字节浮点数。
     :param name: 模块名称。默认值为空字符串。
     :param submit_kwargs: 提交量子电路的附加关键字参数,默认值:
         {"chip_id":pyqpanda.real_chip_type.origin_72,
