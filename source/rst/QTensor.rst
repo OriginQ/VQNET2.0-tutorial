@@ -9,12 +9,7 @@ VQNet量子机器学习所使用的数据结构QTensor的python接口介绍。QT
 
 QTensor's 函数与属性
 ******************************************
-
-
-__init__
-==============================
-
-.. py:function:: QTensor.__init__(data, requires_grad=False, nodes=None, device=0, dtype = None, name = "")
+.. py:class:: pyvqnet.tensor.tensor.QTensor(data, requires_grad=False, nodes=None, device=0, dtype=None, name="")
 
     具有动态计算图构造和自动微分的张量。
 
@@ -50,1025 +45,918 @@ __init__
         #   [ True  True  True  True]]]
 
 
-ndim
-==============================
+    .. py:attribute:: ndim
 
-.. py:attribute:: QTensor.ndim
+        返回张量的维度的个数。
+            
+        :return: 张量的维度的个数。
 
-    返回张量的维度的个数。
-        
-    :return: 张量的维度的个数。
+        Example::
 
-    Example::
+            from pyvqnet.tensor import QTensor
 
-        from pyvqnet.tensor import QTensor
+            a = QTensor([2, 3, 4, 5], requires_grad=True)
+            print(a.ndim)
 
-        a = QTensor([2, 3, 4, 5], requires_grad=True)
-        print(a.ndim)
-
-        # 1
+            # 1
     
-shape
-==============================
+ 
 
-.. py:attribute:: QTensor.shape
+    .. py:attribute:: shape
 
-    返回张量的维度
+        返回张量的维度
+        
+        :return: 一个列表存有张量的维度
+
+        Example::
+
+            from pyvqnet.tensor import QTensor
+
+            a = QTensor([2, 3, 4, 5], requires_grad=True)
+            print(a.shape)
+
+            # [4]
+
+ 
+
+    .. py:attribute:: size
+
+        返回张量的元素个数。
+        
+        :return: 张量的元素个数。
+
+        Example::
+
+            from pyvqnet.tensor import QTensor
+
+            a = QTensor([2, 3, 4, 5], requires_grad=True)
+            print(a.size)
+
+            # 4
+
+ 
+
+    .. py:method:: numel
+
+        返回张量的元素个数。
+        
+        :return: 张量的元素个数。
+
+        Example::
+
+            from pyvqnet.tensor import QTensor
+
+            a = QTensor([2, 3, 4, 5], requires_grad=True)
+            print(a.numel())
+
+            # 4
+
+
+ 
+
+    .. py:attribute:: dtype
+
+        返回张量的数据类型。
+
+        QTensor 内部数据类型dtype支持kbool = 0, kuint8 = 1, kint8 = 2,kint16 = 3,kint32 = 4,kint64 = 5, 
+        kfloat32 = 6, kfloat64 = 7, kcomplex64 = 8, kcomplex128 = 9 .
+
+        :return: 张量的数据类型。
+
+        Example::
+
+            from pyvqnet.tensor import QTensor
+
+            a = QTensor([2, 3, 4, 5])
+            print(a.dtype)
+            # 4
+
+ 
+    .. py:attribute:: is_dense
+
+        是否是稠密张量。
+
+        :return: 当该数据是稠密的时候，返回1；否则返回 0。
+
+        Example::
+
+            from pyvqnet.tensor import QTensor
+
+            a = QTensor([2, 3, 4, 5])
+            print(a.is_dense)
+            #1
+
+ 
+    .. py:attribute:: is_csr
+
+        是否是Compressed Sparse Row格式的稀疏2维度矩阵。
+
+        :return: 当该数据是CSR格式的稀疏张量时候，返回1；否则返回 0。
+
+        Example::
+
+            from pyvqnet.tensor import QTensor,dense_to_csr
+
+            a = QTensor([[2, 3, 4, 5]])
+            b = dense_to_csr(a)
+            print(b.is_csr)
+            #1
+ 
+
+    .. py:attribute:: is_contiguous
+
+        是否是contiguous的多维数组。
+
+        :return: 如果是contiguous，返回True，否则返回False。
+
+        Example::
+
+            from pyvqnet.tensor import QTensor
+
+            a = QTensor([[2, 3, 4, 5],[2, 3, 4, 5]])
+            b = a.is_contiguous
+            print(b)
+            #True
+            c= a.permute((1,0))
+            print(c.is_contiguous)
+            #False
+
+ 
+
+    .. py:method:: csr_members()
+
+        返回Compressed Sparse Row格式的稀疏2维度矩阵的row_idx,col_idx 以及非0数值data,3个1维QTensor。具体含义见 https://en.wikipedia.org/wiki/Sparse_matrix#Compressed_sparse_row_(CSR,_CRS_or_Yale_format)。
+        
+        :return:
+
+            返回列表，其中第一个元素为row_idx,shape为[矩阵行数+1],第2个元素为col_idx,shape为[非0元素数]，第3个元素为data,shape为[非0元素数]
+
+        Example::
+
+            from pyvqnet.tensor import QTensor,dense_to_csr
+
+            a = QTensor([[2, 3, 4, 5]])
+            b = dense_to_csr(a)
+            print(b.csr_members())
+            #([0,4], [0,1,2,3], [2,3,4,5])
+
+ 
+
+    .. py:method:: zero_grad()
+
+        将张量的梯度设置为零。将在优化过程中被优化器使用。
+
+        :return: 无。
+
+        Example::
+
+            from pyvqnet.tensor import QTensor
+            t3 = QTensor([2, 3, 4, 5], requires_grad=True)
+            t3.zero_grad()
+            print(t3.grad)
+            # [0., 0., 0., 0.]
+        
+
+ 
+
+    .. py:method:: backward(grad=None)
+
+        利用反向传播算法，计算当前张量所在的计算图中的所有需计算梯度的张量的梯度。
+
+        :return: 无
+
+        Example::
+
+            from pyvqnet.tensor import QTensor
+
+            target = QTensor([[0, 0, 1, 0, 0, 0, 0, 0, 0, 0.2]], requires_grad=True)
+            y = 2*target + 3
+            y.backward()
+            print(target.grad)
+            #[[2. 2. 2. 2. 2. 2. 2. 2. 2. 2.]]
+
+ 
+    .. py:method:: to_numpy()
+
+        将张量的数据拷贝到一个numpy.ndarray里面。
+
+        :return: 一个新的 numpy.ndarray 包含 QTensor 数据
+
+        Example::
+
+            from pyvqnet.tensor import tensor
+            from pyvqnet.tensor import QTensor
+            t3 = QTensor([2, 3, 4, 5], requires_grad=True)
+            t4 = t3.to_numpy()
+            print(t4)
+
+            # [2. 3. 4. 5.]
+
+ 
+
+    .. py:method:: item()
+
+        从只包含单个元素的 QTensor 返回唯一的元素。
+
+        :return: 元素值
+
+        Example::
+
+            from pyvqnet.tensor import tensor
+
+            t = tensor.ones([1])
+            print(t.item())
+
+            # 1.0
+
+
+ 
+    .. py:method:: contiguous()
+
+        返回当前QTensor的contiguous形式 ,如果已经是contiguous，则返回自身。
+
+        :return: 返回当前QTensor的contiguous形式 ,如果已经是contiguous，则返回自身。
+
+        Example::
+
+            from pyvqnet.tensor import tensor
+
+            t = tensor.ones([1])
+            print(t.contiguous())
+
+
+
+
+    .. py:method:: argmax(*kargs)
+
+        返回输入 QTensor 中所有元素的最大值的索引，或返回 QTensor 按某一维度的最大值的索引。
+
+        :param dim: 计算argmax的轴，只接受单个维度。 如果 dim == None，则返回输入张量中所有元素的最大值的索引。有效的 dim 范围是 [-R, R)，其中 R 是输入的 ndim。 当 dim < 0 时，它的工作方式与 dim + R 相同。
+        :param keepdims: 输出 QTensor 是否保留了最大值索引操作的轴，默认是False。
+
+        :return: 输入 QTensor 中最大值的索引。
+
+        Example::
+
+            from pyvqnet.tensor import tensor
+            from pyvqnet.tensor import QTensor
+            a = QTensor([[1.3398, 0.2663, -0.2686, 0.2450],
+                        [-0.7401, -0.8805, -0.3402, -1.1936],
+                        [0.4907, -1.3948, -1.0691, -0.3132],
+                        [-1.6092, 0.5419, -0.2993, 0.3195]])
+            flag = a.argmax()
+            print(flag)
+            
+            # [0.]
+
+            flag_0 = a.argmax([0], True)
+            print(flag_0)
+
+            # [
+            # [0., 3., 0., 3.]
+            # ]
+
+            flag_1 = a.argmax([1], True)
+            print(flag_1)
+
+            # [
+            # [0.],
+            # [2.],
+            # [0.],
+            # [1.]
+            # ]
+
+ 
+
+    .. py:method:: argmin(*kargs)
+
+        返回输入 QTensor 中所有元素的最小值的索引，或返回 QTensor 按某一维度的最小值的索引。
+
+        :param dim: 计算argmax的轴，只接受单个维度。 如果 dim == None，则返回输入张量中所有元素的最小值的索引。有效的 dim 范围是 [-R, R)，其中 R 是输入的 ndim。 当 dim < 0 时，它的工作方式与 dim + R 相同。
+        :param keepdims: 输出 QTensor 是否保留了最小值索引操作的轴，默认是False。
+
+        :return: 输入 QTensor 中最小值的索引。
+
+        Example::
+
+            from pyvqnet.tensor import tensor
+            from pyvqnet.tensor import QTensor
+            a = QTensor([[1.3398, 0.2663, -0.2686, 0.2450],
+                        [-0.7401, -0.8805, -0.3402, -1.1936],
+                        [0.4907, -1.3948, -1.0691, -0.3132],
+                        [-1.6092, 0.5419, -0.2993, 0.3195]])
+            flag = a.argmin()
+            print(flag)
+
+            # [12.]
+
+            flag_0 = a.argmin([0], True)
+            print(flag_0)
+
+            # [
+            # [3., 2., 2., 1.]
+            # ]
+
+            flag_1 = a.argmin([1], False)
+            print(flag_1)
+
+            # [2., 3., 1., 0.]
+
+
+    .. py:method:: fill_(v)
+
+        为当前张量填充特定值，该函数改变原张量的内部数据。
+
+        :param v: 填充值。
+
+        :return: 无。
+
+        Example::
+
+            from pyvqnet.tensor import tensor
+            from pyvqnet.tensor import QTensor
+            shape = [2, 3]
+            value = 42
+            t = tensor.zeros(shape)
+            t.fill_(value)
+            print(t)
+
+            # [
+            # [42., 42., 42.],
+            # [42., 42., 42.]
+            # ]
+
+
+    .. py:method:: all()
+
+        判断张量内数据是否全为全零。
+
+        :return: 返回True，如果全为非0;否则返回False。
+
+        Example::
+
+            from pyvqnet.tensor import tensor
+
+            shape = [2, 3]
+            t = tensor.zeros(shape)
+            t.fill_(1.0)
+            flag = t.all()
+            print(flag)
+
+            # True
+
+    .. py:method:: any()
+
+        判断张量内数据是否有任意元素不为0。
+
+        :return: 返回True，如果有任意元素不为0;否则返回False。
+
+        Example::
+
+            from pyvqnet.tensor import tensor
+
+            shape = [2, 3]
+            t = tensor.ones(shape)
+            t.fill_(1.0)
+            flag = t.any()
+            print(flag)
+
+            # True
+
+
+    .. py:method:: fill_rand_binary_(v=0.5)
+
+        用从二项分布中随机采样的值填充 QTensor 。
+
+        如果二项分布后随机生成的数据大于二值化阈值 v ，则设置 QTensor 对应位置的元素值为1，否则为0。
+
+        :param v: 二值化阈值，默认0.5。
+
+        :return: 无。
+
+        Example::
+
+            from pyvqnet.tensor import tensor
+            from pyvqnet.tensor import QTensor
+            import numpy as np
+            a = np.arange(6).reshape(2, 3).astype(np.float32)
+            t = QTensor(a)
+            t.fill_rand_binary_(2)
+            print(t)
+
+            # [
+            # [1., 1., 1.],
+            # [1., 1., 1.]
+            # ]
+
+ 
+
+    .. py:method:: fill_rand_signed_uniform_(v=1)
+
+        用从有符号均匀分布中随机采样的值填充 QTensor 。用缩放因子 v 对生成的随机采样的值进行缩放。
+
+        :param v: 缩放因子，默认1。
+
+        :return: 无。
+
+        Example::
+
+            from pyvqnet.tensor import tensor
+            from pyvqnet.tensor import QTensor
+            import numpy as np
+            a = np.arange(6).reshape(2, 3).astype(np.float32)
+            t = QTensor(a)
+            value = 42
+
+            t.fill_rand_signed_uniform_(value)
+            print(t)
+
+            # [
+            # [12.8852444, 4.4327269, 4.8489408],
+            # [-24.3309803, 26.8036957, 39.4903450]
+            # ]
+
+
+    .. py:method:: fill_rand_uniform_(v=1)
+
+        用从均匀分布中随机采样的值填充 QTensor 。用缩放因子 v 对生成的随机采样的值进行缩放。
+
+        :param v: 缩放因子，默认1。
+
+        :return: 无。
+
+        Example::
+
+            from pyvqnet.tensor import tensor
+            from pyvqnet.tensor import QTensor
+            import numpy as np
+            a = np.arange(6).reshape(2, 3).astype(np.float32)
+            t = QTensor(a)
+            value = 42
+            t.fill_rand_uniform_(value)
+            print(t)
+
+            # [
+            # [20.0404720, 14.4064417, 40.2955666],
+            # [5.5692234, 26.2520485, 35.3326073]
+            # ]
+
+
+    .. py:method:: fill_rand_normal_(m=0, s=1, fast_math=True)
+
+        生成均值为 m 和方差 s 产生正态分布元素，并填充到张量中。
+
+        :param m: 均值，默认0。
+        :param s: 方差，默认1。
+        :param fast_math: 是否使用快速方法产生高斯分布，默认True。
+
+        :return: 无。
+
+        Example::
+
+            from pyvqnet.tensor import tensor
+            from pyvqnet.tensor import QTensor
+            import numpy as np
+            a = np.arange(6).reshape(2, 3).astype(np.float32)
+            t = QTensor(a)
+            t.fill_rand_normal_(2, 10, True)
+            print(t)
+
+            # [
+            # [-10.4446531    4.9158096   2.9204607],
+            # [ -7.2682705   8.1267328    6.2758742 ],
+            # ]
+
+
+    .. py:method:: transpose(new_dims=None)
+
+        反转张量的轴。如果 new_dims = None，则反转所有轴。
+
+        :param new_dims: 列表形式储存的新的轴顺序。
+
+        :return:  新的 QTensor 。
+
+        Example::
+
+            from pyvqnet.tensor import tensor
+            from pyvqnet.tensor import QTensor
+            import numpy as np
+            R, C = 3, 4
+            a = np.arange(R * C).reshape([2, 2, 3]).astype(np.float32)
+            t = QTensor(a)
+            rlt = t.transpose([2,0,1])
+            print(rlt)
+            # [
+            # [[0., 3.],
+            #  [6., 9.]],
+            # [[1., 4.],
+            #  [7., 10.]],
+            # [[2., 5.],
+            #  [8., 11.]]
+            # ]
+ 
+
+
+    .. py:method:: reshape(new_shape)
+
+        改变 QTensor 的形状，返回一个新的张量。
+
+        :param new_shape: 新的形状。
+
+        :return: 新形状的 QTensor 。
+
+        Example::
+
+            from pyvqnet.tensor import tensor
+            from pyvqnet.tensor import QTensor
+            import numpy as np
+            R, C = 3, 4
+            a = np.arange(R * C).reshape(R, C).astype(np.float32)
+            t = QTensor(a)
+            reshape_t = t.reshape([C, R])
+            print(reshape_t)
+            # [
+            # [0., 1., 2.],
+            # [3., 4., 5.],
+            # [6., 7., 8.],
+            # [9., 10., 11.]
+            # ]
+
+
+    .. py:method:: __getitem__()
+
+        支持对 QTensor 使用 切片索引，下标，或使用 QTensor 作为高级索引访问输入。该操作返回一个新的 QTensor 。
+
+        通过冒号 ``:``  分隔切片参数 start:stop:step 来进行切片操作，其中 start、stop、step 均可缺省。
+
+        针对1-D QTensor ，则仅有单个轴上的索引或切片。
+
+        针对2-D及以上的 QTensor ，则会有多个轴上的索引或切片。
+
+        使用 QTensor 作为 索引，则进行高级索引，请参考numpy中 `高级索引 <https://docs.scipy.org/doc/numpy-1.10.1/reference/arrays.indexing.html>`_ 部分。
+
+        若作为索引的 QTensor 为逻辑运算的结果，则进行 布尔数组索引。
+
+        .. note:: 
+            
+            a[3][4][1] 形式的索引暂不支持, 使用 a[3,4,1] 形式代替。
+
+
+        :param item: 以 pyslice , 整数, QTensor 构成切片索引。
+
+        :return: 新的 QTensor。
+
+        Example::
+
+            from pyvqnet.tensor import tensor, QTensor
+            aaa = tensor.arange(1, 61)
+            aaa = aaa.reshape([4, 5, 3])
+            print(aaa[0:2, 3, :2])
+            # [
+            # [10., 11.],
+            #  [25., 26.]
+            # ]
+            print(aaa[3, 4, 1])
+            #[59.]
+            print(aaa[:, 2, :])
+            # [
+            # [7., 8., 9.],    
+            #  [22., 23., 24.],
+            #  [37., 38., 39.],
+            #  [52., 53., 54.] 
+            # ]
+            print(aaa[2])
+            # [
+            # [31., 32., 33.], 
+            #  [34., 35., 36.],
+            #  [37., 38., 39.],
+            #  [40., 41., 42.],
+            #  [43., 44., 45.]
+            # ]
+            print(aaa[0:2, ::3, 2:])
+            # [
+            # [[3.],
+            #  [12.]],
+            # [[18.],
+            #  [27.]]
+            # ]
+            a = tensor.ones([2, 2])
+            b = QTensor([[1, 1], [0, 1]])
+            b = b > 0
+            c = a[b]
+            print(c)
+            #[1., 1., 1.]
+            tt = tensor.arange(1, 56 * 2 * 4 * 4 + 1).reshape([2, 8, 4, 7, 4])
+            tt.requires_grad = True
+            index_sample1 = tensor.arange(0, 3).reshape([3, 1])
+            index_sample2 = QTensor([0, 1, 0, 2, 3, 2, 2, 3, 3]).reshape([3, 3])
+            gg = tt[:, index_sample1, 3:, index_sample2, 2:]
+            print(gg)
+            # [
+            # [[[[87., 88.]],
+            # [[983., 984.]]],
+            # [[[91., 92.]],
+            # [[987., 988.]]],
+            # [[[87., 88.]],
+            # [[983., 984.]]]],
+            # [[[[207., 208.]],
+            # [[1103., 1104.]]],
+            # [[[211., 212.]],
+            # [[1107., 1108.]]],
+            # [[[207., 208.]],
+            # [[1103., 1104.]]]],
+            # [[[[319., 320.]],
+            # [[1215., 1216.]]],
+            # [[[323., 324.]],
+            # [[1219., 1220.]]],
+            # [[[323., 324.]],
+            # [[1219., 1220.]]]]
+            # ]
+
+ 
+
+    .. py:method:: __setitem__()
+
+        支持对 QTensor 使用 切片索引，下标，或使用 QTensor 作为高级索引修改输入。该操作对输入原地进行修改 。
+
+        通过冒号 ``:``  分隔切片参数 start:stop:step 来进行切片操作，其中 start、stop、step 均可缺省。
+
+        针对1-D QTensor，则仅有单个轴上的索引或切片。
+
+        针对2-D及以上的 QTensor ，则会有多个轴上的索引或切片。
+
+        使用 QTensor 作为 索引，则进行高级索引，请参考numpy中 `高级索引 <https://docs.scipy.org/doc/numpy-1.10.1/reference/arrays.indexing.html>`_ 部分。
+
+        若作为索引的 QTensor 为逻辑运算的结果，则进行 布尔数组索引。
+
+        .. note:: 
+            
+            a[3][4][1] 形式的索引暂不支持, 使用 a[3,4,1] 形式代替。
+
+
+        :param item: 以 pyslice , 整数, QTensor 构成切片索引。
+
+        :return: 无。
+
+        Example::
+
+            from pyvqnet.tensor import tensor
+            aaa = tensor.arange(1, 61)
+            aaa = aaa.reshape([4, 5, 3])
+            vqnet_a2 = aaa[3, 4, 1]
+            aaa[3, 4, 1] = tensor.arange(10001,
+                                            10001 + vqnet_a2.size).reshape(vqnet_a2.shape)
+            print(aaa)
+            # [
+            # [[1., 2., 3.],    
+            #  [4., 5., 6.],    
+            #  [7., 8., 9.],    
+            #  [10., 11., 12.], 
+            #  [13., 14., 15.]],
+            # [[16., 17., 18.], 
+            #  [19., 20., 21.], 
+            #  [22., 23., 24.], 
+            #  [25., 26., 27.], 
+            #  [28., 29., 30.]],
+            # [[31., 32., 33.], 
+            #  [34., 35., 36.],
+            #  [37., 38., 39.],
+            #  [40., 41., 42.],
+            #  [43., 44., 45.]],
+            # [[46., 47., 48.],
+            #  [49., 50., 51.],
+            #  [52., 53., 54.],
+            #  [55., 56., 57.],
+            #  [58., 10001., 60.]]
+            # ]
+            aaa = tensor.arange(1, 61)
+            aaa = aaa.reshape([4, 5, 3])
+            vqnet_a3 = aaa[:, 2, :]
+            aaa[:, 2, :] = tensor.arange(10001,
+                                            10001 + vqnet_a3.size).reshape(vqnet_a3.shape)
+            print(aaa)
+            # [
+            # [[1., 2., 3.],
+            #  [4., 5., 6.],
+            #  [10001., 10002., 10003.],
+            #  [10., 11., 12.],
+            #  [13., 14., 15.]],
+            # [[16., 17., 18.],
+            #  [19., 20., 21.],
+            #  [10004., 10005., 10006.],
+            #  [25., 26., 27.],
+            #  [28., 29., 30.]],
+            # [[31., 32., 33.],
+            #  [34., 35., 36.],
+            #  [10007., 10008., 10009.],
+            #  [40., 41., 42.],
+            #  [43., 44., 45.]],
+            # [[46., 47., 48.],
+            #  [49., 50., 51.],
+            #  [10010., 10011., 10012.],
+            #  [55., 56., 57.],
+            #  [58., 59., 60.]]
+            # ]
+            aaa = tensor.arange(1, 61)
+            aaa = aaa.reshape([4, 5, 3])
+            vqnet_a4 = aaa[2, :]
+            aaa[2, :] = tensor.arange(10001,
+                                        10001 + vqnet_a4.size).reshape(vqnet_a4.shape)
+            print(aaa)
+            # [
+            # [[1., 2., 3.],
+            #  [4., 5., 6.],
+            #  [7., 8., 9.],
+            #  [10., 11., 12.],
+            #  [13., 14., 15.]],
+            # [[16., 17., 18.],
+            #  [19., 20., 21.],
+            #  [22., 23., 24.],
+            #  [25., 26., 27.],
+            #  [28., 29., 30.]],
+            # [[10001., 10002., 10003.],
+            #  [10004., 10005., 10006.],
+            #  [10007., 10008., 10009.],
+            #  [10010., 10011., 10012.],
+            #  [10013., 10014., 10015.]],
+            # [[46., 47., 48.],
+            #  [49., 50., 51.],
+            #  [52., 53., 54.],
+            #  [55., 56., 57.],
+            #  [58., 59., 60.]]
+            # ]
+            aaa = tensor.arange(1, 61)
+            aaa = aaa.reshape([4, 5, 3])
+            vqnet_a5 = aaa[0:2, ::2, 1:2]
+            aaa[0:2, ::2,
+                1:2] = tensor.arange(10001,
+                                        10001 + vqnet_a5.size).reshape(vqnet_a5.shape)
+            print(aaa)
+            # [
+            # [[1., 10001., 3.],
+            #  [4., 5., 6.],
+            #  [7., 10002., 9.],
+            #  [10., 11., 12.],
+            #  [13., 10003., 15.]],
+            # [[16., 10004., 18.],
+            #  [19., 20., 21.],
+            #  [22., 10005., 24.],
+            #  [25., 26., 27.],
+            #  [28., 10006., 30.]],
+            # [[31., 32., 33.],
+            #  [34., 35., 36.],
+            #  [37., 38., 39.],
+            #  [40., 41., 42.],
+            #  [43., 44., 45.]],
+            # [[46., 47., 48.],
+            #  [49., 50., 51.],
+            #  [52., 53., 54.],
+            #  [55., 56., 57.],
+            #  [58., 59., 60.]]
+            # ]
+            a = tensor.ones([2, 2])
+            b = tensor.QTensor([[1, 1], [0, 1]])
+            b = b > 0
+            x = tensor.QTensor([1001, 2001, 3001])
+
+            a[b] = x
+            print(a)
+            # [
+            # [1001., 2001.],
+            #  [1., 3001.]
+            # ]
+
+
+
+    .. py:method:: GPU(device: int = DEV_GPU_0)
+
+        克隆QTensor到指定的GPU设备
+
+        device 指定存储其内部数据的设备。 当device >= DEV_GPU_0时，数据存储在GPU上。 
+        如果您的计算机有多个 GPU，您可以指定不同的设备来存储数据。 例如，device = DEV_GPU_1, DEV_GPU_2, DEV_GPU_3, ... 表示存储在具有不同序列号的GPU上。
+
+        .. note::
+
+            QTensor在不同GPU上无法进行计算。
+            如果您尝试在 ID 超过验证 GPU 最大数量的 GPU 上创建 QTensor，将引发 Cuda 错误。
+
+        :param device: 当前保存QTensor的设备，默认=DEV_GPU_0，
+        device = pyvqnet.DEV_GPU_0，存储在第一个 GPU 中，devcie = DEV_GPU_1，
+        存储在第二个 GPU 中，依此类推。
+
+        :return: QTensor 克隆到 GPU 设备。
+
+        Examples::
+
+            from pyvqnet.tensor import QTensor
+            a = QTensor([2])
+            b = a.GPU()
+            print(b.device)
+            #1000
+ 
+
+    .. py:method:: CPU()
+
+        克隆QTensor到特定的CPU设备
+
+        :return: QTensor 克隆到 CPU 设备。
+
+        Examples::
+
+            from pyvqnet.tensor import QTensor
+            a = QTensor([2])
+            b = a.CPU()
+            print(b.device)
+            # 0
+ 
+
+    .. py:method:: toGPU(device: int = DEV_GPU_0)
+
+        移动QTensor到指定的GPU设备
+
+        device 指定存储其内部数据的设备。 当device >= DEV_GPU时，数据存储在GPU上。
+        如果您的计算机有多个 GPU，您可以指定不同的设备来存储数据。 
+        例如，device = DEV_GPU_1, DEV_GPU_2, DEV_GPU_3, ... 表示存储在具有不同序列号的GPU上。
+
+        .. note::
+
+            QTensor在不同GPU上无法进行计算。
+            如果您尝试在 ID 超过验证 GPU 最大数量的 GPU 上创建 QTensor，将引发 Cuda 错误。
+
+        :param device: 当前保存QTensor的设备，默认=DEV_GPU_0。device = pyvqnet.DEV_GPU_0，存储在第一个 GPU 中，devcie = DEV_GPU_1，存储在第二个 GPU 中，依此类推。
+        :return: QTensor 移动到 GPU 设备。
+
+        Examples::
+
+            from pyvqnet.tensor import QTensor
+            a = QTensor([2])
+            a = a.toGPU()
+            print(a.device)
+            #1000
+
+ 
+
+    .. py:method:: toCPU()
+
+        移动QTensor到特定的GPU设备
+
+        :return: QTensor 移动到 CPU 设备。
+
+        Examples::
+
+            from pyvqnet.tensor import QTensor
+            a = QTensor([2])
+            b = a.toCPU()
+            print(b.device)
+            # 0
+
+
     
-    :return: 一个列表存有张量的维度
+    .. py:method:: isGPU()
 
-    Example::
+        该 QTensor 的数据是否存储在 GPU 主机内存上。
 
-        from pyvqnet.tensor import QTensor
+        :return: 该 QTensor 的数据是否存储在 GPU 主机内存上。
 
-        a = QTensor([2, 3, 4, 5], requires_grad=True)
-        print(a.shape)
+        Examples::
+        
+            from pyvqnet.tensor import QTensor
+            a = QTensor([2])
+            a = a.isGPU()
+            print(a)
+            # False
 
-        # [4]
-
-size
-==============================
-
-.. py:attribute:: QTensor.size
-
-    返回张量的元素个数。
     
-    :return: 张量的元素个数。
+    .. py:method:: isCPU()
 
-    Example::
+        该 QTensor 的数据是否存储在 CPU 主机内存上。
 
-        from pyvqnet.tensor import QTensor
+        :return: 该 QTensor 的数据是否存储在 CPU 主机内存上。
 
-        a = QTensor([2, 3, 4, 5], requires_grad=True)
-        print(a.size)
-
-        # 4
-
-numel
-==============================
-
-.. py:method:: QTensor.numel
-
-    返回张量的元素个数。
-    
-    :return: 张量的元素个数。
-
-    Example::
-
-        from pyvqnet.tensor import QTensor
-
-        a = QTensor([2, 3, 4, 5], requires_grad=True)
-        print(a.numel())
-
-        # 4
-
-
-dtype
-==============================
-
-.. py:attribute:: QTensor.dtype
-
-    返回张量的数据类型。
-
-    QTensor 内部数据类型dtype支持kbool = 0, kuint8 = 1, kint8 = 2,kint16 = 3,kint32 = 4,kint64 = 5, 
-    kfloat32 = 6, kfloat64 = 7, kcomplex64 = 8, kcomplex128 = 9 .
-
-    :return: 张量的数据类型。
-
-    Example::
-
-        from pyvqnet.tensor import QTensor
-
-        a = QTensor([2, 3, 4, 5])
-        print(a.dtype)
-        # 4
-
-
-is_dense
-==============================
-
-.. py:attribute:: QTensor.is_dense
-
-    是否是稠密张量。
-
-    :return: 当该数据是稠密的时候，返回1；否则返回 0。
-
-    Example::
-
-        from pyvqnet.tensor import QTensor
-
-        a = QTensor([2, 3, 4, 5])
-        print(a.is_dense)
-        #1
-
-
-is_csr
-==============================
-
-.. py:attribute:: QTensor.is_csr
-
-    是否是Compressed Sparse Row格式的稀疏2维度矩阵。
-
-    :return: 当该数据是CSR格式的稀疏张量时候，返回1；否则返回 0。
-
-    Example::
-
-        from pyvqnet.tensor import QTensor,dense_to_csr
-
-        a = QTensor([[2, 3, 4, 5]])
-        b = dense_to_csr(a)
-        print(b.is_csr)
-        #1
-
-is_contiguous
-==============================
-
-.. py:attribute:: QTensor.is_contiguous
-
-    是否是contiguous的多维数组。
-
-    :return: 如果是contiguous，返回True，否则返回False。
-
-    Example::
-
-        from pyvqnet.tensor import QTensor
-
-        a = QTensor([[2, 3, 4, 5],[2, 3, 4, 5]])
-        b = a.is_contiguous
-        print(b)
-        #True
-        c= a.permute((1,0))
-        print(c.is_contiguous)
-        #False
-
-csr_members
-==============================
-
-.. py:method:: QTensor.csr_members()
-
-    返回Compressed Sparse Row格式的稀疏2维度矩阵的row_idx,col_idx 以及非0数值data,3个1维QTensor。具体含义见 https://en.wikipedia.org/wiki/Sparse_matrix#Compressed_sparse_row_(CSR,_CRS_or_Yale_format)。
-    
-    :return:
-
-        返回列表，其中第一个元素为row_idx,shape为[矩阵行数+1],第2个元素为col_idx,shape为[非0元素数]，第3个元素为data,shape为[非0元素数]
-
-    Example::
-
-        from pyvqnet.tensor import QTensor,dense_to_csr
-
-        a = QTensor([[2, 3, 4, 5]])
-        b = dense_to_csr(a)
-        print(b.csr_members())
-        #([0,4], [0,1,2,3], [2,3,4,5])
-
-zero_grad
-==============================
-
-.. py:method:: QTensor.zero_grad()
-
-    将张量的梯度设置为零。将在优化过程中被优化器使用。
-
-    :return: 无。
-
-    Example::
-
-        from pyvqnet.tensor import QTensor
-        t3 = QTensor([2, 3, 4, 5], requires_grad=True)
-        t3.zero_grad()
-        print(t3.grad)
-        # [0., 0., 0., 0.]
+        Examples::
         
+            from pyvqnet.tensor import QTensor
+            a = QTensor([2])
+            a = a.isCPU()
+            print(a)
+            # True
 
-backward
-==============================
+    .. py:method:: astype(dtype)
 
-.. py:method:: QTensor.backward(grad=None)
+        将当前QTensor转化为对应数据类型dtype，如果dtype相同则返回自身。
 
-    利用反向传播算法，计算当前张量所在的计算图中的所有需计算梯度的张量的梯度。
+        :param dtype: 目标数据类型dtype。
 
-    :return: 无
+        :return:  QTensor。
 
-    Example::
-
-        from pyvqnet.tensor import QTensor
-
-        target = QTensor([[0, 0, 1, 0, 0, 0, 0, 0, 0, 0.2]], requires_grad=True)
-        y = 2*target + 3
-        y.backward()
-        print(target.grad)
-        #[[2. 2. 2. 2. 2. 2. 2. 2. 2. 2.]]
-
-to_numpy
-==============================
-
-.. py:method:: QTensor.to_numpy()
-
-    将张量的数据拷贝到一个numpy.ndarray里面。
-
-    :return: 一个新的 numpy.ndarray 包含 QTensor 数据
-
-    Example::
-
-        from pyvqnet.tensor import tensor
-        from pyvqnet.tensor import QTensor
-        t3 = QTensor([2, 3, 4, 5], requires_grad=True)
-        t4 = t3.to_numpy()
-        print(t4)
-
-        # [2. 3. 4. 5.]
-
-item
-==============================
-
-.. py:method:: QTensor.item()
-
-    从只包含单个元素的 QTensor 返回唯一的元素。
-
-    :return: 元素值
-
-    Example::
-
-        from pyvqnet.tensor import tensor
-
-        t = tensor.ones([1])
-        print(t.item())
-
-        # 1.0
-
-
-contiguous
-==============================
-
-.. py:method:: QTensor.contiguous()
-
-    返回当前QTensor的contiguous形式 ,如果已经是contiguous，则返回自身。
-
-    :return: 返回当前QTensor的contiguous形式 ,如果已经是contiguous，则返回自身。
-
-    Example::
-
-        from pyvqnet.tensor import tensor
-
-        t = tensor.ones([1])
-        print(t.contiguous())
-
-
-argmax
-==============================
-
-.. py:method:: QTensor.argmax(*kargs)
-
-    返回输入 QTensor 中所有元素的最大值的索引，或返回 QTensor 按某一维度的最大值的索引。
-
-    :param dim: 计算argmax的轴，只接受单个维度。 如果 dim == None，则返回输入张量中所有元素的最大值的索引。有效的 dim 范围是 [-R, R)，其中 R 是输入的 ndim。 当 dim < 0 时，它的工作方式与 dim + R 相同。
-    :param keepdims: 输出 QTensor 是否保留了最大值索引操作的轴，默认是False。
-
-    :return: 输入 QTensor 中最大值的索引。
-
-    Example::
-
-        from pyvqnet.tensor import tensor
-        from pyvqnet.tensor import QTensor
-        a = QTensor([[1.3398, 0.2663, -0.2686, 0.2450],
-                    [-0.7401, -0.8805, -0.3402, -1.1936],
-                    [0.4907, -1.3948, -1.0691, -0.3132],
-                    [-1.6092, 0.5419, -0.2993, 0.3195]])
-        flag = a.argmax()
-        print(flag)
+        Examples::
         
-        # [0.]
-
-        flag_0 = a.argmax([0], True)
-        print(flag_0)
-
-        # [
-        # [0., 3., 0., 3.]
-        # ]
-
-        flag_1 = a.argmax([1], True)
-        print(flag_1)
-
-        # [
-        # [0.],
-        # [2.],
-        # [0.],
-        # [1.]
-        # ]
-
-argmin
-==============================
-
-.. py:method:: QTensor.argmin(*kargs)
-
-    返回输入 QTensor 中所有元素的最小值的索引，或返回 QTensor 按某一维度的最小值的索引。
-
-    :param dim: 计算argmax的轴，只接受单个维度。 如果 dim == None，则返回输入张量中所有元素的最小值的索引。有效的 dim 范围是 [-R, R)，其中 R 是输入的 ndim。 当 dim < 0 时，它的工作方式与 dim + R 相同。
-    :param keepdims: 输出 QTensor 是否保留了最小值索引操作的轴，默认是False。
-
-    :return: 输入 QTensor 中最小值的索引。
-
-    Example::
-
-        from pyvqnet.tensor import tensor
-        from pyvqnet.tensor import QTensor
-        a = QTensor([[1.3398, 0.2663, -0.2686, 0.2450],
-                    [-0.7401, -0.8805, -0.3402, -1.1936],
-                    [0.4907, -1.3948, -1.0691, -0.3132],
-                    [-1.6092, 0.5419, -0.2993, 0.3195]])
-        flag = a.argmin()
-        print(flag)
-
-        # [12.]
-
-        flag_0 = a.argmin([0], True)
-        print(flag_0)
-
-        # [
-        # [3., 2., 2., 1.]
-        # ]
-
-        flag_1 = a.argmin([1], False)
-        print(flag_1)
-
-        # [2., 3., 1., 0.]
-
-        
-
-fill\_
-==============================
-
-.. py:method:: QTensor.fill_(v)
-
-    为当前张量填充特定值，该函数改变原张量的内部数据。
-
-    :param v: 填充值。
-
-    :return: 无。
-
-    Example::
-
-        from pyvqnet.tensor import tensor
-        from pyvqnet.tensor import QTensor
-        shape = [2, 3]
-        value = 42
-        t = tensor.zeros(shape)
-        t.fill_(value)
-        print(t)
-
-        # [
-        # [42., 42., 42.],
-        # [42., 42., 42.]
-        # ]
-
-
-all
-==============================
-
-.. py:method:: QTensor.all()
-
-    判断张量内数据是否全为全零。
-
-    :return: 返回True，如果全为非0;否则返回False。
-
-    Example::
-
-        from pyvqnet.tensor import tensor
-
-        shape = [2, 3]
-        t = tensor.zeros(shape)
-        t.fill_(1.0)
-        flag = t.all()
-        print(flag)
-
-        # True
-
-any
-==============================
-
-.. py:method:: QTensor.any()
-
-    判断张量内数据是否有任意元素不为0。
-
-    :return: 返回True，如果有任意元素不为0;否则返回False。
-
-    Example::
-
-        from pyvqnet.tensor import tensor
-
-        shape = [2, 3]
-        t = tensor.ones(shape)
-        t.fill_(1.0)
-        flag = t.any()
-        print(flag)
-
-        # True
-
-
-fill_rand_binary\_
-==============================
-
-.. py:method:: QTensor.fill_rand_binary_(v=0.5)
-
-    用从二项分布中随机采样的值填充 QTensor 。
-
-    如果二项分布后随机生成的数据大于二值化阈值 v ，则设置 QTensor 对应位置的元素值为1，否则为0。
-
-    :param v: 二值化阈值，默认0.5。
-
-    :return: 无。
-
-    Example::
-
-        from pyvqnet.tensor import tensor
-        from pyvqnet.tensor import QTensor
-        import numpy as np
-        a = np.arange(6).reshape(2, 3).astype(np.float32)
-        t = QTensor(a)
-        t.fill_rand_binary_(2)
-        print(t)
-
-        # [
-        # [1., 1., 1.],
-        # [1., 1., 1.]
-        # ]
-
-fill_rand_signed_uniform\_
-==============================
-
-.. py:method:: QTensor.fill_rand_signed_uniform_(v=1)
-
-    用从有符号均匀分布中随机采样的值填充 QTensor 。用缩放因子 v 对生成的随机采样的值进行缩放。
-
-    :param v: 缩放因子，默认1。
-
-    :return: 无。
-
-    Example::
-
-        from pyvqnet.tensor import tensor
-        from pyvqnet.tensor import QTensor
-        import numpy as np
-        a = np.arange(6).reshape(2, 3).astype(np.float32)
-        t = QTensor(a)
-        value = 42
-
-        t.fill_rand_signed_uniform_(value)
-        print(t)
-
-        # [
-        # [12.8852444, 4.4327269, 4.8489408],
-        # [-24.3309803, 26.8036957, 39.4903450]
-        # ]
-
-
-fill_rand_uniform\_
-==============================
-
-.. py:method:: QTensor.fill_rand_uniform_(v=1)
-
-    用从均匀分布中随机采样的值填充 QTensor 。用缩放因子 v 对生成的随机采样的值进行缩放。
-
-    :param v: 缩放因子，默认1。
-
-    :return: 无。
-
-    Example::
-
-        from pyvqnet.tensor import tensor
-        from pyvqnet.tensor import QTensor
-        import numpy as np
-        a = np.arange(6).reshape(2, 3).astype(np.float32)
-        t = QTensor(a)
-        value = 42
-        t.fill_rand_uniform_(value)
-        print(t)
-
-        # [
-        # [20.0404720, 14.4064417, 40.2955666],
-        # [5.5692234, 26.2520485, 35.3326073]
-        # ]
-
-
-fill_rand_normal\_
-==============================
-
-.. py:method:: QTensor.fill_rand_normal_(m=0, s=1, fast_math=True)
-
-    生成均值为 m 和方差 s 产生正态分布元素，并填充到张量中。
-
-    :param m: 均值，默认0。
-    :param s: 方差，默认1。
-    :param fast_math: 是否使用快速方法产生高斯分布，默认True。
-
-    :return: 无。
-
-    Example::
-
-        from pyvqnet.tensor import tensor
-        from pyvqnet.tensor import QTensor
-        import numpy as np
-        a = np.arange(6).reshape(2, 3).astype(np.float32)
-        t = QTensor(a)
-        t.fill_rand_normal_(2, 10, True)
-        print(t)
-
-        # [
-        # [-10.4446531    4.9158096   2.9204607],
-        # [ -7.2682705   8.1267328    6.2758742 ],
-        # ]
-
-
-QTensor.transpose
-==============================
-
-.. py:method:: QTensor.transpose(new_dims=None)
-
-    反转张量的轴。如果 new_dims = None，则反转所有轴。
-
-    :param new_dims: 列表形式储存的新的轴顺序。
-
-    :return:  新的 QTensor 。
-
-    Example::
-
-        from pyvqnet.tensor import tensor
-        from pyvqnet.tensor import QTensor
-        import numpy as np
-        R, C = 3, 4
-        a = np.arange(R * C).reshape([2, 2, 3]).astype(np.float32)
-        t = QTensor(a)
-        rlt = t.transpose([2,0,1])
-        print(rlt)
-        # [
-        # [[0., 3.],
-        #  [6., 9.]],
-        # [[1., 4.],
-        #  [7., 10.]],
-        # [[2., 5.],
-        #  [8., 11.]]
-        # ]
-        
-
-
-
-QTensor.reshape
-==============================
-
-.. py:method:: QTensor.reshape(new_shape)
-
-    改变 QTensor 的形状，返回一个新的张量。
-
-    :param new_shape: 新的形状。
-
-    :return: 新形状的 QTensor 。
-
-    Example::
-
-        from pyvqnet.tensor import tensor
-        from pyvqnet.tensor import QTensor
-        import numpy as np
-        R, C = 3, 4
-        a = np.arange(R * C).reshape(R, C).astype(np.float32)
-        t = QTensor(a)
-        reshape_t = t.reshape([C, R])
-        print(reshape_t)
-        # [
-        # [0., 1., 2.],
-        # [3., 4., 5.],
-        # [6., 7., 8.],
-        # [9., 10., 11.]
-        # ]
-        
-
-reshape\_
-==============================
-
-.. py:method:: QTensor.reshape_(new_shape)
-
-    原地改变当前 QTensor 的形状。该接口会首先尝试在不改变原始内存数据情况下进行变换，如果无法成功，则复制当前数据到新的内存。
-
-    .. warning::
-
-        建议使用reshape接口，该接口在部分情况下，实际的底层内存位置会被复制而不是原地修改。
-
-    :param new_shape: 新的形状。
-
-    :return: 无。
-
-    Example::
-
-        from pyvqnet.tensor import tensor
-        from pyvqnet.tensor import QTensor
-        import numpy as np
-        R, C = 3, 4
-        a = np.arange(R * C).reshape(R, C).astype(np.float32)
-        t = QTensor(a)
-        t.reshape_([C, R])
-        print(t)
-
-        # [
-        # [0., 1., 2.],
-        # [3., 4., 5.],
-        # [6., 7., 8.],
-        # [9., 10., 11.]
-        # ]
-
-
-getdata
-==============================
-
-.. py:method:: QTensor.getdata()
-
-    返回一个numpy.ndarray 储存当前 QTensor 的数据。
-
-    :return: 包含当前 QTensor 数据的numpy.ndarray。
-
-    Example::
-
-        from pyvqnet.tensor import tensor
-        from pyvqnet.tensor import QTensor
-        t = tensor.ones([3, 4])
-        a = t.getdata()
-        print(a)
-
-        # [[1. 1. 1. 1.]
-        #  [1. 1. 1. 1.]
-        #  [1. 1. 1. 1.]]
-
-__getitem__
-==============================
-
-.. py:method:: QTensor.__getitem__()
-
-    支持对 QTensor 使用 切片索引，下标，或使用 QTensor 作为高级索引访问输入。该操作返回一个新的 QTensor 。
-
-    通过冒号 ``:``  分隔切片参数 start:stop:step 来进行切片操作，其中 start、stop、step 均可缺省。
-
-    针对1-D QTensor ，则仅有单个轴上的索引或切片。
-
-    针对2-D及以上的 QTensor ，则会有多个轴上的索引或切片。
-
-    使用 QTensor 作为 索引，则进行高级索引，请参考numpy中 `高级索引 <https://docs.scipy.org/doc/numpy-1.10.1/reference/arrays.indexing.html>`_ 部分。
-
-    若作为索引的 QTensor 为逻辑运算的结果，则进行 布尔数组索引。
-
-    .. note:: 
-        
-        a[3][4][1] 形式的索引暂不支持, 使用 a[3,4,1] 形式代替。
-
-
-    :param item: 以 pyslice , 整数, QTensor 构成切片索引。
-
-    :return: 新的 QTensor。
-
-    Example::
-
-        from pyvqnet.tensor import tensor, QTensor
-        aaa = tensor.arange(1, 61)
-        aaa = aaa.reshape([4, 5, 3])
-        print(aaa[0:2, 3, :2])
-        # [
-        # [10., 11.],
-        #  [25., 26.]
-        # ]
-        print(aaa[3, 4, 1])
-        #[59.]
-        print(aaa[:, 2, :])
-        # [
-        # [7., 8., 9.],    
-        #  [22., 23., 24.],
-        #  [37., 38., 39.],
-        #  [52., 53., 54.] 
-        # ]
-        print(aaa[2])
-        # [
-        # [31., 32., 33.], 
-        #  [34., 35., 36.],
-        #  [37., 38., 39.],
-        #  [40., 41., 42.],
-        #  [43., 44., 45.]
-        # ]
-        print(aaa[0:2, ::3, 2:])
-        # [
-        # [[3.],
-        #  [12.]],
-        # [[18.],
-        #  [27.]]
-        # ]
-        a = tensor.ones([2, 2])
-        b = QTensor([[1, 1], [0, 1]])
-        b = b > 0
-        c = a[b]
-        print(c)
-        #[1., 1., 1.]
-        tt = tensor.arange(1, 56 * 2 * 4 * 4 + 1).reshape([2, 8, 4, 7, 4])
-        tt.requires_grad = True
-        index_sample1 = tensor.arange(0, 3).reshape([3, 1])
-        index_sample2 = QTensor([0, 1, 0, 2, 3, 2, 2, 3, 3]).reshape([3, 3])
-        gg = tt[:, index_sample1, 3:, index_sample2, 2:]
-        print(gg)
-        # [
-        # [[[[87., 88.]],
-        # [[983., 984.]]],
-        # [[[91., 92.]],
-        # [[987., 988.]]],
-        # [[[87., 88.]],
-        # [[983., 984.]]]],
-        # [[[[207., 208.]],
-        # [[1103., 1104.]]],
-        # [[[211., 212.]],
-        # [[1107., 1108.]]],
-        # [[[207., 208.]],
-        # [[1103., 1104.]]]],
-        # [[[[319., 320.]],
-        # [[1215., 1216.]]],
-        # [[[323., 324.]],
-        # [[1219., 1220.]]],
-        # [[[323., 324.]],
-        # [[1219., 1220.]]]]
-        # ]
-
-__setitem__
-==============================
-
-.. py:method:: QTensor.__setitem__()
-
-    支持对 QTensor 使用 切片索引，下标，或使用 QTensor 作为高级索引修改输入。该操作对输入原地进行修改 。
-
-    通过冒号 ``:``  分隔切片参数 start:stop:step 来进行切片操作，其中 start、stop、step 均可缺省。
-
-    针对1-D QTensor，则仅有单个轴上的索引或切片。
-
-    针对2-D及以上的 QTensor ，则会有多个轴上的索引或切片。
-
-    使用 QTensor 作为 索引，则进行高级索引，请参考numpy中 `高级索引 <https://docs.scipy.org/doc/numpy-1.10.1/reference/arrays.indexing.html>`_ 部分。
-
-    若作为索引的 QTensor 为逻辑运算的结果，则进行 布尔数组索引。
-
-    .. note:: 
-        
-        a[3][4][1] 形式的索引暂不支持, 使用 a[3,4,1] 形式代替。
-
-
-    :param item: 以 pyslice , 整数, QTensor 构成切片索引。
-
-    :return: 无。
-
-    Example::
-
-        from pyvqnet.tensor import tensor
-        aaa = tensor.arange(1, 61)
-        aaa = aaa.reshape([4, 5, 3])
-        vqnet_a2 = aaa[3, 4, 1]
-        aaa[3, 4, 1] = tensor.arange(10001,
-                                        10001 + vqnet_a2.size).reshape(vqnet_a2.shape)
-        print(aaa)
-        # [
-        # [[1., 2., 3.],    
-        #  [4., 5., 6.],    
-        #  [7., 8., 9.],    
-        #  [10., 11., 12.], 
-        #  [13., 14., 15.]],
-        # [[16., 17., 18.], 
-        #  [19., 20., 21.], 
-        #  [22., 23., 24.], 
-        #  [25., 26., 27.], 
-        #  [28., 29., 30.]],
-        # [[31., 32., 33.], 
-        #  [34., 35., 36.],
-        #  [37., 38., 39.],
-        #  [40., 41., 42.],
-        #  [43., 44., 45.]],
-        # [[46., 47., 48.],
-        #  [49., 50., 51.],
-        #  [52., 53., 54.],
-        #  [55., 56., 57.],
-        #  [58., 10001., 60.]]
-        # ]
-        aaa = tensor.arange(1, 61)
-        aaa = aaa.reshape([4, 5, 3])
-        vqnet_a3 = aaa[:, 2, :]
-        aaa[:, 2, :] = tensor.arange(10001,
-                                        10001 + vqnet_a3.size).reshape(vqnet_a3.shape)
-        print(aaa)
-        # [
-        # [[1., 2., 3.],
-        #  [4., 5., 6.],
-        #  [10001., 10002., 10003.],
-        #  [10., 11., 12.],
-        #  [13., 14., 15.]],
-        # [[16., 17., 18.],
-        #  [19., 20., 21.],
-        #  [10004., 10005., 10006.],
-        #  [25., 26., 27.],
-        #  [28., 29., 30.]],
-        # [[31., 32., 33.],
-        #  [34., 35., 36.],
-        #  [10007., 10008., 10009.],
-        #  [40., 41., 42.],
-        #  [43., 44., 45.]],
-        # [[46., 47., 48.],
-        #  [49., 50., 51.],
-        #  [10010., 10011., 10012.],
-        #  [55., 56., 57.],
-        #  [58., 59., 60.]]
-        # ]
-        aaa = tensor.arange(1, 61)
-        aaa = aaa.reshape([4, 5, 3])
-        vqnet_a4 = aaa[2, :]
-        aaa[2, :] = tensor.arange(10001,
-                                    10001 + vqnet_a4.size).reshape(vqnet_a4.shape)
-        print(aaa)
-        # [
-        # [[1., 2., 3.],
-        #  [4., 5., 6.],
-        #  [7., 8., 9.],
-        #  [10., 11., 12.],
-        #  [13., 14., 15.]],
-        # [[16., 17., 18.],
-        #  [19., 20., 21.],
-        #  [22., 23., 24.],
-        #  [25., 26., 27.],
-        #  [28., 29., 30.]],
-        # [[10001., 10002., 10003.],
-        #  [10004., 10005., 10006.],
-        #  [10007., 10008., 10009.],
-        #  [10010., 10011., 10012.],
-        #  [10013., 10014., 10015.]],
-        # [[46., 47., 48.],
-        #  [49., 50., 51.],
-        #  [52., 53., 54.],
-        #  [55., 56., 57.],
-        #  [58., 59., 60.]]
-        # ]
-        aaa = tensor.arange(1, 61)
-        aaa = aaa.reshape([4, 5, 3])
-        vqnet_a5 = aaa[0:2, ::2, 1:2]
-        aaa[0:2, ::2,
-            1:2] = tensor.arange(10001,
-                                    10001 + vqnet_a5.size).reshape(vqnet_a5.shape)
-        print(aaa)
-        # [
-        # [[1., 10001., 3.],
-        #  [4., 5., 6.],
-        #  [7., 10002., 9.],
-        #  [10., 11., 12.],
-        #  [13., 10003., 15.]],
-        # [[16., 10004., 18.],
-        #  [19., 20., 21.],
-        #  [22., 10005., 24.],
-        #  [25., 26., 27.],
-        #  [28., 10006., 30.]],
-        # [[31., 32., 33.],
-        #  [34., 35., 36.],
-        #  [37., 38., 39.],
-        #  [40., 41., 42.],
-        #  [43., 44., 45.]],
-        # [[46., 47., 48.],
-        #  [49., 50., 51.],
-        #  [52., 53., 54.],
-        #  [55., 56., 57.],
-        #  [58., 59., 60.]]
-        # ]
-        a = tensor.ones([2, 2])
-        b = tensor.QTensor([[1, 1], [0, 1]])
-        b = b > 0
-        x = tensor.QTensor([1001, 2001, 3001])
-
-        a[b] = x
-        print(a)
-        # [
-        # [1001., 2001.],
-        #  [1., 3001.]
-        # ]
-
-
-GPU
-==============================
-
-.. py:function:: QTensor.GPU(device: int = DEV_GPU_0)
-
-    克隆QTensor到指定的GPU设备
-
-    device 指定存储其内部数据的设备。 当device >= DEV_GPU_0时，数据存储在GPU上。 
-    如果您的计算机有多个 GPU，您可以指定不同的设备来存储数据。 例如，device = DEV_GPU_1, DEV_GPU_2, DEV_GPU_3, ... 表示存储在具有不同序列号的GPU上。
-
-    .. note::
-
-        QTensor在不同GPU上无法进行计算。
-        如果您尝试在 ID 超过验证 GPU 最大数量的 GPU 上创建 QTensor，将引发 Cuda 错误。
-
-    :param device: 当前保存QTensor的设备，默认=DEV_GPU_0，
-     device = pyvqnet.DEV_GPU_0，存储在第一个 GPU 中，devcie = DEV_GPU_1，
-     存储在第二个 GPU 中，依此类推。
-
-    :return: QTensor 克隆到 GPU 设备。
-
-    Examples::
-
-        from pyvqnet.tensor import QTensor
-        a = QTensor([2])
-        b = a.GPU()
-        print(b.device)
-        #1000
-
-CPU
-==============================
-
-.. py:function:: QTensor.CPU()
-
-    克隆QTensor到特定的CPU设备
-
-    :return: QTensor 克隆到 CPU 设备。
-
-    Examples::
-
-        from pyvqnet.tensor import QTensor
-        a = QTensor([2])
-        b = a.CPU()
-        print(b.device)
-        # 0
-
-toGPU
-==============================
-
-.. py:function:: QTensor.toGPU(device: int = DEV_GPU_0)
-
-    移动QTensor到指定的GPU设备
-
-    device 指定存储其内部数据的设备。 当device >= DEV_GPU时，数据存储在GPU上。
-     如果您的计算机有多个 GPU，您可以指定不同的设备来存储数据。 
-     例如，device = DEV_GPU_1, DEV_GPU_2, DEV_GPU_3, ... 表示存储在具有不同序列号的GPU上。
-
-    .. note::
-
-        QTensor在不同GPU上无法进行计算。
-        如果您尝试在 ID 超过验证 GPU 最大数量的 GPU 上创建 QTensor，将引发 Cuda 错误。
-
-    :param device: 当前保存QTensor的设备，默认=DEV_GPU_0。device = pyvqnet.DEV_GPU_0，存储在第一个 GPU 中，devcie = DEV_GPU_1，存储在第二个 GPU 中，依此类推。
-    :return: QTensor 移动到 GPU 设备。
-
-    Examples::
-
-        from pyvqnet.tensor import QTensor
-        a = QTensor([2])
-        a = a.toGPU()
-        print(a.device)
-        #1000
-
-
-toCPU
-==============================
-
-.. py:function:: QTensor.toCPU()
-
-    移动QTensor到特定的GPU设备
-
-    :return: QTensor 移动到 CPU 设备。
-
-    Examples::
-
-        from pyvqnet.tensor import QTensor
-        a = QTensor([2])
-        b = a.toCPU()
-        print(b.device)
-        # 0
-
-
-isGPU
-==============================
-
-.. py:function:: QTensor.isGPU()
-
-    该 QTensor 的数据是否存储在 GPU 主机内存上。
-
-    :return: 该 QTensor 的数据是否存储在 GPU 主机内存上。
-
-    Examples::
-    
-        from pyvqnet.tensor import QTensor
-        a = QTensor([2])
-        a = a.isGPU()
-        print(a)
-        # False
-
-isCPU
-==============================
-
-.. py:function:: QTensor.isCPU()
-
-    该 QTensor 的数据是否存储在 CPU 主机内存上。
-
-    :return: 该 QTensor 的数据是否存储在 CPU 主机内存上。
-
-    Examples::
-    
-        from pyvqnet.tensor import QTensor
-        a = QTensor([2])
-        a = a.isCPU()
-        print(a)
-        # True
-
+            from pyvqnet.tensor import QTensor
+            from pyvqnet import kcomplex128
+            a = QTensor([2])
+            a = a.astype(kcomplex128)
+            print(a)
+            #[2.+0.j]
 
 创建函数
 *************
