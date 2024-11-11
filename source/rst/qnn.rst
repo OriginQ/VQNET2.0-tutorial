@@ -1237,7 +1237,6 @@ HybirdVQCQpandaQVMLayer
     :param num_cubits: `int` - 量子电路中用于测量的经典比特数。
     :param pauli_str_dict: `dict|list` - 表示量子电路中泡利算子的字典或字典列表。默认值为 None。
     :param shots: `int` - 量子线路测量次数。默认值为 1000。
-    :param dtype: 参数的数据类型。默认值为 None,即使用默认数据类型4字节浮点数。
     :param name: 模块名称。默认值为空字符串。
     :param submit_kwargs: 提交量子电路的附加关键字参数,默认值:
         {"chip_id":pyqpanda.real_chip_type.origin_72,
@@ -1358,7 +1357,6 @@ HybirdVQCQpandaQVMLayer
                     6,
                     pauli_str_dict={'Z0':2,'Y3':3},
                     shots = 1000,
-                    dtype=None,
                     name="",
             submit_kwargs={"test_qcloud_fake":True},
                     query_kwargs={})
@@ -1388,7 +1386,6 @@ DataParallelHybirdVQCQpandaQVMLayer
     :param num_cubits: `int` - 量子电路中用于测量的经典比特数。
     :param pauli_str_dict: `dict|list` - 表示量子电路中泡利算子的字典或字典列表。默认值为 None。
     :param shots: `int` - 量子线路测量次数。默认值为 1000。
-    :param dtype: 参数的数据类型。默认值为 None,即使用默认数据类型4字节浮点数。
     :param name: 模块名称。默认值为空字符串。
     :param submit_kwargs: 提交量子电路的附加关键字参数,默认值:
         {"chip_id":pyqpanda.real_chip_type.origin_72,
@@ -1519,7 +1516,6 @@ DataParallelHybirdVQCQpandaQVMLayer
                 'Y3': 3
             },
             shots=1000,
-            dtype=None,
             name="",
             submit_kwargs={"test_qcloud_fake": True},
             query_kwargs={})
