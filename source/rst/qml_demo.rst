@@ -3626,7 +3626,8 @@ QUnet主要是用于解决图像分割的技术。
     from pyvqnet.nn.module import Module
     from pyvqnet.nn.loss import MeanSquaredError
     from pyvqnet.optim.adam import Adam
-    from pyvqnet.tensor.tensor import QTensor,kfloat32
+    from pyvqnet.tensor.tensor import QTensor
+    from pyvqnet import kfloat32
     from pyvqnet.qnn.quantumlayer import QuantumLayerMultiProcess
     from pyvqnet.tensor import tensor
     from pyvqnet.qnn.measure import expval

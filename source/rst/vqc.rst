@@ -2743,7 +2743,8 @@ VQC_Purity
     Example::
 
         from pyvqnet.qnn.vqc import VQC_Purity, rx, ry, cnot, QMachine
-        from pyvqnet.tensor import kfloat64, QTensor
+        from pyvqnet.tensor import QTensor
+        from pyvqnet import kfloat64
         x = QTensor([[0.7, 0.4], [1.7, 2.4]], requires_grad=True)
         qm = QMachine(3)
         qm.reset_states(2)
@@ -2800,7 +2801,8 @@ VQC_DensityMatrixFromQstate
     Example::
 
         from pyvqnet.qnn.vqc import VQC_DensityMatrixFromQstate,rx,ry,cnot,QMachine
-        from pyvqnet.tensor import kfloat64, QTensor
+        from pyvqnet.tensor import QTensor
+        from pyvqnet import kfloat64
         x = QTensor([[0.7,0.4],[1.7,2.4]],requires_grad=True)
 
         qm = QMachine(3)
@@ -2847,7 +2849,8 @@ Probability
     Example::
 
         from pyvqnet.qnn.vqc import Probability,rx,ry,cnot,QMachine,rz
-        from pyvqnet.tensor import kfloat64, QTensor
+        from pyvqnet.tensor import QTensor
+        from pyvqnet import kfloat64
         x = QTensor([[0.56, 0.1],[0.56, 0.1]],requires_grad=True)
         qm = QMachine(4)
         qm.reset_states(2)
@@ -2884,7 +2887,8 @@ MeasureAll
     Example::
 
         from pyvqnet.qnn.vqc import MeasureAll,rx,ry,cnot,QMachine,rz
-        from pyvqnet.tensor import kfloat64, QTensor
+        from pyvqnet.tensor import QTensor
+        from pyvqnet import kfloat64
         x = QTensor([[0.56, 0.1],[0.56, 0.1]],requires_grad=True)
         qm = QMachine(4)
         qm.reset_states(2)
@@ -2927,7 +2931,8 @@ Samples
     Example::
 
         from pyvqnet.qnn.vqc import Samples,rx,ry,cnot,QMachine,rz
-        from pyvqnet.tensor import kfloat64, QTensor
+        from pyvqnet.tensor import QTensor
+        from pyvqnet import kfloat64
         x = QTensor([[0.56, 0.1],[0.56, 0.1]],requires_grad=True)
 
         qm = QMachine(4)
@@ -3267,7 +3272,6 @@ VQC_QuantumEmbedding
 
     使用 RZ,RY,RZ 创建变分量子电路,将经典数据编码为量子态。
     参考 `Quantum embeddings for machine learning <https://arxiv.org/abs/2001.03622>`_。
-    在初始化该类后,其成员函数 ``compute_circuit`` 为运行函数,可作为参数输入 ``QuantumLayerV2`` 类构成量子机器学习模型的一层。
 
     :param qubits: 使用pyqpanda 申请的量子比特。
     :param machine: 使用pyqpanda 申请的量子虚拟机。
@@ -3330,11 +3334,11 @@ VQC_QuantumEmbedding
 ExpressiveEntanglingAnsatz
 ---------------------------------------------------------------
 
-.. py:class:: pyvqnet.qnn.vqc.ExpressiveEntanglingAnsatz(type, num_wires, )
+.. py:class:: pyvqnet.qnn.vqc.ExpressiveEntanglingAnsatz(type: int, num_wires: int, depth: int, name: str = "")
 
     论文 `Expressibility and entangling capability of parameterized quantum circuits for hybrid quantum-classical algorithms <https://arxiv.org/pdf/1905.10876.pdf>`_ 中的 19 种不同的ansatz。
 
-    :param type: 电路类型从 1 到 19。
+    :param type: 电路类型从 1 到 19,共19种线路。
     :param num_wires: 量子比特数。
     :param depth: 电路深度。
     :param name: 名字,默认"".
@@ -3418,7 +3422,7 @@ VQC_AngleEmbedding
 ---------------------------------------------------------------
 
 
-.. py:function:: pyvqnet.qnn.vqc.VQC_AngleEmbedding(input_feat, wires, q_machine: QMachine, rotation: str = "X")
+.. py:function:: pyvqnet.qnn.vqc.VQC_AngleEmbedding(input_feat, wires, q_machine: pyvqnet.qnn.vqc.QMachine, rotation: str = "X")
 
     将 :math:`N` 特征编码到 :math:`n` 量子比特的旋转角度中, 其中 :math:`N \leq n`。
 
@@ -3491,7 +3495,7 @@ VQC_IQPEmbedding
 ---------------------------------------------------------------
 
 
-.. py:function:: pyvqnet.qnn.vqc.VQC_IQPEmbedding(input_feat, q_machine: QMachine, rep: int = 1)
+.. py:function:: pyvqnet.qnn.vqc.VQC_IQPEmbedding(input_feat, q_machine: pyvqnet.qnn.vqc.QMachine, rep: int = 1)
 
     使用IQP线路的对角门将 :math:`n` 特征编码为 :math:`n` 量子比特。
 
@@ -3817,7 +3821,7 @@ VQC_ZFeatureMap
 ---------------------------------------------------------------
 
 
-.. py:function:: pyvqnet.qnn.vqc.VQC_ZFeatureMap(input_feat, q_machine: QMachine, data_map_func=None, rep: int = 2)
+.. py:function:: pyvqnet.qnn.vqc.VQC_ZFeatureMap(input_feat, q_machine: pyvqnet.qnn.vqc.QMachine, data_map_func=None, rep: int = 2)
 
     一阶泡利 Z 演化电路。
 
@@ -3860,7 +3864,7 @@ VQC_ZZFeatureMap
 ---------------------------------------------------------------
 
 
-.. py:function:: pyvqnet.qnn.vqc.VQC_ZZFeatureMap(input_feat, q_machine: QMachine, data_map_func=None, entanglement: Union[str, List[List[int]],Callable[[int], List[int]]] = "full",rep: int = 2)
+.. py:function:: pyvqnet.qnn.vqc.VQC_ZZFeatureMap(input_feat, q_machine: pyvqnet.qnn.vqc.QMachine, data_map_func=None, entanglement: Union[str, List[List[int]],Callable[[int], List[int]]] = "full",rep: int = 2)
 
     二阶 Pauli-Z 演化电路。
 
@@ -3908,12 +3912,11 @@ VQC_AllSinglesDoubles
 ---------------------------------------------------------------
 
 
-.. py:function:: pyvqnet.qnn.vqc.VQC_AllSinglesDoubles(weights, q_machine: QMachine, hf_state, wires, singles=None, doubles=None)
+.. py:function:: pyvqnet.qnn.vqc.VQC_AllSinglesDoubles(weights, q_machine: pyvqnet.qnn.vqc.QMachine, hf_state, wires, singles=None, doubles=None)
 
-    在这种情况下,我们有四个单激发和双激发来保留 Hartree-Fock 态的总自旋投影。 :class:`~.vqc.qCircuit.single_exitation` 门 :math:`G` 作用于量子位 ``[0, 2], [0, 4], [1, 3], [1, 5]``, 
-    而 :class:`~.vqc.qCircuit.double_exitation` 运算 :math:`G^{(2)}` 应用于量子位 ``[0, 1, 2, 3] , [0, 1, 2, 5], [0, 1, 2, 4], [0, 1, 4, 5]``。
+    在这种情况下,我们有四个单激发和双激发来保留 Hartree-Fock 态的总自旋投影。 
 
-    由此产生的酉保留了粒子数量,并在初始 Hartree-Fock 状态和编码多激发配置的其他状态的叠加中准备了n量子位系统。
+    由此产生的酉矩阵保留了粒子数量,并在初始 Hartree-Fock 状态和编码多激发配置的其他状态的叠加中准备了n量子位系统。
       
     :param weights: 大小为 ``(len(singles) + len(doubles),)`` 的QTensor,包含按顺序进入 vqc.qCircuit.single_excitation 和 vqc.qCircuit.double_excitation 操作的角度
     :param q_machine: 量子虚拟机。
@@ -3951,7 +3954,7 @@ VQC_BasisRotation
 ---------------------------------------------------------------
 
 
-.. py:function:: pyvqnet.qnn.vqc.VQC_BasisRotation(q_machine: QMachine, wires, unitary_matrix: QTensor, check=False)
+.. py:function:: pyvqnet.qnn.vqc.VQC_BasisRotation(q_machine: pyvqnet.qnn.vqc.QMachine, wires, unitary_matrix: QTensor, check=False)
 
     实现一个电路,提供可用于执行精确的单体基础旋转的整体。
 
@@ -3962,7 +3965,6 @@ VQC_BasisRotation
         U(u) = \exp{\left( \sum_{pq} \left[\log u \right]_{pq} (a_p^\dagger a_q - a_q^\dagger a_p) \right)}.
     
     :math:`U(u)` 通过使用论文 `Optica, 3, 1460 (2016) <https://opg.optica.org/optica/fulltext.cfm?uri=optica-3-12-1460&id=355743>`_\ 中给出的方案。
-    将输入酉矩阵分解后,由一系列 :class:`~vqc.qCircuit.phaseshift` 和 :class:`~vqc.qCircuit.single_exitation` 门来有效实现。
     
 
     :param q_machine: 量子虚拟机。
@@ -4283,7 +4285,7 @@ VQC_QSVT
 QuantumLayerAdjoint
 ---------------------------------------------------------------
 
-.. py:class:: pyvqnet.qnn.vqc.QuantumLayerAdjoint(general_module: pyvqnet.nn.Module, q_machine: QMachine,name="")
+.. py:class:: pyvqnet.qnn.vqc.QuantumLayerAdjoint(general_module: pyvqnet.nn.Module, q_machine: pyvqnet.qnn.vqc.QMachine,name="")
 
 
     使用伴随矩阵方式进行梯度计算的可自动微分的QuantumLayer层,参考  `Efficient calculation of gradients in classical simulations of variational quantum algorithms <https://arxiv.org/abs/2009.02823>`_ 。
@@ -4369,7 +4371,7 @@ QuantumLayerAdjoint
 QuantumLayerES
 ---------------------------------------------------------------
 
-.. py:class:: pyvqnet.qnn.vqc.QuantumLayerES(general_module: nn.Module, q_machine: QMachine, name="", sigma = np.pi / 24)
+.. py:class:: pyvqnet.qnn.vqc.QuantumLayerES(general_module: nn.Module, q_machine: pyvqnet.qnn.vqc.QMachine, name="", sigma = np.pi / 24)
 
 
     根据进化策略进行梯度计算的可自动微分的QuantumLayer层,参考  `Learning to learn with an evolutionary strategy Learning to learn with an evolutionary strategy <https://arxiv.org/abs/2310.17402>`_ 。

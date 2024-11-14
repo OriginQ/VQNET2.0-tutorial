@@ -467,7 +467,7 @@
     from pyvqnet.qnn.vqc.qmachine import QMachine
     from pyvqnet.qnn.vqc.utils import probs
     from pyvqnet.nn import Module, Parameter
-    from pyvqnet.tensor import tensor,kfloat32
+    from pyvqnet.tensor import tensor
     from pyvqnet.tensor import QTensor
     from pyvqnet.dtype import *
     from pyvqnet.optim import Adam
@@ -3326,7 +3326,8 @@ QMLP模型示例
     from pyvqnet.nn import Module,Parameter
     from pyvqnet.nn.loss import MeanSquaredError
     from pyvqnet.optim.adam import Adam
-    from pyvqnet.tensor.tensor import QTensor,kfloat32
+    from pyvqnet.tensor import QTensor
+    from pyvqnet import kfloat32, kint64
     from pyvqnet.device import DEV_GPU
 
     from pyvqnet.qnn.vqc import QMachine,QModule,rx,rz,ry,\

@@ -191,7 +191,7 @@ toGPU
         Module在不同GPU上无法进行计算。
         如果您尝试在 ID 超过验证 GPU 最大数量的 GPU 上创建 QTensor,将引发 Cuda 错误。
 
-    :param device: 当前保存QTensor的设备,默认=DEV_GPU_0。device= pyvqnet.DEV_GPU_0,存储在第一个 GPU 中,devcie = DEV_GPU_1,存储在第二个 GPU 中,依此类推
+    :param device: 当前保存QTensor的设备,默认:DEV_GPU_0。device= pyvqnet.DEV_GPU_0,存储在第一个 GPU 中,devcie = DEV_GPU_1,存储在第二个 GPU 中,依此类推
     :return: Module 移动到 GPU 设备。
 
     Examples::
@@ -220,6 +220,8 @@ toCPU
         print(test_conv.backend)
         #0
 
+
+.. _save_parameters:
 
 模型参数保存和载入
 *********************************************************
@@ -1828,7 +1830,6 @@ Interpolate
         import numpy as np
         np.random.seed(0)
 
-        from time import time
         np_ = np.random.randn(36).reshape((1, 1, 6, 6)).astype(np.float32)
         mode_ = "bilinear"
         size_ = 3
@@ -1845,15 +1846,10 @@ Interpolate
                 x = self.ln(x)
                 return 2 * x 
 
-        input_vqnet = tensor.QTensor(np_,  dtype=pyvqnet.kfloat32, requires_grad=True).toGPU()
-        model = model_vqnet().toGPU()
+        input_vqnet = tensor.QTensor(np_,  dtype=pyvqnet.kfloat32, requires_grad=True)
         loss_pyvqnet = pyvqnet.nn.MeanSquaredError()
-        time3 = time()
-        output_vqnet = model(input_vqnet)
-        time4 = time()
-        print(f"output_vqnet {output_vqnet} time {time4 - time3}")
-
-        l = loss_pyvqnet(tensor.QTensor([[1.0]]).toGPU(), output_vqnet)
+        output_vqnet = model_vqnet(input_vqnet)
+        l = loss_pyvqnet(tensor.QTensor([[1.0]]), output_vqnet)
         l.backward()
         print(model.parameters()[0].grad)
 
@@ -2078,7 +2074,8 @@ MeanSquaredError
 
     Example::
 
-        from pyvqnet.tensor import QTensor, kfloat64
+        from pyvqnet.tensor import QTensor
+        from pyvqnet import kfloat64
         from pyvqnet.nn import MeanSquaredError
         y = QTensor([[0, 0, 1, 0, 0, 0, 0, 0, 0, 0]],
                     requires_grad=False,
@@ -2167,7 +2164,8 @@ CategoricalCrossEntropy
 
     Example::
 
-        from pyvqnet.tensor import QTensor,kfloat32,kint64
+        from pyvqnet.tensor import QTensor
+        from pyvqnet import kfloat32,kint64
         from pyvqnet.nn import CategoricalCrossEntropy
         x = QTensor([[1, 2, 3, 4, 5],
         [1, 2, 3, 4, 5],
@@ -2206,7 +2204,8 @@ SoftmaxCrossEntropy
 
     Example::
 
-        from pyvqnet.tensor import QTensor, kfloat32, kint64
+        from pyvqnet.tensor import QTensor
+        from pyvqnet import kfloat32, kint64
         from pyvqnet.nn import SoftmaxCrossEntropy
         x = QTensor([[1, 2, 3, 4, 5], [1, 2, 3, 4, 5], [1, 2, 3, 4, 5]],
                     requires_grad=True,
@@ -2251,7 +2250,8 @@ NLL_Loss
 
     Example::
 
-        from pyvqnet.tensor import QTensor, kint64
+        from pyvqnet.tensor import QTensor
+        from pyvqnet import kint64
         from pyvqnet.nn import NLL_Loss
 
         x = QTensor([
@@ -2527,6 +2527,12 @@ Gelu
 
     .. math:: \text{GELU}(x) = 0.5 * x * (1 + \text{Tanh}(\sqrt{2 / \pi} * (x + 0.044715 * x^3)))
 
+
+    :param approximate: 近似计算方式，默认为"tanh"。
+    :param name: 激活函数层的命名,默认为""。
+
+    :return: Gelu 激活函数层实例。
+    
     Examples::
 
         from pyvqnet.tensor import randu, ones_like
@@ -2596,6 +2602,8 @@ Tanh
 优化器模块
 *********************************************************
 
+
+.. _Optimizer:
 
 Optimizer
 =================================
@@ -3038,7 +3046,8 @@ Rotosolve算法它允许相对于其他参数的固定值直接跳转到单个�
 
         from pyvqnet.optim.rotosolve import Rotosolve
         import pyqpanda as pq
-        from pyvqnet.tensor import QTensor,kfloat64
+        from pyvqnet.tensor import QTensor
+        from pyvqnet import kfloat64
         from pyvqnet.qnn.measure import expval
         machine = pq.CPUQVM()
         machine.init_qvm()
@@ -3432,10 +3441,14 @@ auc_calculate
         print("auc:", result) # 0.1111111111111111
 
 
-分布式计算模块
+.. _vqnet_dist:
+
+VQNet原生分布式计算模块
 *********************************************************
 
 该模块使用mpi启动多进程并行计算，使用nccl进行GPU之间通信。仅在linux操作系统下能够使用。
+
+
 
 环境部署
 =================================
@@ -3750,11 +3763,13 @@ h
 CommController
 =================================
 
-.. py:class:: pyvqnet.distributed.ControllComm.CommController(backend="mpi")
+.. py:class:: pyvqnet.distributed.ControllComm.CommController(backend,rank=None,world_size=None)
 
     CommController用于控制在cpu、gpu下数据通信的控制器, 通过设置参数 `backend` 来生成cpu(mpi)、gpu(nccl)的控制器。(目前分布式计算的功能仅支持linux操作系系统下使用)
 
     :param backend: 用于生成cpu或者gpu的数据通信控制器。
+    :param rank: 该参数仅在非pyvqnet后端下有用，默认值为：None。
+    :param world_size: 该参数仅在非pyvqnet后端下有用，默认值为：None。
 
     :return:
         CommController 实例。
@@ -4089,20 +4104,30 @@ CommController
 
         Examples::
             
+            from pyvqnet.distributed import CommController,get_rank,init_group
+            from pyvqnet.tensor import tensor
+
+            Comm_OP = CommController("mpi")
+            group = init_group([[0,1]])
+            #mpi init group internally
+            # A list of lists, where each sublist contains a communicator and the corresponding rank list.
+            complex_data = tensor.QTensor([3+1j, 2, 1 + get_rank()],dtype=8).reshape((3,1))
+            print(f" before rank {get_rank()}: {complex_data}")
+            for comm_ in group:
+                if Comm_OP.getRank() in comm_[1]:
+                    complex_data = Comm_OP.all_gather_group(complex_data, comm_[0])
+                    print(f"after rank {get_rank()}: {complex_data}")
+            # mpirun -n 2 python test.py
+
             from pyvqnet.distributed import CommController,get_rank,get_local_rank
             from pyvqnet.tensor import tensor
-            import numpy as np
             Comm_OP = CommController("nccl")
-
             Comm_OP.ncclSplitGroup([[0, 1]])
-
             complex_data = tensor.QTensor([3+1j, 2, 1 + get_rank()],dtype=8).reshape((3,1)).toGPU(1000+ get_local_rank())
-
-            print(f"allgather_group before rank {get_rank()}: {complex_data}")
-
-            complex_data = Comm_OP.allgather_group(complex_data)
-            print(f"allgather_group after rank {get_rank()}: {complex_data}")
-            # vqnetrun -n 2 python test.py
+            print(f" before rank {get_rank()}: {complex_data}")
+            complex_data = Comm_OP.all_gather_group(complex_data)
+            print(f"after rank {get_rank()}: {complex_data}")
+            # mpirun -n 2 python test.py
 
 
  
