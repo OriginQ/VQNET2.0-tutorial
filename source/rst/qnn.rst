@@ -1547,16 +1547,16 @@ DataParallelHybirdVQCQpandaQVMLayer
         10.10.7.107 slots=2
         10.10.7.109 slots=2
 
-
-
-    使用 mpi 进行2节点每节点2进程共4进程并行，则可以运行 `vqnetrun -np 4 -f hosts python xxx.py
+    使用 mpi 进行2节点每节点2进程共4进程并行，则可以运行 `vqnetrun -np 4 -f hosts python xxx.py`
+    
     Example::
 
         from pyvqnet.distributed import *
         Comm_OP = CommController("mpi")
         #rest code not changed
 
-    使用 nccl 进行2节点每节点2进程共4进程并行，则可以运行 `vqnetrun -np 4 -f hosts python xxx.py
+    使用 nccl 进行2节点每节点2进程共4进程并行，则可以运行 `vqnetrun -np 4 -f hosts python xxx.py`
+    
     Example::
 
         from pyvqnet.distributed import *

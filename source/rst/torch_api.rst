@@ -60,6 +60,9 @@ get_backend
         pyvqnet.backends.set_backend("torch")
         pyvqnet.backends.get_backend()
 
+
+.. _torch_api:
+
 QTensor函数
 ===================
 

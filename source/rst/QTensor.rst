@@ -841,9 +841,7 @@ QTensor's 函数与属性
             QTensor在不同GPU上无法进行计算。
             如果您尝试在 ID 超过验证 GPU 最大数量的 GPU 上创建 QTensor，将引发 Cuda 错误。
 
-        :param device: 当前保存QTensor的设备，默认:DEV_GPU_0，
-        device = pyvqnet.DEV_GPU_0，存储在第一个 GPU 中，devcie = DEV_GPU_1，
-        存储在第二个 GPU 中，依此类推。
+        :param device: 当前保存QTensor的设备，默认:DEV_GPU_0，device = pyvqnet.DEV_GPU_0，存储在第一个 GPU 中，devcie = DEV_GPU_1，存储在第二个 GPU 中，依此类推。
 
         :return: QTensor 克隆到 GPU 设备。
 
@@ -1261,7 +1259,7 @@ diagonal
 diag
 ==============================
 
-.. py:function:: pyvqnet.tensor.diag(t, k: int = 0,requires_grad=False)
+.. py:function:: pyvqnet.tensor.diag(t, k: int = 0)
 
     构造对角矩阵。
 
@@ -1271,8 +1269,7 @@ diag
 
     :param t: 输入 QTensor。
     :param k: 偏移量（主对角线为 0，正数为向上偏移，负数为向下偏移），默认为0。
-    :param requires_grad: 是否计算梯度，默认为False。
-
+    
     :return: 输出 QTensor。
 
     Example::
