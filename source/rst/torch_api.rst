@@ -17,6 +17,7 @@ VQNet使用torch进行底层计算
         ``pyvqnet.backends.set_backend("torch")`` 以及 ``pyvqnet.backends.set_backend("pyvqnet")`` 会修改全局运行后端。
         不同后端配置下申请的 ``QTensor`` 不能混在一起运算。
 
+        使用 ``to_tensor`` 可将 ``torch.Tensor`` 封装为一个 ``QTensor`` 。
 
 计算后端基本设置
 ====================
@@ -76,6 +77,9 @@ QTensor函数
     pyvqnet.backends.set_backend("pyvqnet")
 
 在 :ref:`qtensor_api` 下的所有成员函数，创建函数，数学函数，逻辑函数，矩阵变换等均使用torch进行计算。使用 ``QTensor.data`` 可获取torch数据。
+
+使用 ``to_tensor`` 可将 ``torch.Tensor`` 封装为一个 ``QTensor`` 。
+
 
 
 经典神经网络类以及变分量子神经网络模块
