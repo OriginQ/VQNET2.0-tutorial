@@ -1,4 +1,6 @@
 
+.. _torch_api:
+
 ====================================
 VQNet使用torch进行底层计算
 ====================================
@@ -61,7 +63,7 @@ get_backend
         pyvqnet.backends.get_backend()
 
 
-.. _torch_api:
+
 
 QTensor函数
 ===================

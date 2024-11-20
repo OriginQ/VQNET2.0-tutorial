@@ -11,19 +11,20 @@ VQNet Changelog
 Added
 ===================
 
-- 增加 `pyvqnet.backends.set_backend()` 接口，在用户安装 `torch` 时候，可使用 `torch` 进行QTensor的矩阵计算，变分量子线路计算。
-- 增加 `pyvqnet.nn.torch` 继承于 `torch.nn.Module` 的神经网络接口，变分量子线路神经接口等，具体见文档 :ref:`torch_api` 。
+- 增加 `pyvqnet.backends.set_backend()` 接口，在用户安装 `torch` 时候，可使用 `torch` 进行QTensor的矩阵计算，变分量子线路计算，具体见文档 :ref:`torch_api` 。
+- 增加 `pyvqnet.nn.torch` 下继承于 `torch.nn.Module` 的神经网络接口，变分量子线路神经接口等，具体见文档 :ref:`torch_api` 。
 
 Changed
 ===================
 - diag接口修改。
-- all_gather实现与torch.distributed.all_gather一致。
-- `QTensor` 最大支持30维度数据。
-
+- 修改all_gather实现与torch.distributed.all_gather一致。
+- 修改 `QTensor` 最大支持30维度数据。
+- 修改分布式功能所需 `mpi4py` 需要4.0.1版本以上
 
 Fixed
 ===================
 - 部分随机数实现由于omp无法固定种子。
+- 修复分布式启动的部分bug。
 
 
 [v2.14.0] - 2024-09-30
