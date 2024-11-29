@@ -3918,6 +3918,26 @@ Dropout是经典深度神经网络（DNN）的一种常用技术，可防止计�
     from matplotlib import ticker
     import matplotlib.pyplot as plt
     from sklearn.preprocessing import MinMaxScaler
+    from pyvqnet.nn import Parameter
+
+设置全局变量
+
+.. code-block::
+
+    # 设置量子线路层数等相关全局变量
+    n_qubits = 5
+    inner_layers = 3
+    layers = 3
+    params_per_layer = n_qubits * inner_layers # 此时三个参数为全局变量, 若改成局部变量，注意样例使用地方修改
+    
+    # 设置模型训练相关参数
+    epochs = 700
+    n_run = 3
+    seed =1234
+    drop_rates = [(0.0, 0.0), (0.3, 0.2), (0.7, 0.7)]
+    train_history = {}
+    test_history = {}
+    opt_params = {}
 
 搭建简单的量子线路
 
@@ -3958,12 +3978,6 @@ Dropout是经典深度神经网络（DNN）的一种常用技术，可防止计�
             for qb in wires[:-1]:
                 entangler(qmachine, wires=[wires[qb], wires[qb + 1]])
             counter += 1
-
-    # quantum circuit qubits and params
-    n_qubits = 5
-    inner_layers = 3
-    params_per_layer = n_qubits * inner_layers
-
 
     def qnn_circuit(x, theta, keep_rot, n_qubits, layers, qm):
         for i in range(layers):
@@ -4021,16 +4035,6 @@ Dropout是经典深度神经网络（DNN）的一种常用技术，可防止计�
             keep_rot.append(keep_rot_layer)
 
         return np.array(keep_rot)
-
-    seed = 42
-    layer_drop_rate = 0.5
-    rot_drop_rate = 0.5
-    layers = 5
-    n_qubits = 4
-    inner_layers = 3
-    params_per_layer = 12
-
-    result = make_dropout(seed, layer_drop_rate, rot_drop_rate, layers)
 
 将量子线路添加至量子神经网络模块
 
@@ -4111,16 +4115,6 @@ Dropout是经典深度神经网络（DNN）的一种常用技术，可防止计�
 
 .. code-block::
 
-    epochs = 700
-
-    n_run = 3
-    seed =1234
-    drop_rates = [(0.0, 0.0), (0.3, 0.2), (0.7, 0.7)]
-
-    train_history = {}
-    test_history = {}
-    opt_params = {}
-    layers = 3
 
     for layer_drop_rate, rot_drop_rate in drop_rates:
         costs_per_comb = []
