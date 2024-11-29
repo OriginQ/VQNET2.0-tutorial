@@ -1495,7 +1495,6 @@ DataParallelHybirdVQCQpandaQVMLayer
 
                 return rlt
 
-        device = Comm_OP.get_rank
         input_x = tensor.QTensor([[0.1, 0.2, 0.3]])
         input_x = tensor.broadcast_to(input_x, [20, 3])
         input_x.requires_grad = True
@@ -1535,6 +1534,8 @@ DataParallelHybirdVQCQpandaQVMLayer
         from pyvqnet.distributed import *
 
         Comm_OP = CommController("nccl")
+        #input_x = tensor.QTensor([[0.1, 0.2, 0.3]])
+        input_x = tensor.QTensor([[0.1, 0.2, 0.3]],device=Comm_OP.get_local_rank() + pyvqnet.DEV_GPU_0)
         #rest code not changed
 
     
@@ -1561,6 +1562,8 @@ DataParallelHybirdVQCQpandaQVMLayer
 
         from pyvqnet.distributed import *
         Comm_OP = CommController("nccl")
+        #input_x = tensor.QTensor([[0.1, 0.2, 0.3]])
+        input_x = tensor.QTensor([[0.1, 0.2, 0.3]],device=Comm_OP.get_local_rank() + pyvqnet.DEV_GPU_0)
         #rest code not changed
 
 量子逻辑门

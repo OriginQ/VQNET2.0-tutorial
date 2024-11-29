@@ -4723,13 +4723,13 @@ vqc_quantumpooling_circuit
 QuantumLayerAdjoint
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:class:: pyvqnet.qnn.vqc.torch.QuantumLayerAdjoint(general_module: pyvqnet.nn.Module, q_machine: pyvqnet.qnn.vqc.torch.QMachine,name="")
+.. py:class:: pyvqnet.qnn.vqc.torch.QuantumLayerAdjoint(general_module: pyvqnet.nn.Module, use_qpanda=False,name="")
 
 
     使用伴随矩阵方式进行梯度计算的可自动微分的QuantumLayer层,参考  `Efficient calculation of gradients in classical simulations of variational quantum algorithms <https://arxiv.org/abs/2009.02823>`_ 。
 
     :param general_module: 一个仅使用 ``pyvqnet.qnn.vqc.torch`` 下量子线路接口搭建的 `pyvqnet.nn.Module` 实例。
-    :param q_machine: 来自general_module中定义的QMachine。
+    :param use_qpanda: 是否使用qpanda线路进行前传，默认：False。
     :param name: 该层名字,默认为""。
 
     .. note::
@@ -4793,7 +4793,7 @@ QuantumLayerAdjoint
         qunatum_model = QModel(num_wires=6,
                             dtype=pyvqnet.kcomplex64,
                             grad_mode="adjoint")
-        adjoint_model = QuantumLayerAdjoint(qunatum_model, qunatum_model.qm)
+        adjoint_model = QuantumLayerAdjoint(qunatum_model)
         batch_y = adjoint_model(input_x)
         batch_y.backward()
 
