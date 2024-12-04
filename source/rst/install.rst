@@ -4,14 +4,20 @@ VQNet 安装步骤
 VQNet python包安装
 ----------------------------------
 
-我们提供了Linux, Windows, x86_64 OSX >=10.12, arm64 OSX>=13.0 上的python预编译包供安装，需要 **python3.8, 3.9 或 3.10** 。
+我们提供了Linux, Windows, x86_64 OSX >=10.12, arm64 OSX>=13.0 上的python预编译包供安装,需要 **python3.8, 3.9 或 3.10** 。
 
-对于Linux系统,pyvqnet提供了基于Nvidia GPU对经典神经网络计算加速功能，当您的电脑的GPU是GTX10系列及其以后的型号，按照cuda官方网站安装cuda11.7，可使用pyvqnet的GPU功能构建模型。
+对于Linux系统,pyvqnet提供了基于Nvidia GPU对经典神经网络计算加速功能,当您的电脑的GPU是GTX10系列及其以后的型号,可使用pyvqnet的GPU功能构建模型。
 
 
 .. code-block::
 
     pip install pyvqnet --index-url https://pypi.originqc.com.cn
+
+如果您遇到网络问题导致无法下载,可尝试增加timeout。
+
+.. code-block::
+
+    pip install pyvqnet --index-url https://pypi.originqc.com.cn --default-timeout=100
 
 VQNet 测试安装成功
 ----------------------------------
@@ -40,20 +46,20 @@ VQNet 的一个简单例子
 。
 量子机器学习中的量子计算模块一般有如下几个部分：
 
-（1）编码线路（Encoder），用于将经典数据编码到量子数据；
-（2）可变参数的量子线路（Ansatz），用于训练带参量子门中的参数；
-（3）测量模块(Measurement)，用于检测测量值（也就是某个量子比特的量子态在某些轴上的投影）。
+(1）编码线路(Encoder）,用于将经典数据编码到量子数据；
+(2）可变参数的量子线路(Ansatz）,用于训练带参量子门中的参数；
+(3）测量模块(Measurement),用于检测测量值(也就是某个量子比特的量子态在某些轴上的投影）。
 
-量子计算模块与经典神经网络的运算模块一样是可微分的，是量子经典神经网络混合模型的理论基础。
-VQNet支持将量子计算模块与经典计算模块（例如：卷积，池化，全连接层，激活函数等）一起构成混合机器学习模型，提供多种优化算法优化参数。
+量子计算模块与经典神经网络的运算模块一样是可微分的,是量子经典神经网络混合模型的理论基础。
+VQNet支持将量子计算模块与经典计算模块(例如：卷积,池化,全连接层,激活函数等）一起构成混合机器学习模型,提供多种优化算法优化参数。
 
 .. figure:: ./images/classic-quantum.PNG
 
-在量子计算模块，VQNet支持使用本源量子高效的量子软件计算包 `pyQPanda <https://pyqpanda-toturial.readthedocs.io/zh/latest/>`_  进行量子模块构建。
-使用pyQPanda提供的各种常用 `量子逻辑门函数接口 <https://pyqpanda-toturial.readthedocs.io/zh/latest/QGate.html>`_ ， `量子线路接口 <https://pyqpanda-toturial.readthedocs.io/zh/latest/QCircuit.html>`_ , `量子虚拟机函数接口 <https://pyqpanda-toturial.readthedocs.io/zh/latest/QuantumMachine.html>`_ ， `测量函数接口 <https://pyqpanda-toturial.readthedocs.io/zh/latest/Measure.html>`_，用户可以快速构建量子计算模块。
+在量子计算模块,VQNet支持使用本源量子高效的量子软件计算包 `pyQPanda <https://pyqpanda-toturial.readthedocs.io/zh/latest/>`_  进行量子模块构建。
+使用pyQPanda提供的各种常用 `量子逻辑门函数接口 <https://pyqpanda-toturial.readthedocs.io/zh/latest/QGate.html>`_ , `量子线路接口 <https://pyqpanda-toturial.readthedocs.io/zh/latest/QCircuit.html>`_ , `量子虚拟机函数接口 <https://pyqpanda-toturial.readthedocs.io/zh/latest/QuantumMachine.html>`_ , `测量函数接口 <https://pyqpanda-toturial.readthedocs.io/zh/latest/Measure.html>`_,用户可以快速构建量子计算模块。
 
-接下来的例子我们使用pyQPanda构建了一个量子计算模块。通过VQNet，该量子计算模块可以直接嵌入到混合机器学习模型中进行量子线路参数训练。
-本例使用1个量子比特，使用了多个带参数的旋转门 `RZ`，`RY`，`RZ` 对输入x进行编码，并使用 `prob_run_dict()` 函数观测量子比特的概率测量结果作为输出。
+接下来的例子我们使用pyQPanda构建了一个量子计算模块。通过VQNet,该量子计算模块可以直接嵌入到混合机器学习模型中进行量子线路参数训练。
+本例使用1个量子比特,使用了多个带参数的旋转门 `RZ`,`RY`,`RZ` 对输入x进行编码,并使用 `prob_run_dict()` 函数观测量子比特的概率测量结果作为输出。
 
 .. code-block::
 
@@ -64,41 +70,41 @@ VQNet支持将量子计算模块与经典计算模块（例如：卷积，池化
             param1 = weights.squeeze()
             #使用pyqpanda接口构建量子线路实例
             circult = pq.QCircuit()
-            #使用pyqpanda接口在第一个量子比特上插入逻辑门RZ门，参数位x1[0]
+            #使用pyqpanda接口在第一个量子比特上插入逻辑门RZ门,参数位x1[0]
             circult.insert(pq.RZ(qlist[0], x1[0]))
-            #使用pyqpanda接口在第一个量子比特上插入逻辑门RY门，参数位x1[1]
+            #使用pyqpanda接口在第一个量子比特上插入逻辑门RY门,参数位x1[1]
             circult.insert(pq.RY(qlist[0], x1[1]))
-            #使用pyqpanda接口在第一个量子比特上插入逻辑门RZ门，参数位x1[2]
+            #使用pyqpanda接口在第一个量子比特上插入逻辑门RZ门,参数位x1[2]
             circult.insert(pq.RZ(qlist[0], x1[2]))
-            #使用pyqpanda接口在第一个量子比特上插入逻辑门RZ门，参数位param1[0]
+            #使用pyqpanda接口在第一个量子比特上插入逻辑门RZ门,参数位param1[0]
             circult.insert(pq.RZ(qlist[0], param1[0]))
-            #使用pyqpanda接口在第一个量子比特上插入逻辑门RY门，参数位param1[1]
+            #使用pyqpanda接口在第一个量子比特上插入逻辑门RY门,参数位param1[1]
             circult.insert(pq.RY(qlist[0], param1[1]))
-            #使用pyqpanda接口在第一个量子比特上插入逻辑门RZ门，参数位param1[2]
+            #使用pyqpanda接口在第一个量子比特上插入逻辑门RZ门,参数位param1[2]
             circult.insert(pq.RZ(qlist[0], param1[2]))
-            #使用pyqpanda接口在第一个量子比特上插入逻辑门RZ门，参数位x1[0]
+            #使用pyqpanda接口在第一个量子比特上插入逻辑门RZ门,参数位x1[0]
             circult.insert(pq.RZ(qlist[0], x1[0]))
-            #使用pyqpanda接口在第一个量子比特上插入逻辑门RY门，参数位x1[1]
+            #使用pyqpanda接口在第一个量子比特上插入逻辑门RY门,参数位x1[1]
             circult.insert(pq.RY(qlist[0], x1[1]))
-            #使用pyqpanda接口在第一个量子比特上插入逻辑门RZ门，参数位x1[2]
+            #使用pyqpanda接口在第一个量子比特上插入逻辑门RZ门,参数位x1[2]
             circult.insert(pq.RZ(qlist[0], x1[2]))
-            #使用pyqpanda接口在第一个量子比特上插入逻辑门RZ门，参数位param1[3]
+            #使用pyqpanda接口在第一个量子比特上插入逻辑门RZ门,参数位param1[3]
             circult.insert(pq.RZ(qlist[0], param1[3]))
-            #使用pyqpanda接口在第一个量子比特上插入逻辑门RY门，参数位param1[4]
+            #使用pyqpanda接口在第一个量子比特上插入逻辑门RY门,参数位param1[4]
             circult.insert(pq.RY(qlist[0], param1[4]))
-            #使用pyqpanda接口在第一个量子比特上插入逻辑门RZ门，参数位param1[5]
+            #使用pyqpanda接口在第一个量子比特上插入逻辑门RZ门,参数位param1[5]
             circult.insert(pq.RZ(qlist[0], param1[5]))
-            #使用pyqpanda接口在第一个量子比特上插入逻辑门RZ门，参数位x1[0]
+            #使用pyqpanda接口在第一个量子比特上插入逻辑门RZ门,参数位x1[0]
             circult.insert(pq.RZ(qlist[0], x1[0]))
-            #使用pyqpanda接口在第一个量子比特上插入逻辑门RY门，参数位x1[1]
+            #使用pyqpanda接口在第一个量子比特上插入逻辑门RY门,参数位x1[1]
             circult.insert(pq.RY(qlist[0], x1[1]))
-            #使用pyqpanda接口在第一个量子比特上插入逻辑门RZ门，参数位x1[2]
+            #使用pyqpanda接口在第一个量子比特上插入逻辑门RZ门,参数位x1[2]
             circult.insert(pq.RZ(qlist[0], x1[2]))
-            #使用pyqpanda接口在第一个量子比特上插入逻辑门RZ门，参数位param1[6]
+            #使用pyqpanda接口在第一个量子比特上插入逻辑门RZ门,参数位param1[6]
             circult.insert(pq.RZ(qlist[0], param1[6]))
-            #使用pyqpanda接口在第一个量子比特上插入逻辑门RY门，参数位param1[7]
+            #使用pyqpanda接口在第一个量子比特上插入逻辑门RY门,参数位param1[7]
             circult.insert(pq.RY(qlist[0], param1[7]))
-            #使用pyqpanda接口在第一个量子比特上插入逻辑门RZ门，参数位param1[8]
+            #使用pyqpanda接口在第一个量子比特上插入逻辑门RZ门,参数位param1[8]
             circult.insert(pq.RZ(qlist[0], param1[8]))
             #构建量子程序
             prog = pq.QProg()
@@ -108,7 +114,7 @@ VQNet支持将量子计算模块与经典计算模块（例如：卷积，池化
             prob = list(prob.values())
             return prob
 
-本例子中机器学习的任务是对随机生成的数据根据进行二分类，其中下图是该数据样例，零为圆点，半径为1以内红色的二维点为一类，蓝色的点为另一类。
+本例子中机器学习的任务是对随机生成的数据根据进行二分类,其中下图是该数据样例,零为圆点,半径为1以内红色的二维点为一类,蓝色的点为另一类。
 
 .. figure:: ./images/origin_circle.png
 
@@ -126,8 +132,8 @@ VQNet支持将量子计算模块与经典计算模块（例如：卷积，池化
     from pyvqnet.nn.module import Module
 
 
-定义模型Model，其中 `__init__` 函数定义内部各个神经网络模块以及量子模块，`forward` 函数定义前传函数。`QuantumLayer` 为封装量子计算的抽象类。
-您只需将刚才定义的量子计算函数 `qdrl_circuit`，待训练参数个数 `param_num` ，运行后端配置 `"cpu"` , 量子比特数 `qbit_num` 输入参数，该类就在 `VQNet` 中自动计算参数梯度。
+定义模型Model,其中 `__init__` 函数定义内部各个神经网络模块以及量子模块,`forward` 函数定义前传函数。`QuantumLayer` 为封装量子计算的抽象类。
+您只需将刚才定义的量子计算函数 `qdrl_circuit`,待训练参数个数 `param_num` ,运行后端配置 `"cpu"` , 量子比特数 `qbit_num` 输入参数,该类就在 `VQNet` 中自动计算参数梯度。
 
 .. code-block::
 
@@ -139,7 +145,7 @@ VQNet支持将量子计算模块与经典计算模块（例如：卷积，池化
     class Model(Module):
         def __init__(self):
             super(Model, self).__init__()
-            #使用QuantumLayer类，可以把带训练参数的量子线路纳入VQNet的自动微分的训练流程中
+            #使用QuantumLayer类,可以把带训练参数的量子线路纳入VQNet的自动微分的训练流程中
             self.pqc = QuantumLayer(qdrl_circuit,param_num,"cpu",qbit_num)
         #定义模型前向函数    
         def forward(self, x):
@@ -176,15 +182,15 @@ VQNet支持将量子计算模块与经典计算模块（例如：卷积，池化
         score = np.sum(pred == score)
         return score
 
-VQNet遵循机器学习一般的训练测试流程: 迭代进行载入数据，前传计算，损失函数计算，反向计算，更新参数的操作。
+VQNet遵循机器学习一般的训练测试流程: 迭代进行载入数据,前传计算,损失函数计算,反向计算,更新参数的操作。
 
 .. code-block::
 
     #实例化定义的模型
     model = Model()
-    #定义一个优化器，这里用的是Adam
+    #定义一个优化器,这里用的是Adam
     optimizer = adam.Adam(model.parameters(),lr =0.6)
-    #定义一个损失函数，这里用的交叉熵损失函数
+    #定义一个损失函数,这里用的交叉熵损失函数
     Closs = CategoricalCrossEntropy()
 
 训练模型部分的函数

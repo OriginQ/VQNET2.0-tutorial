@@ -1,7 +1,7 @@
 QTensor 模块
 ###########################
 
-VQNet量子机器学习所使用的数据结构QTensor的python接口介绍。QTensor支持常用的多维张量的操作，例如创建函数，数学函数，逻辑函数，矩阵变换等。
+VQNet量子机器学习所使用的数据结构QTensor的python接口介绍。QTensor支持常用的多维张量的操作,例如创建函数,数学函数,逻辑函数,矩阵变换等。
 
 
 
@@ -16,18 +16,18 @@ __init__
 
     具有动态计算图构造和自动微分的张量。
 
-    :param data: 输入数据，可以是 _core.Tensor 或numpy 数组。
-    :param requires_grad: 是否应该跟踪张量的梯度，默认为 False。
-    :param nodes: 计算图中的后继者列表，默认为无。
-    :param device: 储存在哪个设备上，默认: pyvqnet.DEV_CPU，在CPU上。
-    :param dtype: 参数的数据类型，defaults：None，使用默认数据类型:kfloat32,代表32位浮点数。
+    :param data: 输入数据,可以是 _core.Tensor 或numpy 数组。
+    :param requires_grad: 是否应该跟踪张量的梯度,默认为 False。
+    :param nodes: 计算图中的后继者列表,默认为无。
+    :param device: 储存在哪个设备上,默认: pyvqnet.DEV_CPU,在CPU上。
+    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
     :param name: QTensor的名字,default:""。
     :return: 输出 QTensor。
 
     .. note::
-            QTensor 内部数据类型dtype支持kbool,kuint8,kint8,kint16,kint32,kint64,kfloat32,kfloat64,kcomplex64,kcomplex128.
 
-            分别代表C++的 bool,uint8_t,int8_t,int16_t,int32_t,int64_t,float,double,complex<float>,complex<double>.
+            QTensor 内部数据类型dtype支持kbool,kuint8,kint8,kint16,kint32,kint64,kfloat32,kfloat64,kcomplex64,kcomplex128.
+            分别对应C++的 bool,uint8_t,int8_t,int16_t,int32_t,int64_t,float,double,complex<float>,complex<double>.
 
     Example::
 
@@ -149,7 +149,7 @@ is_dense
 
     是否是稠密张量。
 
-    :return: 当该数据是稠密的时候，返回1；否则返回 0。
+    :return: 当该数据是稠密的时候,返回1；否则返回 0。
 
     Example::
 
@@ -167,7 +167,7 @@ is_csr
 
     是否是Compressed Sparse Row格式的稀疏2维度矩阵。
 
-    :return: 当该数据是CSR格式的稀疏张量时候，返回1；否则返回 0。
+    :return: 当该数据是CSR格式的稀疏张量时候,返回1；否则返回 0。
 
     Example::
 
@@ -178,6 +178,26 @@ is_csr
         print(b.is_csr)
         #1
 
+is_contiguous
+==============================
+
+.. py:attribute:: QTensor.is_contiguous
+
+    是否是contiguous的多维数组。
+
+    :return: 如果是contiguous,返回True,否则返回False。
+
+    Example::
+
+        from pyvqnet.tensor import QTensor
+
+        a = QTensor([[2, 3, 4, 5],[2, 3, 4, 5]])
+        b = a.is_contiguous
+        print(b)
+        #True
+        c= a.permute((1,0))
+        print(c.is_contiguous)
+        #False
 
 csr_members
 ==============================
@@ -185,9 +205,10 @@ csr_members
 .. py:method:: QTensor.csr_members()
 
     返回Compressed Sparse Row格式的稀疏2维度矩阵的row_idx,col_idx 以及非0数值data,3个1维QTensor。具体含义见 https://en.wikipedia.org/wiki/Sparse_matrix#Compressed_sparse_row_(CSR,_CRS_or_Yale_format)。
+    
     :return:
 
-        返回列表，其中第一个元素为row_idx,shape为[矩阵行数+1],第2个元素为col_idx,shape为[非0元素数]，第3个元素为data,shape为[非0元素数]
+        返回列表,其中第一个元素为row_idx,shape为[矩阵行数+1],第2个元素为col_idx,shape为[非0元素数],第3个元素为data,shape为[非0元素数]
 
     Example::
 
@@ -221,7 +242,7 @@ backward
 
 .. py:method:: QTensor.backward(grad=None)
 
-    利用反向传播算法，计算当前张量所在的计算图中的所有需计算梯度的张量的梯度。
+    利用反向传播算法,计算当前张量所在的计算图中的所有需计算梯度的张量的梯度。
 
     :return: 无
 
@@ -272,15 +293,33 @@ item
 
         # 1.0
 
+
+contiguous
+==============================
+
+.. py:method:: QTensor.contiguous()
+
+    返回当前QTensor的contiguous形式 ,如果已经是contiguous,则返回自身。
+
+    :return: 返回当前QTensor的contiguous形式 ,如果已经是contiguous,则返回自身。
+
+    Example::
+
+        from pyvqnet.tensor import tensor
+
+        t = tensor.ones([1])
+        print(t.contiguous())
+
+
 argmax
 ==============================
 
 .. py:method:: QTensor.argmax(*kargs)
 
-    返回输入 QTensor 中所有元素的最大值的索引，或返回 QTensor 按某一维度的最大值的索引。
+    返回输入 QTensor 中所有元素的最大值的索引,或返回 QTensor 按某一维度的最大值的索引。
 
-    :param dim: 计算argmax的轴，只接受单个维度。 如果 dim == None，则返回输入张量中所有元素的最大值的索引。有效的 dim 范围是 [-R, R)，其中 R 是输入的 ndim。 当 dim < 0 时，它的工作方式与 dim + R 相同。
-    :param keepdims: 输出 QTensor 是否保留了最大值索引操作的轴，默认是False。
+    :param dim: 计算argmax的轴,只接受单个维度。 如果 dim == None,则返回输入张量中所有元素的最大值的索引。有效的 dim 范围是 [-R, R),其中 R 是输入的 ndim。 当 dim < 0 时,它的工作方式与 dim + R 相同。
+    :param keepdims: 输出 QTensor 是否保留了最大值索引操作的轴,默认是False。
 
     :return: 输入 QTensor 中最大值的索引。
 
@@ -319,10 +358,10 @@ argmin
 
 .. py:method:: QTensor.argmin(*kargs)
 
-    返回输入 QTensor 中所有元素的最小值的索引，或返回 QTensor 按某一维度的最小值的索引。
+    返回输入 QTensor 中所有元素的最小值的索引,或返回 QTensor 按某一维度的最小值的索引。
 
-    :param dim: 计算argmax的轴，只接受单个维度。 如果 dim == None，则返回输入张量中所有元素的最小值的索引。有效的 dim 范围是 [-R, R)，其中 R 是输入的 ndim。 当 dim < 0 时，它的工作方式与 dim + R 相同。
-    :param keepdims: 输出 QTensor 是否保留了最小值索引操作的轴，默认是False。
+    :param dim: 计算argmax的轴,只接受单个维度。 如果 dim == None,则返回输入张量中所有元素的最小值的索引。有效的 dim 范围是 [-R, R),其中 R 是输入的 ndim。 当 dim < 0 时,它的工作方式与 dim + R 相同。
+    :param keepdims: 输出 QTensor 是否保留了最小值索引操作的轴,默认是False。
 
     :return: 输入 QTensor 中最小值的索引。
 
@@ -358,7 +397,7 @@ fill\_
 
 .. py:method:: QTensor.fill_(v)
 
-    为当前张量填充特定值，该函数改变原张量的内部数据。
+    为当前张量填充特定值,该函数改变原张量的内部数据。
 
     :param v: 填充值。
 
@@ -387,7 +426,7 @@ all
 
     判断张量内数据是否全为全零。
 
-    :return: 返回True，如果全为非0;否则返回False。
+    :return: 返回True,如果全为非0;否则返回False。
 
     Example::
 
@@ -408,7 +447,7 @@ any
 
     判断张量内数据是否有任意元素不为0。
 
-    :return: 返回True，如果有任意元素不为0;否则返回False。
+    :return: 返回True,如果有任意元素不为0;否则返回False。
 
     Example::
 
@@ -430,9 +469,9 @@ fill_rand_binary\_
 
     用从二项分布中随机采样的值填充 QTensor 。
 
-    如果二项分布后随机生成的数据大于二值化阈值 v ，则设置 QTensor 对应位置的元素值为1，否则为0。
+    如果二项分布后随机生成的数据大于二值化阈值 v ,则设置 QTensor 对应位置的元素值为1,否则为0。
 
-    :param v: 二值化阈值，默认0.5。
+    :param v: 二值化阈值,默认0.5。
 
     :return: 无。
 
@@ -458,7 +497,7 @@ fill_rand_signed_uniform\_
 
     用从有符号均匀分布中随机采样的值填充 QTensor 。用缩放因子 v 对生成的随机采样的值进行缩放。
 
-    :param v: 缩放因子，默认1。
+    :param v: 缩放因子,默认1。
 
     :return: 无。
 
@@ -487,7 +526,7 @@ fill_rand_uniform\_
 
     用从均匀分布中随机采样的值填充 QTensor 。用缩放因子 v 对生成的随机采样的值进行缩放。
 
-    :param v: 缩放因子，默认1。
+    :param v: 缩放因子,默认1。
 
     :return: 无。
 
@@ -513,11 +552,11 @@ fill_rand_normal\_
 
 .. py:method:: QTensor.fill_rand_normal_(m=0, s=1, fast_math=True)
 
-    生成均值为 m 和方差 s 产生正态分布元素，并填充到张量中。
+    生成均值为 m 和方差 s 产生正态分布元素,并填充到张量中。
 
-    :param m: 均值，默认0。
-    :param s: 方差，默认1。
-    :param fast_math: 是否使用快速方法产生高斯分布，默认True。
+    :param m: 均值,默认0。
+    :param s: 方差,默认1。
+    :param fast_math: 是否使用快速方法产生高斯分布,默认True。
 
     :return: 无。
 
@@ -542,7 +581,7 @@ QTensor.transpose
 
 .. py:method:: QTensor.transpose(new_dims=None)
 
-    反转张量的轴。如果 new_dims = None，则反转所有轴。
+    反转张量的轴。如果 new_dims = None,则反转所有轴。
 
     :param new_dims: 列表形式储存的新的轴顺序。
 
@@ -569,45 +608,13 @@ QTensor.transpose
         
 
 
-transpose\_
-==============================
-
-.. py:method:: QTensor.transpose_(new_dims=None)
-
-    反转张量的轴。如果 new_dims = None，则反转所有轴。该接口改变当前张量自己的轴顺序。
-
-    :param new_dims: 列表形式储存的新的轴顺序。
-
-    :return: 无。
-
-    Example::
-
-        from pyvqnet.tensor import tensor
-        from pyvqnet.tensor import QTensor
-        import numpy as np
-        R, C = 3, 4
-        a = np.arange(R * C).reshape([2, 2, 3]).astype(np.float32)
-        t = QTensor(a)
-        t.transpose_([2, 0, 1])
-        print(t)
-
-        # [
-        # [[0., 3.],
-        #  [6., 9.]],
-        # [[1., 4.],
-        #  [7., 10.]],
-        # [[2., 5.],
-        #  [8., 11.]]
-        # ]
-        
-
 
 QTensor.reshape
 ==============================
 
 .. py:method:: QTensor.reshape(new_shape)
 
-    改变 QTensor 的形状，返回一个新的张量。
+    改变 QTensor 的形状,返回一个新的张量。
 
     :param new_shape: 新的形状。
 
@@ -636,7 +643,11 @@ reshape\_
 
 .. py:method:: QTensor.reshape_(new_shape)
 
-    改变当前 QTensor 的形状。
+    原地改变当前 QTensor 的形状。该接口会首先尝试在不改变原始内存数据情况下进行变换,如果无法成功,则复制当前数据到新的内存。
+
+    .. warning::
+
+        建议使用reshape接口,该接口在部分情况下,实际的底层内存位置会被复制而不是原地修改。
 
     :param new_shape: 新的形状。
 
@@ -687,20 +698,22 @@ __getitem__
 
 .. py:method:: QTensor.__getitem__()
 
-    支持对 QTensor 使用 切片索引，下标，或使用 QTensor 作为高级索引访问输入。该操作返回一个新的 QTensor 。
+    支持对 QTensor 使用 切片索引,下标,或使用 QTensor 作为高级索引访问输入。该操作返回一个新的 QTensor 。
 
-    通过冒号 ``:``  分隔切片参数 start:stop:step 来进行切片操作，其中 start、stop、step 均可缺省。
+    通过冒号 ``:``  分隔切片参数 start:stop:step 来进行切片操作,其中 start、stop、step 均可缺省。
 
-    针对1-D QTensor ，则仅有单个轴上的索引或切片。
+    针对1-D QTensor ,则仅有单个轴上的索引或切片。
 
-    针对2-D及以上的 QTensor ，则会有多个轴上的索引或切片。
+    针对2-D及以上的 QTensor ,则会有多个轴上的索引或切片。
 
-    使用 QTensor 作为 索引，则进行高级索引，请参考numpy中 `高级索引 <https://docs.scipy.org/doc/numpy-1.10.1/reference/arrays.indexing.html>`_ 部分。
+    使用 QTensor 作为 索引,则进行高级索引,请参考numpy中 `高级索引 <https://docs.scipy.org/doc/numpy-1.10.1/reference/arrays.indexing.html>`_ 部分。
 
-    若作为索引的 QTensor 为逻辑运算的结果，则进行 布尔数组索引。
+    若作为索引的 QTensor 为逻辑运算的结果,则进行 布尔数组索引。
 
-    .. note:: a[3][4][1] 形式的索引暂不支持, 使用 a[3,4,1] 形式代替。
-                ``Ellipsis`` `...` 暂不支持 。
+    .. note:: 
+        
+        a[3][4][1] 形式的索引暂不支持, 使用 a[3,4,1] 形式代替。
+
 
     :param item: 以 pyslice , 整数, QTensor 构成切片索引。
 
@@ -710,7 +723,7 @@ __getitem__
 
         from pyvqnet.tensor import tensor, QTensor
         aaa = tensor.arange(1, 61)
-        aaa.reshape_([4, 5, 3])
+        aaa = aaa.reshape([4, 5, 3])
         print(aaa[0:2, 3, :2])
         # [
         # [10., 11.],
@@ -778,20 +791,22 @@ __setitem__
 
 .. py:method:: QTensor.__setitem__()
 
-    支持对 QTensor 使用 切片索引，下标，或使用 QTensor 作为高级索引修改输入。该操作对输入原地进行修改 。
+    支持对 QTensor 使用 切片索引,下标,或使用 QTensor 作为高级索引修改输入。该操作对输入原地进行修改 。
 
-    通过冒号 ``:``  分隔切片参数 start:stop:step 来进行切片操作，其中 start、stop、step 均可缺省。
+    通过冒号 ``:``  分隔切片参数 start:stop:step 来进行切片操作,其中 start、stop、step 均可缺省。
 
-    针对1-D QTensor，则仅有单个轴上的索引或切片。
+    针对1-D QTensor,则仅有单个轴上的索引或切片。
 
-    针对2-D及以上的 QTensor ，则会有多个轴上的索引或切片。
+    针对2-D及以上的 QTensor ,则会有多个轴上的索引或切片。
 
-    使用 QTensor 作为 索引，则进行高级索引，请参考numpy中 `高级索引 <https://docs.scipy.org/doc/numpy-1.10.1/reference/arrays.indexing.html>`_ 部分。
+    使用 QTensor 作为 索引,则进行高级索引,请参考numpy中 `高级索引 <https://docs.scipy.org/doc/numpy-1.10.1/reference/arrays.indexing.html>`_ 部分。
 
-    若作为索引的 QTensor 为逻辑运算的结果，则进行 布尔数组索引。
+    若作为索引的 QTensor 为逻辑运算的结果,则进行 布尔数组索引。
 
-    .. note:: a[3][4][1] 形式的索引暂不支持, 使用 a[3,4,1] 形式代替。
-                ``Ellipsis`` `...` 暂不支持 。
+    .. note:: 
+        
+        a[3][4][1] 形式的索引暂不支持, 使用 a[3,4,1] 形式代替。
+
 
     :param item: 以 pyslice , 整数, QTensor 构成切片索引。
 
@@ -801,7 +816,7 @@ __setitem__
 
         from pyvqnet.tensor import tensor
         aaa = tensor.arange(1, 61)
-        aaa.reshape_([4, 5, 3])
+        aaa = aaa.reshape([4, 5, 3])
         vqnet_a2 = aaa[3, 4, 1]
         aaa[3, 4, 1] = tensor.arange(10001,
                                         10001 + vqnet_a2.size).reshape(vqnet_a2.shape)
@@ -829,7 +844,7 @@ __setitem__
         #  [58., 10001., 60.]]
         # ]
         aaa = tensor.arange(1, 61)
-        aaa.reshape_([4, 5, 3])
+        aaa = aaa.reshape([4, 5, 3])
         vqnet_a3 = aaa[:, 2, :]
         aaa[:, 2, :] = tensor.arange(10001,
                                         10001 + vqnet_a3.size).reshape(vqnet_a3.shape)
@@ -857,7 +872,7 @@ __setitem__
         #  [58., 59., 60.]]
         # ]
         aaa = tensor.arange(1, 61)
-        aaa.reshape_([4, 5, 3])
+        aaa = aaa.reshape([4, 5, 3])
         vqnet_a4 = aaa[2, :]
         aaa[2, :] = tensor.arange(10001,
                                     10001 + vqnet_a4.size).reshape(vqnet_a4.shape)
@@ -885,7 +900,7 @@ __setitem__
         #  [58., 59., 60.]]
         # ]
         aaa = tensor.arange(1, 61)
-        aaa.reshape_([4, 5, 3])
+        aaa = aaa.reshape([4, 5, 3])
         vqnet_a5 = aaa[0:2, ::2, 1:2]
         aaa[0:2, ::2,
             1:2] = tensor.arange(10001,
@@ -933,16 +948,17 @@ GPU
 
     克隆QTensor到指定的GPU设备
 
-    device 指定存储其内部数据的设备。 当device >= DEV_GPU_0时，数据存储在GPU上。 
-    如果您的计算机有多个 GPU，您可以指定不同的设备来存储数据。 例如，device = DEV_GPU_1, DEV_GPU_2, DEV_GPU_3, ... 表示存储在具有不同序列号的GPU上。
+    device 指定存储其内部数据的设备。 当device >= DEV_GPU_0时,数据存储在GPU上。 
+    如果您的计算机有多个 GPU,您可以指定不同的设备来存储数据。 例如,device = DEV_GPU_1, DEV_GPU_2, DEV_GPU_3, ... 表示存储在具有不同序列号的GPU上。
 
     .. note::
-        QTensor在不同GPU上无法进行计算。
-        如果您尝试在 ID 超过验证 GPU 最大数量的 GPU 上创建 QTensor，将引发 Cuda 错误。
 
-    :param device: 当前保存QTensor的设备，默认=DEV_GPU_0，
-     device = pyvqnet.DEV_GPU_0，存储在第一个 GPU 中，devcie = DEV_GPU_1，
-     存储在第二个 GPU 中，依此类推。
+        QTensor在不同GPU上无法进行计算。
+        如果您尝试在 ID 超过验证 GPU 最大数量的 GPU 上创建 QTensor,将引发 Cuda 错误。
+
+    :param device: 当前保存QTensor的设备,默认=DEV_GPU_0,
+     device = pyvqnet.DEV_GPU_0,存储在第一个 GPU 中,devcie = DEV_GPU_1,
+     存储在第二个 GPU 中,依此类推。
 
     :return: QTensor 克隆到 GPU 设备。
 
@@ -978,15 +994,16 @@ toGPU
 
     移动QTensor到指定的GPU设备
 
-    device 指定存储其内部数据的设备。 当device >= DEV_GPU时，数据存储在GPU上。
-     如果您的计算机有多个 GPU，您可以指定不同的设备来存储数据。 
-     例如，device = DEV_GPU_1, DEV_GPU_2, DEV_GPU_3, ... 表示存储在具有不同序列号的GPU上。
+    device 指定存储其内部数据的设备。 当device >= DEV_GPU时,数据存储在GPU上。
+     如果您的计算机有多个 GPU,您可以指定不同的设备来存储数据。 
+     例如,device = DEV_GPU_1, DEV_GPU_2, DEV_GPU_3, ... 表示存储在具有不同序列号的GPU上。
 
     .. note::
-        QTensor在不同GPU上无法进行计算。
-        如果您尝试在 ID 超过验证 GPU 最大数量的 GPU 上创建 QTensor，将引发 Cuda 错误。
 
-    :param device: 当前保存QTensor的设备，默认=DEV_GPU_0。device = pyvqnet.DEV_GPU_0，存储在第一个 GPU 中，devcie = DEV_GPU_1，存储在第二个 GPU 中，依此类推。
+        QTensor在不同GPU上无法进行计算。
+        如果您尝试在 ID 超过验证 GPU 最大数量的 GPU 上创建 QTensor,将引发 Cuda 错误。
+
+    :param device: 当前保存QTensor的设备,默认=DEV_GPU_0。device = pyvqnet.DEV_GPU_0,存储在第一个 GPU 中,devcie = DEV_GPU_1,存储在第二个 GPU 中,依此类推。
     :return: QTensor 移动到 GPU 设备。
 
     Examples::
@@ -1064,8 +1081,8 @@ ones
     创建元素全一的 QTensor 。
 
     :param shape: 数据的形状。
-    :param device: 储存在哪个设备上，默认: pyvqnet.DEV_CPU，在CPU上。
-    :param dtype: 参数的数据类型，defaults：None，使用默认数据类型:kfloat32,代表32位浮点数。
+    :param device: 储存在哪个设备上,默认: pyvqnet.DEV_CPU,在CPU上。
+    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
 
     :return: 返回新的 QTensor 。
 
@@ -1089,8 +1106,8 @@ ones_like
     创建元素全一的 QTensor ,形状和输入的 QTensor 一样。
 
     :param t: 输入 QTensor 。
-    :param device: 储存在哪个设备上，默认: pyvqnet.DEV_CPU，在CPU上。
-    :param dtype: 参数的数据类型，defaults：None,跟输入的dtype一样。
+    :param device: 储存在哪个设备上,默认: pyvqnet.DEV_CPU,在CPU上。
+    :param dtype: 参数的数据类型,defaults:None,跟输入的dtype一样。
 
     :return: 新的全一  QTensor 。
 
@@ -1114,8 +1131,8 @@ full
 
     :param shape: 要创建的张量形状。
     :param value: 填充的值。
-    :param device: 储存在哪个设备上，默认: pyvqnet.DEV_CPU，在CPU上。
-    :param dtype: 参数的数据类型，defaults：None，使用默认数据类型:kfloat32,代表32位浮点数。
+    :param device: 储存在哪个设备上,默认: pyvqnet.DEV_CPU,在CPU上。
+    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
 
     :return: 输出新 QTensor 。 
 
@@ -1142,8 +1159,8 @@ full_like
 
     :param t: 输入 QTensor 。
     :param value: 填充 QTensor 的值。
-    :param device: 储存在哪个设备上，默认: pyvqnet.DEV_CPU，在CPU上。
-    :param dtype: 参数的数据类型，defaults：None,跟输入的dtype一样。
+    :param device: 储存在哪个设备上,默认: pyvqnet.DEV_CPU,在CPU上。
+    :param dtype: 参数的数据类型,defaults:None,跟输入的dtype一样。
 
     :return: 输出 QTensor。
 
@@ -1170,8 +1187,8 @@ zeros
     创建输入形状大小的全零 QTensor 。
 
     :param shape: 输入形状。
-    :param device: 储存在哪个设备上，默认: pyvqnet.DEV_CPU，在CPU上。
-    :param dtype: 参数的数据类型，defaults：None，使用默认数据类型:kfloat32,代表32位浮点数。
+    :param device: 储存在哪个设备上,默认: pyvqnet.DEV_CPU,在CPU上。
+    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
 
     :return: 输出 QTensor 。
 
@@ -1199,8 +1216,8 @@ zeros_like
     创建一个形状和输入一样的 QTensor,所有元素为0 。
 
     :param t: 输入参考 QTensor 。
-    :param device: 储存在哪个设备上，默认: pyvqnet.DEV_CPU，在CPU上。
-    :param dtype: 参数的数据类型，defaults：None,跟输入的dtype一样。
+    :param device: 储存在哪个设备上,默认: pyvqnet.DEV_CPU,在CPU上。
+    :param dtype: 参数的数据类型,defaults:None,跟输入的dtype一样。
 
     :return: 输出 QTensor 。
 
@@ -1225,10 +1242,10 @@ arange
 
     :param start: 间隔开始。
     :param end: 间隔结束。
-    :param step: 值之间的间距，默认为1。
-    :param device: 要使用的设备，默认 = pyvqnet.DEV_CPU，使用 CPU 设备。
-    :param dtype: 参数的数据类型，defaults：None，使用默认数据类型:kfloat32,代表32位浮点数。
-    :param requires_grad: 是否计算梯度，默认为False。
+    :param step: 值之间的间距,默认为1。
+    :param device: 要使用的设备,默认 = pyvqnet.DEV_CPU,使用 CPU 设备。
+    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
+    :param requires_grad: 是否计算梯度,默认为False。
 
     :return: 输出 QTensor 。
 
@@ -1247,14 +1264,14 @@ linspace
 
 .. py:function:: pyvqnet.tensor.linspace(start, end, num, device=pyvqnet.DEV_CPU,dtype=None,requires_grad= False)
 
-    创建一维 QTensor ，其中的元素为区间 start 和 end 上均匀间隔的共 num 个值。
+    创建一维 QTensor ,其中的元素为区间 start 和 end 上均匀间隔的共 num 个值。
 
     :param start: 间隔开始。
     :param end: 间隔结束。
     :param num: 间隔的个数。
-    :param device: 要使用的设备，默认 = pyvqnet.DEV_CPU ，使用 CPU 设备。
-    :param dtype: 参数的数据类型，defaults：None，使用默认数据类型:kfloat32,代表32位浮点数。
-    :param requires_grad: 是否计算梯度，默认为False。
+    :param device: 要使用的设备,默认 = pyvqnet.DEV_CPU ,使用 CPU 设备。
+    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
+    :param requires_grad: 是否计算梯度,默认为False。
 
     :return: 输出 QTensor 。
 
@@ -1278,9 +1295,9 @@ logspace
     :param end: ``base ** end`` 是序列的最终值
     :param num: 要生成的样本数
     :param base: 对数刻度的基数
-    :param device: 要使用的设备，默认 = pyvqnet.DEV_CPU ，使用 CPU 设备。
-    :param dtype: 参数的数据类型，defaults：None，使用默认数据类型:kfloat32,代表32位浮点数。
-    :param requires_grad: 是否计算梯度，默认为False。
+    :param device: 要使用的设备,默认 = pyvqnet.DEV_CPU ,使用 CPU 设备。
+    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
+    :param requires_grad: 是否计算梯度,默认为False。
 
     :return: 输出 QTensor 。
 
@@ -1300,12 +1317,12 @@ eye
 
 .. py:function:: pyvqnet.tensor.eye(size, offset: int = 0, device=pyvqnet.DEV_CPU,dtype=None)
 
-    创建一个 size x size 的 QTensor，对角线上为 1，其他地方为 0。
+    创建一个 size x size 的 QTensor,对角线上为 1,其他地方为 0。
 
-    :param size: 要创建的（正方形）QTensor 的大小。
-    :param offset: 对角线的索引：0（默认）表示主对角线，正值表示上对角线，负值表示下对角线。
-    :param device: 要使用的设备，默认 =pyvqnet.DEV_CPU ，使用 CPU 设备。
-    :param dtype: 参数的数据类型，defaults：None，使用默认数据类型:kfloat32,代表32位浮点数。
+    :param size: 要创建的(正方形)QTensor 的大小。
+    :param offset: 对角线的索引:0(默认)表示主对角线,正值表示上对角线,负值表示下对角线。
+    :param device: 要使用的设备,默认 =pyvqnet.DEV_CPU ,使用 CPU 设备。
+    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
 
     :return: 输出 QTensor 。
 
@@ -1324,6 +1341,32 @@ eye
         # ]
         
 
+diagonal
+==============================
+.. py:function:: pyvqnet.tensor.diagonal(t: QTensor, offset: int = 0, dim1=0, dim2=1)
+
+    返回 :attr:`t` 的部分视图,其对角线元素相对于 :attr:`dim1` 和 :attr:`dim2` 附加为形状末尾的维度。
+    :attr:`offset` 是主对角线的偏移量。
+
+    :param t: 输入张量
+    :param offset: 偏移量(0 表示主对角线,正值表示主对角线上方的第 n 条对角线,负值表示主对角线下方的第 n 条对角线)
+    :param dim1: 取对角线的第一维度。默认值:0。
+    :param dim2: 取对角线的第二维度。默认值:1。
+
+    Example::
+
+        from pyvqnet.tensor import randn,diagonal
+
+        x = randn((2, 5, 4, 2))
+        diagonal_elements = diagonal(x, offset=-1, dim1=1, dim2=2)
+        print(diagonal_elements)
+        # [[[-0.4641751,-0.1410288,-0.1215512, 0.5423283],
+        #   [ 0.9556418, 0.0376572, 1.2571657, 0.8268463]],
+
+        #  [[-0.7972266, 0.2080281,-0.1157126,-0.7342224],
+        #   [ 1.1039937, 0.4700735, 1.0219841,-0.146358 ]]]
+
+
 diag
 ==============================
 
@@ -1331,12 +1374,13 @@ diag
 
     构造对角矩阵。
 
-    输入一个 2-D QTensor，则返回一个与此相同的新张量，除了
-    选定对角线中的元素以外的元素设置为零。
+    输入一个 2-D QTensor,则返回一个1D的新张量,包含
+    选定对角线中的元素。
+    输入一个 1-D QTensor,则返回一个2D新张量,其选定对角线元素为输入值,其余为0
 
     :param t: 输入 QTensor。
-    :param k: 偏移量（主对角线为 0，正数为向上偏移，负数为向下偏移），默认为0。
-    :param requires_grad: 是否计算梯度，默认为False。
+    :param k: 偏移量(主对角线为 0,正数为向上偏移,负数为向下偏移),默认为0。
+    :param requires_grad: 是否计算梯度,默认为False。
 
     :return: 输出 QTensor。
 
@@ -1350,36 +1394,26 @@ diag
         for k in range(-3, 4):
             u = tensor.diag(t,k=k)
             print(u)
+        # [12.]
+        # <QTensor [1] DEV_CPU kfloat32>
 
+        # [ 8.,13.]
+        # <QTensor [2] DEV_CPU kfloat32>
 
-        # [[ 0.  0.  0.  0.]
-        #  [ 0.  0.  0.  0.]
-        #  [ 0.  0.  0.  0.]
-        #  [12.  0.  0.  0.]]
-        # [[ 0.  0.  0.  0.]
-        #  [ 0.  0.  0.  0.]
-        #  [ 8.  0.  0.  0.]
-        #  [ 0. 13.  0.  0.]]
-        # [[ 0.  0.  0.  0.]
-        #  [ 4.  0.  0.  0.]
-        #  [ 0.  9.  0.  0.]
-        #  [ 0.  0. 14.  0.]]
-        # [[ 0.  0.  0.  0.]
-        #  [ 0.  5.  0.  0.]
-        #  [ 0.  0. 10.  0.]
-        #  [ 0.  0.  0. 15.]]
-        # [[ 0.  1.  0.  0.]
-        #  [ 0.  0.  6.  0.]
-        #  [ 0.  0.  0. 11.]
-        #  [ 0.  0.  0.  0.]]
-        # [[0. 0. 2. 0.]
-        #  [0. 0. 0. 7.]
-        #  [0. 0. 0. 0.]
-        #  [0. 0. 0. 0.]]
-        # [[0. 0. 0. 3.]
-        #  [0. 0. 0. 0.]
-        #  [0. 0. 0. 0.]
-        #  [0. 0. 0. 0.]]
+        # [ 4., 9.,14.]
+        # <QTensor [3] DEV_CPU kfloat32>
+
+        # [ 0., 5.,10.,15.]
+        # <QTensor [4] DEV_CPU kfloat32>
+
+        # [ 1., 6.,11.]
+        # <QTensor [3] DEV_CPU kfloat32>
+
+        # [2.,7.]
+        # <QTensor [2] DEV_CPU kfloat32>
+
+        # [3.]
+        # <QTensor [1] DEV_CPU kfloat32>
 
 
 randu
@@ -1390,11 +1424,11 @@ randu
     创建一个具有均匀分布随机值的 QTensor 。
 
     :param shape: 要创建的 QTensor 的形状。
-    :param min: 分布的下限，默认: 0。
-    :param max: 分布的上线，默认: 1。
-    :param device: 要使用的设备，默认 =pyvqnet.DEV_CPU ，使用 CPU 设备。
-    :param dtype: 参数的数据类型，defaults：None，使用默认数据类型:kfloat32,代表32位浮点数。
-    :param requires_grad: 是否计算梯度，默认为False。
+    :param min: 分布的下限,默认: 0。
+    :param max: 分布的上线,默认: 1。
+    :param device: 要使用的设备,默认 =pyvqnet.DEV_CPU ,使用 CPU 设备。
+    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
+    :param requires_grad: 是否计算梯度,默认为False。
 
     :return: 输出 QTensor 。
 
@@ -1420,11 +1454,11 @@ randn
     创建一个具有正态分布随机值的 QTensor 。
 
     :param shape: 要创建的 QTensor 的形状。
-    :param mean: 分布的均值，默认: 0。
-    :param max: 分布的方差，默认: 1。
-    :param device: 要使用的设备，默认 = pyvqnet.DEV_CPU ，使用 CPU 设备。
-    :param dtype: 参数的数据类型，defaults：None，使用默认数据类型:kfloat32,代表32位浮点数。
-    :param requires_grad: 是否计算梯度，默认为False。
+    :param mean: 分布的均值,默认: 0。
+    :param max: 分布的方差,默认: 1。
+    :param device: 要使用的设备,默认 = pyvqnet.DEV_CPU ,使用 CPU 设备。
+    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
+    :param requires_grad: 是否计算梯度,默认为False。
 
     :return: 输出 QTensor 。
 
@@ -1441,13 +1475,39 @@ randn
         # [-0.6987777, -0.0089036, -0.5084590]
         # ]
 
+binomial
+==============================
+.. py:function:: pyvqnet.tensor.binomial(total_countst, probs)
+
+    创建一个由 :attr:`total_count` 和 :attr:`probs` 参数化的二项分布。
+
+    :param total_counts: 伯努利试验的次数。
+    :param probs: 事件概率。
+
+    :return:
+        二项分布的 QTensor。
+
+    Example::
+
+        import pyvqnet.tensor as tensor
+
+        a = tensor.randu([3,4])
+        b = 1000
+
+        c = tensor.binomial(b,a)
+        print(c)
+
+        # [[221.,763., 30.,339.],
+        #  [803.,899.,105.,356.],
+        #  [550.,688.,828.,493.]]
+
 
 multinomial
 ==============================
 
 .. py:function:: pyvqnet.tensor.multinomial(t, num_samples)
 
-    返回一个张量，其中每行包含 num_samples 个索引采样，来自位于张量输入的相应行中的多项式概率分布。
+    返回一个张量,其中每行包含 num_samples 个索引采样,来自位于张量输入的相应行中的多项式概率分布。
     
     :param t: 输入概率分布,仅支持浮点数。
     :param num_samples: 采样样本。
@@ -1475,10 +1535,10 @@ triu
 
 .. py:function:: pyvqnet.tensor.triu(t, diagonal=0)
 
-    返回输入 t 的上三角矩阵，其余部分被设为0。
+    返回输入 t 的上三角矩阵,其余部分被设为0。
 
     :param t: 输入 QTensor。
-    :param diagonal: 偏移量（主对角线为 0，正数为向上偏移，负数为向下偏移），默认=0。
+    :param diagonal: 偏移量(主对角线为 0,正数为向上偏移,负数为向下偏移),默认=0。
 
     :return: 输出 QTensor。
 
@@ -1508,10 +1568,10 @@ tril
 
 .. py:function:: pyvqnet.tensor.tril(t, diagonal=0)
 
-    返回输入 t 的下三角矩阵，其余部分被设为0。
+    返回输入 t 的下三角矩阵,其余部分被设为0。
 
     :param t: 输入 QTensor。
-    :param diagonal: 偏移量（主对角线为 0，正数为向上偏移，负数为向下偏移），默认=0。
+    :param diagonal: 偏移量(主对角线为 0,正数为向上偏移,负数为向下偏移),默认=0。
 
     :return: 输出 QTensor。
 
@@ -1545,7 +1605,7 @@ floor
 
 .. py:function:: pyvqnet.tensor.floor(t)
 
-    返回一个新的 QTensor，其中元素为输入 QTensor 的向下取整。
+    返回一个新的 QTensor,其中元素为输入 QTensor 的向下取整。
 
     :param t: 输入 QTensor 。
 
@@ -1566,7 +1626,7 @@ ceil
 
 .. py:function:: pyvqnet.tensor.ceil(t)
 
-    返回一个新的 QTensor，其中元素为输入 QTensor 的向上取整。
+    返回一个新的 QTensor,其中元素为输入 QTensor 的向上取整。
 
     :param t: 输入 QTensor 。
     :return: 输出 QTensor 。
@@ -1586,7 +1646,7 @@ round
 
 .. py:function:: pyvqnet.tensor.round(t)
 
-    返回一个新的 QTensor，其中元素为输入 QTensor 的四舍五入到最接近的整数.
+    返回一个新的 QTensor,其中元素为输入 QTensor 的四舍五入到最接近的整数.
 
     :param t: 输入 QTensor 。
     :return: 输出 QTensor 。
@@ -1610,8 +1670,8 @@ sort
 
     :param t: 输入 QTensor 。
     :param axis: 排序使用的轴。
-    :param descending: 如果是True，进行降序排序，否则使用升序排序。默认为升序。
-    :param stable: 是否使用稳定排序，默认为稳定排序。
+    :param descending: 如果是True,进行降序排序,否则使用升序排序。默认为升序。
+    :param stable: 是否使用稳定排序,默认为稳定排序。
     :return: 输出 QTensor 。
 
     Example::
@@ -1635,12 +1695,12 @@ argsort
 
 .. py:function:: pyvqnet.tensor.argsort(t, axis: int, descending=False, stable=True)
 
-    对输入变量沿给定轴进行排序，输出排序好的数据的相应索引。
+    对输入变量沿给定轴进行排序,输出排序好的数据的相应索引。
 
     :param t: 输入 QTensor 。
     :param axis: 排序使用的轴。
-    :param descending: 如果是True，进行降序排序，否则使用升序排序。默认为升序。
-    :param stable: 是否使用稳定排序，默认为稳定排序。
+    :param descending: 如果是True,进行降序排序,否则使用升序排序。默认为升序。
+    :param stable: 是否使用稳定排序,默认为稳定排序。
     :return: 输出 QTensor 。
 
     Example::
@@ -1666,12 +1726,12 @@ topK
 
     返回给定输入张量沿给定维度的 k 个最大元素。
 
-    如果 if_descent 为 False，则返回 k 个最小元素。
+    如果 if_descent 为 False,则返回 k 个最小元素。
 
     :param t: 输入 QTensor 。
     :param k: 取排序后的 k 的个数。
-    :param axis: 要排序的维度。默认 = -1，最后一个轴。
-    :param if_descent: 排序使用升序还是降序，默认降序。
+    :param axis: 要排序的维度。默认 = -1,最后一个轴。
+    :param if_descent: 排序使用升序还是降序,默认降序。
 
     :return: 新的 QTensor 。
 
@@ -1682,7 +1742,7 @@ topK
             24., 13., 15., 4., 3., 8., 11., 3., 6., 15., 24., 13., 15., 3., 3., 8., 7.,
             3., 6., 11.
         ])
-        x.reshape_([2, 5, 1, 2])
+        x=x.reshape([2, 5, 1, 2])
         x.requires_grad = True
         y = tensor.topK(x, 3, 1)
         print(y)
@@ -1702,12 +1762,12 @@ argtopK
 
     返回给定输入张量沿给定维度的 k 个最大元素的索引。
 
-    如果 if_descent 为 False，则返回 k 个最小元素的索引。
+    如果 if_descent 为 False,则返回 k 个最小元素的索引。
 
     :param t: 输入 QTensor 。
     :param k: 取排序后的 k 的个数。
-    :param axis: 要排序的维度。默认 = -1，最后一个轴。
-    :param if_descent: 排序使用升序还是降序，默认降序。
+    :param axis: 要排序的维度。默认 = -1,最后一个轴。
+    :param if_descent: 排序使用升序还是降序,默认降序。
 
     :return: 新的 QTensor 。
 
@@ -1718,7 +1778,7 @@ argtopK
             24., 13., 15., 4., 3., 8., 11., 3., 6., 15., 24., 13., 15., 3., 3., 8., 7.,
             3., 6., 11.
         ])
-        x.reshape_([2, 5, 1, 2])
+        x=x.reshape([2, 5, 1, 2])
         x.requires_grad = True
         y = tensor.argtopK(x, 3, 1)
         print(y)
@@ -1826,10 +1886,10 @@ sums
 
 .. py:function:: pyvqnet.tensor.sums(t: pyvqnet.tensor.QTensor, axis: Optional[int] = None, keepdims=False)
 
-    对输入的 QTensor 按 axis 设定的轴计算元素和，如果 axis 是None，则返回所有元素和。
+    对输入的 QTensor 按 axis 设定的轴计算元素和,如果 axis 是None,则返回所有元素和。
 
     :param t: 输入 QTensor 。
-    :param axis: 用于求和的轴，默认为None。
+    :param axis: 用于求和的轴,默认为None。
     :param keepdims: 输出张量是否保留了减小的维度。默认为False。
     :return: 输出 QTensor 。
 
@@ -1851,7 +1911,7 @@ cumsum
     返回维度轴中输入元素的累积总和。
 
     :param t: 输入 QTensor 。
-    :param axis: 计算的轴，默认 -1，使用最后一个轴。
+    :param axis: 计算的轴,默认 -1,使用最后一个轴。
     :return: 输出 QTensor 。
 
     Example::
@@ -1871,10 +1931,10 @@ mean
 
 .. py:function:: pyvqnet.tensor.mean(t: pyvqnet.tensor.QTensor, axis=None, keepdims=False)
 
-    对输入的 QTensor 按 axis 设定的轴计算元素的平均，如果 axis 是None，则返回所有元素平均。
+    对输入的 QTensor 按 axis 设定的轴计算元素的平均,如果 axis 是None,则返回所有元素平均。
 
     :param t: 输入 QTensor ,需要是浮点数或者复数。
-    :param axis: 用于求平均的轴，默认为None。
+    :param axis: 用于求平均的轴,默认为None。
     :param keepdims: 输出张量是否保留了减小的维度。默认为False。
     :return: 输出 QTensor 或 均值。
 
@@ -1893,10 +1953,10 @@ median
 
 .. py:function:: pyvqnet.tensor.median(t: pyvqnet.tensor.QTensor, axis=None, keepdims=False)
 
-    对输入的 QTensor 按 axis 设定的轴计算元素的平均，如果 axis 是None，则返回所有元素平均。
+    对输入的 QTensor 按 axis 设定的轴计算元素的平均,如果 axis 是None,则返回所有元素平均。
 
     :param t: 输入 QTensor 。
-    :param axis: 用于求平均的轴，默认为None。
+    :param axis: 用于求平均的轴,默认为None。
     :param keepdims: 输出张量是否保留了减小的维度。默认为False。
     :return: 输出 QTensor 或 中值。
 
@@ -1925,10 +1985,10 @@ std
 
 .. py:function:: pyvqnet.tensor.std(t: pyvqnet.tensor.QTensor, axis=None, keepdims=False, unbiased=True)
 
-    对输入的 QTensor 按 axis 设定的轴计算元素的标准差，如果 axis 是None，则返回所有元素标准差。
+    对输入的 QTensor 按 axis 设定的轴计算元素的标准差,如果 axis 是None,则返回所有元素标准差。
 
     :param t: 输入 QTensor 。
-    :param axis: 用于求标准差的轴，默认为None。
+    :param axis: 用于求标准差的轴,默认为None。
     :param keepdims: 输出张量是否保留了减小的维度。默认为False。
     :param unbiased: 是否使用贝塞尔修正,默认使用。
     :return: 输出 QTensor 或 标准差。
@@ -1958,10 +2018,10 @@ var
 
 .. py:function:: pyvqnet.tensor.var(t: pyvqnet.tensor.QTensor, axis=None, keepdims=False, unbiased=True)
 
-    对输入的 QTensor 按 axis 设定的轴计算元素的方差，如果 axis 是None，则返回所有元素方差。
+    对输入的 QTensor 按 axis 设定的轴计算元素的方差,如果 axis 是None,则返回所有元素方差。
 
     :param t: 输入 QTensor 。
-    :param axis: 用于求方差的轴，默认为None。
+    :param axis: 用于求方差的轴,默认为None。
     :param keepdims: 输出张量是否保留了减小的维度。默认为False。
     :param unbiased: 是否使用贝塞尔修正,默认使用。
     :return: 输出 QTensor 或方差。
@@ -1982,7 +2042,7 @@ matmul
 
 .. py:function:: pyvqnet.tensor.matmul(t1: pyvqnet.tensor.QTensor, t2: pyvqnet.tensor.QTensor)
 
-    二维矩阵点乘或3、4维张量进行批矩阵乘法.
+    二维矩阵点乘或3、4维张量进行批矩阵乘法,或一维向量与二维矩阵矩阵向量积,或两个一维向量点积。
 
     :param t1: 第一个 QTensor 。
     :param t2: 第二个 QTensor 。
@@ -2017,16 +2077,16 @@ kron
 
 .. py:function:: pyvqnet.tensor.kron(t1: pyvqnet.tensor.QTensor, t2: pyvqnet.tensor.QTensor)
 
-    计算 ``t1`` 和  ``t2`` 的 Kronecker 积，用 :math:`\otimes` 表示。
+    计算 ``t1`` 和  ``t2`` 的 Kronecker 积,用 :math:`\otimes` 表示。
 
-    如果 ``t1`` 是一个 :math:`(a_0 \times a_1 \times \dots \times a_n)` 张量并且 ``t2`` 是一个 :math:`(b_0 \times b_1 \times \dots \times b_n)` 张量，结果将是 :math:`(a_0*b_0 \times a_1*b_1 \times \dots \times a_n*b_n)` 张量，包含以下条目：
+    如果 ``t1`` 是一个 :math:`(a_0 \times a_1 \times \dots \times a_n)` 张量并且 ``t2`` 是一个 :math:`(b_0 \times b_1 \times \dots \times b_n)` 张量,结果将是 :math:`(a_0*b_0 \times a_1*b_1 \times \dots \times a_n*b_n)` 张量,包含以下条目:
 
      .. math::
          (\text{input} \otimes \text{other})_{k_0, k_1, \dots, k_n} =
              \text{input}_{i_0, i_1, \dots, i_n} * \text{other}_{j_0, j_1, \dots, j_n},
 
      其中 :math:`k_t = i_t * b_t + j_t` 为 :math:`0 \leq t \leq n`。
-     如果一个张量的维数少于另一个，它将被解压缩，直到它具有相同的维数。
+     如果一个张量的维数少于另一个,它将被解压缩,直到它具有相同的维数。
 
     :param t1: 第一个 QTensor 。
     :param t2: 第二个 QTensor 。
@@ -2121,6 +2181,41 @@ kron
         #     [483. 506. 529. 552. 504. 528. 552. 576.]]]]]
 
 
+einsum
+==============================
+
+.. py:function:: pyvqnet.tensor.einsum(equation, *operands)
+
+    使用基于爱因斯坦求和约定的符号沿指定的维度对输入操作数元素的乘积求和。
+
+    .. note::
+
+        此函数使用 opt_einsum (https://optimized-einsum.readthedocs.io/en/stable/) 来加速计算或通过优化收缩顺序来减少内存消耗。当至少有三个输入时,会发生此优化。
+
+        对于更加复杂的 `einsum` ,可另外导入opt_einsum直接对QTensor进行计算。
+
+    :param equation: 爱因斯坦求和的下标。
+
+    :param operands: 要计算爱因斯坦求和的张量。
+
+    :return:
+            QTensor 结果。
+
+    Example::
+
+        from pyvqnet import tensor
+
+        vqneta = tensor.randn((3, 5, 4))
+        vqnetl = tensor.randn((2, 5))
+        vqnetr = tensor.randn((2, 4))
+        z = tensor.einsum('bn,anm,bm->ba',  vqnetl, vqneta,vqnetr)
+        print(z.shape)
+        #[2, 3]
+        vqneta = tensor.randn((20,30,40,50))
+        z = tensor.einsum('...ij->...ji', vqneta)
+        print(z.shape)
+        #[20, 30, 50, 40]
+
 reciprocal
 ==============================
 
@@ -2147,7 +2242,7 @@ sign
 
 .. py:function:: pyvqnet.tensor.sign(t)
 
-    对输入 t 中每个元素进行正负判断，并且输出正负判断值：1代表正，-1代表负，0代表零。
+    对输入 t 中每个元素进行正负判断,并且输出正负判断值:1代表正,-1代表负,0代表零。
 
     :param t: 输入 QTensor 。
 
@@ -2194,7 +2289,7 @@ trace
     返回二维矩阵的迹。
 
     :param t: 输入 QTensor 。
-    :param k: 偏移量（主对角线为 0，正数为向上偏移，负数为向下偏移），默认为0。
+    :param k: 偏移量(主对角线为 0,正数为向上偏移,负数为向下偏移),默认为0。
 
     :return: 输入二维矩阵的对角线元素之和。
 
@@ -2515,7 +2610,7 @@ log_softmax
     顺序计算在轴axis上的softmax函数以及log函数的结果。
 
     :param t: 输入 QTensor 。
-    :param axis: 用于求softmax的轴，默认为-1。
+    :param axis: 用于求softmax的轴,默认为-1。
 
     :return: 输出 QTensor。
 
@@ -2576,15 +2671,58 @@ square
 
         # [1., 4., 9.]
 
+
+eigh
+==============================
+
+.. py:function:: pyvqnet.tensor.eigh(t: QTensor)
+ 
+    返回复厄米矩阵(共轭对称)或实对称矩阵的特征值和特征向量。
+    返回两个对象,一个包含a的特征值的一维数组,
+    以及相应特征向量(以列表示)的二维方阵或矩阵(取决于输入类型)。
+
+    :param: 输入QTensor。
+    :param: t的特征值和特征向量。
+    :return:
+
+        返回特征值以及特征向量
+
+    Examples::
+
+        import numpy as np
+        import pyvqnet
+        from pyvqnet import tensor
+
+
+        def generate_random_symmetric_matrix(n):
+                A = pyvqnet.tensor.randn((n, n))
+                A = A + A.transpose()
+                return A
+
+        n = 3
+        symmetric_matrix = generate_random_symmetric_matrix(n)
+
+        evs,vecs = pyvqnet.tensor.eigh(symmetric_matrix)
+        print(evs)
+        print(vecs)
+        # [-4.0669565,-1.9191254,-1.3642329]
+        # <QTensor [3] DEV_CPU kfloat32>
+
+        # [[-0.9889652, 0.0325959,-0.1445187],
+        #  [ 0.0912495, 0.9025176,-0.4208745],
+        #  [ 0.1167119,-0.4294176,-0.8955328]]
+        # <QTensor [3, 3] DEV_CPU kfloat32>
+
+
 frobenius_norm
 ==============================
 
-.. py:function:: pyvqnet.tensor.frobenius_norm(t: QTensor, axis: int = None, keepdims=False):
+.. py:function:: pyvqnet.tensor.frobenius_norm(t: QTensor, axis: int = None, keepdims=False)
 
-    对输入的 QTensor 按 axis 设定的轴计算张量的F范数，如果 axis 是None，则返回所有元素F范数。
+    对输入的 QTensor 按 axis 设定的轴计算张量的F范数,如果 axis 是None,则返回所有元素F范数。
 
     :param t: 输入 QTensor 。
-    :param axis: 用于求F范数的轴，默认为None。
+    :param axis: 用于求F范数的轴,默认为None。
     :param keepdims: 输出张量是否保留了减小的维度。默认为False。
     :return: 输出 QTensor 或 F范数值。
 
@@ -2658,10 +2796,10 @@ min
 
 .. py:function:: pyvqnet.tensor.min(t: pyvqnet.tensor.QTensor, axis=None, keepdims=False)
 
-    对输入的 QTensor 按 axis 设定的轴计算元素的最小值，如果 axis 是None，则返回所有元素的最小值。
+    对输入的 QTensor 按 axis 设定的轴计算元素的最小值,如果 axis 是None,则返回所有元素的最小值。
 
     :param t: 输入 QTensor 。
-    :param axis: 用于求最小值的轴，默认为None。
+    :param axis: 用于求最小值的轴,默认为None。
     :param keepdims: 输出张量是否保留了减小的维度。默认为False。
 
     :return: 输出 QTensor 或浮点数。
@@ -2684,10 +2822,10 @@ max
 
 .. py:function:: pyvqnet.tensor.max(t: pyvqnet.tensor.QTensor, axis=None, keepdims=False)
 
-    对输入的 QTensor 按 axis 设定的轴计算元素的最大值，如果 axis 是None，则返回所有元素的最大值。
+    对输入的 QTensor 按 axis 设定的轴计算元素的最大值,如果 axis 是None,则返回所有元素的最大值。
 
     :param t: 输入 QTensor 。
-    :param axis: 用于求最大值的轴，默认为None。
+    :param axis: 用于求最大值的轴,默认为None。
     :param keepdims: 输出张量是否保留了减小的维度。默认为False。
     
     :return: 输出 QTensor 或浮点数。
@@ -2711,7 +2849,7 @@ clip
 
 .. py:function:: pyvqnet.tensor.clip(t: pyvqnet.tensor.QTensor, min_val, max_val)
 
-    将输入的所有元素进行剪裁，使得输出元素限制在[min_val, max_val]。
+    将输入的所有元素进行剪裁,使得输出元素限制在[min_val, max_val]。
 
     :param t: 输入 QTensor 。
     :param min_val:  裁剪下限值。
@@ -2738,8 +2876,8 @@ where
     根据条件返回从 t1 或 t2 中选择的元素。
 
     :param condition: 判断条件 QTensor,需要是kbool数据类型 。
-    :param t1: 如果满足条件，则从中获取元素。
-    :param t2: 如果条件不满足，则从中获取元素。
+    :param t1: 如果满足条件,则从中获取元素。
+    :param t2: 如果条件不满足,则从中获取元素。
 
     :return: 输出 QTensor 。
 
@@ -2786,10 +2924,10 @@ isfinite
 
 .. py:function:: pyvqnet.tensor.isfinite(t)
 
-    逐元素判断输入是否为Finite （既非 +/-INF 也非 +/-NaN ）。
+    逐元素判断输入是否为Finite (既非 +/-INF 也非 +/-NaN )。
 
     :param t: 输入 QTensor 。
-    :return: 输出 QTensor , 其中对应位置元素满足条件时返回True，否则返回False。
+    :return: 输出 QTensor , 其中对应位置元素满足条件时返回True,否则返回False。
 
     Example::
 
@@ -2810,7 +2948,7 @@ isinf
     逐元素判断输入的每一个值是否为 +/-INF 。
 
     :param t: 输入 QTensor 。
-    :return: 输出 QTensor , 其中对应位置元素满足条件时返回True，否则返回False。
+    :return: 输出 QTensor , 其中对应位置元素满足条件时返回True,否则返回False。
 
     Example::
 
@@ -2831,7 +2969,7 @@ isnan
     逐元素判断输入的每一个值是否为 +/-NaN 。
 
     :param t: 输入 QTensor 。
-    :return: 输出 QTensor , 其中对应位置元素满足条件时返回True，否则返回False。
+    :return: 输出 QTensor , 其中对应位置元素满足条件时返回True,否则返回False。
 
     Example::
 
@@ -2852,7 +2990,7 @@ isneginf
     逐元素判断输入的每一个值是否为 -INF 。
 
     :param t: 输入 QTensor 。
-    :return: 输出 QTensor , 其中对应位置元素满足条件时返回True，否则返回False。
+    :return: 输出 QTensor , 其中对应位置元素满足条件时返回True,否则返回False。
 
     Example::
 
@@ -2873,7 +3011,7 @@ isposinf
     逐元素判断输入的每一个值是否为 +INF 。
 
     :param t: 输入 QTensor 。
-    :return: 输出 QTensor , 其中对应位置元素满足条件时返回True，否则返回False。
+    :return: 输出 QTensor , 其中对应位置元素满足条件时返回True,否则返回False。
 
     Example::
 
@@ -2891,7 +3029,7 @@ logical_and
 
 .. py:function:: pyvqnet.tensor.logical_and(t1, t2)
 
-    对两个输入进行逐元素逻辑与操作，其中对应位置元素满足条件时返回True，否则返回False。
+    对两个输入进行逐元素逻辑与操作,其中对应位置元素满足条件时返回True,否则返回False。
 
     :param t1: 输入 QTensor 。
     :param t2: 输入 QTensor 。
@@ -2915,7 +3053,7 @@ logical_or
 
 .. py:function:: pyvqnet.tensor.logical_or(t1, t2)
 
-    对两个输入进行逐元素逻辑或操作，其中对应位置元素满足条件时返回True，否则返回False。
+    对两个输入进行逐元素逻辑或操作,其中对应位置元素满足条件时返回True,否则返回False。
 
     :param t1: 输入 QTensor 。
     :param t2: 输入 QTensor 。
@@ -2939,7 +3077,7 @@ logical_not
 
 .. py:function:: pyvqnet.tensor.logical_not(t)
 
-    对输入进行逐元素逻辑非操作，其中对应位置元素满足条件时返回True，否则返回False。
+    对输入进行逐元素逻辑非操作,其中对应位置元素满足条件时返回True,否则返回False。
 
     :param t: 输入 QTensor 。
     :return: 输出 QTensor 。
@@ -2960,7 +3098,7 @@ logical_xor
 
 .. py:function:: pyvqnet.tensor.logical_xor(t1, t2)
 
-    对两个输入进行逐元素逻辑异或操作，其中对应位置元素满足条件时返回True，否则返回False。
+    对两个输入进行逐元素逻辑异或操作,其中对应位置元素满足条件时返回True,否则返回False。
 
     :param t1: 输入 QTensor 。
     :param t2: 输入 QTensor 。
@@ -2984,7 +3122,7 @@ greater
 
 .. py:function:: pyvqnet.tensor.greater(t1, t2)
 
-    逐元素比较 t1 是否大于 t2 ，其中对应位置元素满足条件时返回True，否则返回False。
+    逐元素比较 t1 是否大于 t2 ,其中对应位置元素满足条件时返回True,否则返回False。
 
     :param t1: 输入 QTensor 。
     :param t2: 输入 QTensor 。
@@ -3009,7 +3147,7 @@ greater_equal
 
 .. py:function:: pyvqnet.tensor.greater_equal(t1, t2)
 
-    逐元素比较 t1 是否大于等于 t2 ，其中对应位置元素满足条件时返回True，否则返回False。
+    逐元素比较 t1 是否大于等于 t2 ,其中对应位置元素满足条件时返回True,否则返回False。
 
     :param t1: 输入 QTensor 。
     :param t2: 输入 QTensor 。
@@ -3034,7 +3172,7 @@ less
 
 .. py:function:: pyvqnet.tensor.less(t1, t2)
 
-    逐元素比较 t1 是否小于 t2 ，其中对应位置元素满足条件时返回True，否则返回False。
+    逐元素比较 t1 是否小于 t2 ,其中对应位置元素满足条件时返回True,否则返回False。
 
     :param t1: 输入 QTensor 。
     :param t2: 输入 QTensor 。
@@ -3059,7 +3197,7 @@ less_equal
 
 .. py:function:: pyvqnet.tensor.less_equal(t1, t2)
 
-    逐元素比较 t1 是否小于等于 t2 ，其中对应位置元素满足条件时返回True，否则返回False。
+    逐元素比较 t1 是否小于等于 t2 ,其中对应位置元素满足条件时返回True,否则返回False。
 
     :param t1: 输入 QTensor 。
     :param t2: 输入 QTensor 。
@@ -3085,7 +3223,7 @@ equal
 
 .. py:function:: pyvqnet.tensor.equal(t1, t2)
 
-    逐元素比较 t1 是否等于 t2 ，其中对应位置元素满足条件时返回True，否则返回False。
+    逐元素比较 t1 是否等于 t2 ,其中对应位置元素满足条件时返回True,否则返回False。
 
     :param t1: 输入 QTensor 。
     :param t2: 输入 QTensor 。
@@ -3110,7 +3248,7 @@ not_equal
 
 .. py:function:: pyvqnet.tensor.not_equal(t1, t2)
 
-    逐元素比较 t1 是否不等于 t2 ，其中对应位置元素满足条件时返回True，否则返回False。
+    逐元素比较 t1 是否不等于 t2 ,其中对应位置元素满足条件时返回True,否则返回False。
 
     :param t1: 输入 QTensor 。
     :param t2: 输入 QTensor 。
@@ -3130,6 +3268,31 @@ not_equal
         #[[False  True]
         # [ True False]]
 
+
+
+bitwise_and
+==============================
+
+.. py:function:: pyvqnet.tensor.bitwise_and(t1, t2)
+ 
+    逐元素计算两个 QTensor 的按位与。
+
+    :param t1: 输入 QTensor t1。只有整数或布尔值才是有效输入。
+    :param t2: 输入 QTensor t2。只有整数或布尔值才是有效输入。
+
+    Example::
+
+        from pyvqnet.tensor import *
+        import numpy as np
+        from pyvqnet.dtype import *
+        powers_of_two = 1 << np.arange(14, dtype=np.int64)[::-1]
+        samples = tensor.QTensor([23],dtype=kint8)
+        samples = samples.unsqueeze(-1)
+        states_sampled_base_ten = samples & tensor.QTensor(powers_of_two,dtype = samples.dtype, device = samples.device)
+        print(states_sampled_base_ten)
+        #[[ 0, 0, 0, 0, 0, 0, 0, 0, 0,16, 0, 4, 2, 1]]
+
+
 变换函数
 *********************
 
@@ -3138,7 +3301,7 @@ broadcast
 
 .. py:function:: pyvqnet.tensor.broadcast(t1: pyvqnet.tensor.QTensor, t2: pyvqnet.tensor.QTensor)
 
-    受到某些限制，较小的阵列在整个更大的阵列，以便它们具有兼容的形状。该接口可对入参张量进行自动微分。
+    受到某些限制,较小的阵列在整个更大的阵列,以便它们具有兼容的形状。该接口可对入参张量进行自动微分。
 
     参考https://numpy.org/doc/stable/user/basics.broadcasting.html
 
@@ -3190,7 +3353,7 @@ select
 
 .. py:function:: pyvqnet.tensor.select(t: pyvqnet.tensor.QTensor, index)
 
-    输入字符串形式的索引位置，获取该索引下的数据切片，返回一个新的 QTensor 。
+    输入字符串形式的索引位置,获取该索引下的数据切片,返回一个新的 QTensor 。
     
     :param t: 输入 QTensor 。
     :param index: 一个字符串包含切片的索引。
@@ -3219,7 +3382,7 @@ concatenate
 
 .. py:function:: pyvqnet.tensor.concatenate(args: list, axis=1)
 
-    对 args 内的多个 QTensor 沿 axis 轴进行联结，返回一个新的 QTensor 。
+    对 args 内的多个 QTensor 沿 axis 轴进行联结,返回一个新的 QTensor 。
 
     :param args: 包含输入 QTensor 。
     :param axis: 要连接的维度。 必须介于 0 和输入张量的最大维数之间。
@@ -3246,7 +3409,7 @@ stack
 
 .. py:function:: pyvqnet.tensor.stack(QTensors: list, axis) 
 
-    沿新轴 axis 堆叠输入的 QTensors ，返回一个新的 QTensor。
+    沿新轴 axis 堆叠输入的 QTensors ,返回一个新的 QTensor。
 
     :param QTensors: 包含输入 QTensor 。
     :param axis: 要堆叠的维度。 必须介于 0 和输入张量的最大维数之间。
@@ -3287,10 +3450,10 @@ permute
 
 .. py:function:: pyvqnet.tensor.permute(t: pyvqnet.tensor.QTensor, dim: list)
 
-    根据输入的 dim 的顺序，改变t 的轴的顺序。如果 dims = None，则按顺序反转 t 的轴。
+    根据输入的 dim 的顺序,改变t 的轴的顺序。如果 dims = None,则按顺序反转 t 的轴。
 
     :param t: 输入 QTensor 。
-    :param dim: 维度的新顺序（整数列表）。
+    :param dim: 维度的新顺序(整数列表)。
     :return: 输出 QTensor 。
 
     Example::
@@ -3321,10 +3484,10 @@ transpose
 
 .. py:function:: pyvqnet.tensor.transpose(t: pyvqnet.tensor.QTensor, dim: list)
 
-    根据输入的 dim 的顺序，改变t 的轴的顺序。如果 dims = None，则按顺序反转 t 的轴。该函数功能与 permute 一致。
+    根据输入的 dim 的顺序,改变t 的轴的顺序。如果 dims = None,则按顺序反转 t 的轴。该函数功能与 permute 一致。
 
     :param t: 输入 QTensor 。
-    :param dim: 维度的新顺序（整数列表）。
+    :param dim: 维度的新顺序(整数列表)。
 
     :return: 输出 QTensor 。
 
@@ -3358,11 +3521,11 @@ tile
 
     通过按照 reps 给出的次数复制输入 QTensor 。
     
-    如果 reps 的长度为 d，则结果 QTensor 的维度大小为 max(d, t.ndim)。如果 t.ndim < d，则通过从起始维度插入新轴，将 t 扩展为 d 维度。
+    如果 reps 的长度为 d,则结果 QTensor 的维度大小为 max(d, t.ndim)。如果 t.ndim < d,则通过从起始维度插入新轴,将 t 扩展为 d 维度。
     
-    因此形状 (3,) 数组被提升为 (1, 3) 用于 2-D 复制，或形状 (1, 1, 3) 用于 3-D 复制。如果 t.ndim > d，reps 通过插入 1 扩展为 t.ndim。
+    因此形状 (3,) 数组被提升为 (1, 3) 用于 2-D 复制,或形状 (1, 1, 3) 用于 3-D 复制。如果 t.ndim > d,reps 通过插入 1 扩展为 t.ndim。
 
-    因此，对于形状为 (2, 3, 4, 5) 的 t，(4, 3) 的 reps 被视为 (1, 1, 4, 3)。
+    因此,对于形状为 (2, 3, 4, 5) 的 t,(4, 3) 的 reps 被视为 (1, 1, 4, 3)。
 
     :param t: 输入 QTensor 。
     :param reps: 每个维度的重复次数。
@@ -3393,10 +3556,10 @@ squeeze
 
 .. py:function:: pyvqnet.tensor.squeeze(t: pyvqnet.tensor.QTensor, axis: int = - 1)
 
-    删除 axis 指定的轴，该轴的维度为1。如果 axis = None ，则将输入所有长度为1的维度删除。
+    删除 axis 指定的轴,该轴的维度为1。如果 axis = None ,则将输入所有长度为1的维度删除。
 
     :param t: 输入 QTensor 。
-    :param axis: 要压缩的轴，默认为None。 
+    :param axis: 要压缩的轴,默认为None。 
     :return: 输出 QTensor 。
 
     Example::
@@ -3424,10 +3587,10 @@ unsqueeze
 
 .. py:function:: pyvqnet.tensor.unsqueeze(t: pyvqnet.tensor.QTensor, axis: int = 0)
 
-    在axis 指定的维度上插入一个维度为的1的轴，返回一个新的 QTensor 。
+    在axis 指定的维度上插入一个维度为的1的轴,返回一个新的 QTensor 。
 
     :param t: 输入 QTensor 。
-    :param axis: 要插入维度的位置，默认为0。 
+    :param axis: 要插入维度的位置,默认为0。 
     :return: 输出 QTensor 。
 
     Example::
@@ -3451,6 +3614,29 @@ unsqueeze
         #  [21., 22., 23.]]]]]
         # ]
         
+
+moveaxis
+==============================
+.. py:function:: pyvqnet.tensor.moveaxis(t, source: int, destination: int)
+
+    将 `t` 的维度从 `source` 中的位置移动到 `destination` 中的位置。
+
+    `t` 的其他未明确移动的维度保持其原始顺序,并出现在 `destination` 中未指定的位置。
+
+    :param t: 输入 QTensor。
+    :param source: (整数或整数元组)要移动的维度的原始位置。这些位置必须是唯一的。
+    :param destination: (整数或整数元组)每个原始维度的目标位置。这些位置也必须是唯一的。
+
+    :return: 新的QTensor
+
+    Example::
+
+        from pyvqnet import QTensor,tensor
+        a = tensor.arange(0,24).reshape((2,3,4))
+        b = tensor.moveaxis(a,(1, 2), (0, 1))
+        print(b.shape)
+        #[3, 4, 2]
+
 
 swapaxis
 ==============================
@@ -3491,7 +3677,7 @@ masked_fill
 
 .. py:function:: pyvqnet.tensor.masked_fill(t, mask, value)
 
-    在 mask == 1 的位置，用值 value 填充输入。
+    在 mask == 1 的位置,用值 value 填充输入。
     mask的形状必须与输入的 QTensor 的形状是可广播的。
 
     :param t: 输入 QTensor。
@@ -3527,8 +3713,8 @@ flatten
     将输入 t 从 start 到 end 的连续维度展平。
 
     :param t: 输入 QTensor 。
-    :param start: 展平开始的轴，默认 = 0，从第一个轴开始。
-    :param end: 展平结束的轴，默认 = -1，以最后一个轴结束。
+    :param start: 展平开始的轴,默认 = 0,从第一个轴开始。
+    :param end: 展平结束的轴,默认 = -1,以最后一个轴结束。
     :return: 输出 QTensor 。
 
     Example::
@@ -3547,7 +3733,7 @@ reshape
 
 .. py:function:: pyvqnet.tensor.reshape(t: pyvqnet.tensor.QTensor,new_shape)
 
-    改变 QTensor 的形状，返回一个新的张量。
+    改变 QTensor 的形状,返回一个新的张量。
 
     :param t: 输入 QTensor 。
     :param new_shape: 新的形状。
@@ -3576,7 +3762,7 @@ flip
 
 .. py:function:: pyvqnet.tensor.flip(t, flip_dims)
 
-    沿指定轴反转QTensor，返回一个新的张量。
+    沿指定轴反转QTensor,返回一个新的张量。
 
     :param t: 输入 QTensor 。
     :param flip_dims: 需要翻转的轴或轴列表。
@@ -3612,7 +3798,7 @@ gather
 
     沿由“dim”指定的轴收集值。
 
-    对于 3-D 张量，输出由以下指定：
+    对于 3-D 张量,输出由以下指定:
 
     .. math::
 
@@ -3624,7 +3810,7 @@ gather
 
     :param t: 输入 QTensor。
     :param dim: 聚集轴。
-    :param index: 索引QTensor，应该与输入具有相同的维度大小。
+    :param index: 索引QTensor,应该与输入具有相同的维度大小。
 
     :return: 聚集的结果
 
@@ -3659,7 +3845,7 @@ scatter
 
     将张量 src 中的所有值写入 indices 张量中指定的索引处的 input 中。
 
-    对于 3-D 张量，输出由以下指定：
+    对于 3-D 张量,输出由以下指定:
 
     .. math::
 
@@ -3669,7 +3855,7 @@ scatter
 
     :param input: 输入QTensor。
     :param dim: 散点轴。
-    :param indices: 索引QTensor，应该和输入有相同的维度大小。
+    :param indices: 索引QTensor,应该和输入有相同的维度大小。
     :param src: 要散布的源张量。
 
     Example::
@@ -3724,7 +3910,7 @@ broadcast_to
 
 .. py:function:: pyvqnet.tensor.broadcast_to(t, ref)
 
-    受到某些约束，数组 t 被“广播”到参考形状，以便它们具有兼容的形状。
+    受到某些约束,数组 t 被“广播”到参考形状,以便它们具有兼容的形状。
 
     https://numpy.org/doc/stable/user/basics.broadcasting.html
 
@@ -3749,7 +3935,7 @@ dense_to_csr
 
 .. py:function:: pyvqnet.tensor.dense_to_csr(t)
     
-    将稠密矩阵转化为CSR格式稀疏矩阵，仅支持2维。
+    将稠密矩阵转化为CSR格式稀疏矩阵,仅支持2维。
 
     :param t: 输入稠密QTensor
     :return: CSR稀疏矩阵
@@ -3768,7 +3954,7 @@ csr_to_dense
 
 .. py:function:: pyvqnet.tensor.csr_to_dense(t)
     
-    将CSR格式稀疏矩阵转化为稠密矩阵，仅支持2维。
+    将CSR格式稀疏矩阵转化为稠密矩阵,仅支持2维。
 
     :param t: 输入CSR稀疏矩阵
     :return: 稠密QTensor
@@ -3812,15 +3998,15 @@ pad_sequence
 
 .. py:function:: pyvqnet.tensor.pad_sequence(qtensor_list, batch_first=False, padding_value=0)
 
-    用 ``padding_value`` 填充可变长度张量列表。 ``pad_sequence`` 沿新维度堆叠张量列表，并将它们填充到相等的长度。
+    用 ``padding_value`` 填充可变长度张量列表。 ``pad_sequence`` 沿新维度堆叠张量列表,并将它们填充到相等的长度。
     输入是列表大小为 ``L x *`` 的序列。 L 是可变长度。
 
     :param qtensor_list: `list[QTensor]`- 可变长度序列列表。
-    :param batch_first: 'bool' - 如果为真，输出将是 ``批大小 x 最长序列长度 x *`` ，否则为 ``最长序列长度 x 批大小 x *`` 。 默认值: False。
-    :param padding_value: 'float' - 填充值。 默认值：0。
+    :param batch_first: 'bool' - 如果为真,输出将是 ``批大小 x 最长序列长度 x *`` ,否则为 ``最长序列长度 x 批大小 x *`` 。 默认值: False。
+    :param padding_value: 'float' - 填充值。 默认值:0。
 
     :return:
-        如果 batch_first 为 ``False``，则张量大小为 ``批大小 x 最长序列长度 x *``。
+        如果 batch_first 为 ``False``,则张量大小为 ``批大小 x 最长序列长度 x *``。
         否则张量的大小为 ``最长序列长度 x 批大小 x *`` 。
 
     Examples::
@@ -3869,17 +4055,17 @@ pad_packed_sequence
 .. py:function:: pyvqnet.tensor.pad_packed_sequence(sequence, batch_first=False, padding_value=0, total_length=None)
 
     填充一批打包的可变长度序列。它是 `pack_pad_sequence` 的逆操作。
-    当  ``batch_first`` 是 True，它将返回  ``B x T x *`` 形状的张量，否则返回  ``T x B x *``。
+    当  ``batch_first`` 是 True,它将返回  ``B x T x *`` 形状的张量,否则返回  ``T x B x *``。
     其中 `T` 为序列最长长度, `B` 为批处理大小。
 
 
 
     :param sequence: 'QTensor' - 待处理数据。
-    :param batch_first: 'bool' - 如果为 ``True`` ，批处理将是输入的第一维。 默认值：False。
+    :param batch_first: 'bool' - 如果为 ``True`` ,批处理将是输入的第一维。 默认值:False。
     :param padding_value: 'bool' - 填充值。默认:0。
-    :param total_length: 'bool' - 如果不是 ``None`` ，输出将被填充到长度 :attr:`total_length`。 默认值：None。
+    :param total_length: 'bool' - 如果不是 ``None`` ,输出将被填充到长度 :attr:`total_length`。 默认值:None。
     :return:
-        包含填充序列的张量元组，以及批次中每个序列的长度列表。批次元素将按照最初的顺序重新排序。
+        包含填充序列的张量元组,以及批次中每个序列的长度列表。批次元素将按照最初的顺序重新排序。
 
     Examples::
 
@@ -3946,16 +4132,16 @@ pack_pad_sequence
 .. py:function:: pyvqnet.tensor.pack_pad_sequence(input, lengths, batch_first=False, enforce_sorted=True)
 
     打包一个包含可变长度填充序列的张量。
-    如果 batch_first 是 True, `input` 的形状应该为 [批大小,长度,*]，否则形状 [长度，批大小,*]。
+    如果 batch_first 是 True, `input` 的形状应该为 [批大小,长度,*],否则形状 [长度,批大小,*]。
 
-    对于未排序的序列，使用 ``enforce_sorted`` 是 False。 如果 :attr:`enforce_sorted` 是 ``True``，序列应该按长度降序排列。
+    对于未排序的序列,使用 ``enforce_sorted`` 是 False。 如果 :attr:`enforce_sorted` 是 ``True``,序列应该按长度降序排列。
 
     :param input: 'QTensor' - 填充的可变长度序列。
     :param lengths: 'list' - 每个批次的序列长度。
-    :param batch_first: 'bool' - 如果 ``True``，则输入预期为 ``B x T x *``
-        格式，默认：False。
-    :param enforce_sorted: 'bool' - 如果 ``True``，输入应该是
-        包含按长度降序排列的序列。 如果 ``False``，输入将无条件排序。 默认值：True。
+    :param batch_first: 'bool' - 如果 ``True``,则输入预期为 ``B x T x *``
+        格式,默认:False。
+    :param enforce_sorted: 'bool' - 如果 ``True``,输入应该是
+        包含按长度降序排列的序列。 如果 ``False``,输入将无条件排序。 默认值:True。
 
     :return: 一个 :class:`PackedSequence` 对象。
 
@@ -3999,3 +4185,21 @@ pack_pad_sequence
 
         print(data.batch_sizes)
         # [3, 2, 1, 1]
+
+no_grad
+==============================
+    
+.. py:function:: pyvqnet.no_grad()
+
+    禁用前向计算时记录反向传播节点。
+
+    Example::
+
+        import pyvqnet.tensor as tensor
+        from pyvqnet import no_grad
+
+        with no_grad():
+            x = tensor.QTensor([1.0, 2.0, 3.0],requires_grad=True)
+            y = tensor.tan(x)
+            y.backward()
+        #RuntimeError: output requires_grad is False.
