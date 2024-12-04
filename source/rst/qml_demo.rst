@@ -21,7 +21,7 @@
 
 .. math::
 
-    x = 1101 \rightarrow|\psi\rangle=|1101\rangle
+    x = 0101 \rightarrow|\psi\rangle=|0101\rangle
 
 .. image:: ./images/qvc_circuit.png
    :width: 600 px
