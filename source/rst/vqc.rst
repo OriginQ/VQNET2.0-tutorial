@@ -149,9 +149,9 @@ QMachine
     .. py:method:: reset_states(batchsize)
 
         将模拟器里面初态重新初始化,并且广播为
-        (batchsize,*) 维度从而适应批量数据训练。
+        (batchsize,[2]**num_qubits) 维度从而使得模拟器可以进行批量数据的模型计算。
 
-        :param batchsize: 批处理维度。
+        :param batchsize: 批处理的数量。
 
 
 量子逻辑门接口
@@ -162,11 +162,11 @@ i
 
 .. py:function:: pyvqnet.qnn.vqc.i(q_machine, wires, params=None, use_dagger=False)
 
-    对q_machine中的态矢作用量子逻辑门 I 。
+    对 ``q_machine`` 中的态矢(statevectors)作用量子逻辑门 I 。
 
-    :param q_machine:  量子虚拟机设备。
+    :param q_machine: 量子虚拟机设备。
     :param wires: 量子比特索引。
-    :param params: 参数矩阵,默认为None。
+    :param params: 参数矩阵,默认为None,对于含p个参数的逻辑门操作函数,入参的维度需要为[1,p],或[p]。
     :param use_dagger: 是否共轭转置,默认为False。
     
 
@@ -200,7 +200,7 @@ I
 
     :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
-    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
+    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None,如果为p个参数的含参逻辑门,入参的数据维度需要为[1,p]或者[p]。
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
@@ -225,7 +225,7 @@ hadamard
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
-    :param params: 参数矩阵,默认为None。
+    :param params: 参数矩阵,默认为None,对于含p个参数的逻辑门操作函数,入参的维度需要为[1,p],或[p]。
     :param use_dagger: 是否共轭转置,默认为False。
     
 
@@ -258,7 +258,7 @@ Hadamard
 
     :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
-    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
+    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None,如果为p个参数的含参逻辑门,入参的数据维度需要为[1,p]或者[p]。
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
@@ -285,7 +285,7 @@ t
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
-    :param params: 参数矩阵,默认为None。
+    :param params: 参数矩阵,默认为None,对于含p个参数的逻辑门操作函数,入参的维度需要为[1,p],或[p]。
     :param use_dagger: 是否共轭转置,默认为False。
     
 
@@ -318,7 +318,7 @@ T
 
     :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
-    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
+    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None,如果为p个参数的含参逻辑门,入参的数据维度需要为[1,p]或者[p]。
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
@@ -343,7 +343,7 @@ s
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
-    :param params: 参数矩阵,默认为None。
+    :param params: 参数矩阵,默认为None,对于含p个参数的逻辑门操作函数,入参的维度需要为[1,p],或[p]。
     :param use_dagger: 是否共轭转置,默认为False。
     
 
@@ -376,7 +376,7 @@ S
 
     :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
-    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
+    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None,如果为p个参数的含参逻辑门,入参的数据维度需要为[1,p]或者[p]。
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
@@ -402,7 +402,7 @@ paulix
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
-    :param params: 参数矩阵,默认为None。
+    :param params: 参数矩阵,默认为None,对于含p个参数的逻辑门操作函数,入参的维度需要为[1,p],或[p]。
     :param use_dagger: 是否共轭转置,默认为False。
     
 
@@ -435,7 +435,7 @@ PauliX
 
     :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
-    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
+    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None,如果为p个参数的含参逻辑门,入参的数据维度需要为[1,p]或者[p]。
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
@@ -460,7 +460,7 @@ pauliy
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
-    :param params: 参数矩阵,默认为None。
+    :param params: 参数矩阵,默认为None,对于含p个参数的逻辑门操作函数,入参的维度需要为[1,p],或[p]。
     :param use_dagger: 是否共轭转置,默认为False。
     
 
@@ -494,7 +494,7 @@ PauliY
 
     :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
-    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
+    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None,如果为p个参数的含参逻辑门,入参的数据维度需要为[1,p]或者[p]。
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
@@ -520,7 +520,7 @@ pauliz
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
-    :param params: 参数矩阵,默认为None。
+    :param params: 参数矩阵,默认为None,对于含p个参数的逻辑门操作函数,入参的维度需要为[1,p],或[p]。
     :param use_dagger: 是否共轭转置,默认为False。
     
 
@@ -554,7 +554,7 @@ PauliZ
 
     :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
-    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
+    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None,如果为p个参数的含参逻辑门,入参的数据维度需要为[1,p]或者[p]。
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
@@ -580,7 +580,7 @@ x1
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
-    :param params: 参数矩阵,默认为None。
+    :param params: 参数矩阵,默认为None,对于含p个参数的逻辑门操作函数,入参的维度需要为[1,p],或[p]。
     :param use_dagger: 是否共轭转置,默认为False。
     
 
@@ -614,7 +614,7 @@ X1
 
     :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
-    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
+    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None,如果为p个参数的含参逻辑门,入参的数据维度需要为[1,p]或者[p]。
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
@@ -636,11 +636,11 @@ rx
 
 .. py:function:: pyvqnet.qnn.vqc.rx(q_machine, wires, params=None, use_dagger=False)
     
-    对q_machine中的态矢作用量子逻辑门 rx 。
+    对q_machine中的态矢作用量子逻辑门 rx 
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
-    :param params: 参数矩阵,默认为None。
+    :param params: 参数矩阵,默认为None,对于含p个参数的逻辑门操作函数,入参的维度需要为[1,p],或[p]。
     :param use_dagger: 是否共轭转置,默认为False。
     
 
@@ -675,7 +675,7 @@ RX
 
     :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
-    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
+    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None,如果为p个参数的含参逻辑门,入参的数据维度需要为[1,p]或者[p]。
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
@@ -701,7 +701,7 @@ ry
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
-    :param params: 参数矩阵,默认为None。
+    :param params: 参数矩阵,默认为None,对于含p个参数的逻辑门操作函数,入参的维度需要为[1,p],或[p]。
     :param use_dagger: 是否共轭转置,默认为False。
     
 
@@ -736,7 +736,7 @@ RY
 
     :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
-    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
+    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None,如果为p个参数的含参逻辑门,入参的数据维度需要为[1,p]或者[p]。
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
@@ -762,7 +762,7 @@ rz
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
-    :param params: 参数矩阵,默认为None。
+    :param params: 参数矩阵,默认为None,对于含p个参数的逻辑门操作函数,入参的维度需要为[1,p],或[p]。
     :param use_dagger: 是否共轭转置,默认为False。
     
 
@@ -797,7 +797,7 @@ RZ
 
     :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
-    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
+    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None,如果为p个参数的含参逻辑门,入参的数据维度需要为[1,p]或者[p]。
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
@@ -823,7 +823,7 @@ crx
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
-    :param params: 参数矩阵,默认为None。
+    :param params: 参数矩阵,默认为None,对于含p个参数的逻辑门操作函数,入参的维度需要为[1,p],或[p]。
     :param use_dagger: 是否共轭转置,默认为False。
     
 
@@ -860,7 +860,7 @@ CRX
 
     :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
-    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
+    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None,如果为p个参数的含参逻辑门,入参的数据维度需要为[1,p]或者[p]。
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
@@ -886,7 +886,7 @@ cry
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
-    :param params: 参数矩阵,默认为None。
+    :param params: 参数矩阵,默认为None,对于含p个参数的逻辑门操作函数,入参的维度需要为[1,p],或[p]。
     :param use_dagger: 是否共轭转置,默认为False。
     
 
@@ -922,7 +922,7 @@ CRY
 
     :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
-    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
+    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None,如果为p个参数的含参逻辑门,入参的数据维度需要为[1,p]或者[p]。
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
@@ -948,7 +948,7 @@ crz
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
-    :param params: 参数矩阵,默认为None。
+    :param params: 参数矩阵,默认为None,对于含p个参数的逻辑门操作函数,入参的维度需要为[1,p],或[p]。
     :param use_dagger: 是否共轭转置,默认为False。
     
 
@@ -984,7 +984,7 @@ CRZ
 
     :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
-    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
+    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None,如果为p个参数的含参逻辑门,入参的数据维度需要为[1,p]或者[p]。
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
@@ -1000,41 +1000,6 @@ CRZ
         layer(q_machine = device)
         print(device.states)
 
-p
----------------------------------------------------------------
-
-
-.. py:function:: pyvqnet.qnn.vqc.p(q_machine, wires, params=None, use_dagger=False)
-    
-    对q_machine中的态矢作用量子逻辑门 p 。
-
-    :param q_machine:  量子虚拟机设备。
-    :param wires: 量子比特索引。
-    :param params: 参数矩阵,默认为None。
-    :param use_dagger: 是否共轭转置,默认为False。
-    
-
-    Example::
-        
-        from pyvqnet.qnn.vqc import p,QMachine
-        from pyvqnet.tensor import QTensor
-        qm  = QMachine(4)
-        p(q_machine=qm, wires=1,params=QTensor([24.0]),)
-        print(qm.states)
-
-        # [[[[[1.+0.j 0.+0.j]
-        #     [0.+0.j 0.+0.j]]
-        # 
-        #    [[0.+0.j 0.+0.j]
-        #     [0.+0.j 0.+0.j]]]
-        # 
-        # 
-        #   [[[0.+0.j 0.+0.j]
-        #     [0.+0.j 0.+0.j]]
-        # 
-        #    [[0.+0.j 0.+0.j]
-        #     [0.+0.j 0.+0.j]]]]]
-
 
 
 u1
@@ -1047,7 +1012,7 @@ u1
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
-    :param params: 参数矩阵,默认为None。
+    :param params: 参数矩阵,默认为None,对于含p个参数的逻辑门操作函数,入参的维度需要为[1,p],或[p]。
     :param use_dagger: 是否共轭转置,默认为False。
     
 
@@ -1082,7 +1047,7 @@ U1
 
     :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
-    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
+    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None,如果为p个参数的含参逻辑门,入参的数据维度需要为[1,p]或者[p]。
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
@@ -1108,7 +1073,7 @@ u2
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
-    :param params: 参数矩阵,默认为None。
+    :param params: 参数矩阵,默认为None,对于含p个参数的逻辑门操作函数,入参的维度需要为[1,p],或[p]。
     :param use_dagger: 是否共轭转置,默认为False。
     
 
@@ -1143,7 +1108,7 @@ U2
 
     :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
-    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
+    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None,如果为p个参数的含参逻辑门,入参的数据维度需要为[1,p]或者[p]。
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
@@ -1169,7 +1134,7 @@ u3
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
-    :param params: 参数矩阵,默认为None。
+    :param params: 参数矩阵,默认为None,对于含p个参数的逻辑门操作函数,入参的维度需要为[1,p],或[p]。
     :param use_dagger: 是否共轭转置,默认为False。
     
 
@@ -1204,7 +1169,7 @@ U3
 
     :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
-    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
+    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None,如果为p个参数的含参逻辑门,入参的数据维度需要为[1,p]或者[p]。
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
@@ -1230,7 +1195,7 @@ cy
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
-    :param params: 参数矩阵,默认为None。
+    :param params: 参数矩阵,默认为None,对于含p个参数的逻辑门操作函数,入参的维度需要为[1,p],或[p]。
     :param use_dagger: 是否共轭转置,默认为False。
 
     Example::
@@ -1263,7 +1228,7 @@ CY
 
     :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
-    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
+    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None,如果为p个参数的含参逻辑门,入参的数据维度需要为[1,p]或者[p]。
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
@@ -1289,7 +1254,7 @@ cnot
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
-    :param params: 参数矩阵,默认为None。
+    :param params: 参数矩阵,默认为None,对于含p个参数的逻辑门操作函数,入参的维度需要为[1,p],或[p]。
     :param use_dagger: 是否共轭转置,默认为False。
     
 
@@ -1323,7 +1288,7 @@ CNOT
 
     :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
-    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
+    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None,如果为p个参数的含参逻辑门,入参的数据维度需要为[1,p]或者[p]。
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
@@ -1349,7 +1314,7 @@ cr
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
-    :param params: 参数矩阵,默认为None。
+    :param params: 参数矩阵,默认为None,对于含p个参数的逻辑门操作函数,入参的维度需要为[1,p],或[p]。
     :param use_dagger: 是否共轭转置,默认为False。
     
 
@@ -1384,7 +1349,7 @@ CR
 
     :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
-    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
+    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None,如果为p个参数的含参逻辑门,入参的数据维度需要为[1,p]或者[p]。
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
@@ -1410,7 +1375,7 @@ swap
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
-    :param params: 参数矩阵,默认为None。
+    :param params: 参数矩阵,默认为None,对于含p个参数的逻辑门操作函数,入参的维度需要为[1,p],或[p]。
     :param use_dagger: 是否共轭转置,默认为False。
     
 
@@ -1445,7 +1410,7 @@ SWAP
 
     :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
-    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
+    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None,如果为p个参数的含参逻辑门,入参的数据维度需要为[1,p]或者[p]。
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
@@ -1472,7 +1437,7 @@ cswap
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
-    :param params: 参数矩阵,默认为None。
+    :param params: 参数矩阵,默认为None,对于含p个参数的逻辑门操作函数,入参的维度需要为[1,p],或[p]。
     :param use_dagger: 是否共轭转置,默认为False。
     
 
@@ -1516,7 +1481,7 @@ CSWAP
 
     :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
-    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
+    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None,如果为p个参数的含参逻辑门,入参的数据维度需要为[1,p]或者[p]。
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
@@ -1570,7 +1535,7 @@ iswap
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
-    :param params: 参数矩阵,默认为None。
+    :param params: 参数矩阵,默认为None,对于含p个参数的逻辑门操作函数,入参的维度需要为[1,p],或[p]。
     :param use_dagger: 是否共轭转置,默认为False。
     
 
@@ -1606,7 +1571,7 @@ cz
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
-    :param params: 参数矩阵,默认为None。
+    :param params: 参数矩阵,默认为None,对于含p个参数的逻辑门操作函数,入参的维度需要为[1,p],或[p]。
     :param use_dagger: 是否共轭转置,默认为False。
     
 
@@ -1641,7 +1606,7 @@ CZ
 
     :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
-    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
+    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None,如果为p个参数的含参逻辑门,入参的数据维度需要为[1,p]或者[p]。
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
@@ -1667,7 +1632,7 @@ rxx
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
-    :param params: 参数矩阵,默认为None。
+    :param params: 参数矩阵,默认为None,对于含p个参数的逻辑门操作函数,入参的维度需要为[1,p],或[p]。
     :param use_dagger: 是否共轭转置,默认为False。
     
 
@@ -1702,7 +1667,7 @@ RXX
 
     :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
-    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
+    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None,如果为p个参数的含参逻辑门,入参的数据维度需要为[1,p]或者[p]。
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
@@ -1728,7 +1693,7 @@ ryy
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
-    :param params: 参数矩阵,默认为None。
+    :param params: 参数矩阵,默认为None,对于含p个参数的逻辑门操作函数,入参的维度需要为[1,p],或[p]。
     :param use_dagger: 是否共轭转置,默认为False。
     
 
@@ -1763,7 +1728,7 @@ RYY
 
     :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
-    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
+    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None,如果为p个参数的含参逻辑门,入参的数据维度需要为[1,p]或者[p]。
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
@@ -1789,7 +1754,7 @@ rzz
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
-    :param params: 参数矩阵,默认为None。
+    :param params: 参数矩阵,默认为None,对于含p个参数的逻辑门操作函数,入参的维度需要为[1,p],或[p]。
     :param use_dagger: 是否共轭转置,默认为False。
     
 
@@ -1825,7 +1790,7 @@ RZZ
 
     :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
-    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
+    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None,如果为p个参数的含参逻辑门,入参的数据维度需要为[1,p]或者[p]。
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
@@ -1851,7 +1816,7 @@ rzx
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
-    :param params: 参数矩阵,默认为None。
+    :param params: 参数矩阵,默认为None,对于含p个参数的逻辑门操作函数,入参的维度需要为[1,p],或[p]。
     :param use_dagger: 是否共轭转置,默认为False。
     
 
@@ -1885,7 +1850,7 @@ RZX
 
     :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
-    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
+    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None,如果为p个参数的含参逻辑门,入参的数据维度需要为[1,p]或者[p]。
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
@@ -1911,7 +1876,7 @@ toffoli
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
-    :param params: 参数矩阵,默认为None。
+    :param params: 参数矩阵,默认为None,对于含p个参数的逻辑门操作函数,入参的维度需要为[1,p],或[p]。
     :param use_dagger: 是否共轭转置,默认为False。
     
 
@@ -1946,7 +1911,7 @@ Toffoli
 
     :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
-    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
+    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None,如果为p个参数的含参逻辑门,入参的数据维度需要为[1,p]或者[p]。
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
@@ -1972,7 +1937,7 @@ isingxx
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
-    :param params: 参数矩阵,默认为None。
+    :param params: 参数矩阵,默认为None,对于含p个参数的逻辑门操作函数,入参的维度需要为[1,p],或[p]。
     :param use_dagger: 是否共轭转置,默认为False。
     
 
@@ -2009,7 +1974,7 @@ IsingXX
 
     :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
-    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
+    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None,如果为p个参数的含参逻辑门,入参的数据维度需要为[1,p]或者[p]。
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
@@ -2035,7 +2000,7 @@ isingyy
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
-    :param params: 参数矩阵,默认为None。
+    :param params: 参数矩阵,默认为None,对于含p个参数的逻辑门操作函数,入参的维度需要为[1,p],或[p]。
     :param use_dagger: 是否共轭转置,默认为False。
     
 
@@ -2072,7 +2037,7 @@ IsingYY
 
     :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
-    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
+    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None,如果为p个参数的含参逻辑门,入参的数据维度需要为[1,p]或者[p]。
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
@@ -2098,7 +2063,7 @@ isingzz
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
-    :param params: 参数矩阵,默认为None。
+    :param params: 参数矩阵,默认为None,对于含p个参数的逻辑门操作函数,入参的维度需要为[1,p],或[p]。
     :param use_dagger: 是否共轭转置,默认为False。
     
 
@@ -2134,7 +2099,7 @@ IsingZZ
 
     :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
-    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
+    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None,如果为p个参数的含参逻辑门,入参的数据维度需要为[1,p]或者[p]。
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
@@ -2159,7 +2124,7 @@ isingxy
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
-    :param params: 参数矩阵,默认为None。
+    :param params: 参数矩阵,默认为None,对于含p个参数的逻辑门操作函数,入参的维度需要为[1,p],或[p]。
     :param use_dagger: 是否共轭转置,默认为False。
     
 
@@ -2195,7 +2160,7 @@ IsingXY
 
     :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
-    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
+    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None,如果为p个参数的含参逻辑门,入参的数据维度需要为[1,p]或者[p]。
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
@@ -2221,7 +2186,7 @@ phaseshift
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
-    :param params: 参数矩阵,默认为None。
+    :param params: 参数矩阵,默认为None,对于含p个参数的逻辑门操作函数,入参的维度需要为[1,p],或[p]。
     :param use_dagger: 是否共轭转置,默认为False。
     
 
@@ -2257,7 +2222,7 @@ PhaseShift
 
     :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
-    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
+    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None,如果为p个参数的含参逻辑门,入参的数据维度需要为[1,p]或者[p]。
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
@@ -2283,7 +2248,7 @@ multirz
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
-    :param params: 参数矩阵,默认为None。
+    :param params: 参数矩阵,默认为None,对于含p个参数的逻辑门操作函数,入参的维度需要为[1,p],或[p]。
     :param use_dagger: 是否共轭转置,默认为False。
     
 
@@ -2319,7 +2284,7 @@ MultiRZ
 
     :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
-    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
+    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None,如果为p个参数的含参逻辑门,入参的数据维度需要为[1,p]或者[p]。
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
@@ -2345,7 +2310,7 @@ sdg
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
-    :param params: 参数矩阵,默认为None。
+    :param params: 参数矩阵,默认为None,对于含p个参数的逻辑门操作函数,入参的维度需要为[1,p],或[p]。
     :param use_dagger: 是否共轭转置,默认为False。
     
 
@@ -2382,7 +2347,7 @@ SDG
 
     :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
-    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
+    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None,如果为p个参数的含参逻辑门,入参的数据维度需要为[1,p]或者[p]。
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
@@ -2408,7 +2373,7 @@ tdg
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
-    :param params: 参数矩阵,默认为None。
+    :param params: 参数矩阵,默认为None,对于含p个参数的逻辑门操作函数,入参的维度需要为[1,p],或[p]。
     :param use_dagger: 是否共轭转置,默认为False。
     
 
@@ -2443,7 +2408,7 @@ TDG
 
     :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
-    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
+    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None,如果为p个参数的含参逻辑门,入参的数据维度需要为[1,p]或者[p]。
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
@@ -2469,7 +2434,7 @@ controlledphaseshift
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
-    :param params: 参数矩阵,默认为None。
+    :param params: 参数矩阵,默认为None,对于含p个参数的逻辑门操作函数,入参的维度需要为[1,p],或[p]。
     :param use_dagger: 是否共轭转置,默认为False。
     
 
@@ -2508,7 +2473,7 @@ ControlledPhaseShift
 
     :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
-    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
+    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None,如果为p个参数的含参逻辑门,入参的数据维度需要为[1,p]或者[p]。
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
@@ -2536,7 +2501,7 @@ multicontrolledx
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
-    :param params: 参数矩阵,默认为None。
+    :param params: 参数矩阵,默认为None,对于含p个参数的逻辑门操作函数,入参的维度需要为[1,p],或[p]。
     :param use_dagger: 是否共轭转置,默认为False。
     :param control_values: 控制值,默认为None,当比特位为1时控制。
 
@@ -2580,7 +2545,7 @@ MultiControlledX
 
     :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
-    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
+    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None,如果为p个参数的含参逻辑门,入参的数据维度需要为[1,p]或者[p]。
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
@@ -2648,7 +2613,7 @@ single_excitation
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
-    :param params: 参数矩阵,默认为None。
+    :param params: 参数矩阵,默认为None,对于含p个参数的逻辑门操作函数,入参的维度需要为[1,p],或[p]。
     :param use_dagger: 是否共轭转置,默认为False。
     
 
@@ -2684,7 +2649,7 @@ double_excitation
 
     :param q_machine:  量子虚拟机设备。
     :param wires: 量子比特索引。
-    :param params: 参数矩阵,默认为None。
+    :param params: 参数矩阵,默认为None,对于含p个参数的逻辑门操作函数,入参的维度需要为[1,p],或[p]。
     :param use_dagger: 是否共轭转置,默认为False。
     
 
@@ -2722,9 +2687,9 @@ VQC_Purity
 ---------------------------------------------------------------
 
 
-.. py:class:: pyvqnet.qnn.vqc.VQC_Purity(state, qubits_idx, num_wires)
+.. py:function:: pyvqnet.qnn.vqc.VQC_Purity(state, qubits_idx, num_wires)
 
-    从态矢中计算特定量子比特上的纯度。
+    从态矢中计算特定量子比特 ``qubits_idx`` 上的纯度。
 
     .. math::
         \gamma = \text{Tr}(\rho^2)
@@ -2737,8 +2702,11 @@ VQC_Purity
     :param qubits_idx: 要计算纯度的量子比特位索引
     :param num_wires: 量子比特数
 
-    :return:
-            纯度
+    :return: 对应比特位置上的纯度。
+
+    .. note::
+        
+        该函数结果一般为[b,len(qubits_idx)],其中b为 q_machine.reset_states(b)的批处理数量b。
 
     Example::
 
@@ -2763,14 +2731,18 @@ VQC_VarMeasure
 ---------------------------------------------------------------
 
 
-.. py:class:: pyvqnet.qnn.vqc.VQC_VarMeasure(q_machine, obs)
+.. py:function:: pyvqnet.qnn.vqc.VQC_VarMeasure(q_machine, obs)
 
-    提供的可观察量的方差。
+    提供的可观察量 ``obs`` 的方差。
 
     :param q_machine: 从pyqpanda get_qstate()获取的量子态
-    :param obs: 构建的量子线路
+    :param obs: 测量观测量,当前支持Hadamard,I,PauliX,PauliY,PauliZ 几种Observable.
 
-    :return: 方差值
+    :return: 计算可观测量方差。
+
+    .. note::
+
+        测量结果一般为[b,1],其中b为 q_machine.reset_states(b)的批处理数量b。
 
     Example::
 
@@ -2785,18 +2757,19 @@ VQC_VarMeasure
 
         # [[0.7701511]]
 
+
 VQC_DensityMatrixFromQstate
 ---------------------------------------------------------------
 
 
-.. py:class:: pyvqnet.qnn.vqc.VQC_DensityMatrixFromQstate(state, indices)
+.. py:function:: pyvqnet.qnn.vqc.VQC_DensityMatrixFromQstate(state, indices)
 
     计算量子态在一组特定量子比特上的密度矩阵。
 
     :param state: 一维列表状态向量。 这个列表的大小应该是 ``(2**N,)`` 对于量子比特个数 ``N`` ,qstate 应该从 000 ->111 开始。
     :param indices: 所考虑子系统中的量子比特索引列表。
+    :return: 大小为“(b, 2**len(indices), 2**len(indices))”的密度矩阵,其中b为 q_machine.reset_states(b)的批处理数量b。
 
-    :return: 大小为“(2**len(indices), 2**len(indices))”的密度矩阵。
 
     Example::
 
@@ -2838,13 +2811,25 @@ Probability
 ---------------------------------------------------------------
 
 
-.. py:class:: pyvqnet.qnn.vqc.Probability(wires=None, name="")
+.. py:class:: pyvqnet.qnn.vqc.Probability(wires, name="")
 
-    计算量子线路在特定比特上概率测量结果。
+    一个计算量子线路在特定比特上概率测量的Module类。
+
 
     :param wires: 测量比特的索引,列表、元组或者整数。
     :param name: 模块的名字,默认:""。
-    :return: 测量结果,QTensor。
+    :return: 一个概率测量的类。
+
+    .. py:method:: forward(q_machine)
+
+        进行概率测量计算
+
+        :param q_machine: 作用的量子态矢模拟器
+        :return: 概率测量结果
+
+    .. note::
+
+        使用该类进行计算的概率测量结果一般为[b,len(wires)],其中b为 q_machine.reset_states(b)的批处理数量b。
 
     Example::
 
@@ -2864,14 +2849,15 @@ Probability
         y =ma(q_machine=qm)
 
         # [[1.0000002 0.       ]
-        #  [1.0000002 0.       ]]        
+        #  [1.0000002 0.       ]]
+
 
 MeasureAll
 ---------------------------------------------------------------
 
-.. py:class:: pyvqnet.qnn.vqc.MeasureAll(obs=None, name="")
+.. py:class:: pyvqnet.qnn.vqc.MeasureAll(obs, name="")
 
-    计算量子线路的测量结果,支持输入obs为多个或单个泡利算子或这哈密顿量。
+    计算量子线路的测量结果,支持输入观测量 ``obs`` 为由观测量 `observables`、作用比特 `wires` 、系数 `coefficient` 键值对构成的字典,或者键值对字典列表。
     例如:
 
     {\'wires\': [0,  1], \'observables\': [\'x\', \'i\'],\'coefficient\':[0.23,-3.5]}
@@ -2880,9 +2866,21 @@ MeasureAll
     或:
     [{\'wires\': [0, 2, 3],\'observables\': [\'X\', \'Y\', \'Z\'],\'coefficient\': [1, 0.5, 0.4]}, {\'wires\': [0, 1, 2],\'observables\': [\'X\', \'Y\', \'Z\'],\'coefficient\': [1, 0.5, 0.4]}]
 
-    :param obs: observable。
+    :param obs: 测量观测量,可以是单个观测量类包括,或者由观测量、作用比特、系数键值对构成的字典,或者键值对字典列表。
     :param name: 模块的名字,默认:""。
-    :return: 测量结果,QTensor。
+
+    .. py:method:: forward(q_machine)
+        
+        进行测量操作
+
+        :param q_machine: 作用的量子态矢模拟器
+        :return: 测量结果,QTensor。
+
+    .. note::
+
+        如果 ``obs`` 是列表,使用该类进行计算的测量结果一般为[b,obs的列表长度],其中b为 q_machine.reset_states(b)的批处理数量b。
+        如果 ``obs`` 是字典,使用该类进行计算的测量结果一般为[b,1],其中b为 q_machine.reset_states(b)的批处理数量b。
+    
 
     Example::
 
@@ -2890,14 +2888,20 @@ MeasureAll
         from pyvqnet.tensor import QTensor
         from pyvqnet import kfloat64
         x = QTensor([[0.56, 0.1],[0.56, 0.1]],requires_grad=True)
+
+        # 4 qubits
         qm = QMachine(4)
+        # batch size = 2
         qm.reset_states(2)
+
         rz(q_machine=qm,wires=0,params=x[:,[0]])
         rz(q_machine=qm,wires=1,params=x[:,[0]])
         cnot(q_machine=qm,wires=[0,1])
         ry(q_machine=qm,wires=2,params=x[:,[1]])
         cnot(q_machine=qm,wires=[0,2])
         rz(q_machine=qm,wires=3,params=x[:,[1]])
+        
+        # list of 2 observables
         obs_list = [{
             'wires': [0, 2, 3],
             'observables': ['X', 'Y', 'Z'],
@@ -2907,8 +2911,12 @@ MeasureAll
             'observables': ['X', 'Y', 'Z'],
             'coefficient': [1, 0.5, 0.4]
         }]
+
         ma = MeasureAll(obs = obs_list)
+
         y = ma(q_machine=qm)
+        
+        #return QTensor of [batch_size,len(obs)]
         print(y)
 
         # [[0.4000001 0.3980018]
@@ -2920,13 +2928,25 @@ Samples
 
 .. py:class:: pyvqnet.qnn.vqc.Samples(wires=None, obs=None, shots = 1,name="")
 
-    获取特定线路上的带有 shot 的样本结果
+    获取特定线路 ``wires`` 上的带有 ``shots`` 的观测量 ``obs`` 结果。
 
-    :param wires: 样本量子比特索引。默认值：None,根据运行时使用模拟器的所有比特。
+    :param wires: 样本量子比特索引。默认值:None,使用模拟器的所有比特。
     :param obs: 该值只能设为None。
-    :param shots: 样本重复次数,默认值：1。
-    :param name: 此模块的名称,默认值：“”。
+    :param shots: 样本重复次数,默认值:1。
+    :param name: 此模块的名称,默认值:“”。
     :return: 一个测量方法类
+
+
+    .. py:method:: forward(q_machine)
+
+        进行采样操作。
+
+        :param q_machine: 作用的量子态矢模拟器
+        :return: 测量结果,QTensor。
+
+    .. note::
+
+        使用该类进行计算的测量结果一般为[b,shots,len(wires)],其中b为 q_machine.reset_states(b)的批处理数量b。
 
     Example::
 
@@ -2962,13 +2982,24 @@ Samples
 SparseHamiltonian
 ---------------------------------------------------------------
 
-.. py:class:: pyvqnet.qnn.vqc.SparseHamiltonian(obs=None, name="")
+.. py:class:: pyvqnet.qnn.vqc.SparseHamiltonian(obs, name="")
 
-    计算观测量的稀疏哈密顿量,例如 {"observables":H,"wires":[0,2,3]}。
+    计算观测量 ``obs`` 的稀疏哈密顿量,例如 {"observables":H,"wires":[0,2,3]}。
 
-    :param obs: 稀疏哈密顿量,使用 `tensor.dense_to_csr()` 函数获取稠密函数的稀疏格式。
+    :param obs: 稀疏观测量,使用 `tensor.dense_to_csr()` 函数获取稠密函数的稀疏格式。
     :param name: 模块的名字,默认:""。
-    :return: 期望结果,QTensor。
+    :return: 一个测量方法类
+
+    .. py:method:: forward(q_machine)
+
+        进行稀疏哈密顿量测量。
+
+        :param q_machine: 作用的量子态矢模拟器
+        :return: 测量结果,QTensor。
+
+    .. note::
+
+        使用该类进行计算的测量结果一般为[b,1],其中b为 q_machine.reset_states(b)的批处理数量b。
 
     Example::
 
@@ -3044,13 +3075,25 @@ SparseHamiltonian
 HermitianExpval
 ---------------------------------------------------------------
 
-.. py:class:: pyvqnet.qnn.vqc.HermitianExpval(obs=None, name="")
+.. py:class:: pyvqnet.qnn.vqc.HermitianExpval(obs, name="")
 
-    计算量子线路某个厄密特量的期望。
+    计算量子线路某个厄密特观测量 ``obs`` 的期望。
 
-    :param obs: 厄密特量。
+    :param obs: 厄密特观测量。
     :param name: 模块的名字,默认:""。
     :return: 期望结果,QTensor。
+
+    .. py:method:: forward(q_machine)
+
+        进行厄密特量测量。
+
+        :param q_machine: 作用的量子态矢模拟器
+        :return: 测量结果,QTensor。
+
+    .. note::
+
+        使用该类进行计算的测量结果一般为[b,1],其中b为 q_machine.reset_states(b)的批处理数量b。
+
 
     Example::
 
@@ -3119,13 +3162,16 @@ VQC_HardwareEfficientAnsatz
 
 .. py:class:: pyvqnet.qnn.vqc.VQC_HardwareEfficientAnsatz(n_qubits,single_rot_gate_list,entangle_gate="CNOT",entangle_rules='linear',depth=1)
 
-    论文介绍的Hardware Efficient Ansatz的实现: `Hardware-efficient Variational Quantum Eigensolver for Small Molecules <https://arxiv.org/pdf/1704.05018.pdf>`__ 。
+    一个含可训练参数的变分量子线路类,实现了论文介绍的Hardware Efficient Ansatz的实现: `Hardware-efficient Variational Quantum Eigensolver for Small Molecules <https://arxiv.org/pdf/1704.05018.pdf>`__ 。
 
     :param n_qubits: 量子比特数。
     :param single_rot_gate_list: 单个量子位旋转门列表由一个或多个作用于每个量子位的旋转门构成。目前支持 Rx、Ry、Rz。
     :param entangle_gate: 非参数化纠缠门。支持CNOT、CZ。默认: CNOT。
     :param entangle_rules: 电路中如何使用纠缠门。 ``linear`` 意味着纠缠门将作用于每个相邻的量子位。 ``all`` 意味着纠缠门将作用于任何两个 qbuits。 默认值:``linear``。
     :param depth: ansatz 的深度,默认:1。
+    :return: 返回一个含可训练参数的变分量子线路类。
+
+
 
     Example::
 
@@ -3171,13 +3217,14 @@ VQC_BasicEntanglerTemplate
 
 .. py:class:: pyvqnet.qnn.vqc.VQC_BasicEntanglerTemplate(num_layer=1, num_qubits=1, rotation="RX", initial=None, dtype=None)
 
-    由每个量子位上的单参数单量子位旋转组成的层,后跟一个闭合链或环组合的多个CNOT 门。
+    由每个量子位上的单参数单量子位旋转组成的层,后跟一个闭合链或环组合的多个CNOT 门构成的类。
 
     CNOT 门环将每个量子位与其邻居连接起来,最后一个量子位被认为是第一个量子位的邻居。
 
     :param num_layer: 量子比特线路层数。
     :param num_qubits: 量子比特数,默认为1。
     :param rotation: 使用单参数单量子比特门,``RX`` 被用作默认值。
+    :return: 返回一个含可训练参数的变分量子线路类。
 
     Example::
 
@@ -3228,6 +3275,7 @@ VQC_StronglyEntanglingTemplate
     :param weights: 形状为 ``(L, M, 3)`` 的权重张量,默认值:None,使用形状为 ``(1,1,3)`` 的随机张量。
     :param num_qubits: 量子比特数,默认值:1。
     :param ranges: 确定每个后续层的范围超参数的序列； 默认值:None,使用 :math:`r=l \ mod M` 作为ranges 的值。
+    :return: 返回一个含可训练参数的变分量子线路类。
 
     Example::
 
@@ -3279,7 +3327,8 @@ VQC_QuantumEmbedding
     :param depth_input: 输入数据的特征维度。
     :param num_unitary_layers: 每个子模块中变分量子门的重复次数。
     :param num_repetitions: 子模块的重复次数。
-
+    :return: 返回一个含可训练参数的变分量子线路类。
+    
     Example::
 
         from pyvqnet.nn import Module
@@ -3396,13 +3445,12 @@ VQC_BasisEmbedding
 
 .. py:function:: pyvqnet.qnn.vqc.VQC_BasisEmbedding(basis_state,q_machine)
 
-    将n个二进制特征编码为n个量子比特的基态。
+    将二进制特征 ``basis_state`` 编码为 ``q_machine`` 的基态。
 
     例如, 对于 ``basis_state=([0, 1, 1])``, 在量子系统下其基态为 :math:`|011 \rangle`。
 
     :param basis_state:  ``(n)`` 大小的二进制输入。
     :param q_machine: 量子虚拟机设备。
-    
 
     Example::
         
@@ -3424,7 +3472,7 @@ VQC_AngleEmbedding
 
 .. py:function:: pyvqnet.qnn.vqc.VQC_AngleEmbedding(input_feat, wires, q_machine: pyvqnet.qnn.vqc.QMachine, rotation: str = "X")
 
-    将 :math:`N` 特征编码到 :math:`n` 量子比特的旋转角度中, 其中 :math:`N \leq n`。
+    将 :math:`N` 特征编码到 ``q_machine`` :math:`n` 量子比特的旋转角度中, 其中 :math:`N \leq n`。
 
     旋转可以选择为 : 'X' , 'Y' , 'Z', 如 ``rotation`` 的参数定义为:
 
@@ -3471,7 +3519,7 @@ VQC_AmplitudeEmbedding
 
 .. py:function:: pyvqnet.qnn.vqc.VQC_AmplitudeEmbeddingCircuit(input_feature, q_machine)
 
-    将 :math:`2^n` 特征编码为 :math:`n` 量子比特的振幅向量。
+    将 :math:`2^n` 特征编码为 ``q_machine``  :math:`n` 量子比特的振幅向量。
 
     :param input_feature: 表示参数的numpy数组。
     :param q_machine: 量子虚拟机设备。
@@ -3497,7 +3545,7 @@ VQC_IQPEmbedding
 
 .. py:function:: pyvqnet.qnn.vqc.VQC_IQPEmbedding(input_feat, q_machine: pyvqnet.qnn.vqc.QMachine, rep: int = 1)
 
-    使用IQP线路的对角门将 :math:`n` 特征编码为 :math:`n` 量子比特。
+    使用IQP线路的对角门将 :math:`n` 特征编码为 ``q_machine``  :math:`n` 量子比特。
 
     编码是由 `Havlicek et al. (2018) <https://arxiv.org/pdf/1804.11326.pdf>`_ 提出。
 
@@ -3529,7 +3577,7 @@ VQC_RotCircuit
 
 .. py:function:: pyvqnet.qnn.vqc.VQC_RotCircuit(q_machine, wire, params)
 
-    任意单量子比特旋转。
+    在 ``q_machine`` 的比特 ``wire`` 上使用 ``params`` 进行单量子比特旋转操作。
 
     .. math::
 
@@ -3564,7 +3612,7 @@ VQC_CRotCircuit
 
 .. py:function:: pyvqnet.qnn.vqc.VQC_CRotCircuit(para,control_qubits,rot_wire,q_machine)
 
-	受控Rot操作符。
+    在 ``q_machine`` 的比特 ``rot_wire`` 以及受控比特 ``control_qubits`` 上使用 ``params`` 进行受控Rot操作符。
 
     .. math:: CR(\phi, \theta, \omega) = \begin{bmatrix}
             1 & 0 & 0 & 0 \\
@@ -3602,7 +3650,7 @@ VQC_Controlled_Hadamard
 
 .. py:function:: pyvqnet.qnn.vqc.VQC_Controlled_Hadamard(wires, q_machine)
 
-    受控Hadamard逻辑门
+    在 ``q_machine`` 的比特 ``wire`` 上使用受控Hadamard逻辑门
 
     .. math:: CH = \begin{bmatrix}
             1 & 0 & 0 & 0 \\
@@ -3637,7 +3685,7 @@ VQC_CCZ
 
 .. py:function:: pyvqnet.qnn.vqc.VQC_CCZ(wires, q_machine)
 
-    受控-受控-Z (controlled-controlled-Z) 逻辑门。
+    在 ``q_machine`` 的比特 ``wire`` 上使用受控-受控-Z (controlled-controlled-Z) 逻辑门。
 
     .. math::
 
@@ -3680,7 +3728,7 @@ VQC_FermionicSingleExcitation
 
 .. py:function:: pyvqnet.qnn.vqc.VQC_FermionicSingleExcitation(weight, wires, q_machine)
 
-    对泡利矩阵的张量积求幂的耦合簇单激励算子。矩阵形式下式给出:
+    在 ``q_machine`` 的比特 ``wire`` 上使用由 ``weight`` 构成的泡利矩阵的张量积求幂的耦合簇单激励算子。矩阵形式下式给出:
 
     .. math::
 
@@ -3716,7 +3764,7 @@ VQC_FermionicDoubleExcitation
 
 .. py:function:: pyvqnet.qnn.vqc.VQC_FermionicDoubleExcitation(weight, wires1, wires2, q_machine)
 
-    对泡利矩阵的张量积求幂的耦合聚类双激励算子,矩阵形式由下式给出:
+    在 ``q_machine`` 的比特 ``wire1`` , ``wire2`` 上使用由 ``weight`` 对泡利矩阵的张量积求幂的耦合聚类双激励算子,矩阵形式由下式给出:
 
     .. math::
 
@@ -3727,7 +3775,7 @@ VQC_FermionicDoubleExcitation
     创建运算符和索引 :math:`r, s` 和 :math:`p, q` 在占用的和
     分别为空分子轨道。 使用 `Jordan-Wigner 变换
     <https://arxiv.org/abs/1208.5986>`_ 上面定义的费米子算子可以写成
-    根据 Pauli 矩阵（有关更多详细信息,请参见
+    根据 Pauli 矩阵(有关更多详细信息,请参见
     `arXiv:1805.04340 <https://arxiv.org/abs/1805.04340>`_)
 
     .. math::
@@ -3766,7 +3814,7 @@ VQC_UCCSD
 
 .. py:function:: pyvqnet.qnn.vqc.VQC_UCCSD(weights, wires, s_wires, d_wires, init_state, q_machine)
 
-    实现酉耦合簇单激发和双激发拟设（UCCSD）。UCCSD 是 VQE 拟设,通常用于运行量子化学模拟。
+    在 ``q_machine`` 上实现酉耦合簇单激发和双激发拟设(UCCSD)。UCCSD 是 VQE 拟设,通常用于运行量子化学模拟。
 
     在一阶 Trotter 近似内,UCCSD 酉函数由下式给出:
 
@@ -3780,7 +3828,7 @@ VQC_UCCSD
 
     其中 :math:`\hat{c}` 和 :math:`\hat{c}^\dagger` 是费米子湮灭和
     创建运算符和索引 :math:`r, s` 和 :math:`p, q` 在占用的和
-    分别为空分子轨道。（更多细节见
+    分别为空分子轨道。(更多细节见
     `arXiv:1805.04340 <https://arxiv.org/abs/1805.04340>`_):
 
 
@@ -3823,7 +3871,7 @@ VQC_ZFeatureMap
 
 .. py:function:: pyvqnet.qnn.vqc.VQC_ZFeatureMap(input_feat, q_machine: pyvqnet.qnn.vqc.QMachine, data_map_func=None, rep: int = 2)
 
-    一阶泡利 Z 演化电路。
+    在 ``q_machine`` 上运行一阶泡利 Z 演化电路。
 
     对于 3 个量子位和 2 次重复,电路表示为:
 
@@ -3866,7 +3914,7 @@ VQC_ZZFeatureMap
 
 .. py:function:: pyvqnet.qnn.vqc.VQC_ZZFeatureMap(input_feat, q_machine: pyvqnet.qnn.vqc.QMachine, data_map_func=None, entanglement: Union[str, List[List[int]],Callable[[int], List[int]]] = "full",rep: int = 2)
 
-    二阶 Pauli-Z 演化电路。
+    在 ``q_machine`` 上运行二阶 Pauli-Z 演化电路。
 
     对于 3 个量子位、1 个重复和线性纠缠,电路表示为:
 
@@ -3956,9 +4004,9 @@ VQC_BasisRotation
 
 .. py:function:: pyvqnet.qnn.vqc.VQC_BasisRotation(q_machine: pyvqnet.qnn.vqc.QMachine, wires, unitary_matrix: QTensor, check=False)
 
-    实现一个电路,提供可用于执行精确的单体基础旋转的整体。
+    在 ``q_machine`` 上实现一个电路,执行精确的单体基础旋转。
 
-    :class:`~.vqc.qCircuit.VQC_BasisRotation` 执行以下由 `arXiv:1711.04789 <https://arxiv.org/abs/1711.04789>`_\ 中给出的单粒子费米子确定的酉变换 :math:`U(u)`
+    :class:`~.vqc.VQC_BasisRotation` 执行以下由 `arXiv:1711.04789 <https://arxiv.org/abs/1711.04789>`_\ 中给出的单粒子费米子确定的酉变换 :math:`U(u)`
     
     .. math::
 
@@ -4005,16 +4053,13 @@ VQC_QuantumPoolingCircuit
 
 .. py:function:: pyvqnet.qnn.vqc.VQC_QuantumPoolingCircuit(ignored_wires, sinks_wires, params, q_machine)
 
-    对数据进行降采样的量子电路。
-
-    为了减少电路中的量子位数量,首先在系统中创建成对的量子位。在最初配对所有量子位之后,将广义2量子位酉元应用于每一对量子位上。并在应用这两个量子位酉元之后,在神经网络的其余部分忽略每对量子位中的一个量子位。
+    在 ``q_machine`` 上对数据进行降采样的量子电路。为了减少电路中的量子位数量,首先在系统中创建成对的量子位。在最初配对所有量子位之后,将广义2量子位酉元应用于每一对量子位上。并在应用这两个量子位酉元之后,在神经网络的其余部分忽略每对量子位中的一个量子位。
 
     :param sources_wires: 将被忽略的源量子位索引。
     :param sinks_wires: 将保留的目标量子位索引。
-    :param params: 输入参数。
+    :param params: 输入参数,形状应该为[ len(ignored_wires) + len(sinks_wires) // 2 * 3]。
     :param q_machine: 量子虚拟机设备。
 
-    
 
     Examples:: 
 
@@ -4036,11 +4081,11 @@ vqc_qft_add_to_register
 
 .. py:function:: pyvqnet.qnn.vqc.vqc_qft_add_to_register(q_machine, m, k)
 
-    将无符号整数 `m` 编码到量子比特中,然后将 `k` 加到此量子比特上。
+    在 ``q_machine`` 进行如下操作:将无符号整数 `m` 编码到量子比特中,然后将 `k` 加到此量子比特上。
 
     .. math:: \text{Sum(k)}\vert m \rangle = \vert m + k \rangle.
 
-    实现此幺正运算的过程如下：
+    实现此幺正运算的过程如下:
     (1). 通过 将 QFT 应用于 :math:`\vert m \rangle` 状态,将状态从计算基础转换为傅里叶基础。
     (2). 使用 :math:`R_Z` 门将 :math:`j` 个量子比特旋转角度 :math:`\frac{2k\pi}{2^{j}}`,从而得到新相 :math:`\frac{2(m + k)\pi}{2^{j}}`。
     (3). 应用 QFT 逆返回计算基础并得到 :math:`m+k`。
@@ -4072,11 +4117,11 @@ vqc_qft_add_two_register
 
 .. py:function:: vqc_qft_add_two_register(q_machine, m, k, wires_m, wires_k, wires_solution)
 
-    将两个量子比特中编码的无符号整数进行加法。
+    在 ``q_machine`` 进行如下操作: 将两个量子比特wires_m, wires_k中编码的无符号整数m, k进行加法,结果存在wires_solution比特上。
 
     .. math:: \text{Sum}_2\vert m \rangle \vert k \rangle \vert 0 \rangle = \vert m \rangle \vert k \rangle \vert m+k \rangle
 
-    在这种情况下,我们可以将第三个寄存器（最初位于 :math:`0`）理解为一个计数器,它将计算出 :math:`m` 和 :math:`k` 加起来的单位数。二进制分解将使这变得简单。如果我们有 :math:`\vert m \rangle = \vert \overline{q_0q_1q_2} \rangle`,则如果 :math:`q_2 = 1`,则我们必须将 :math:`1` 添加到计数器,否则不添加任何内容。一般来说,如果 :math:`i`-th 量子位处于 :math:`\vert 1 \rangle` 状态,则我们应该添加 :math:`2^{n-i-1}` 个单位,否则添加 0。
+    在这种情况下,我们可以将第三个寄存器(最初位于 :math:`0`)理解为一个计数器,它将计算出 :math:`m` 和 :math:`k` 加起来的单位数。二进制分解将使这变得简单。如果我们有 :math:`\vert m \rangle = \vert \overline{q_0q_1q_2} \rangle`,则如果 :math:`q_2 = 1`,则我们必须将 :math:`1` 添加到计数器,否则不添加任何内容。一般来说,如果 :math:`i`-th 量子位处于 :math:`\vert 1 \rangle` 状态,则我们应该添加 :math:`2^{n-i-1}` 个单位,否则添加 0。
 
     :param q_machine: 用于模拟的量子机。
     :param m: 嵌入寄存器中的经典整数作为 lhs。
@@ -4119,7 +4164,7 @@ vqc_qft_mul
 
 .. py:function:: vqc_qft_mul(q_machine, m, k, wires_m, wires_k, wires_solution)
 
-    将两个量子比特中编码的数值进行加法。
+    在 ``q_machine`` 进行如下操作: 将两个量子比特wires_m, wires_k中编码的数值m, k, 进行乘法,结果存在wires_solution比特上。
 
     .. math:: \text{Mul}\vert m \rangle \vert k \rangle \vert 0 \rangle = \vert m \rangle \vert k \rangle \vert m\cdot k \rangle
 
@@ -4200,7 +4245,8 @@ VQC_LCU
     输入应为 Hermitian。
 
     :param wires: 运算符作用的 qlist 索引,可能需要辅助量子位。
-    :param check_hermitian: 检查输入是否为 Hermitian,默认值：True。
+    :param check_hermitian: 检查输入是否为 Hermitian,默认值:True。
+    :return: 返回一个基于VQC的LCU类实例。
 
     Examples::
 
@@ -4238,12 +4284,12 @@ VQC_QSVT
 
 .. py:class:: pyvqnet.qnn.vqc.VQC_QSVT(A, angles, wires)
 
-    Implements the
-    `quantum singular value transformation <https://arxiv.org/abs/1806.01838>`__ (QSVT) circuit.
+    实现
+    `quantum singular value transformation <https://arxiv.org/abs/1806.01838>`__ (QSVT) 线路.
 
 
     :param A: 要编码的一般 :math:`(n \times m)` 矩阵。
-    :param angles: 要移动以获得所需多项式的角度列表。
+    :param angles:  构建QSVT多项式的偏移系数。
     :param wires: A 作用于的量子比特索引。
 
     Example::
@@ -4753,7 +4799,7 @@ QNG
 .. py:class:: pyvqnet.qnn.vqc.qng.QNG(qmodel, stepsize=0.01)
 
     `量子自然梯度法(Quantum Nature Gradient) <https://arxiv.org/abs/1909.02108>`_ 借鉴经典自然梯度法的概念 `Amari (1998) <https://www.mitpressjournals.org/doi/abs/10.1162/089976698300017746>`__ ,
-    我们改为将优化问题视为给定输入的可能输出值的概率分布（即,最大似然估计）,则更好的方法是在分布
+    我们改为将优化问题视为给定输入的可能输出值的概率分布(即,最大似然估计),则更好的方法是在分布
     空间中执行梯度下降,它相对于参数化是无量纲和不变的. 因此,无论参数化如何,每个优化步骤总是会为每个参数选择最佳步长。
     在量子机器学习任务中,量子态空间拥有一个独特的不变度量张量,称为 Fubini-Study 度量张量 :math:`g_{ij}`。
     该张量将量子线路参数空间中的最速下降转换为分布空间中的最速下降。
@@ -4934,8 +4980,8 @@ wrapper_commute_controlled
 
     装饰器用于进行受控门交换
     这是一个量子变换,用于将可交换的门移动到受控操作的控制比特和目标比特之前。
-    控制比特两侧的对角门不会影响受控门的结果；因此,我们可以将所有作用在第一个比特上的单比特门一起推到右边（如果需要,可以进行融合）。
-    类似地,X 门与 CNOT 和 Toffoli 的目标比特可交换（PauliY 与 CRY 也是如此）。
+    控制比特两侧的对角门不会影响受控门的结果；因此,我们可以将所有作用在第一个比特上的单比特门一起推到右边(如果需要,可以进行融合)。
+    类似地,X 门与 CNOT 和 Toffoli 的目标比特可交换(PauliY 与 CRY 也是如此)。
     我们可以使用此变换将单比特门尽可能推到受控操作的深处。
 
     .. note::

@@ -817,7 +817,7 @@ BatchNorm2d
     :param channel_num: `int` - 输入通道数。
     :param momentum: `float` - 计算指数加权平均时的动量,默认为 0.1。
     :param epsilon: `float` - 数值稳定参数, 默认 1e-5。
-    :param affine: `bool` - 一个布尔值,当设置为 ``True`` 时,此模块具有可学习的每通道仿射参数,初始化为 1(用于权重）和 0(用于偏差）。默认值:``True``。
+    :param affine: `bool` - 一个布尔值,当设置为 ``True`` 时,此模块具有可学习的每通道仿射参数,初始化为 1(用于权重)和 0(用于偏差)。默认值:``True``。
     :param beta_initializer: `callable` - beta的初始化方式,默认全零初始化。
     :param gamma_initializer: `callable` - gamma的的初始化方式,默认全一初始化。
     :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
@@ -1809,15 +1809,15 @@ Interpolate
 
     可用于选择的 `mode` 有 ``nearest`` 、``bilinear`` 、``bicubic``.
 
-    :param size: 输出大小，默认为None。
-    :param scale_factor: 缩放因子，默认为None。
+    :param size: 输出大小,默认为None。
+    :param scale_factor: 缩放因子,默认为None。
     :param mode: 用于上采样的算法  ``nearest`` | ``bilinear`` | ``bicubic``.
-    :param align_corners:  从几何学角度看，我们将输入和输出的像素点视为方形而不是点。输入和输出的像素点视为正方形，而不是点。
-            如果设置为 `true`，输入和输出张量将根据其角像素的中心点对齐。角像素的中心点对齐，保留角像素的值。
-            如果设置为 `false`，输入和输出张量将按其角像素的角点对齐，而角像素的值将保留。角像素的角点对齐，插值会使用边缘值填充
-            对超出边界的值进行填充，从而使此操作与输入大小无关。
+    :param align_corners:  从几何学角度看,我们将输入和输出的像素点视为方形而不是点。输入和输出的像素点视为正方形,而不是点。
+            如果设置为 `true`,输入和输出张量将根据其角像素的中心点对齐。角像素的中心点对齐,保留角像素的值。
+            如果设置为 `false`,输入和输出张量将按其角像素的角点对齐,而角像素的值将保留。角像素的角点对齐,插值会使用边缘值填充
+            对超出边界的值进行填充,从而使此操作与输入大小无关。
             当 ``scale_factor`` 保持不变时。这只有在 ``mode`` 为 ``bilinear`` 时才有效。
-    :param recompute_scale_factor: 重新计算缩放因子，以便在插值计算中使用。 当 ``scale_factor`` 作为参数传递时，它将用于来计算输出尺寸。
+    :param recompute_scale_factor: 重新计算缩放因子,以便在插值计算中使用。 当 ``scale_factor`` 作为参数传递时,它将用于来计算输出尺寸。
     :param name: 模块名字.
 
     Example::
@@ -1858,7 +1858,7 @@ fuse_module
 =================================
 .. py:class:: pyvqnet.nn.fuse_module(model)
 
-    用于模型在推理阶段的相应相邻模块融合成一个模块，减少模型推理阶段计算量, 增加模型推理速度。
+    用于模型在推理阶段的相应相邻模块融合成一个模块,减少模型推理阶段计算量, 增加模型推理速度。
 
     目前支持的模块序列如下：
 
@@ -1866,7 +1866,7 @@ fuse_module
 
     linear, bn
 
-    其他序列保持不变，对于这些序列将列表中的第一个模块替换成融合后的模块，其他的用 ``Identity`` 代替。
+    其他序列保持不变,对于这些序列将列表中的第一个模块替换成融合后的模块,其他的用 ``Identity`` 代替。
 
     :param input: 包括融合模块的模型。
 
@@ -1981,12 +1981,12 @@ SDPA
 =================================
 .. py:class:: pyvqnet.transformer.SDPA(attn_mask=None,dropout_p=0.,scale=None,is_causal=False)
 
-    构造计算查询、键和值张量的缩放点积注意力的类。如果输入为cpu下的QTensor,则使用数学公式计算, 如果输入在gpu下QTensor，则使用flash-attention方法计算。
+    构造计算查询、键和值张量的缩放点积注意力的类。如果输入为cpu下的QTensor,则使用数学公式计算, 如果输入在gpu下QTensor,则使用flash-attention方法计算。
 
     :param attn_mask: 注意力掩码；形状必须可以广播到注意力权重的形状。
-    :param dropout_p: Dropout 概率，如果大于 0.0, 则应用。
+    :param dropout_p: Dropout 概率,如果大于 0.0, 则应用。
     :param scale:  在 softmax 之前应用的缩放因子。
-    :param is_causal: 如果为 "true"，则假定存在左上因果注意屏蔽，如果同时设置了 attn_mask 和 is_causal, 则会出现错误。
+    :param is_causal: 如果为 "true",则假定存在左上因果注意屏蔽,如果同时设置了 attn_mask 和 is_causal, 则会出现错误。
     :return: 一个SDPA类
 
     Examples::
@@ -1997,7 +1997,7 @@ SDPA
 
     .. py:method:: forward(query,key,value)
 
-        进行前向计算，如果输入为cpu下的QTensor,则使用数学公式计算, 如果输入在gpu下QTensor，则使用flash-attention方法计算。
+        进行前向计算,如果输入为cpu下的QTensor,则使用数学公式计算, 如果输入在gpu下QTensor,则使用flash-attention方法计算。
 
         :param query: query输入QTensor。
         :param key: key输入QTensor。
@@ -4540,18 +4540,18 @@ ColumnParallelLinear
 =================================
 .. py:class:: pyvqnet.distributed.ColumnParallelLinear(input_size,output_size,weight_initializer,bias_initializer,use_bias,dtype,name,tp_comm)
     
-    张量并行计算，列并行线性层
+    张量并行计算,列并行线性层
     
     线性层定义为 Y = XA + b。
-    其二维并行为 A = [A_1，...，A_p]。
+    其二维并行为 A = [A_1,...,A_p]。
 
     :param input_size: 矩阵 A 的第一个维度。
     :param output_size: 矩阵 A 的第二个维度。
     :param weight_initializer: `callable` 默认为 `normal`。
     :param bias_initializer: `callable` 默认为0。
     :param use_bias: `bool` - 默认为 True。
-    :param dtype: 默认 `None`，使用默认数据类型。
-    :param name: 模块名称，默认为“”。
+    :param dtype: 默认 `None`,使用默认数据类型。
+    :param name: 模块名称,默认为“”。
     :param tp_comm:  通讯控制器。
 
 
@@ -4716,9 +4716,9 @@ RowParallelLinear
 =================================
 .. py:class:: pyvqnet.distributed.RowParallelLinear(input_size,output_size,weight_initializer,bias_initializer,use_bias,dtype,name,tp_comm)
     
-    张量并行计算，行并行线性层。
+    张量并行计算,行并行线性层。
 
-    线性层的定义为 Y = XA + b。A 沿其一维并行，X 沿其二维并行。
+    线性层的定义为 Y = XA + b。A 沿其一维并行,X 沿其二维并行。
     A = transpose([A_1 ... A_p]) X = [X_1, ..., X_p]。
 
     :param input_size: 矩阵 A 的第一个维度。
@@ -4726,7 +4726,7 @@ RowParallelLinear
     :param weight_initializer: `callable` 默认为 `normal`。
     :param bias_initializer: `callable` 默认为0。
     :param use_bias: `bool` - 默认为 True。
-    :param dtype: 默认 `None`，使用默认数据类型。
+    :param dtype: 默认 `None`,使用默认数据类型。
     :param name: 模块名称。
     :param tp_comm: 通讯控制器。
 
