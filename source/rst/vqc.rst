@@ -3046,7 +3046,7 @@ Samples
 
 .. py:class:: pyvqnet.qnn.vqc.Samples(wires=None, obs=None, shots = 1,name="")
 
-    获取特定线路 ``wires`` 上的带有 ``shot`` 的观测量 ``obs`` 结果。
+    获取特定线路 ``wires`` 上的带有 ``shots`` 的观测量 ``obs`` 结果。
 
     :param wires: 样本量子比特索引。默认值:None,使用模拟器的所有比特。
     :param obs: 该值只能设为None。
@@ -3105,7 +3105,7 @@ SparseHamiltonian
 
     :param obs: 稀疏观测量,使用 `tensor.dense_to_csr()` 函数获取稠密函数的稀疏格式。
     :param name: 模块的名字,默认:""。
-    :return: 期望结果,QTensor。
+    :return: 一个测量方法类
 
     .. py:method:: forward(q_machine)
 
