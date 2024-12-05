@@ -1372,13 +1372,13 @@ DataParallelHybirdVQCQpandaQVMLayer
 
 .. py:class:: pyvqnet.qnn.DataParallelHybirdVQCQpandaQVMLayer(vqc_module: Module,qcloud_token: str,num_qubits: int,num_cubits: int,pauli_str_dict: Union[List[Dict], Dict, None] = None,shots: int = 1000,dtype: Union[int, None] = None,name: str = "",submit_kwargs: Dict = {},query_kwargs: Dict = {})
 
-    ``HybirdVQCQpandaQVMLayer`` 的数据并行版本，其中 ``vqc_module`` 为用户自定义的量子变分线路模型,其中的QMachine设置 ``save_ir= True`` 。
-    使用数据并行将输入数据第一个维度 批处理数量 根据 `CommController` 中分配的进程数进行分割，在多个进程中基于 `mpi` 或者 `nccl` 进行数据并行。请注意一个进程对应一个节点上的GPU设备。
-    每个进程中的该模块在前向计算时提交 批处理数量/节点数 个数据产生的量子线路，反向计算中计算 批处理数量/节点数 个数据贡献的梯度，并通过all_reduce计算多个节点上参数的平均梯度。
+    ``HybirdVQCQpandaQVMLayer`` 的数据并行版本, 其中 ``vqc_module`` 为用户自定义的量子变分线路模型,其中的QMachine设置 ``save_ir= True`` 。
+    使用数据并行将输入数据第一个维度 批处理数量 根据 `CommController` 中分配的进程数进行分割, 在多个进程中基于 `mpi` 或者 `nccl` 进行数据并行。请注意一个进程对应一个节点上的GPU设备。
+    每个进程中的该模块在前向计算时提交 批处理数量/节点数 个数据产生的量子线路, 反向计算中计算 批处理数量/节点数 个数据贡献的梯度, 并通过all_reduce计算多个节点上参数的平均梯度。
 
     .. note::
 
-        该模块内部对输入切分,并将数据移动到对应设备上。第0个进程计算[0,批处理数量/节点数]数据，第k个进程计算[(k-1)批处理数量/节点数,k*批处理数量/节点数]
+        该模块内部对输入切分,并将数据移动到对应设备上。第0个进程计算[0,批处理数量/节点数]数据, 第k个进程计算[(k-1)批处理数量/节点数,k*批处理数量/节点数]
 
     :param vqc_module: 带有 forward() 的 vqc_module。
     :param qcloud_token: `str` - 量子机器的类型或用于执行的云令牌。
@@ -1395,7 +1395,7 @@ DataParallelHybirdVQCQpandaQVMLayer
         "test_qcloud_fake":True}。
     :param query_kwargs: 查询量子结果的附加关键字参数,默认值:{"timeout":2,"print_query_info":True,"sub_circuits_split_size":1}。
     
-    以下是使用cpu计算的mpi例子,单节点双进程的命令如下： mpirun -n 2 python xxx.py
+    以下是使用cpu计算的mpi例子,单节点双进程的命令如下:  mpirun -n 2 python xxx.py
     
     Example::
 
@@ -1527,7 +1527,7 @@ DataParallelHybirdVQCQpandaQVMLayer
 
 
     
-    以下是使用gpu计算的nccl例子,单节点双进程的命令如下： mpirun -n 2 python xxx.py
+    以下是使用gpu计算的nccl例子,单节点双进程的命令如下:  mpirun -n 2 python xxx.py
 
     Example::
 
@@ -1539,7 +1539,7 @@ DataParallelHybirdVQCQpandaQVMLayer
         #rest code not changed
 
     
-    以下是进行多节点多进程并行计算的例子，请保证在不同节点的相同路径下，相同python环境下运行该脚本，并在每个节点下
+    以下是进行多节点多进程并行计算的例子, 请保证在不同节点的相同路径下, 相同python环境下运行该脚本, 并在每个节点下
     编写ip地址映射文件 `hosts`,格式参考  :ref:`hostfile` 。
 
     Example::
@@ -1548,7 +1548,7 @@ DataParallelHybirdVQCQpandaQVMLayer
         10.10.7.107 slots=2
         10.10.7.109 slots=2
 
-    使用 mpi 进行2节点每节点2进程共4进程并行，则可以运行 `vqnetrun -np 4 -f hosts python xxx.py`
+    使用 mpi 进行2节点每节点2进程共4进程并行, 则可以运行 `vqnetrun -np 4 -f hosts python xxx.py`
     
     Example::
 
@@ -1556,7 +1556,7 @@ DataParallelHybirdVQCQpandaQVMLayer
         Comm_OP = CommController("mpi")
         #rest code not changed
 
-    使用 nccl 进行2节点每节点2进程共4进程并行，则可以运行 `vqnetrun -np 4 -f hosts python xxx.py`
+    使用 nccl 进行2节点每节点2进程共4进程并行, 则可以运行 `vqnetrun -np 4 -f hosts python xxx.py`
     
     Example::
 

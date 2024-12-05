@@ -3160,16 +3160,18 @@ HermitianExpval
 VQC_HardwareEfficientAnsatz
 ---------------------------------------------------------------
 
-.. py:class:: pyvqnet.qnn.vqc.VQC_HardwareEfficientAnsatz(n_qubits,single_rot_gate_list,entangle_gate="CNOT",entangle_rules='linear',depth=1)
+.. py:class:: pyvqnet.qnn.vqc.VQC_HardwareEfficientAnsatz(n_qubits,single_rot_gate_list,entangle_gate="CNOT",entangle_rules='linear',depth=1,initial=None,dtype=None)
 
     一个含可训练参数的变分量子线路类,实现了论文介绍的Hardware Efficient Ansatz的实现: `Hardware-efficient Variational Quantum Eigensolver for Small Molecules <https://arxiv.org/pdf/1704.05018.pdf>`__ 。
 
     :param n_qubits: 量子比特数。
-    :param single_rot_gate_list: 单个量子位旋转门列表由一个或多个作用于每个量子位的旋转门构成。目前支持 Rx、Ry、Rz。
-    :param entangle_gate: 非参数化纠缠门。支持CNOT、CZ。默认: CNOT。
-    :param entangle_rules: 电路中如何使用纠缠门。 ``linear`` 意味着纠缠门将作用于每个相邻的量子位。 ``all`` 意味着纠缠门将作用于任何两个 qbuits。 默认值:``linear``。
-    :param depth: ansatz 的深度,默认:1。
-    :return: 返回一个含可训练参数的变分量子线路类。
+    :param single_rot_gate_list: 单个量子比特旋转门列表由一个或多个作用于每个量子比特的旋转门构成。目前支持 Rx、Ry、Rz。
+    :param entangle_gate: 非参数化纠缠门。支持 CNOT、CZ。默认值: CNOT。
+    :param entangle_rules: 纠缠门在电路中的使用方式。"linear" 表示纠缠门将作用于每个相邻的量子比特。'all' 表示纠缠门将作用于任意两个量子比特。默认值: "linear"。
+    :param depth: 假设的深度, 默认值: 1。
+    :param initial: 使用initial 初始化所有其中参数逻辑门的参数, 默认值: None, 此模块将随机初始化参数。
+    :param dtype: 参数的数据类型,默认值: None,使用 float32。
+    :return: 一个 VQC_HardwareEfficientAnsatz 实例。
 
 
 
@@ -3224,7 +3226,9 @@ VQC_BasicEntanglerTemplate
     :param num_layer: 量子比特线路层数。
     :param num_qubits: 量子比特数,默认为1。
     :param rotation: 使用单参数单量子比特门,``RX`` 被用作默认值。
-    :return: 返回一个含可训练参数的变分量子线路类。
+    :param initial: 使用initial 初始化所有其中参数逻辑门的参数, 默认值: None, 此模块将随机初始化参数。
+    :param dtype: 参数的数据类型,默认值: None,使用 float32。
+    :return: 返回一个含可训练参数的VQC_BasicEntanglerTemplate实例。
 
     Example::
 
@@ -3264,18 +3268,18 @@ VQC_BasicEntanglerTemplate
 VQC_StronglyEntanglingTemplate
 ---------------------------------------------------------------
 
-.. py:class:: pyvqnet.qnn.vqc.VQC_StronglyEntanglingTemplate(weights=None, num_qubits=1, ranges=None)
+.. py:class:: pyvqnet.qnn.vqc.VQC_StronglyEntanglingTemplate(num_layers=1, num_qubits=1, rotation = "RX", initial = None, dtype: = None)
 
     由单个量子比特旋转和纠缠器组成的层,参考 `circuit-centric classifier design <https://arxiv.org/abs/1804.00633>`__ .
 
-    参数 ``weights`` 包含每一层的权重。 因此得出层数 :math:`L` 等于 ``weights`` 的第一个维度。
+ 
+    :param num_layers: 重复层数,默认值: 1。
+    :param num_qubits: 量子比特数,默认值: 1。
+    :param rotation: 要使用的单参数单量子比特门,默认值: `RX`
+    :param initial: 使用initial 初始化所有其中参数逻辑门的参数,默认值: None,此模块将随机初始化参数。
+    :param dtype: 参数的数据类型,默认值: None,使用 float32。
+    :return: VQC_BasicEntanglerTemplate 实例
 
-    其包含2-qubit CNOT 门,作用于 :math:`M` 个量子比特上,:math:`i = 1,...,M`。 每个门的第二个量子位标号由公式 :math:`(i+r)\mod M` 给出,其中 :math:`r` 是一个称为 ``range``  的超参数,并且 :math:`0 < r < M`。
-
-    :param weights: 形状为 ``(L, M, 3)`` 的权重张量,默认值:None,使用形状为 ``(1,1,3)`` 的随机张量。
-    :param num_qubits: 量子比特数,默认值:1。
-    :param ranges: 确定每个后续层的范围超参数的序列； 默认值:None,使用 :math:`r=l \ mod M` 作为ranges 的值。
-    :return: 返回一个含可训练参数的变分量子线路类。
 
     Example::
 
@@ -3316,18 +3320,20 @@ VQC_QuantumEmbedding
 ---------------------------------------------------------------
 
 
-.. py:class:: pyvqnet.qnn.vqc.VQC_QuantumEmbedding(qubits, machine, num_repetitions_input, depth_input, num_unitary_layers, num_repetitions)
+.. py:class:: pyvqnet.qnn.vqc.VQC_QuantumEmbedding( num_repetitions_input, depth_input, num_unitary_layers, num_repetitions,initial=None,dtype=None,name="")
 
     使用 RZ,RY,RZ 创建变分量子电路,将经典数据编码为量子态。
     参考 `Quantum embeddings for machine learning <https://arxiv.org/abs/2001.03622>`_。
 
-    :param qubits: 使用pyqpanda 申请的量子比特。
-    :param machine: 使用pyqpanda 申请的量子虚拟机。
-    :param num_repetitions_input: 在子模块中对输入进行编码的重复次数。
-    :param depth_input: 输入数据的特征维度。
-    :param num_unitary_layers: 每个子模块中变分量子门的重复次数。
+ 
+    :param num_repetitions_input: 子模块中输入编码的重复次数。
+    :paramdepth_input: 输入维数。
+    :param num_unitary_layers: 变分量子门的重复次数。
     :param num_repetitions: 子模块的重复次数。
-    :return: 返回一个含可训练参数的变分量子线路类。
+    :param initial: 初始化所有参数, 该参数必须是只有一个元素的 QTensor, 默认值: None。
+    :param dtype: 参数的数据类型, 默认值: None, 使用 float32。
+    :param name: 该模块的名称。
+    :return: VQC_QuantumEmbedding 实例。
     
     Example::
 
@@ -3383,13 +3389,14 @@ VQC_QuantumEmbedding
 ExpressiveEntanglingAnsatz
 ---------------------------------------------------------------
 
-.. py:class:: pyvqnet.qnn.vqc.ExpressiveEntanglingAnsatz(type: int, num_wires: int, depth: int, name: str = "")
+.. py:class:: pyvqnet.qnn.vqc.ExpressiveEntanglingAnsatz(type: int, num_wires: int, depth: int, dtype=None, name: str = "")
 
     论文 `Expressibility and entangling capability of parameterized quantum circuits for hybrid quantum-classical algorithms <https://arxiv.org/pdf/1905.10876.pdf>`_ 中的 19 种不同的ansatz。
 
     :param type: 电路类型从 1 到 19,共19种线路。
     :param num_wires: 量子比特数。
     :param depth: 电路深度。
+    :param dtype: 参数的数据类型, 默认值: None, 使用 float32。
     :param name: 名字,默认"".
 
     :return:
@@ -4337,7 +4344,7 @@ QuantumLayerAdjoint
     使用伴随矩阵方式进行梯度计算的可自动微分的QuantumLayer层,参考  `Efficient calculation of gradients in classical simulations of variational quantum algorithms <https://arxiv.org/abs/2009.02823>`_ 。
 
     :param general_module: 一个仅使用 ``pyvqnet.qnn.vqc`` 下量子线路接口搭建的 `pyvqnet.nn.Module` 实例。
-    :param use_qpanda: 是否使用qpanda线路进行前传，默认：False。
+    :param use_qpanda: 是否使用qpanda线路进行前传, 默认: False。
     :param name: 该层名字,默认为""。
 
     .. note::

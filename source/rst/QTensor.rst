@@ -137,7 +137,7 @@ QTensor's 函数与属性
 
         是否是稠密张量。
 
-        :return: 当该数据是稠密的时候，返回1；否则返回 0。
+        :return: 当该数据是稠密的时候, 返回1；否则返回 0。
 
         Example::
 
@@ -152,7 +152,7 @@ QTensor's 函数与属性
 
         是否是Compressed Sparse Row格式的稀疏2维度矩阵。
 
-        :return: 当该数据是CSR格式的稀疏张量时候，返回1；否则返回 0。
+        :return: 当该数据是CSR格式的稀疏张量时候, 返回1；否则返回 0。
 
         Example::
 
@@ -168,7 +168,7 @@ QTensor's 函数与属性
 
         是否是contiguous的多维数组。
 
-        :return: 如果是contiguous，返回True，否则返回False。
+        :return: 如果是contiguous, 返回True, 否则返回False。
 
         Example::
 
@@ -190,7 +190,7 @@ QTensor's 函数与属性
         
         :return:
 
-            返回列表，其中第一个元素为row_idx,shape为[矩阵行数+1],第2个元素为col_idx,shape为[非0元素数]，第3个元素为data,shape为[非0元素数]
+            返回列表, 其中第一个元素为row_idx,shape为[矩阵行数+1],第2个元素为col_idx,shape为[非0元素数], 第3个元素为data,shape为[非0元素数]
 
         Example::
 
@@ -222,7 +222,7 @@ QTensor's 函数与属性
 
     .. py:method:: backward(grad=None)
 
-        利用反向传播算法，计算当前张量所在的计算图中的所有需计算梯度的张量的梯度。
+        利用反向传播算法, 计算当前张量所在的计算图中的所有需计算梯度的张量的梯度。
 
         :return: 无
 
@@ -274,9 +274,9 @@ QTensor's 函数与属性
  
     .. py:method:: contiguous()
 
-        返回当前QTensor的contiguous形式 ,如果已经是contiguous，则返回自身。
+        返回当前QTensor的contiguous形式 ,如果已经是contiguous, 则返回自身。
 
-        :return: 返回当前QTensor的contiguous形式 ,如果已经是contiguous，则返回自身。
+        :return: 返回当前QTensor的contiguous形式 ,如果已经是contiguous, 则返回自身。
 
         Example::
 
@@ -290,10 +290,10 @@ QTensor's 函数与属性
 
     .. py:method:: argmax(*kargs)
 
-        返回输入 QTensor 中所有元素的最大值的索引，或返回 QTensor 按某一维度的最大值的索引。
+        返回输入 QTensor 中所有元素的最大值的索引, 或返回 QTensor 按某一维度的最大值的索引。
 
-        :param dim: 计算argmax的轴，只接受单个维度。 如果 dim == None，则返回输入张量中所有元素的最大值的索引。有效的 dim 范围是 [-R, R)，其中 R 是输入的 ndim。 当 dim < 0 时，它的工作方式与 dim + R 相同。
-        :param keepdims: 输出 QTensor 是否保留了最大值索引操作的轴，默认是False。
+        :param dim: 计算argmax的轴, 只接受单个维度。 如果 dim == None, 则返回输入张量中所有元素的最大值的索引。有效的 dim 范围是 [-R, R), 其中 R 是输入的 ndim。 当 dim < 0 时, 它的工作方式与 dim + R 相同。
+        :param keepdims: 输出 QTensor 是否保留了最大值索引操作的轴, 默认是False。
 
         :return: 输入 QTensor 中最大值的索引。
 
@@ -331,10 +331,10 @@ QTensor's 函数与属性
 
     .. py:method:: argmin(*kargs)
 
-        返回输入 QTensor 中所有元素的最小值的索引，或返回 QTensor 按某一维度的最小值的索引。
+        返回输入 QTensor 中所有元素的最小值的索引, 或返回 QTensor 按某一维度的最小值的索引。
 
-        :param dim: 计算argmax的轴，只接受单个维度。 如果 dim == None，则返回输入张量中所有元素的最小值的索引。有效的 dim 范围是 [-R, R)，其中 R 是输入的 ndim。 当 dim < 0 时，它的工作方式与 dim + R 相同。
-        :param keepdims: 输出 QTensor 是否保留了最小值索引操作的轴，默认是False。
+        :param dim: 计算argmax的轴, 只接受单个维度。 如果 dim == None, 则返回输入张量中所有元素的最小值的索引。有效的 dim 范围是 [-R, R), 其中 R 是输入的 ndim。 当 dim < 0 时, 它的工作方式与 dim + R 相同。
+        :param keepdims: 输出 QTensor 是否保留了最小值索引操作的轴, 默认是False。
 
         :return: 输入 QTensor 中最小值的索引。
 
@@ -366,7 +366,7 @@ QTensor's 函数与属性
 
     .. py:method:: fill_(v)
 
-        为当前张量填充特定值，该函数改变原张量的内部数据。
+        为当前张量填充特定值, 该函数改变原张量的内部数据。
 
         :param v: 填充值。
 
@@ -392,7 +392,7 @@ QTensor's 函数与属性
 
         判断张量内数据是否全为全零。
 
-        :return: 返回True，如果全为非0;否则返回False。
+        :return: 返回True, 如果全为非0;否则返回False。
 
         Example::
 
@@ -410,7 +410,7 @@ QTensor's 函数与属性
 
         判断张量内数据是否有任意元素不为0。
 
-        :return: 返回True，如果有任意元素不为0;否则返回False。
+        :return: 返回True, 如果有任意元素不为0;否则返回False。
 
         Example::
 
@@ -429,9 +429,9 @@ QTensor's 函数与属性
 
         用从二项分布中随机采样的值填充 QTensor 。
 
-        如果二项分布后随机生成的数据大于二值化阈值 v ，则设置 QTensor 对应位置的元素值为1，否则为0。
+        如果二项分布后随机生成的数据大于二值化阈值 v , 则设置 QTensor 对应位置的元素值为1, 否则为0。
 
-        :param v: 二值化阈值，默认0.5。
+        :param v: 二值化阈值, 默认0.5。
 
         :return: 无。
 
@@ -456,7 +456,7 @@ QTensor's 函数与属性
 
         用从有符号均匀分布中随机采样的值填充 QTensor 。用缩放因子 v 对生成的随机采样的值进行缩放。
 
-        :param v: 缩放因子，默认1。
+        :param v: 缩放因子, 默认1。
 
         :return: 无。
 
@@ -482,7 +482,7 @@ QTensor's 函数与属性
 
         用从均匀分布中随机采样的值填充 QTensor 。用缩放因子 v 对生成的随机采样的值进行缩放。
 
-        :param v: 缩放因子，默认1。
+        :param v: 缩放因子, 默认1。
 
         :return: 无。
 
@@ -505,11 +505,11 @@ QTensor's 函数与属性
 
     .. py:method:: fill_rand_normal_(m=0, s=1, fast_math=True)
 
-        生成均值为 m 和方差 s 产生正态分布元素，并填充到张量中。
+        生成均值为 m 和方差 s 产生正态分布元素, 并填充到张量中。
 
-        :param m: 均值，默认0。
-        :param s: 方差，默认1。
-        :param fast_math: 是否使用快速方法产生高斯分布，默认True。
+        :param m: 均值, 默认0。
+        :param s: 方差, 默认1。
+        :param fast_math: 是否使用快速方法产生高斯分布, 默认True。
 
         :return: 无。
 
@@ -531,7 +531,7 @@ QTensor's 函数与属性
 
     .. py:method:: transpose(new_dims=None)
 
-        反转张量的轴。如果 new_dims = None，则反转所有轴。
+        反转张量的轴。如果 new_dims = None, 则反转所有轴。
 
         :param new_dims: 列表形式储存的新的轴顺序。
 
@@ -560,7 +560,7 @@ QTensor's 函数与属性
 
     .. py:method:: reshape(new_shape)
 
-        改变 QTensor 的形状，返回一个新的张量。
+        改变 QTensor 的形状, 返回一个新的张量。
 
         :param new_shape: 新的形状。
 
@@ -586,17 +586,17 @@ QTensor's 函数与属性
 
     .. py:method:: __getitem__()
 
-        支持对 QTensor 使用 切片索引，下标，或使用 QTensor 作为高级索引访问输入。该操作返回一个新的 QTensor 。
+        支持对 QTensor 使用 切片索引, 下标, 或使用 QTensor 作为高级索引访问输入。该操作返回一个新的 QTensor 。
 
-        通过冒号 ``:``  分隔切片参数 start:stop:step 来进行切片操作，其中 start、stop、step 均可缺省。
+        通过冒号 ``:``  分隔切片参数 start:stop:step 来进行切片操作, 其中 start、stop、step 均可缺省。
 
-        针对1-D QTensor ，则仅有单个轴上的索引或切片。
+        针对1-D QTensor , 则仅有单个轴上的索引或切片。
 
-        针对2-D及以上的 QTensor ，则会有多个轴上的索引或切片。
+        针对2-D及以上的 QTensor , 则会有多个轴上的索引或切片。
 
-        使用 QTensor 作为 索引，则进行高级索引，请参考numpy中 `高级索引 <https://docs.scipy.org/doc/numpy-1.10.1/reference/arrays.indexing.html>`_ 部分。
+        使用 QTensor 作为 索引, 则进行高级索引, 请参考numpy中 `高级索引 <https://docs.scipy.org/doc/numpy-1.10.1/reference/arrays.indexing.html>`_ 部分。
 
-        若作为索引的 QTensor 为逻辑运算的结果，则进行 布尔数组索引。
+        若作为索引的 QTensor 为逻辑运算的结果, 则进行 布尔数组索引。
 
         .. note:: 
             
@@ -678,17 +678,17 @@ QTensor's 函数与属性
 
     .. py:method:: __setitem__()
 
-        支持对 QTensor 使用 切片索引，下标，或使用 QTensor 作为高级索引修改输入。该操作对输入原地进行修改 。
+        支持对 QTensor 使用 切片索引, 下标, 或使用 QTensor 作为高级索引修改输入。该操作对输入原地进行修改 。
 
-        通过冒号 ``:``  分隔切片参数 start:stop:step 来进行切片操作，其中 start、stop、step 均可缺省。
+        通过冒号 ``:``  分隔切片参数 start:stop:step 来进行切片操作, 其中 start、stop、step 均可缺省。
 
-        针对1-D QTensor，则仅有单个轴上的索引或切片。
+        针对1-D QTensor, 则仅有单个轴上的索引或切片。
 
-        针对2-D及以上的 QTensor ，则会有多个轴上的索引或切片。
+        针对2-D及以上的 QTensor , 则会有多个轴上的索引或切片。
 
-        使用 QTensor 作为 索引，则进行高级索引，请参考numpy中 `高级索引 <https://docs.scipy.org/doc/numpy-1.10.1/reference/arrays.indexing.html>`_ 部分。
+        使用 QTensor 作为 索引, 则进行高级索引, 请参考numpy中 `高级索引 <https://docs.scipy.org/doc/numpy-1.10.1/reference/arrays.indexing.html>`_ 部分。
 
-        若作为索引的 QTensor 为逻辑运算的结果，则进行 布尔数组索引。
+        若作为索引的 QTensor 为逻辑运算的结果, 则进行 布尔数组索引。
 
         .. note:: 
             
@@ -833,15 +833,15 @@ QTensor's 函数与属性
 
         克隆QTensor到指定的GPU设备
 
-        device 指定存储其内部数据的设备。 当device >= DEV_GPU_0时，数据存储在GPU上。 
-        如果您的计算机有多个 GPU，您可以指定不同的设备来存储数据。 例如，device = DEV_GPU_1, DEV_GPU_2, DEV_GPU_3, ... 表示存储在具有不同序列号的GPU上。
+        device 指定存储其内部数据的设备。 当device >= DEV_GPU_0时, 数据存储在GPU上。 
+        如果您的计算机有多个 GPU, 您可以指定不同的设备来存储数据。 例如, device = DEV_GPU_1, DEV_GPU_2, DEV_GPU_3, ... 表示存储在具有不同序列号的GPU上。
 
         .. note::
 
             QTensor在不同GPU上无法进行计算。
-            如果您尝试在 ID 超过验证 GPU 最大数量的 GPU 上创建 QTensor，将引发 Cuda 错误。
+            如果您尝试在 ID 超过验证 GPU 最大数量的 GPU 上创建 QTensor, 将引发 Cuda 错误。
 
-        :param device: 当前保存QTensor的设备，默认:DEV_GPU_0，device = pyvqnet.DEV_GPU_0，存储在第一个 GPU 中，devcie = DEV_GPU_1，存储在第二个 GPU 中，依此类推。
+        :param device: 当前保存QTensor的设备, 默认:DEV_GPU_0, device = pyvqnet.DEV_GPU_0, 存储在第一个 GPU 中, devcie = DEV_GPU_1, 存储在第二个 GPU 中, 依此类推。
 
         :return: QTensor 克隆到 GPU 设备。
 
@@ -873,16 +873,16 @@ QTensor's 函数与属性
 
         移动QTensor到指定的GPU设备
 
-        device 指定存储其内部数据的设备。 当device >= DEV_GPU时，数据存储在GPU上。
-        如果您的计算机有多个 GPU，您可以指定不同的设备来存储数据。 
-        例如，device = DEV_GPU_1, DEV_GPU_2, DEV_GPU_3, ... 表示存储在具有不同序列号的GPU上。
+        device 指定存储其内部数据的设备。 当device >= DEV_GPU时, 数据存储在GPU上。
+        如果您的计算机有多个 GPU, 您可以指定不同的设备来存储数据。 
+        例如, device = DEV_GPU_1, DEV_GPU_2, DEV_GPU_3, ... 表示存储在具有不同序列号的GPU上。
 
         .. note::
 
             QTensor在不同GPU上无法进行计算。
-            如果您尝试在 ID 超过验证 GPU 最大数量的 GPU 上创建 QTensor，将引发 Cuda 错误。
+            如果您尝试在 ID 超过验证 GPU 最大数量的 GPU 上创建 QTensor, 将引发 Cuda 错误。
 
-        :param device: 当前保存QTensor的设备，默认:DEV_GPU_0。device = pyvqnet.DEV_GPU_0，存储在第一个 GPU 中，devcie = DEV_GPU_1，存储在第二个 GPU 中，依此类推。
+        :param device: 当前保存QTensor的设备, 默认:DEV_GPU_0。device = pyvqnet.DEV_GPU_0, 存储在第一个 GPU 中, devcie = DEV_GPU_1, 存储在第二个 GPU 中, 依此类推。
         :return: QTensor 移动到 GPU 设备。
 
         Examples::
@@ -942,7 +942,7 @@ QTensor's 函数与属性
 
     .. py:method:: astype(dtype)
 
-        将当前QTensor转化为对应数据类型dtype，如果dtype相同则返回自身。
+        将当前QTensor转化为对应数据类型dtype, 如果dtype相同则返回自身。
 
         :param dtype: 目标数据类型dtype。
 
@@ -1268,7 +1268,7 @@ diag
     输入一个 1-D QTensor,则返回一个2D新张量,其选定对角线元素为输入值,其余为0
 
     :param t: 输入 QTensor。
-    :param k: 偏移量（主对角线为 0，正数为向上偏移，负数为向下偏移），默认为0。
+    :param k: 偏移量(主对角线为 0, 正数为向上偏移, 负数为向下偏移), 默认为0。
     
     :return: 输出 QTensor。
 
@@ -1426,7 +1426,7 @@ triu
     返回输入 t 的上三角矩阵,其余部分被设为0。
 
     :param t: 输入 QTensor。
-    :param diagonal: 偏移量（主对角线为 0，正数为向上偏移，负数为向下偏移），默认:0。
+    :param diagonal: 偏移量(主对角线为 0, 正数为向上偏移, 负数为向下偏移), 默认:0。
 
     :return: 输出 QTensor。
 
@@ -1459,7 +1459,7 @@ tril
     返回输入 t 的下三角矩阵,其余部分被设为0。
 
     :param t: 输入 QTensor。
-    :param diagonal: 偏移量（主对角线为 0，正数为向上偏移，负数为向下偏移），默认:0。
+    :param diagonal: 偏移量(主对角线为 0, 正数为向上偏移, 负数为向下偏移), 默认:0。
 
     :return: 输出 QTensor。
 

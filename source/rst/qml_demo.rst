@@ -3854,13 +3854,13 @@ QUnet主要是用于解决图像分割的技术。
 
     P(|1_{anc}\rangle) = \frac{1}{2} - \frac{1}{2}|\langle x | y \rangle|^2
 
-两个量子态之间的欧几里得距离如下：
+两个量子态之间的欧几里得距离如下: 
 
 .. math::
 
     Euclidean \ distance = \sqrt{(2 - 2|\langle x | y \rangle|)}
 
-可见测量量子比特位 :math:`|1\rangle` ​与欧几里得距离有正相关. 本算法的量子线路如下所述：
+可见测量量子比特位 :math:`|1\rangle` ​与欧几里得距离有正相关. 本算法的量子线路如下所述: 
 
 .. image:: ./images/Kmeans.jpg
    :width: 600 px
@@ -4118,7 +4118,7 @@ QUnet主要是用于解决图像分割的技术。
 1.1用串行Pauli旋转编码拟合傅里叶级数
 ----------------------------------------
 
-首先我们展示使用Pauli旋转作为数据编码门的量子模型如何只能在一定程度上拟合傅里叶级数。为简单起见,我们将只看单量子比特电路：
+首先我们展示使用Pauli旋转作为数据编码门的量子模型如何只能在一定程度上拟合傅里叶级数。为简单起见,我们将只看单量子比特电路: 
 
 .. image:: ./images/single_qubit_model.png
    :width: 600 px
@@ -4219,7 +4219,7 @@ QUnet主要是用于解决图像分割的技术。
     plt.show()
 
 
-不训练的量子线路运行结果为：
+不训练的量子线路运行结果为: 
 
 .. image:: ./images/single_qubit_model_result_no_train.png
    :width: 600 px
@@ -4371,7 +4371,7 @@ QUnet主要是用于解决图像分割的技术。
     if __name__ == "__main__":
         run()
 
-其中量子模型为：
+其中量子模型为: 
 
 .. image:: ./images/single_qubit_model_circuit.png
    :width: 600 px
@@ -4379,7 +4379,7 @@ QUnet主要是用于解决图像分割的技术。
 
 |
 
-网络训练结果为：
+网络训练结果为: 
 
 .. image:: ./images/single_qubit_model_result.png
    :width: 600 px
@@ -4387,7 +4387,7 @@ QUnet主要是用于解决图像分割的技术。
 
 |
 
-网络训练损失为：
+网络训练损失为: 
 
 .. code-block::
 
@@ -4402,7 +4402,7 @@ QUnet主要是用于解决图像分割的技术。
 1.2用并行Pauli旋转编码拟合傅里叶级数
 ------------------------------------
 
-根据论文所示,我们期望与串行模型相似的结果：只有在量子模型中编码门至少有r个重复时,才能拟合r阶的傅立叶级数。量子比特电路：
+根据论文所示,我们期望与串行模型相似的结果: 只有在量子模型中编码门至少有r个重复时,才能拟合r阶的傅立叶级数。量子比特电路: 
 
 .. image:: ./images/parallel_model.png
    :width: 600 px
@@ -4521,7 +4521,7 @@ QUnet主要是用于解决图像分割的技术。
     plt.legend(loc="upper right")
     plt.show()
 
-不训练的量子线路运行结果为：
+不训练的量子线路运行结果为: 
 
 .. image:: ./images/parallel_model_result_no_train.png
    :width: 600 px
@@ -4696,7 +4696,7 @@ QUnet主要是用于解决图像分割的技术。
     if __name__ == "__main__":
         run()
 
-其中量子模型为：
+其中量子模型为: 
 
 .. image:: ./images/parallel_model_circuit.png
    :width: 600 px
@@ -4704,7 +4704,7 @@ QUnet主要是用于解决图像分割的技术。
 
 |
 
-网络训练结果为：
+网络训练结果为: 
 
 .. image:: ./images/parallel_model_result.png
    :width: 600 px
@@ -4712,7 +4712,7 @@ QUnet主要是用于解决图像分割的技术。
 
 |
 
-网络训练损失为：
+网络训练损失为: 
 
 .. code-block::
 
@@ -4732,7 +4732,7 @@ QUnet主要是用于解决图像分割的技术。
 在论文 `Expressibility and entangling capability of parameterized quantum circuits for hybrid quantum-classical algorithms <https://arxiv.org/abs/1905.10876>`_ 中,
 作者提出了基于神经网络输出态之间的保真度概率分布的表达能力量化方法。
 对任意量子神经网络 :math:`U(\vec{\theta})` ,采样两次神经网络参数(设为 :math:`\vec{\phi}` 和 :math:`\vec{\psi}` ),
-则两个量子电路输出态之间的保真度 :math:`F=|\langle0|U(\vec{\phi})^\dagger U(\vec{\psi})|0\rangle|^2` 服从某个概率分布：
+则两个量子电路输出态之间的保真度 :math:`F=|\langle0|U(\vec{\phi})^\dagger U(\vec{\psi})|0\rangle|^2` 服从某个概率分布: 
 
 .. math::
 
@@ -4750,7 +4750,7 @@ QUnet主要是用于解决图像分割的技术。
 
     D_{KL}(P||Q)=\sum_jP(j)\ln\frac{P(j)}{Q(j)}
 
-如果将量子神经网络输出的保真度分布记为 :math:`P_\text{QNN}(f)` ,则量子神经网络的表达能力定义为 :math:`P_\text{QNN}(f)` 和 :math:`P_\text{Haar}(f)` 之间的 K-L 散度 ：
+如果将量子神经网络输出的保真度分布记为 :math:`P_\text{QNN}(f)` ,则量子神经网络的表达能力定义为 :math:`P_\text{QNN}(f)` 和 :math:`P_\text{Haar}(f)` 之间的 K-L 散度 : 
 
 .. math::
 
@@ -4760,7 +4760,7 @@ QUnet主要是用于解决图像分割的技术。
 因此,当 :math:`P_\text{QNN}(f)` 越接近 :math:`P_\text{Haar}(f)` 时, :math:`\text{Expr}` 将越小(越趋近于 0),
 量子神经网络的表达能力也就越强；反之, :math:`\text{Expr}` 越大,量子神经网络的表达能力也就越弱。
 
-我们可以根据该定义直接计算单比特量子神经网络 :math:`R_Y(\theta)` , :math:`R_Y(\theta_1)R_Z(\theta_2)` 和 :math:`R_Y(\theta_1)R_Z(\theta_2)R_Y(\theta_3)` 的表达能力：
+我们可以根据该定义直接计算单比特量子神经网络 :math:`R_Y(\theta)` , :math:`R_Y(\theta_1)R_Z(\theta_2)` 和 :math:`R_Y(\theta_1)R_Z(\theta_2)R_Y(\theta_3)` 的表达能力: 
 
 以下用VQNet展示了 `HardwareEfficientAnsatz <https://arxiv.org/abs/1704.05018>`_ 在不同深度下(1,2,3)的量子线路表达能力。
 
@@ -4820,7 +4820,7 @@ QUnet主要是用于解决图像分割的技术。
         cir1 = az.create_ansatz(w)
         return cir1, machine, qlist
 
-哈尔采样输出的保真度服从分布：
+哈尔采样输出的保真度服从分布: 
 
 .. image:: ./images/haar-fidelity.png
    :width: 600 px
@@ -4915,11 +4915,11 @@ QUnet主要是用于解决图像分割的技术。
 
 本案例主要使用VQNet展示贫瘠高原现象,使用梯度分析函数对用户自定义量子神经网络中的参数梯度进行分析。
 
-以下代码按照原论文中提及的类似方法搭建如下随机电路：
+以下代码按照原论文中提及的类似方法搭建如下随机电路: 
 
 首先作用在所有量子比特上绕布洛赫球的 Y-轴旋转 :math:`\pi/4` 。
 
-其余的结构加起来构成一个模块(Block), 每个模块共分为两层：
+其余的结构加起来构成一个模块(Block), 每个模块共分为两层: 
 
 - 第一层搭建随机的旋转门, 其中 :math:`R \in \{R_x, R_y, R_z\}` 。
 - 第二层由 CZ 门组成,作用在每两个相邻的量子比特上。
@@ -4927,7 +4927,7 @@ QUnet主要是用于解决图像分割的技术。
 线路代码如rand_circuit_pq函数所示。
 
 当我们确定了电路的结构之后,我们还需要定义一个损失函数(loss function)来确定优化曲面。
-按照原论文中提及的,我们采用 VQE算法中常用的损失函数：
+按照原论文中提及的,我们采用 VQE算法中常用的损失函数: 
 
 .. math::
 
@@ -5062,7 +5062,7 @@ QUnet主要是用于解决图像分割的技术。
 
 使用二进制比特字符串对其进行编码,其中黑为0,白为1,可知 :math:`w` 编码为(1,1,1,1,1,1,0,1,1,0,0,0,1,1,0,1)。共16位的字符串正好可以编码进4bit的量子态的振幅的符号上,符号为负数编码为0,符号为正数编码为1。通过以上编码方式,我们算法输入input转化为16位的二进制串。这样的不重复的二进制串可以分别对应特定的输入线路 :math:`U_i` 。
  
-该论文提出的量子感知机线路结构如下：
+该论文提出的量子感知机线路结构如下: 
 
 .. image:: ./images/QP-cir.png
    :width: 600 px
@@ -5070,17 +5070,17 @@ QUnet主要是用于解决图像分割的技术。
 
 |
 
-在比特0~3上构建编码线路 :math:`U_i` ,包含多受控的 :math:`CZ` 门, :math:`CNOT` 门, :math:`H` 门；在 :math:`U_i` 后面紧接着构建权重变换线路 :math:`U_w` ,同样由受控门以及 :math:`H` 门构成。使用 :math:`U_i` 可以进行酉矩阵变化,将数据编码到量子态上：
+在比特0~3上构建编码线路 :math:`U_i` ,包含多受控的 :math:`CZ` 门, :math:`CNOT` 门, :math:`H` 门；在 :math:`U_i` 后面紧接着构建权重变换线路 :math:`U_w` ,同样由受控门以及 :math:`H` 门构成。使用 :math:`U_i` 可以进行酉矩阵变化,将数据编码到量子态上: 
 
 .. math::
     U_i|0\rangle^{\otimes N}=\left|\psi_i\right\rangle
 
-使用酉矩阵变换 :math:`U_w` 来计算输入和权重之间的内积：
+使用酉矩阵变换 :math:`U_w` 来计算输入和权重之间的内积: 
 
 .. math::
     U_w\left|\psi_i\right\rangle=\sum_{j=0}^{m-1} c_j|j\rangle \equiv\left|\phi_{i, w}\right\rangle
 
-使用一个目标比特在辅助比特上的多受控 :math:`NOT` 门,并使用一些后续的 :math:`H` 门, :math:`X` 门,:math:`CX` 门作为激活函数可以获取 :math:`U_i` 和 :math:`U_w` 的归一化激活概率值：
+使用一个目标比特在辅助比特上的多受控 :math:`NOT` 门,并使用一些后续的 :math:`H` 门, :math:`X` 门,:math:`CX` 门作为激活函数可以获取 :math:`U_i` 和 :math:`U_w` 的归一化激活概率值: 
 
 .. math::
     \left|\phi_{i, w}\right\rangle|0\rangle_a \rightarrow \sum_{j=0}^{m-2} c_j|j\rangle|0\rangle_a+c_{m-1}|m-1\rangle|1\rangle_a
@@ -5128,7 +5128,7 @@ VQNet提供了 ``QuantumNeuron`` 模块实现该算法。首先初始化一个�
 但是,由于增加了电路复杂性或梯度值中的潜在误差,这两种替代方案都可能存在缺陷。
 Banchi 和 Crooks 1 发现一种可以适用在任一酉矩阵量子逻辑门上的 `随机参数偏移算法(Stochastic Parameter-Shift Rule) <https://arxiv.org/abs/2005.10299>`_ 。
 
-下面展示适用VQNet对一个量子变分线路使用随机参数偏移法计算梯度的示例。其中, **pyqpanda建议版本为3.7.12** 。示例线路定义如下：
+下面展示适用VQNet对一个量子变分线路使用随机参数偏移法计算梯度的示例。其中, **pyqpanda建议版本为3.7.12** 。示例线路定义如下: 
 
 .. code-block::
 
@@ -5171,7 +5171,7 @@ Banchi 和 Crooks 1 发现一种可以适用在任一酉矩阵量子逻辑门上
         exp2 = expval(machine, m_prog, pauli_dict, q)
         return exp2
 
-随机参数偏移法首先随机从[0,1]的均匀分布中采样一个变量s,接着对线路分别进行如下的酉矩阵变换：
+随机参数偏移法首先随机从[0,1]的均匀分布中采样一个变量s,接着对线路分别进行如下的酉矩阵变换: 
 
      a) :math:`e^{i(1-s)(\hat{H} + \theta\hat{V})}`
      b) :math:`e^{+i\tfrac{\pi}{4}\hat{V}}`
@@ -5210,7 +5210,7 @@ Banchi 和 Crooks 1 发现一种可以适用在任一酉矩阵量子逻辑门上
 将上一步骤中 :math:`\tfrac{\pi}{4}` 变成  :math:`-\tfrac{\pi}{4}`,
 重复进行 a, b, c 操作,获取观测量的期望 :math:`\langle r_- \rangle` 。
 
-随机参数偏移算法计算的梯度公式如下：
+随机参数偏移算法计算的梯度公式如下: 
 
  .. math::
 
@@ -5259,7 +5259,7 @@ Sweke 等人 在 `论文 <https://arxiv.org/abs/1910.01155>`_ 中发现了一种
 在本文中,他们证明了使用有限数量的测量样本(或shots)来估计梯度的量子梯度下降是随机梯度下降的一种形式。
 此外,如果优化涉及期望值的线性组合(例如 VQE),从该线性组合中的项中抽样可以进一步减少所需的时间复杂度。
 
-VQNet实现了该算法的一个示例：使用VQE 求解目标Hamiltonian的基态能量。注意此处我们设置量子线路观测的次数shots仅为1次。
+VQNet实现了该算法的一个示例: 使用VQE 求解目标Hamiltonian的基态能量。注意此处我们设置量子线路观测的次数shots仅为1次。
 
 .. math::
 
@@ -5437,7 +5437,7 @@ vqe_func_analytic()函数是使用参数偏移计算理论梯度,vqe_func_shots(
 受此启发,作者提出了一种概率梯度修剪方法来预测并仅计算高可靠性的梯度。
 该方法可以减少噪声影响,还可以节省在真实量子机器上运行所需的电路数量。
 
-在gradient based pruning算法中,对于参数的优化过程,划分了积累窗口和修剪窗口两个阶段,所有训练时期分成一个重复的累积窗口,然后是一个修剪窗口。 概率梯度修剪方法中有三个重要的超参数：
+在gradient based pruning算法中,对于参数的优化过程,划分了积累窗口和修剪窗口两个阶段,所有训练时期分成一个重复的累积窗口,然后是一个修剪窗口。 概率梯度修剪方法中有三个重要的超参数: 
 
     * 累积窗口宽度 :math:`\omega_a` ,
     * 修剪比例 :math:`r` ,
@@ -5856,7 +5856,7 @@ vqe_func_analytic()函数是使用参数偏移计算理论梯度,vqe_func_shots(
         Run()
 
 
-运行的loss以及accuracy结果：
+运行的loss以及accuracy结果: 
 
 .. code-block::
 	
@@ -5888,7 +5888,7 @@ vqe_func_analytic()函数是使用参数偏移计算理论梯度,vqe_func_shots(
 
 使用 ``NoiseQuantumLayer`` 可以使用QPanda的噪声虚拟机构建含噪量子线路,并进行训练。
 
-一个完整的含噪模型量子机器学习模型的例子如下：
+一个完整的含噪模型量子机器学习模型的例子如下: 
 
 .. code-block::
 
@@ -6146,7 +6146,7 @@ vqe_func_analytic()函数是使用参数偏移计算理论梯度,vqe_func_shots(
         F1.close()
         F2.close()
 		
-对比含噪量子线路与理想量子线路的机器学习模型分类结果,其loss变化情况以及accuary变化情况如下：
+对比含噪量子线路与理想量子线路的机器学习模型分类结果,其loss变化情况以及accuary变化情况如下: 
 
 .. code-block::
 
