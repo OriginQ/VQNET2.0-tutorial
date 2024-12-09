@@ -3946,9 +3946,9 @@ Dropout是经典深度神经网络（DNN）的一种常用技术，可防止计�
     def embedding(x, wires, qmachine):
         # Encodes the datum multiple times in the register,
         for i in wires:
-            ry(qmachine, i, tensor.asin(x[i]))
+            ry(qmachine, i, tensor.asin(x))
         for i in wires:
-            rz(qmachine, i, tensor.acos(x[i] ** 2))
+            rz(qmachine, i, tensor.acos(x ** 2))
 
 
     def var_ansatz(
