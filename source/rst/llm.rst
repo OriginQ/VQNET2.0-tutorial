@@ -1,7 +1,9 @@
 量子大模型微调示例
 ***********************************
 
-近些年随着大模型的普及，以及大模型规模的逐渐增加，导致训练大规模的量子机器学习模型会导致训练成本显著增加，为了减少大模型在微调过程中所需要的训练资源，一些大模型微调方法被提出，不再对大模型全参数进行微调，而是通过提出的微调方法对少量的参数进行训练，从而使大模型在下游任务中依旧能取得不弱于全参数微调的效果，而基于量子线路来进行微调的方式尚未得到普及。
+近些年随着大模型的普及，以及大模型规模的逐渐增加，导致训练大规模的量子机器学习模型会导致训练成本显著增加，为了减少大模型在微调过程中所需要的训练资源，
+一些大模型微调方法被提出，不再对大模型全参数进行微调，而是通过提出的微调方法对少量的参数进行训练，从而使大模型在下游任务中依旧能取得不弱于全参数微调的效果，
+而基于量子线路来进行微调的方式尚未得到普及。
 
 VQNet则设计了一个量子线路用于大模型微调中, 与Llama factory,  peft结合, 实现基于vqc模块进行大模型微调任务。
 
@@ -28,11 +30,11 @@ VQNet版本为2.15.0及以上
     cd peft_vqc pip install -e .
 
     # 安装VQNet
-    pip install pyvqnet>=2.15.0 --index-url https://pypi.originqc.com.cn
+    pip install pyvqnet==2.15.0 --index-url https://pypi.originqc.com.cn
 
 完成需求包安装后, 可以参考文件目录 /llama_factory_peft_vqc/examples/qlora_single_gpu/ 下train.sh等脚本, 根据脚本指定训练基准模型，微调模块选择，微调模块输出路径等参数
 
-train.sh 脚本样例如下，确定基准模型、数据集，输出的路径等参数信息：
+train.sh 脚本样例如下，确定基准模型、数据集、输出的路径等参数信息：
 
 .. code-block::
 
@@ -70,13 +72,30 @@ train.sh 脚本样例如下，确定基准模型、数据集，输出的路径�
         --fp16 \
         --do-train \
 
-除了上面基于 vqc 微调模块训练的实验结果, 也将基于其他tq, quanTA模块的实验结果损失记录,并且将结果绘图:
+除了上面基于 vqc 微调模块训练的实验结果, 也将基于其他tq, quanTA模块的实验结果损失记录, 并且将结果绘图， 结果如下:
 
-.. image:: ./images/peft_vqc1.PNG
+.. image:: ./images/peft_vqc1.png
    :width: 600 px
    :align: center
 
 |
+
+通过 train.sh 训练脚本，可以将微调训练后的模块参数保存到指定目录下，而要使用该微调模块，还需要将该微调模块与基准模型融合，生成新的大模型微调模块，
+通过相同目录 /llama_factory_peft_vqc/examples/qlora_single_gpu/ 下的 merge.sh 脚本将微调模块与基准模型模块融合，并在指定路径下生成文件, 脚本内容如下：
+
+.. code-block::
+
+    #!/bin/bash
+
+    CUDA_VISIBLE_DEVICES=0 python ../../src/export_model.py \
+        --model_name_or_path /data/kxf/models/Qwen2.5-0.5B/ \
+        --template default \
+        --finetuning_type vqc \
+        --adapter_name_or_path ../../saves/LLaMA2-7B/lora/Qwen2.5-0.5B/vqc/alpaca_gpt4_en
+        --export_dir ../../saves/export_model/Qwen2.5-0.5B/vqc/alpaca_gpt4_en \
+        --export_size 2 \
+
+随后可以调用生成后的模型进行微调训练, 查看是否能够收敛, 将脚本train.sh中参数model_name_or_path改成生成的模型路径 ../../saves/export_model/Qwen2.5-0.5B/vqc/alpaca_gpt4_en 即可。
 
 更多相关参数具体介绍如下:
 
