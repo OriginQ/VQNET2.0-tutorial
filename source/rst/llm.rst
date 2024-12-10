@@ -5,21 +5,26 @@
 一些大模型微调方法被提出，不再对大模型全参数进行微调，而是通过提出的微调方法对少量的参数进行训练，从而使大模型在下游任务中依旧能取得不弱于全参数微调的效果，
 而基于量子线路来进行微调的方式尚未得到普及。
 
-VQNet则设计了一个量子线路用于大模型微调中, 与 ``Llama factory``, ``peft`` 结合, 实现基于vqc模块进行大模型微调任务。
+``VQNet`` 通过与 ``Llama factory``, ``peft`` 结合, 实现基于量子线路来进行大模型微调任务。
 
-VQNet版本为 ``2.15.0`` 及以上
+量子大模型微调依赖包安装
+-------------------------
 
-首先下载 ``llama_factory_peft_vqc`` 库 
+该模块介绍在使用量子线路用于大模型微调中, 如何去对所需依赖包进行安装。
+
+使用量子大模型微调, 主要需要 ``llama_factory_peft_vqc`` 和 ``pyvqnet`` 两个包即可， 其中 ``llama_factory_peft_vqc`` 目前是内部文件， ``pyvqnet`` 版本要求 ``2.15.0`` 或者以上即可。
+
+首先介绍 ``llama_factory_peft_vqc`` 内部库的安装
 
 .. code-block::
     
     git clone git@gitlab.qpanda.cn:BY210091/llama_factory_peft_vqc.git
 
-    # 切换到0.1分支
+    # 切换到0.1分支，目前代码文件均在0.1分支上
     git checkout -b 0.1 origin/0.1
 
 
-随后根据README.md文档中内容补充
+随后根据 ``llama_factory_peft_vqc`` 中 ``README.md`` 文档中内容完成其他依赖库以及文件安装
 
 .. code-block::
     
@@ -29,8 +34,15 @@ VQNet版本为 ``2.15.0`` 及以上
     # 安装peft_vqc
     cd peft_vqc pip install -e .
 
+完成 ``llama_factory_peft_vqc`` 库以及依赖库安装后，则对 ``pyvqnet`` 进行安装
+.. code-block::
+    
     # 安装VQNet
     pip install pyvqnet==2.15.0 --index-url https://pypi.originqc.com.cn
+
+
+量子大模型微调训练步骤
+-------------------------
 
 完成需求包安装后, 可以参考文件目录 ``/llama_factory_peft_vqc/examples/qlora_single_gpu/`` 下 ``train.sh`` 等脚本, 根据脚本指定训练基准模型，微调模块选择，微调模块输出路径等参数.
 
@@ -72,7 +84,14 @@ VQNet版本为 ``2.15.0`` 及以上
         --fp16 \
         --do-train \
 
-在量子大模型微调模块中, 相较经典的大模型微调模块, 添加了三种额外的微调方式, 除了上面基于VQNet实现的vqc微调模块 ``vqc`` 、量子张量分解模块 ``quanTA``, 还有基于torch quantum实现的vqc模块  ``tq``, 
+在量子大模型微调模块中, 相较经典的大模型微调模块, 添加了三种额外的微调方式, 分别为：
+
+``vqc`` : 基于VQNet实现的vqc微调模块 
+
+``quanTA`` : 量子张量分解模块 
+
+``tq`` : 基于torch quantum实现的vqc模块  
+
 上述的 ``train.sh`` 样例中是 ``vqc`` 模块微调的脚本样例, 若使用另外两种微调模块则将 ``finetuning_type`` 改为 ``quanTA`` , ``tq`` 即可，将三个模块实验结果记录并绘图， 结果如下:
 
 .. image:: ./images/peft_vqc1.png
@@ -147,7 +166,8 @@ VQNet版本为 ``2.15.0`` 及以上
 
 随后可以调用生成后的模型进行微调训练, 查看是否能够收敛, 将脚本 ``train.sh`` 中参数 ``model_name_or_path`` 改成生成的模型路径 ``../../saves/export_model/Qwen2.5-0.5B/vqc/alpaca_gpt4_en`` 即可。
 
-更多相关参数具体介绍如下:
+更多相关参数具体介绍
+-------------------------
 
 ==============================     ===================================================================
                         微调模块参数介绍
