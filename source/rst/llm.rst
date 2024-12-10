@@ -18,7 +18,7 @@
 
 .. code-block::
     
-    git clone git@gitlab.qpanda.cn:BY210091/llama_factory_peft_vqc.git
+    git clone git@gitlab.qpanda.cn:BY200002/quantum-llm.git
 
     # 切换到0.1分支，目前代码文件均在0.1分支上
     git checkout -b 0.1 origin/0.1
