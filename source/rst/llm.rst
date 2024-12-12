@@ -35,6 +35,7 @@
     cd peft_vqc pip install -e .
 
 完成 ``llama_factory_peft_vqc`` 库以及依赖库安装后，则对 ``pyvqnet`` 进行安装
+
 .. code-block::
     
     # 安装VQNet
