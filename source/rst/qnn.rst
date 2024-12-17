@@ -417,7 +417,7 @@ QuantumLayerV3
             m_prog.insert(cir)
 
             for idx, ele in enumerate(measure_qubits):
-                m_prog << pq.Measure(m_qlist[ele], cubits[idx])  # pylint: disable=expression-not-assigned
+                m_prog << pq.Measure(m_qlist[ele], cubits[idx])  
             return m_prog
         from pyvqnet.utils.initializer import ones
         l = QuantumLayerV3(qfun,
@@ -505,7 +505,7 @@ QuantumBatchAsyncQcloudLayer
             m_prog.insert(cir)
 
             for idx, ele in enumerate(measure_qubits):
-                m_prog << pq.Measure(m_qlist[ele], cubits[idx])  # pylint: disable=expression-not-assigned
+                m_prog << pq.Measure(m_qlist[ele], cubits[idx])  
             return m_prog
 
         l = QuantumBatchAsyncQcloudLayer(qfun,
@@ -629,7 +629,7 @@ QuantumBatchAsyncQcloudLayerES
             m_prog.insert(cir)
 
             for idx, ele in enumerate(measure_qubits):
-                m_prog << pq.Measure(m_qlist[ele], cubits[idx])  # pylint: disable=expression-not-assigned
+                m_prog << pq.Measure(m_qlist[ele], cubits[idx])  
             return m_prog
 
         l = QuantumBatchAsyncQcloudLayerES(qfun,

@@ -272,7 +272,7 @@ Model中使用 :ref:`QuantumLayer` 类这个可进行自动微分的量子计算
     from pyvqnet.data import data_generator as get_minibatch_data
     try:
         matplotlib.use("TkAgg")
-    except:  #pylint:disable=bare-except
+    except:  
         print("Can not use matplot TkAgg")
         pass
 
@@ -453,7 +453,7 @@ VSQL中各个量子比特上的局部量子线路图如下:
         import matplotlib
         try:
             matplotlib.use("TkAgg")
-        except:  #pylint:disable=bare-except
+        except:  
             print("Can not use matplot TkAgg")
             pass
 
@@ -506,13 +506,13 @@ VSQL中各个量子比特上的局部量子线路图如下:
             pass
 
 
-        def circuits_of_vsql(x, weights, qlist, clist, machine):  #pylint:disable=unused-argument
+        def circuits_of_vsql(x, weights, qlist, clist, machine):  
             """
             VSQL model of quantum circuits
             """
             weights = weights.reshape([depth + 1, 3, n_qsc])
 
-            def subcir(weights, qlist, depth, n_qsc, n_start):  #pylint:disable=redefined-outer-name
+            def subcir(weights, qlist, depth, n_qsc, n_start):  
                 cir = pq.QCircuit()
 
                 for i in range(n_qsc):
@@ -528,7 +528,7 @@ VSQL中各个量子比特上的局部量子线路图如下:
 
                 return cir
 
-            def get_pauli_str(n_start, n_qsc):  #pylint:disable=redefined-outer-name
+            def get_pauli_str(n_start, n_qsc):  
                 pauli_str = ",".join("X" + str(i)
                                     for i in range(n_start, n_start + n_qsc))
                 return {pauli_str: 1.0}
@@ -685,7 +685,7 @@ VSQL中各个量子比特上的局部量子线路图如下:
                     optimizer.zero_grad()
                     try:
                         x = x.reshape(batch_size, 1024)
-                    except:  #pylint:disable=bare-except
+                    except:  
                         x = x.reshape(-1, 1024)
 
                     output = model(x)
@@ -806,7 +806,7 @@ Mnist数据集定义
     import matplotlib
     try:
         matplotlib.use("TkAgg")
-    except:  #pylint:disable=bare-except
+    except:  
         print("Can not use matplot TkAgg")
         pass
 
@@ -966,7 +966,7 @@ Mnist数据集定义
                 optimizer.zero_grad()
                 try:
                     x = x.reshape(batch_size, 1, 28, 28)
-                except:  #pylint:disable=bare-except
+                except:  
                     x = x.reshape(-1, 1, 28, 28)
 
                 output = model(x)
@@ -1324,7 +1324,7 @@ Quantum circuit structure learning任务的核心目标就是找到最优的带�
     import matplotlib
     try:
         matplotlib.use("TkAgg")
-    except:  #pylint:disable=bare-except
+    except:  
         print("Can not use matplot TkAgg")
         pass
 
@@ -1369,7 +1369,7 @@ Quantum circuit structure learning任务的核心目标就是找到最优的带�
         return 0.5 * y + 0.8 * z - 0.2 * x
 
 
-    def rotosolve(d, params, generators, cost, M_0):#pylint:disable=invalid-name
+    def rotosolve(d, params, generators, cost, M_0):
         """
         rotosolve algorithm implementation
         """
@@ -1487,7 +1487,7 @@ Quantum circuit structure learning任务的核心目标就是找到最优的带�
     import matplotlib
     try:
         matplotlib.use("TkAgg")
-    except:  #pylint:disable=bare-except
+    except:  
         print("Can not use matplot TkAgg")
         pass
 
@@ -1923,7 +1923,7 @@ Quantum circuit structure learning任务的核心目标就是找到最优的带�
     import matplotlib
     try:
         matplotlib.use("TkAgg")
-    except:  #pylint:disable=bare-except
+    except:  
         print("Can not use matplot TkAgg")
         pass
 
@@ -2231,7 +2231,7 @@ Quantum circuit structure learning任务的核心目标就是找到最优的带�
     n_qubits = 4  # Number of qubits
     q_depth = 6  # Depth of the quantum circuit (number of variational layers)
 
-    def Q_H_layer(qubits, nqubits):#pylint:disable=invalid-name
+    def Q_H_layer(qubits, nqubits):
         """Layer of single-qubit Hadamard gates.
         """
         circuit = pq.QCircuit()
@@ -2239,7 +2239,7 @@ Quantum circuit structure learning任务的核心目标就是找到最优的带�
             circuit.insert(pq.H(qubits[idx]))
         return circuit
 
-    def Q_RY_layer(qubits, w):#pylint:disable=invalid-name
+    def Q_RY_layer(qubits, w):
         """
         Layer of parametrized qubit rotations around the y axis.
         """
@@ -2248,7 +2248,7 @@ Quantum circuit structure learning任务的核心目标就是找到最优的带�
             circuit.insert(pq.RY(qubits[idx], element))
         return circuit
 
-    def Q_entangling_layer(qubits, nqubits):#pylint:disable=invalid-name
+    def Q_entangling_layer(qubits, nqubits):
         """
         Layer of CNOTs followed by another shifted layer of CNOT.
         """
@@ -2264,7 +2264,7 @@ Quantum circuit structure learning任务的核心目标就是找到最优的带�
             circuit.insert(pq.CNOT(qubits[i], qubits[i + 1]))
         return circuit
 
-    def quantum_net(q_input_features, q_weights_flat, qubits, cubits,#pylint:disable=unused-argument
+    def quantum_net(q_input_features, q_weights_flat, qubits, cubits,
                     machine):
         """
         The variational quantum circuit.
@@ -2307,7 +2307,7 @@ Quantum circuit structure learning任务的核心目标就是找到最优的带�
         """
 
 
-        class Q_DressedQuantumNet(Module):#pylint:disable=invalid-name
+        class Q_DressedQuantumNet(Module):
             """
             module implementing the *dressed* quantum net.
             """
@@ -2464,7 +2464,7 @@ Quantum circuit structure learning任务的核心目标就是找到最优的带�
         n_qubits = 4  # Number of qubits
         q_depth = 6  # Depth of the quantum circuit (number of variational layers)
 
-        def Q_H_layer(qubits, nqubits):#pylint:disable=invalid-name
+        def Q_H_layer(qubits, nqubits):
             """Layer of single-qubit Hadamard gates.
             """
             circuit = pq.QCircuit()
@@ -2472,7 +2472,7 @@ Quantum circuit structure learning任务的核心目标就是找到最优的带�
                 circuit.insert(pq.H(qubits[idx]))
             return circuit
 
-        def Q_RY_layer(qubits, w):#pylint:disable=invalid-name
+        def Q_RY_layer(qubits, w):
             """Layer of parametrized qubit rotations around the y axis.
             """
             circuit = pq.QCircuit()
@@ -2480,7 +2480,7 @@ Quantum circuit structure learning任务的核心目标就是找到最优的带�
                 circuit.insert(pq.RY(qubits[idx], element))
             return circuit
 
-        def Q_entangling_layer(qubits, nqubits):#pylint:disable=invalid-name
+        def Q_entangling_layer(qubits, nqubits):
             """Layer of CNOTs followed by another shifted layer of CNOT.
             """
             # In other words it should apply something like :
@@ -2495,7 +2495,7 @@ Quantum circuit structure learning任务的核心目标就是找到最优的带�
                 circuit.insert(pq.CNOT(qubits[i], qubits[i + 1]))
             return circuit
 
-        def quantum_net(q_input_features, q_weights_flat, qubits, cubits,#pylint:disable=unused-argument
+        def quantum_net(q_input_features, q_weights_flat, qubits, cubits,
                         machine):
             """
             The variational quantum circuit.
@@ -3236,7 +3236,7 @@ QUnet主要是用于解决图像分割的技术。
     from matplotlib import pyplot as plt
     try:
         matplotlib.use("TkAgg")
-    except:  # pylint:disable=bare-except
+    except:  
         print("Can not use matplot TkAgg")
 
     try:
@@ -3324,8 +3324,8 @@ QUnet主要是用于解决图像分割的技术。
         """
         Select data from mnist dataset.
         """
-        x_train, y_train = load_mnist("training_data")  #pylint:disable=redefined-outer-name
-        x_test, y_test = load_mnist("testing_data")  #pylint:disable=redefined-outer-name
+        x_train, y_train = load_mnist("training_data")  
+        x_test, y_test = load_mnist("testing_data")  
         idx_train = np.append(
             np.where(y_train == 0)[0][:train_num],
             np.where(y_train == 1)[0][:train_num])
@@ -3636,7 +3636,7 @@ QUnet主要是用于解决图像分割的技术。
     from matplotlib import pyplot as plt
     try:
         matplotlib.use("TkAgg")
-    except:  # pylint:disable=bare-except
+    except:  
         print("Can not use matplot TkAgg")
     def display_frames_as_gif(frames, c_index):
         patch = plt.imshow(frames[0])
@@ -3896,7 +3896,7 @@ QUnet主要是用于解决图像分割的技术。
     import matplotlib
     try:
         matplotlib.use("TkAgg")
-    except:  #pylint:disable=bare-except
+    except:  
         print("Can not use matplot TkAgg")
         pass
     # 根据数据的数据量n,聚类中心k和数据标准差std返回对应数据点和聚类中心点
@@ -3953,7 +3953,7 @@ QUnet主要是用于解决图像分割的技术。
 
         prog = pq.QProg()
         prog.insert(circuit)
-        prog << pq.Measure(qubits[0], cbits[0])  #pylint:disable=expression-not-assigned
+        prog << pq.Measure(qubits[0], cbits[0])
         prog.insert(pq.Reset(qubits[0]))
         prog.insert(pq.Reset(qubits[1]))
         prog.insert(pq.Reset(qubits[2]))
@@ -4140,7 +4140,7 @@ QUnet主要是用于解决图像分割的技术。
     import matplotlib
     try:
         matplotlib.use("TkAgg")
-    except:  # pylint:disable=bare-except
+    except:  
         print("Can not use matplot TkAgg")
         pass
 
@@ -4247,7 +4247,7 @@ QUnet主要是用于解决图像分割的技术。
     import matplotlib
     try:
         matplotlib.use("TkAgg")
-    except:  # pylint:disable=bare-except
+    except:  
         print("Can not use matplot TkAgg")
         pass
 
@@ -4424,7 +4424,7 @@ QUnet主要是用于解决图像分割的技术。
     import matplotlib
     try:
         matplotlib.use("TkAgg")
-    except:  # pylint:disable=bare-except
+    except:  
         print("Can not use matplot TkAgg")
         pass
 
@@ -4550,7 +4550,7 @@ QUnet主要是用于解决图像分割的技术。
     import matplotlib
     try:
         matplotlib.use("TkAgg")
-    except:  # pylint:disable=bare-except
+    except:  
         print("Can not use matplot TkAgg")
         pass
 
@@ -5479,7 +5479,7 @@ vqe_func_analytic()函数是使用参数偏移计算理论梯度,vqe_func_shots(
     qvc_test_data = [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 1, 0, 0, 1, 1, 0]
 
 
-    def qvc_circuits(x, weights, qlist, clist, machine):#pylint:disable=unused-argument
+    def qvc_circuits(x, weights, qlist, clist, machine):
         """
         Quantum circuits run function
         """
@@ -5491,7 +5491,7 @@ vqe_func_analytic()函数是使用参数偏移计算理论梯度,vqe_func_shots(
             return cir
 
         def build_circult(weights, xx, nqubits):
-            def Rot(weights_j, qubits):#pylint:disable=invalid-name
+            def Rot(weights_j, qubits):
                 circult = pq.QCircuit()
                 circult.insert(pq.RZ(qubits, weights_j[0]))
                 circult.insert(pq.RY(qubits, weights_j[1]))
@@ -5532,7 +5532,7 @@ vqe_func_analytic()函数是使用参数偏移计算理论梯度,vqe_func_shots(
         return prob
 
 
-    def qvc_circuits2(x, weights, qlist, clist, machine):#pylint:disable=unused-argument
+    def qvc_circuits2(x, weights, qlist, clist, machine):
         """
         Quantum circuits run function
         """

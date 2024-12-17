@@ -204,7 +204,7 @@ I
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
-    :return: 一个Module,可以用来训练模型。
+    :return: 一个I逻辑门类实例。
 
     Example::
         
@@ -262,7 +262,7 @@ Hadamard
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
-    :return: 一个Module,可以用来训练模型。
+    :return: 一个 Hadamard逻辑门类实例。
 
     Example::
         
@@ -322,7 +322,7 @@ T
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
-    :return: 一个Module,可以用来训练模型。
+    :return: 一个 T逻辑门类实例。
 
     Example::
         
@@ -380,7 +380,7 @@ S
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
-    :return: 一个Module,可以用来训练模型。
+    :return: 一个 S逻辑门类实例。
 
     Example::
         
@@ -439,7 +439,7 @@ PauliX
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
-    :return: 一个Module,可以用来训练模型。
+    :return: 一个 PauliX逻辑门类实例。
 
     Example::
         
@@ -498,7 +498,7 @@ PauliY
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
-    :return: 一个Module,可以用来训练模型。
+    :return: 一个 PauliY逻辑门类实例。
 
     Example::
         
@@ -558,7 +558,7 @@ PauliZ
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
-    :return: 一个Module,可以用来训练模型。
+    :return: 一个 PauliZ逻辑门类实例。
 
     Example::
         
@@ -618,7 +618,7 @@ X1
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
-    :return: 一个Module,可以用来训练模型。
+    :return: 一个 X1逻辑门类实例。
 
     Example::
         
@@ -679,7 +679,7 @@ RX
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
-    :return: 一个Module,可以用来训练模型。
+    :return: 一个 RX逻辑门类实例。
 
     Example::
 
@@ -740,7 +740,7 @@ RY
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
-    :return: 一个Module,可以用来训练模型。
+    :return: 一个 RY逻辑门类实例。
 
     Example::
 
@@ -801,7 +801,7 @@ RZ
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
-    :return: 一个Module,可以用来训练模型。
+    :return: 一个 RZ逻辑门类实例。
 
     Example::
 
@@ -864,7 +864,7 @@ CRX
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
-    :return: 一个Module,可以用来训练模型。
+    :return: 一个 CRX逻辑门类实例。
 
     Example::
 
@@ -926,7 +926,7 @@ CRY
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
-    :return: 一个Module,可以用来训练模型。
+    :return: 一个 CRY逻辑门类实例。
 
     Example::
 
@@ -988,7 +988,7 @@ CRZ
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
-    :return: 一个Module,可以用来训练模型。
+    :return: 一个 CRZ逻辑门类实例。
 
     Example::
 
@@ -1051,7 +1051,7 @@ U1
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
-    :return: 一个Module,可以用来训练模型。
+    :return: 一个 U1逻辑门类实例。
 
     Example::
 
@@ -1112,7 +1112,7 @@ U2
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
-    :return: 一个Module,可以用来训练模型。
+    :return: 一个 U2逻辑门类实例。
 
     Example::
 
@@ -1173,7 +1173,7 @@ U3
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
-    :return: 一个Module,可以用来训练模型。
+    :return: 一个 U3逻辑门类实例。
 
     Example::
 
@@ -1232,7 +1232,7 @@ CY
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
-    :return: 一个Module,可以用来训练模型。
+    :return: 一个 CY逻辑门类实例。
 
     Example::
 
@@ -1292,7 +1292,7 @@ CNOT
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
-    :return: 一个Module,可以用来训练模型。
+    :return: 一个 CNOT逻辑门类实例。
 
     Example::
 
@@ -1353,7 +1353,7 @@ CR
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
-    :return: 一个Module,可以用来训练模型。
+    :return: 一个 CR逻辑门类实例。
 
     Example::
 
@@ -1414,7 +1414,7 @@ SWAP
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
-    :return: 一个Module,可以用来训练模型。
+    :return: 一个 SWAP 逻辑门类实例。
 
     Example::
 
@@ -1485,7 +1485,7 @@ CSWAP
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
-    :return: 一个Module,可以用来训练模型。
+    :return: 一个 CSWAP 逻辑门类实例。
 
     Example::
 
@@ -1610,7 +1610,7 @@ CZ
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
-    :return: 一个Module,可以用来训练模型。
+    :return: 一个 CZ 逻辑门类实例。
 
     Example::
 
@@ -1671,7 +1671,7 @@ RXX
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
-    :return: 一个Module,可以用来训练模型。
+    :return: 一个RXX逻辑门类实例。
 
     Example::
 
@@ -1732,7 +1732,7 @@ RYY
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
-    :return: 一个Module,可以用来训练模型。
+    :return: 一个 RYY 逻辑门类实例。
 
     Example::
 
@@ -1794,7 +1794,7 @@ RZZ
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
-    :return: 一个Module,可以用来训练模型。
+    :return: 一个 RZZ 逻辑门类实例。
 
     Example::
 
@@ -1854,7 +1854,7 @@ RZX
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
-    :return: 一个Module,可以用来训练模型。
+    :return: 一个 RZX 逻辑门类实例。
 
     Example::
 
@@ -1915,7 +1915,7 @@ Toffoli
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
-    :return: 一个Module,可以用来训练模型。
+    :return: 一个 Toffoli 逻辑门类实例。
 
     Example::
 
@@ -1978,7 +1978,7 @@ IsingXX
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
-    :return: 一个Module,可以用来训练模型。
+    :return: 一个IsingXX 逻辑门类实例。
 
     Example::
 
@@ -2041,7 +2041,7 @@ IsingYY
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
-    :return: 一个Module,可以用来训练模型。
+    :return: 一个 IsingYY 逻辑门类实例。
 
     Example::
 
@@ -2103,7 +2103,7 @@ IsingZZ
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
-    :return: 一个Module,可以用来训练模型。
+    :return: 一个 IsingZZ 逻辑门类实例。
 
     Example::
 
@@ -2164,8 +2164,7 @@ IsingXY
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
-    :return: 一个Module,可以用来训练模型。
-
+    :return: 一个 IsingXY 逻辑门类实例。
     Example::
 
         from pyvqnet.qnn.vqc import IsingXY,QMachine
@@ -2226,7 +2225,7 @@ PhaseShift
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
-    :return: 一个Module,可以用来训练模型。
+    :return: 一个 PhaseShift 逻辑门类实例。
 
     Example::
 
@@ -2288,7 +2287,7 @@ MultiRZ
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
-    :return: 一个Module,可以用来训练模型。
+    :return: 一个 MultiRZ 逻辑门类实例。
 
     Example::
 
@@ -2351,7 +2350,7 @@ SDG
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
-    :return: 一个Module,可以用来训练模型。
+    :return: 一个SDG逻辑门类实例。
 
     Example::
         
@@ -2412,7 +2411,7 @@ TDG
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
-    :return: 一个Module,可以用来训练模型。
+    :return: 一个TDG逻辑门类实例。
 
     Example::
         
@@ -2477,7 +2476,7 @@ ControlledPhaseShift
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
-    :return: 一个Module,可以用来训练模型。
+    :return: 一个ControlledPhaseShift。
 
     Example::
 
@@ -2551,7 +2550,7 @@ MultiControlledX
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
     :param control_values: 控制值,默认为None,当比特位为1时控制。
 
-    :return: 一个Module,可以用来训练模型。
+    :return: 一个 MultiControlledX 逻辑门实例。
 
     Example::
 

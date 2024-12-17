@@ -803,7 +803,7 @@
     import matplotlib
     try:
         matplotlib.use("TkAgg")
-    except:  #pylint:disable=bare-except
+    except:  
         print("Can not use matplot TkAgg")
         pass
 
@@ -1110,7 +1110,7 @@
     from pyvqnet.data import data_generator as get_minibatch_data
     try:
         matplotlib.use("TkAgg")
-    except:  #pylint:disable=bare-except
+    except:  
         print("Can not use matplot TkAgg")
         pass
 
@@ -1346,7 +1346,7 @@ Circuit-centric quantum classifiers算法示例
 
 
             def build_circult(weights, xx, nqubits,qm):
-                def Rot(weights_j, nqubits,qm):#pylint:disable=invalid-name
+                def Rot(weights_j, nqubits,qm):
                     VQC_RotCircuit(qm,nqubits,weights_j)
 
                 def basisstate(qm,xx, nqubits):
@@ -1528,7 +1528,7 @@ Circuit-centric quantum classifiers算法示例
     import matplotlib
     try:
         matplotlib.use("TkAgg")
-    except:  #pylint:disable=bare-except
+    except:  
         print("Can not use matplot TkAgg")
         pass
 
@@ -1839,7 +1839,7 @@ Circuit-centric quantum classifiers算法示例
 
     def quantum_cnn_transferlearning():
 
-        class Q_DressedQuantumNet(Module):#pylint:disable=invalid-name
+        class Q_DressedQuantumNet(Module):
 
             def __init__(self):
                 """
@@ -2039,7 +2039,7 @@ VSQL量子整体模型如下:
 
     try:
         matplotlib.use("TkAgg")
-    except:  #pylint:disable=bare-except
+    except:  
         print("Can not use matplot TkAgg")
         pass
 
@@ -2060,7 +2060,7 @@ VSQL量子整体模型如下:
 
 
         def forward(self,x):
-            def get_pauli_str(n_start, n_qsc):#pylint:disable=redefined-outer-name
+            def get_pauli_str(n_start, n_qsc):
                 D = {}
                 D['wires']= [i for i in range(n_start, n_start + n_qsc)]
                 D["observables"] = ["X" for i in range(n_start, n_start + n_qsc)]
@@ -2070,7 +2070,7 @@ VSQL量子整体模型如下:
             self.qm.reset_states(x.shape[0])
             weights = self.w.reshape([depth + 1, 3, n_qsc])
             
-            def subcir(qm, weights, qlist, depth, n_qsc, n_start):#pylint:disable=redefined-outer-name
+            def subcir(qm, weights, qlist, depth, n_qsc, n_start):
 
                 for i in range(n_qsc):
                     rx(qm,qlist[n_start + i], weights[0,0,i])
@@ -2279,7 +2279,7 @@ VSQL量子整体模型如下:
                 optimizer.zero_grad()
                 try:
                     x = x.reshape(batch_size, 1024)
-                except:  #pylint:disable=bare-except
+                except:  
                     x = x.reshape(-1, 1024)
 
                 output = model(x)
@@ -2579,7 +2579,7 @@ QMLP模型示例
     from matplotlib import pyplot as plt
     try:
         matplotlib.use("TkAgg")
-    except:  # pylint:disable=bare-except
+    except:  
         print("Can not use matplot TkAgg")
 
     try:
@@ -2725,8 +2725,8 @@ QMLP模型示例
         """
         Select data from mnist dataset.
         """
-        x_train, y_train = load_mnist("training_data")  #pylint:disable=redefined-outer-name
-        x_test, y_test = load_mnist("testing_data")  #pylint:disable=redefined-outer-name
+        x_train, y_train = load_mnist("training_data")  
+        x_test, y_test = load_mnist("testing_data")  
         idx_train = np.append(
             np.where(y_train == 0)[0][:train_num],
             np.where(y_train == 1)[0][:train_num])
@@ -2885,7 +2885,7 @@ QMLP模型示例
     from matplotlib import pyplot as plt
     try:
         matplotlib.use("TkAgg")
-    except:  # pylint:disable=bare-except
+    except:  
         print("Can not use matplot TkAgg")
     def display_frames_as_gif(frames, c_index):
         patch = plt.imshow(frames[0])
