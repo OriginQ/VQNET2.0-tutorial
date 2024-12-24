@@ -366,7 +366,8 @@ Linear
 
 .. py:class:: pyvqnet.nn.torch.Linear(input_channels, output_channels, weight_initializer=None, bias_initializer=None,use_bias=True, dtype=None, name: str = "")
 
-    线性模块(全连接层),:math:`y = Ax + b` 。
+    线性模块(全连接层)。
+    :math:`y = Ax + b`
     
     .. warning::
 
@@ -1078,13 +1079,14 @@ DropPath
 
     Example::
 
-        import pyvqnet.nn as nn
+        import pyvqnet.nn.torch as nn
         import pyvqnet.tensor as tensor
         import pyvqnet
         pyvqnet.backends.set_backend("torch")
         x = tensor.randu([4])
-        y = nn.torch.DropPath()(x)
+        y = nn.DropPath()(x)
         print(y)
+        #[0.2008128,0.3908308,0.7102265,0.3784221]
 
 Pixel_Shuffle 
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -4937,15 +4939,15 @@ vqc_quantumpooling_circuit
 QuantumLayerAdjoint
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:class:: pyvqnet.qnn.vqc.torch.QuantumLayerAdjoint(general_module: pyvqnet.nn.Module, use_qpanda=False,name="")
+.. py:class:: pyvqnet.qnn.vqc.torch.QuantumLayerAdjoint(general_module, q_machine,name="")
 
 
     使用伴随矩阵方式进行梯度计算的可自动微分的变分量子线路层,参考  `Efficient calculation of gradients in classical simulations of variational quantum algorithms <https://arxiv.org/abs/2009.02823>`_ 。
 
-    :param general_module: 一个仅使用 ``pyvqnet.qnn.vqc.torch`` 下量子线路接口搭建的 `pyvqnet.nn.Module` 实例。
-    :param use_qpanda: 是否使用qpanda线路进行前传,默认: False。
+    :param general_module: 一个仅使用 ``pyvqnet.qnn.vqc.torch`` 下量子线路接口搭建的 ``pyvqnet.qnn.vqc.torch.QModule`` 实例。
+    :param q_machine: general_module 模块中申请的QMachine实例。
     :param name: 该层名字,默认为""。
-
+    :return: 返回一个 QuantumLayerAdjoint 类实例。
 
 
     .. warning::
@@ -5014,7 +5016,7 @@ QuantumLayerAdjoint
         qunatum_model = QModel(num_wires=6,
                             dtype=pyvqnet.kcomplex64,
                             grad_mode="adjoint")
-        adjoint_model = QuantumLayerAdjoint(qunatum_model)
+        adjoint_model = QuantumLayerAdjoint(qunatum_model,q_machine=qunatum_model.qm)
         batch_y = adjoint_model(input_x)
         batch_y.backward()
 

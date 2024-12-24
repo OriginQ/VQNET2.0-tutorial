@@ -2165,6 +2165,7 @@ IsingXY
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
     :return: 一个 IsingXY 逻辑门类实例。
+    
     Example::
 
         from pyvqnet.qnn.vqc import IsingXY,QMachine
@@ -4337,14 +4338,15 @@ VQC_QSVT
 QuantumLayerAdjoint
 ---------------------------------------------------------------
 
-.. py:class:: pyvqnet.qnn.vqc.QuantumLayerAdjoint(general_module: pyvqnet.nn.Module,use_qpanda=False, name="")
+.. py:class:: pyvqnet.qnn.vqc.QuantumLayerAdjoint(general_module: pyvqnet.nn.Module,q_machine, name="")
 
 
     使用伴随矩阵方式进行梯度计算的可自动微分的QuantumLayer层,参考  `Efficient calculation of gradients in classical simulations of variational quantum algorithms <https://arxiv.org/abs/2009.02823>`_ 。
 
-    :param general_module: 一个仅使用 ``pyvqnet.qnn.vqc`` 下量子线路接口搭建的 `pyvqnet.nn.Module` 实例。
-    :param use_qpanda: 是否使用qpanda线路进行前传, 默认: False。
+    :param general_module: 一个仅使用 ``pyvqnet.qnn.vqc`` 下量子线路接口搭建的 ``pyvqnet.nn.Module`` 实例。
+    :param q_machine: general_module 模块中申请的QMachine实例。
     :param name: 该层名字,默认为""。
+    :return: 返回一个 QuantumLayerAdjoint 类实例。
 
     .. note::
 
@@ -4409,7 +4411,7 @@ QuantumLayerAdjoint
                             dtype=pyvqnet.kcomplex64,
                             grad_mode="adjoint")
 
-        adjoint_model = QuantumLayerAdjoint(qunatum_model)
+        adjoint_model = QuantumLayerAdjoint(qunatum_model,q_machine=qunatum_model.qm)
 
         batch_y = adjoint_model(input_x)
         batch_y.backward()
