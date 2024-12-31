@@ -32,7 +32,7 @@
     pip install -r requirements.txt
 
     # 安装peft_vqc
-    cd peft_vqc pip install -e .
+    cd peft_vqc && pip install -e .
 
 完成 ``llama_factory_peft_vqc`` 库以及依赖库安装后，则对 ``pyvqnet`` 进行安装
 
