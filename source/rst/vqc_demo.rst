@@ -591,7 +591,7 @@
             self.weights_last = Parameter((4 ** 2 -1,1), dtype=7)
 
         def forward(self, input):
-
+            self.qm.reset_states(input.shape[0])
             return self.conv(self.qm, self.weights, self.weights_last, input)
 
 
