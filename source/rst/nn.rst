@@ -3507,13 +3507,13 @@ MPI为CPU间通信的常用库, **VQNet中CPU的分布式计算功能则基于MP
 .. code-block::
 
     # 通过下列代码暂存当前python环境的编译器
-    pushd /root/anaconda3/envs/mpi39/compiler_compat && mv ld ld.bak && popd
+    pushd /root/anaconda3/envs/$CONDA_DEFAULT_ENV/compiler_compat && mv ld ld.bak && popd
 
     # 再次安装
     pip install mpi4py
 
     # 还原
-    pushd /root/anaconda3/envs/mpi39/compiler_compat && mv ld.bak ld && popd
+    pushd /root/anaconda3/envs/$CONDA_DEFAULT_ENV/compiler_compat && mv ld.bak ld && popd
 
 NCCL安装
 ^^^^^^^^^^^^^^^^^^^^^^
