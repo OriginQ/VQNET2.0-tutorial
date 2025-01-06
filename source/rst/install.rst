@@ -8,6 +8,11 @@ VQNet python包安装
 
 对于Linux系统,pyvqnet提供了基于Nvidia GPU对经典神经网络计算加速功能,当您的电脑的GPU是GTX10系列及其以后的型号,可使用pyvqnet的GPU功能构建模型。
 
+.. code-block::
+
+    pip install pyvqnet
+
+或者：
 
 .. code-block::
 
