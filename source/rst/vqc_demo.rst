@@ -1,13 +1,13 @@
-使用自动微分的量子机器学习示例
+使用自动微分模拟的量子机器学习示例
 #################################
 
-下面的例子使用 ``pyvqnet.qnn.vqc`` 下的变分量子线路接口实现一项量子机器学习算法和示例。 ``pyvqnet.qnn.vqc`` 下的变分量子线路接口使用态矢来表示量子态在量子逻辑门下的演化,通过自动微分计算变分量子线路中的梯度。
+下面的例子使用 ``pyvqnet.qnn.vqc`` 下的变分量子线路接口实现一些量子机器学习算法和示例。 ``pyvqnet.qnn.vqc`` 下的变分量子线路接口使用态矢来表示量子态在量子逻辑门下的演化,通过自动微分计算变分量子线路中的梯度。
 
 请注意下例子中 ``pyvqnet.qnn.vqc.QMachine`` 的使用,该类存放了量子态矢的数据,当计算批量数据时候或者每次进行测量之后,必须进行 ``pyvqnet.qnn.vqc.QMachine.reset_states`` 重新初始化态矢数据到输入数据的batch_size大小。
 ``pyvqnet.qnn.vqc`` 还提供了 MeasureAll,Probability,Samples 等测量接口。
 
 此外, ``pyvqnet.qnn.vqc.QModule`` 为用户定义的计算自动微分量子线路模型需要继承的类,需要像经典神经网络模型一样,定义 `__init__` 以及 `forward` 函数。
-当模型最后的 ``QTensor`` 运行 `backward` 后,就能使用自动微分计算出 ``QModule`` 中变分量子线路的参数梯度,并可以通过梯度下降法相关的优化器进行更新。
+当模型最后的 ``QTensor`` 运行 `backward` 后,就能使用自动微分模拟计算出 ``QModule`` 中变分量子线路的参数梯度,并可以通过梯度下降法相关的优化器进行更新。
 
 
 
@@ -467,7 +467,7 @@
     from pyvqnet.qnn.vqc.qmachine import QMachine
     from pyvqnet.qnn.vqc.utils import probs
     from pyvqnet.nn import Module, Parameter
-    from pyvqnet.tensor import tensor,kfloat32
+    from pyvqnet.tensor import tensor
     from pyvqnet.tensor import QTensor
     from pyvqnet.dtype import *
     from pyvqnet.optim import Adam
@@ -591,7 +591,7 @@
             self.weights_last = Parameter((4 ** 2 -1,1), dtype=7)
 
         def forward(self, input):
-
+            self.qm.reset_states(input.shape[0])
             return self.conv(self.qm, self.weights, self.weights_last, input)
 
 
@@ -803,7 +803,7 @@
     import matplotlib
     try:
         matplotlib.use("TkAgg")
-    except:  #pylint:disable=bare-except
+    except:  
         print("Can not use matplot TkAgg")
         pass
 
@@ -1110,7 +1110,7 @@
     from pyvqnet.data import data_generator as get_minibatch_data
     try:
         matplotlib.use("TkAgg")
-    except:  #pylint:disable=bare-except
+    except:  
         print("Can not use matplot TkAgg")
         pass
 
@@ -1346,7 +1346,7 @@ Circuit-centric quantum classifiers算法示例
 
 
             def build_circult(weights, xx, nqubits,qm):
-                def Rot(weights_j, nqubits,qm):#pylint:disable=invalid-name
+                def Rot(weights_j, nqubits,qm):
                     VQC_RotCircuit(qm,nqubits,weights_j)
 
                 def basisstate(qm,xx, nqubits):
@@ -1528,7 +1528,7 @@ Circuit-centric quantum classifiers算法示例
     import matplotlib
     try:
         matplotlib.use("TkAgg")
-    except:  #pylint:disable=bare-except
+    except:  
         print("Can not use matplot TkAgg")
         pass
 
@@ -1839,7 +1839,7 @@ Circuit-centric quantum classifiers算法示例
 
     def quantum_cnn_transferlearning():
 
-        class Q_DressedQuantumNet(Module):#pylint:disable=invalid-name
+        class Q_DressedQuantumNet(Module):
 
             def __init__(self):
                 """
@@ -2039,7 +2039,7 @@ VSQL量子整体模型如下:
 
     try:
         matplotlib.use("TkAgg")
-    except:  #pylint:disable=bare-except
+    except:  
         print("Can not use matplot TkAgg")
         pass
 
@@ -2060,7 +2060,7 @@ VSQL量子整体模型如下:
 
 
         def forward(self,x):
-            def get_pauli_str(n_start, n_qsc):#pylint:disable=redefined-outer-name
+            def get_pauli_str(n_start, n_qsc):
                 D = {}
                 D['wires']= [i for i in range(n_start, n_start + n_qsc)]
                 D["observables"] = ["X" for i in range(n_start, n_start + n_qsc)]
@@ -2070,7 +2070,7 @@ VSQL量子整体模型如下:
             self.qm.reset_states(x.shape[0])
             weights = self.w.reshape([depth + 1, 3, n_qsc])
             
-            def subcir(qm, weights, qlist, depth, n_qsc, n_start):#pylint:disable=redefined-outer-name
+            def subcir(qm, weights, qlist, depth, n_qsc, n_start):
 
                 for i in range(n_qsc):
                     rx(qm,qlist[n_start + i], weights[0,0,i])
@@ -2279,7 +2279,7 @@ VSQL量子整体模型如下:
                 optimizer.zero_grad()
                 try:
                     x = x.reshape(batch_size, 1024)
-                except:  #pylint:disable=bare-except
+                except:  
                     x = x.reshape(-1, 1024)
 
                 output = model(x)
@@ -2579,7 +2579,7 @@ QMLP模型示例
     from matplotlib import pyplot as plt
     try:
         matplotlib.use("TkAgg")
-    except:  # pylint:disable=bare-except
+    except:  
         print("Can not use matplot TkAgg")
 
     try:
@@ -2725,8 +2725,8 @@ QMLP模型示例
         """
         Select data from mnist dataset.
         """
-        x_train, y_train = load_mnist("training_data")  #pylint:disable=redefined-outer-name
-        x_test, y_test = load_mnist("testing_data")  #pylint:disable=redefined-outer-name
+        x_train, y_train = load_mnist("training_data")  
+        x_test, y_test = load_mnist("testing_data")  
         idx_train = np.append(
             np.where(y_train == 0)[0][:train_num],
             np.where(y_train == 1)[0][:train_num])
@@ -2885,7 +2885,7 @@ QMLP模型示例
     from matplotlib import pyplot as plt
     try:
         matplotlib.use("TkAgg")
-    except:  # pylint:disable=bare-except
+    except:  
         print("Can not use matplot TkAgg")
     def display_frames_as_gif(frames, c_index):
         patch = plt.imshow(frames[0])
@@ -3326,7 +3326,8 @@ QMLP模型示例
     from pyvqnet.nn import Module,Parameter
     from pyvqnet.nn.loss import MeanSquaredError
     from pyvqnet.optim.adam import Adam
-    from pyvqnet.tensor.tensor import QTensor,kfloat32
+    from pyvqnet.tensor import QTensor
+    from pyvqnet import kfloat32, kint64
     from pyvqnet.device import DEV_GPU
 
     from pyvqnet.qnn.vqc import QMachine,QModule,rx,rz,ry,\

@@ -1,8 +1,10 @@
 
+.. _vqc_api:
+
 变分量子线路自动微分模拟
 ***********************************
 
-VQNet基于自动微分算子构建以及一些常用量子逻辑门、量子线路以及测量方法,可使用自动微分代替量子线路parameter-shift方法计算梯度。我们可以像其他 `Module` 一样,使用VQC算子构成复杂神经网络。在 `Module` 中需要定义虚拟机 `QMachine`,并且需要对machine中 `states` 根据输入的batchsize进行reset_states。请具体看下例:
+VQNet基于自动微分算子构建以及一些常用量子逻辑门、量子线路以及测量方法,可使用自动微分模拟代替量子线路parameter-shift方法计算梯度。我们可以像其他 `Module` 一样,使用VQC算子构成复杂神经网络。在 `Module` 中需要定义虚拟机 `QMachine`,并且需要对machine中 `states` 根据输入的batchsize进行reset_states。请具体看下例:
 
 .. code-block::
 
@@ -119,7 +121,7 @@ QMachine
 
     :param num_wires: 量子比特数。
     :param dtype: 计算数据的数据类型。默认值是pyvqnet。kcomplex64,对应的参数精度为pyvqnet.kfloat32。
-    :param grad_mode: 梯度计算模式,可为 "adjoint",默认值:"",使用自动微分。
+    :param grad_mode: 梯度计算模式,可为 "adjoint",默认值:"",使用自动微分模拟。
     :param save_ir: 设置为True时,将操作保存到originIR,默认值:False。
 
     :return: 输出QMachine。
@@ -202,7 +204,7 @@ I
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
-    :return: 一个Module,可以用来训练模型。
+    :return: 一个I逻辑门类实例。
 
     Example::
         
@@ -260,7 +262,7 @@ Hadamard
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
-    :return: 一个Module,可以用来训练模型。
+    :return: 一个 Hadamard逻辑门类实例。
 
     Example::
         
@@ -320,7 +322,7 @@ T
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
-    :return: 一个Module,可以用来训练模型。
+    :return: 一个 T逻辑门类实例。
 
     Example::
         
@@ -378,7 +380,7 @@ S
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
-    :return: 一个Module,可以用来训练模型。
+    :return: 一个 S逻辑门类实例。
 
     Example::
         
@@ -437,7 +439,7 @@ PauliX
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
-    :return: 一个Module,可以用来训练模型。
+    :return: 一个 PauliX逻辑门类实例。
 
     Example::
         
@@ -496,7 +498,7 @@ PauliY
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
-    :return: 一个Module,可以用来训练模型。
+    :return: 一个 PauliY逻辑门类实例。
 
     Example::
         
@@ -556,7 +558,7 @@ PauliZ
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
-    :return: 一个Module,可以用来训练模型。
+    :return: 一个 PauliZ逻辑门类实例。
 
     Example::
         
@@ -616,7 +618,7 @@ X1
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
-    :return: 一个Module,可以用来训练模型。
+    :return: 一个 X1逻辑门类实例。
 
     Example::
         
@@ -677,7 +679,7 @@ RX
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
-    :return: 一个Module,可以用来训练模型。
+    :return: 一个 RX逻辑门类实例。
 
     Example::
 
@@ -738,7 +740,7 @@ RY
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
-    :return: 一个Module,可以用来训练模型。
+    :return: 一个 RY逻辑门类实例。
 
     Example::
 
@@ -799,7 +801,7 @@ RZ
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
-    :return: 一个Module,可以用来训练模型。
+    :return: 一个 RZ逻辑门类实例。
 
     Example::
 
@@ -862,7 +864,7 @@ CRX
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
-    :return: 一个Module,可以用来训练模型。
+    :return: 一个 CRX逻辑门类实例。
 
     Example::
 
@@ -924,7 +926,7 @@ CRY
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
-    :return: 一个Module,可以用来训练模型。
+    :return: 一个 CRY逻辑门类实例。
 
     Example::
 
@@ -986,7 +988,7 @@ CRZ
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
-    :return: 一个Module,可以用来训练模型。
+    :return: 一个 CRZ逻辑门类实例。
 
     Example::
 
@@ -1049,7 +1051,7 @@ U1
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
-    :return: 一个Module,可以用来训练模型。
+    :return: 一个 U1逻辑门类实例。
 
     Example::
 
@@ -1110,7 +1112,7 @@ U2
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
-    :return: 一个Module,可以用来训练模型。
+    :return: 一个 U2逻辑门类实例。
 
     Example::
 
@@ -1171,7 +1173,7 @@ U3
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
-    :return: 一个Module,可以用来训练模型。
+    :return: 一个 U3逻辑门类实例。
 
     Example::
 
@@ -1230,7 +1232,7 @@ CY
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
-    :return: 一个Module,可以用来训练模型。
+    :return: 一个 CY逻辑门类实例。
 
     Example::
 
@@ -1290,7 +1292,7 @@ CNOT
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
-    :return: 一个Module,可以用来训练模型。
+    :return: 一个 CNOT逻辑门类实例。
 
     Example::
 
@@ -1351,7 +1353,7 @@ CR
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
-    :return: 一个Module,可以用来训练模型。
+    :return: 一个 CR逻辑门类实例。
 
     Example::
 
@@ -1412,7 +1414,7 @@ SWAP
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
-    :return: 一个Module,可以用来训练模型。
+    :return: 一个 SWAP 逻辑门类实例。
 
     Example::
 
@@ -1483,7 +1485,7 @@ CSWAP
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
-    :return: 一个Module,可以用来训练模型。
+    :return: 一个 CSWAP 逻辑门类实例。
 
     Example::
 
@@ -1608,7 +1610,7 @@ CZ
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
-    :return: 一个Module,可以用来训练模型。
+    :return: 一个 CZ 逻辑门类实例。
 
     Example::
 
@@ -1669,7 +1671,7 @@ RXX
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
-    :return: 一个Module,可以用来训练模型。
+    :return: 一个RXX逻辑门类实例。
 
     Example::
 
@@ -1730,7 +1732,7 @@ RYY
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
-    :return: 一个Module,可以用来训练模型。
+    :return: 一个 RYY 逻辑门类实例。
 
     Example::
 
@@ -1792,7 +1794,7 @@ RZZ
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
-    :return: 一个Module,可以用来训练模型。
+    :return: 一个 RZZ 逻辑门类实例。
 
     Example::
 
@@ -1852,7 +1854,7 @@ RZX
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
-    :return: 一个Module,可以用来训练模型。
+    :return: 一个 RZX 逻辑门类实例。
 
     Example::
 
@@ -1913,7 +1915,7 @@ Toffoli
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
-    :return: 一个Module,可以用来训练模型。
+    :return: 一个 Toffoli 逻辑门类实例。
 
     Example::
 
@@ -1976,7 +1978,7 @@ IsingXX
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
-    :return: 一个Module,可以用来训练模型。
+    :return: 一个IsingXX 逻辑门类实例。
 
     Example::
 
@@ -2039,7 +2041,7 @@ IsingYY
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
-    :return: 一个Module,可以用来训练模型。
+    :return: 一个 IsingYY 逻辑门类实例。
 
     Example::
 
@@ -2101,7 +2103,7 @@ IsingZZ
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
-    :return: 一个Module,可以用来训练模型。
+    :return: 一个 IsingZZ 逻辑门类实例。
 
     Example::
 
@@ -2162,8 +2164,8 @@ IsingXY
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
-    :return: 一个Module,可以用来训练模型。
-
+    :return: 一个 IsingXY 逻辑门类实例。
+    
     Example::
 
         from pyvqnet.qnn.vqc import IsingXY,QMachine
@@ -2224,7 +2226,7 @@ PhaseShift
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
-    :return: 一个Module,可以用来训练模型。
+    :return: 一个 PhaseShift 逻辑门类实例。
 
     Example::
 
@@ -2286,7 +2288,7 @@ MultiRZ
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
-    :return: 一个Module,可以用来训练模型。
+    :return: 一个 MultiRZ 逻辑门类实例。
 
     Example::
 
@@ -2349,7 +2351,7 @@ SDG
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
-    :return: 一个Module,可以用来训练模型。
+    :return: 一个SDG逻辑门类实例。
 
     Example::
         
@@ -2410,7 +2412,7 @@ TDG
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
-    :return: 一个Module,可以用来训练模型。
+    :return: 一个TDG逻辑门类实例。
 
     Example::
         
@@ -2475,7 +2477,7 @@ ControlledPhaseShift
     :param wires: 线路作用的比特索引,默认为None。
     :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
-    :return: 一个Module,可以用来训练模型。
+    :return: 一个ControlledPhaseShift。
 
     Example::
 
@@ -2487,129 +2489,6 @@ ControlledPhaseShift
         layer(q_machine = device)
         print(device.states)
 
-        
-multicnot
----------------------------------------------------------------
-
-
-.. py:function:: pyvqnet.qnn.vqc.multicnot(q_machine, wires, params=None, use_dagger=False)
-    
-    对q_machine中的态矢作用量子逻辑门 multicnot 。
-
-    :param q_machine:  量子虚拟机设备。
-    :param wires: 量子比特索引。
-    :param params: 参数矩阵,默认为None,对于含p个参数的逻辑门操作函数,入参的维度需要为[1,p],或[p]。
-    :param use_dagger: 是否共轭转置,默认为False。
-    
-
-    Example::
-    
-        from pyvqnet.qnn.vqc import QMachine
-        import pyvqnet.qnn.vqc as vqc
-        from pyvqnet.tensor import QTensor
-        qm = QMachine(4)
-        vqc.multicnot(q_machine=qm, wires=[0, 1])
-        print(qm.states)
-
-        # [[[[[1.+0.j 0.+0.j]
-        #     [0.+0.j 0.+0.j]]
-        # 
-        #    [[0.+0.j 0.+0.j]
-        #     [0.+0.j 0.+0.j]]]
-        # 
-        # 
-        #   [[[0.+0.j 0.+0.j]
-        #     [0.+0.j 0.+0.j]]
-        # 
-        #    [[0.+0.j 0.+0.j]
-        #     [0.+0.j 0.+0.j]]]]]
-
-MultiCnot
----------------------------------------------------------------
-
-.. py:class:: pyvqnet.qnn.vqc.MultiCnot(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
-    
-    定义一个MultiCnot逻辑门类 。
-
-    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
-    :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
-    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None,如果为p个参数的含参逻辑门,入参的数据维度需要为[1,p]或者[p]。
-    :param wires: 线路作用的比特索引,默认为None。
-    :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
-    :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
-    :return: 一个Module,可以用来训练模型。
-
-    Example::
-
-        from pyvqnet.qnn.vqc import MultiCnot,QMachine
-        device = QMachine(4)
-        layer = MultiCnot(wires=[0,2])
-        batchsize = 2
-        device.reset_states(batchsize)
-        layer(q_machine = device)
-        print(device.states)
-
-
-
-multixcnot
----------------------------------------------------------------
-
-.. py:function:: pyvqnet.qnn.vqc.multixcnot(q_machine, wires, params=None, use_dagger=False)
-    
-    对q_machine中的态矢作用量子逻辑门 multixcnot 。
-
-    :param q_machine:  量子虚拟机设备。
-    :param wires: 量子比特索引。
-    :param params: 参数矩阵,默认为None,对于含p个参数的逻辑门操作函数,入参的维度需要为[1,p],或[p]。
-    :param use_dagger: 是否共轭转置,默认为False。
-
-
-    Example::
-    
-        from pyvqnet.qnn.vqc import QMachine
-        import pyvqnet.qnn.vqc as vqc
-        from pyvqnet.tensor import QTensor
-        qm = QMachine(4)
-        vqc.multixcnot(q_machine=qm, wires=[0, 1])
-        print(qm.states)
-
-        # [[[[[0.+0.j 0.+0.j]
-        #     [0.+0.j 0.+0.j]]
-        # 
-        #    [[1.+0.j 0.+0.j]
-        #     [0.+0.j 0.+0.j]]]
-        # 
-        # 
-        #   [[[0.+0.j 0.+0.j]
-        #     [0.+0.j 0.+0.j]]
-        # 
-        #    [[0.+0.j 0.+0.j]
-        #     [0.+0.j 0.+0.j]]]]]
-
-MultiXcnot
----------------------------------------------------------------
-
-.. py:class:: pyvqnet.qnn.vqc.MultiXcnot(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
-    
-    定义一个MultiXcnot逻辑门类 。
-
-    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
-    :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
-    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None,如果为p个参数的含参逻辑门,入参的数据维度需要为[1,p]或者[p]。
-    :param wires: 线路作用的比特索引,默认为None。
-    :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
-    :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
-    :return: 一个Module,可以用来训练模型。
-
-    Example::
-
-        from pyvqnet.qnn.vqc import MultiXcnot,QMachine
-        device = QMachine(4)
-        layer = MultiXcnot(wires=[0,2])
-        batchsize = 2
-        device.reset_states(batchsize)
-        layer(q_machine = device)
-        print(device.states)
 
 
 multicontrolledx
@@ -2672,7 +2551,7 @@ MultiControlledX
     :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
     :param control_values: 控制值,默认为None,当比特位为1时控制。
 
-    :return: 一个Module,可以用来训练模型。
+    :return: 一个 MultiControlledX 逻辑门实例。
 
     Example::
 
@@ -2832,7 +2711,8 @@ VQC_Purity
     Example::
 
         from pyvqnet.qnn.vqc import VQC_Purity, rx, ry, cnot, QMachine
-        from pyvqnet.tensor import kfloat64, QTensor
+        from pyvqnet.tensor import QTensor
+        from pyvqnet import kfloat64
         x = QTensor([[0.7, 0.4], [1.7, 2.4]], requires_grad=True)
         qm = QMachine(3)
         qm.reset_states(2)
@@ -2894,7 +2774,8 @@ VQC_DensityMatrixFromQstate
     Example::
 
         from pyvqnet.qnn.vqc import VQC_DensityMatrixFromQstate,rx,ry,cnot,QMachine
-        from pyvqnet.tensor import kfloat64, QTensor
+        from pyvqnet.tensor import QTensor
+        from pyvqnet import kfloat64
         x = QTensor([[0.7,0.4],[1.7,2.4]],requires_grad=True)
 
         qm = QMachine(3)
@@ -2953,7 +2834,8 @@ Probability
     Example::
 
         from pyvqnet.qnn.vqc import Probability,rx,ry,cnot,QMachine,rz
-        from pyvqnet.tensor import kfloat64, QTensor
+        from pyvqnet.tensor import QTensor
+        from pyvqnet import kfloat64
         x = QTensor([[0.56, 0.1],[0.56, 0.1]],requires_grad=True)
         qm = QMachine(4)
         qm.reset_states(2)
@@ -3003,8 +2885,8 @@ MeasureAll
     Example::
 
         from pyvqnet.qnn.vqc import MeasureAll,rx,ry,cnot,QMachine,rz
-        from pyvqnet.tensor import kfloat64, QTensor
-
+        from pyvqnet.tensor import QTensor
+        from pyvqnet import kfloat64
         x = QTensor([[0.56, 0.1],[0.56, 0.1]],requires_grad=True)
 
         # 4 qubits
@@ -3069,7 +2951,8 @@ Samples
     Example::
 
         from pyvqnet.qnn.vqc import Samples,rx,ry,cnot,QMachine,rz
-        from pyvqnet.tensor import kfloat64, QTensor
+        from pyvqnet.tensor import QTensor
+        from pyvqnet import kfloat64
         x = QTensor([[0.56, 0.1],[0.56, 0.1]],requires_grad=True)
 
         qm = QMachine(4)
@@ -3277,16 +3160,18 @@ HermitianExpval
 VQC_HardwareEfficientAnsatz
 ---------------------------------------------------------------
 
-.. py:class:: pyvqnet.qnn.vqc.VQC_HardwareEfficientAnsatz(n_qubits,single_rot_gate_list,entangle_gate="CNOT",entangle_rules='linear',depth=1)
+.. py:class:: pyvqnet.qnn.vqc.VQC_HardwareEfficientAnsatz(n_qubits,single_rot_gate_list,entangle_gate="CNOT",entangle_rules='linear',depth=1,initial=None,dtype=None)
 
     一个含可训练参数的变分量子线路类,实现了论文介绍的Hardware Efficient Ansatz的实现: `Hardware-efficient Variational Quantum Eigensolver for Small Molecules <https://arxiv.org/pdf/1704.05018.pdf>`__ 。
 
     :param n_qubits: 量子比特数。
-    :param single_rot_gate_list: 单个量子位旋转门列表由一个或多个作用于每个量子位的旋转门构成。目前支持 Rx、Ry、Rz。
-    :param entangle_gate: 非参数化纠缠门。支持CNOT、CZ。默认: CNOT。
-    :param entangle_rules: 电路中如何使用纠缠门。 ``linear`` 意味着纠缠门将作用于每个相邻的量子位。 ``all`` 意味着纠缠门将作用于任何两个 qbuits。 默认值:``linear``。
-    :param depth: ansatz 的深度,默认:1。
-    :return: 返回一个含可训练参数的变分量子线路类。
+    :param single_rot_gate_list: 单个量子比特旋转门列表由一个或多个作用于每个量子比特的旋转门构成。目前支持 Rx、Ry、Rz。
+    :param entangle_gate: 非参数化纠缠门。支持 CNOT、CZ。默认值: CNOT。
+    :param entangle_rules: 纠缠门在电路中的使用方式。"linear" 表示纠缠门将作用于每个相邻的量子比特。'all' 表示纠缠门将作用于任意两个量子比特。默认值: "linear"。
+    :param depth: 假设的深度, 默认值: 1。
+    :param initial: 使用initial 初始化所有其中参数逻辑门的参数, 默认值: None, 此模块将随机初始化参数。
+    :param dtype: 参数的数据类型,默认值: None,使用 float32。
+    :return: 一个 VQC_HardwareEfficientAnsatz 实例。
 
 
 
@@ -3341,7 +3226,9 @@ VQC_BasicEntanglerTemplate
     :param num_layer: 量子比特线路层数。
     :param num_qubits: 量子比特数,默认为1。
     :param rotation: 使用单参数单量子比特门,``RX`` 被用作默认值。
-    :return: 返回一个含可训练参数的变分量子线路类。
+    :param initial: 使用initial 初始化所有其中参数逻辑门的参数, 默认值: None, 此模块将随机初始化参数。
+    :param dtype: 参数的数据类型,默认值: None,使用 float32。
+    :return: 返回一个含可训练参数的VQC_BasicEntanglerTemplate实例。
 
     Example::
 
@@ -3381,18 +3268,18 @@ VQC_BasicEntanglerTemplate
 VQC_StronglyEntanglingTemplate
 ---------------------------------------------------------------
 
-.. py:class:: pyvqnet.qnn.vqc.VQC_StronglyEntanglingTemplate(weights=None, num_qubits=1, ranges=None)
+.. py:class:: pyvqnet.qnn.vqc.VQC_StronglyEntanglingTemplate(num_layers=1, num_qubits=1, rotation = "RX", initial = None, dtype: = None)
 
     由单个量子比特旋转和纠缠器组成的层,参考 `circuit-centric classifier design <https://arxiv.org/abs/1804.00633>`__ .
 
-    参数 ``weights`` 包含每一层的权重。 因此得出层数 :math:`L` 等于 ``weights`` 的第一个维度。
+ 
+    :param num_layers: 重复层数,默认值: 1。
+    :param num_qubits: 量子比特数,默认值: 1。
+    :param rotation: 要使用的单参数单量子比特门,默认值: `RX`
+    :param initial: 使用initial 初始化所有其中参数逻辑门的参数,默认值: None,此模块将随机初始化参数。
+    :param dtype: 参数的数据类型,默认值: None,使用 float32。
+    :return: VQC_BasicEntanglerTemplate 实例
 
-    其包含2-qubit CNOT 门,作用于 :math:`M` 个量子比特上,:math:`i = 1,...,M`。 每个门的第二个量子位标号由公式 :math:`(i+r)\mod M` 给出,其中 :math:`r` 是一个称为 ``range``  的超参数,并且 :math:`0 < r < M`。
-
-    :param weights: 形状为 ``(L, M, 3)`` 的权重张量,默认值:None,使用形状为 ``(1,1,3)`` 的随机张量。
-    :param num_qubits: 量子比特数,默认值:1。
-    :param ranges: 确定每个后续层的范围超参数的序列； 默认值:None,使用 :math:`r=l \ mod M` 作为ranges 的值。
-    :return: 返回一个含可训练参数的变分量子线路类。
 
     Example::
 
@@ -3433,19 +3320,20 @@ VQC_QuantumEmbedding
 ---------------------------------------------------------------
 
 
-.. py:class:: pyvqnet.qnn.vqc.VQC_QuantumEmbedding(qubits, machine, num_repetitions_input, depth_input, num_unitary_layers, num_repetitions)
+.. py:class:: pyvqnet.qnn.vqc.VQC_QuantumEmbedding( num_repetitions_input, depth_input, num_unitary_layers, num_repetitions,initial=None,dtype=None,name="")
 
     使用 RZ,RY,RZ 创建变分量子电路,将经典数据编码为量子态。
     参考 `Quantum embeddings for machine learning <https://arxiv.org/abs/2001.03622>`_。
-    在初始化该类后,其成员函数 ``compute_circuit`` 为运行函数,可作为参数输入 ``QuantumLayerV2`` 类构成量子机器学习模型的一层。
 
-    :param qubits: 使用pyqpanda 申请的量子比特。
-    :param machine: 使用pyqpanda 申请的量子虚拟机。
-    :param num_repetitions_input: 在子模块中对输入进行编码的重复次数。
-    :param depth_input: 输入数据的特征维度。
-    :param num_unitary_layers: 每个子模块中变分量子门的重复次数。
+ 
+    :param num_repetitions_input: 子模块中输入编码的重复次数。
+    :paramdepth_input: 输入维数。
+    :param num_unitary_layers: 变分量子门的重复次数。
     :param num_repetitions: 子模块的重复次数。
-    :return: 返回一个含可训练参数的变分量子线路类。
+    :param initial: 初始化所有参数, 该参数必须是只有一个元素的 QTensor, 默认值: None。
+    :param dtype: 参数的数据类型, 默认值: None, 使用 float32。
+    :param name: 该模块的名称。
+    :return: VQC_QuantumEmbedding 实例。
     
     Example::
 
@@ -3501,13 +3389,14 @@ VQC_QuantumEmbedding
 ExpressiveEntanglingAnsatz
 ---------------------------------------------------------------
 
-.. py:class:: pyvqnet.qnn.vqc.ExpressiveEntanglingAnsatz(type, num_wires, )
+.. py:class:: pyvqnet.qnn.vqc.ExpressiveEntanglingAnsatz(type: int, num_wires: int, depth: int, dtype=None, name: str = "")
 
     论文 `Expressibility and entangling capability of parameterized quantum circuits for hybrid quantum-classical algorithms <https://arxiv.org/pdf/1905.10876.pdf>`_ 中的 19 种不同的ansatz。
 
-    :param type: 电路类型从 1 到 19。
+    :param type: 电路类型从 1 到 19,共19种线路。
     :param num_wires: 量子比特数。
     :param depth: 电路深度。
+    :param dtype: 参数的数据类型, 默认值: None, 使用 float32。
     :param name: 名字,默认"".
 
     :return:
@@ -3588,7 +3477,7 @@ VQC_AngleEmbedding
 ---------------------------------------------------------------
 
 
-.. py:function:: pyvqnet.qnn.vqc.VQC_AngleEmbedding(input_feat, wires, q_machine: QMachine, rotation: str = "X")
+.. py:function:: pyvqnet.qnn.vqc.VQC_AngleEmbedding(input_feat, wires, q_machine: pyvqnet.qnn.vqc.QMachine, rotation: str = "X")
 
     将 :math:`N` 特征编码到 ``q_machine`` :math:`n` 量子比特的旋转角度中, 其中 :math:`N \leq n`。
 
@@ -3661,7 +3550,7 @@ VQC_IQPEmbedding
 ---------------------------------------------------------------
 
 
-.. py:function:: pyvqnet.qnn.vqc.VQC_IQPEmbedding(input_feat, q_machine: QMachine, rep: int = 1)
+.. py:function:: pyvqnet.qnn.vqc.VQC_IQPEmbedding(input_feat, q_machine: pyvqnet.qnn.vqc.QMachine, rep: int = 1)
 
     使用IQP线路的对角门将 :math:`n` 特征编码为 ``q_machine``  :math:`n` 量子比特。
 
@@ -3987,7 +3876,7 @@ VQC_ZFeatureMap
 ---------------------------------------------------------------
 
 
-.. py:function:: pyvqnet.qnn.vqc.VQC_ZFeatureMap(input_feat, q_machine: QMachine, data_map_func=None, rep: int = 2)
+.. py:function:: pyvqnet.qnn.vqc.VQC_ZFeatureMap(input_feat, q_machine: pyvqnet.qnn.vqc.QMachine, data_map_func=None, rep: int = 2)
 
     在 ``q_machine`` 上运行一阶泡利 Z 演化电路。
 
@@ -4030,7 +3919,7 @@ VQC_ZZFeatureMap
 ---------------------------------------------------------------
 
 
-.. py:function:: pyvqnet.qnn.vqc.VQC_ZZFeatureMap(input_feat, q_machine: QMachine, data_map_func=None, entanglement: Union[str, List[List[int]],Callable[[int], List[int]]] = "full",rep: int = 2)
+.. py:function:: pyvqnet.qnn.vqc.VQC_ZZFeatureMap(input_feat, q_machine: pyvqnet.qnn.vqc.QMachine, data_map_func=None, entanglement: Union[str, List[List[int]],Callable[[int], List[int]]] = "full",rep: int = 2)
 
     在 ``q_machine`` 上运行二阶 Pauli-Z 演化电路。
 
@@ -4078,11 +3967,13 @@ VQC_AllSinglesDoubles
 ---------------------------------------------------------------
 
 
-.. py:function:: pyvqnet.qnn.vqc.VQC_AllSinglesDoubles(weights, q_machine: QMachine, hf_state, wires, singles=None, doubles=None)
+.. py:function:: pyvqnet.qnn.vqc.VQC_AllSinglesDoubles(weights, q_machine: pyvqnet.qnn.vqc.QMachine, hf_state, wires, singles=None, doubles=None)
 
-    在 ``q_machine`` 上将所有 ``SingleExcitation`` 和 ``DoubleExcitation`` 操作应用于初始 Hartree-Fock 状态,准备分子关联状态。
+    在这种情况下,我们有四个单激发和双激发来保留 Hartree-Fock 态的总自旋投影。 
 
-    :param weights: 大小为 ``(len(singles) + len(doubles),)`` 的QTensor,包含按顺序进入 vqc.single_excitation 和 vqc.double_excitation 操作的角度
+    由此产生的酉矩阵保留了粒子数量,并在初始 Hartree-Fock 状态和编码多激发配置的其他状态的叠加中准备了n量子位系统。
+      
+    :param weights: 大小为 ``(len(singles) + len(doubles),)`` 的QTensor,包含按顺序进入 vqc.qCircuit.single_excitation 和 vqc.qCircuit.double_excitation 操作的角度
     :param q_machine: 量子虚拟机。
     :param hf_state: 代表 Hartree-Fock 状态的长度 ``len(wires)`` 占用数向量, ``hf_state`` 用于初始化线路。
     :param wires: 作用的量子位。
@@ -4118,7 +4009,7 @@ VQC_BasisRotation
 ---------------------------------------------------------------
 
 
-.. py:function:: pyvqnet.qnn.vqc.VQC_BasisRotation(q_machine: QMachine, wires, unitary_matrix: QTensor, check=False)
+.. py:function:: pyvqnet.qnn.vqc.VQC_BasisRotation(q_machine: pyvqnet.qnn.vqc.QMachine, wires, unitary_matrix: QTensor, check=False)
 
     在 ``q_machine`` 上实现一个电路,执行精确的单体基础旋转。
 
@@ -4129,7 +4020,6 @@ VQC_BasisRotation
         U(u) = \exp{\left( \sum_{pq} \left[\log u \right]_{pq} (a_p^\dagger a_q - a_q^\dagger a_p) \right)}.
     
     :math:`U(u)` 通过使用论文 `Optica, 3, 1460 (2016) <https://opg.optica.org/optica/fulltext.cfm?uri=optica-3-12-1460&id=355743>`_\ 中给出的方案。
-    将输入酉矩阵分解后,由一系列 :class:`~vqc.phaseshift` 和 :class:`~vqc.single_exitation` 门来有效实现。
     
 
     :param q_machine: 量子虚拟机。
@@ -4444,167 +4334,19 @@ VQC_QSVT
 =====================
 
 
-HybirdVQCQpandaQVMLayer
------------------------------------------------------------
-
-.. py:class:: pyvqnet.qnn.vqc.HybirdVQCQpandaQVMLayer(vqc_module: Module,qcloud_token: str,para_num: int,num_qubits: int,num_cubits: int,pauli_str_dict: Union[List[Dict], Dict, None] = None,shots: int = 1000,initializer: Callable = None,dtype: Union[int, None] = None,name: str = "",submit_kwargs: Dict = {},query_kwargs: Dict = {})
-
-
-    混合 vqc 和 qpanda QVM 层。该层将用户 `forward` 函数定义的量子线路计算转化为QPanda线路,可在QPanda 本地虚拟机或者云端服务上进行前向运行,并在本地CPU上模拟计算线路参数梯度,降低了使用参数漂移法计算的时间复杂度。
-
-    :param vqc_module: 带有 forward() 的 vqc_module,qmachine 设置正确。
-    :param qcloud_token: `str` - 量子机器的类型或用于执行的云令牌。
-    :param para_num: `int` - 参数数量；参数是一维的。
-    :param num_qubits: `int` - 量子电路中的量子比特数。
-    :param num_cubits: `int` - 量子电路中用于测量的经典比特数。
-    :param pauli_str_dict: `dict|list` - 表示量子电路中泡利算子的字典或字典列表。默认值为 None。
-    :param shots: `int` - 测量镜头数。默认值为 1000。
-    :param initializer: 参数值的初始化器。默认值为 None。
-    :param dtype: 参数的数据类型。默认值为 None,即使用默认数据类型。
-    :param name: 模块名称。默认值为空字符串。
-    :param submit_kwargs: 提交量子电路的附加关键字参数,默认值:
-        {"chip_id":pyqpanda.real_chip_type.origin_72,
-        "is_amend":True,"is_mapping":True,
-        "is_optimization":True,
-        "default_task_group_size":200,
-        "test_qcloud_fake":True}。
-    :param query_kwargs: 查询量子结果的附加关键字参数,默认值:{"timeout":2,"print_query_info":True,"sub_circuits_split_size":1}。
-    
-    :return: 可以计算量子电路的模块。
-
-    .. note::
-
-        pauli_str_dict 不能为 None,并且应与 vqc_module 测量函数中的 obs 相同。
-        vqc_module 应具有 QMachine 类型的属性,QMachine 应设置 save_ir=True
-
-    Example::
-
-        from pyvqnet.qnn.vqc  import *
-        import pyvqnet
-        from pyvqnet.nn import Module,Linear
-
-        class Hybird(Module):
-            def __init__(self):
-                self.cl1 = Linear(3,3)
-                self.ql = QModel(num_wires=6, dtype=pyvqnet.kcomplex64)
-                self.cl2 = Linear(1,2)
-            
-            def forward(self,x):
-                x = self.cl1(x)
-                x = self.ql(x)
-                x = self.cl2(x)
-                return x
-            
-        class QModel(Module):
-            def __init__(self, num_wires, dtype,grad_mode=""):
-                super(QModel, self).__init__()
-
-                self._num_wires = num_wires
-                self._dtype = dtype
-                self.qm = QMachine(num_wires, dtype=dtype,grad_mode=grad_mode,save_ir=True)
-                self.rx_layer = RX(has_params=True, trainable=False, wires=0)
-                self.ry_layer = RY(has_params=True, trainable=False, wires=1)
-                self.rz_layer = RZ(has_params=True, trainable=False, wires=1)
-                self.u1 = U1(has_params=True,trainable=True,wires=[2])
-                self.u2 = U2(has_params=True,trainable=True,wires=[3])
-                self.u3 = U3(has_params=True,trainable=True,wires=[1])
-                self.i = I(wires=[3])
-                self.s = S(wires=[3])
-                self.x1 = X1(wires=[3])
-                self.y1 = Y1(wires=[3])
-                self.z1 = Z1(wires=[3])
-                self.x = PauliX(wires=[3])
-                self.y = PauliY(wires=[3])
-                self.z = PauliZ(wires=[3])
-                self.swap = SWAP(wires=[2,3])
-                self.cz = CZ(wires=[2,3])
-                self.cr = CR(has_params=True,trainable=True,wires=[2,3])
-                self.rxx = RXX(has_params=True,trainable=True,wires=[2,3])
-                self.rzz = RYY(has_params=True,trainable=True,wires=[2,3])
-                self.ryy = RZZ(has_params=True,trainable=True,wires=[2,3])
-                self.rzx = RZX(has_params=True,trainable=False, wires=[2,3])
-                self.toffoli = Toffoli(wires=[2,3,4],use_dagger=True)
-                #self.rz_layer2 = RZ(has_params=True, trainable=True, wires=1)
-                self.h =Hadamard(wires=[1])
-    
-                self.iSWAP = iSWAP(True,True,wires=[0,2])
-                self.tlayer = T(wires=1)
-                self.cnot = CNOT(wires=[0, 1])
-                self.measure = MeasureAll(obs={'Z0':2,'Y3':3} 
-            )
-
-            def forward(self, x, *args, **kwargs):
-                self.qm.reset_states(x.shape[0])
-                self.i(q_machine=self.qm)
-                self.s(q_machine=self.qm)
-                self.swap(q_machine=self.qm)
-                self.cz(q_machine=self.qm)
-                self.x(q_machine=self.qm)
-                self.x1(q_machine=self.qm)
-                self.y(q_machine=self.qm)
-                self.y1(q_machine=self.qm)
-                self.z(q_machine=self.qm)
-                self.z1(q_machine=self.qm)
-                self.ryy(q_machine=self.qm)
-                self.rxx(q_machine=self.qm)
-                self.rzz(q_machine=self.qm)
-                self.rzx(q_machine=self.qm,params = x[:,[1]])
-                self.cr(q_machine=self.qm)
-                self.u1(q_machine=self.qm)
-                self.u2(q_machine=self.qm)
-                self.u3(q_machine=self.qm)
-                self.rx_layer(params = x[:,[0]], q_machine=self.qm)
-                self.cnot(q_machine=self.qm)
-                self.h(q_machine=self.qm)
-                self.iSWAP(q_machine=self.qm)
-                self.ry_layer(params = x[:,[1]], q_machine=self.qm)
-                self.tlayer(q_machine=self.qm)
-                self.rz_layer(params = x[:,[2]], q_machine=self.qm)
-                self.toffoli(q_machine=self.qm)
-                rlt = self.measure(q_machine=self.qm)
-
-                return rlt
-            
-
-        input_x = tensor.QTensor([[0.1, 0.2, 0.3]])
-
-        input_x = tensor.broadcast_to(input_x,[2,3])
-
-        input_x.requires_grad = True
-
-        qunatum_model = QModel(num_wires=6, dtype=pyvqnet.kcomplex64)
-
-        l = HybirdVQCQpandaQVMLayer(qunatum_model,
-                                "3047DE8A59764BEDAC9C3282093B16AF1",
-                    5,
-                    6,
-                    6,
-                    pauli_str_dict={'Z0':2,'Y3':3},
-                    shots = 1000,
-                    initializer=None,
-                    dtype=None,
-                    name="",
-            submit_kwargs={"test_qcloud_fake":True},
-                    query_kwargs={})
-    
-        y = l(input_x)
-        print(y)
-        y.backward()
-        print(input_x.grad)
-
-
 
 QuantumLayerAdjoint
 ---------------------------------------------------------------
 
-.. py:class:: pyvqnet.qnn.vqc.QuantumLayerAdjoint(general_module: pyvqnet.nn.Module, q_machine: QMachine,name="")
+.. py:class:: pyvqnet.qnn.vqc.QuantumLayerAdjoint(general_module: pyvqnet.nn.Module,q_machine, name="")
 
 
     使用伴随矩阵方式进行梯度计算的可自动微分的QuantumLayer层,参考  `Efficient calculation of gradients in classical simulations of variational quantum algorithms <https://arxiv.org/abs/2009.02823>`_ 。
 
-    :param general_module: 一个仅使用 ``pyvqnet.qnn.vqc`` 下量子线路接口搭建的 `pyvqnet.nn.Module` 实例。
-    :param q_machine: 来自general_module中定义的QMachine。
+    :param general_module: 一个仅使用 ``pyvqnet.qnn.vqc`` 下量子线路接口搭建的 ``pyvqnet.nn.Module`` 实例。
+    :param q_machine: general_module 模块中申请的QMachine实例。
     :param name: 该层名字,默认为""。
+    :return: 返回一个 QuantumLayerAdjoint 类实例。
 
     .. note::
 
@@ -4669,7 +4411,7 @@ QuantumLayerAdjoint
                             dtype=pyvqnet.kcomplex64,
                             grad_mode="adjoint")
 
-        adjoint_model = QuantumLayerAdjoint(qunatum_model, qunatum_model.qm)
+        adjoint_model = QuantumLayerAdjoint(qunatum_model,q_machine=qunatum_model.qm)
 
         batch_y = adjoint_model(input_x)
         batch_y.backward()
@@ -4683,7 +4425,7 @@ QuantumLayerAdjoint
 QuantumLayerES
 ---------------------------------------------------------------
 
-.. py:class:: pyvqnet.qnn.vqc.QuantumLayerES(general_module: nn.Module, q_machine: QMachine, name="", sigma = np.pi / 24)
+.. py:class:: pyvqnet.qnn.vqc.QuantumLayerES(general_module: nn.Module, q_machine: pyvqnet.qnn.vqc.QMachine, name="", sigma = np.pi / 24)
 
 
     根据进化策略进行梯度计算的可自动微分的QuantumLayer层,参考  `Learning to learn with an evolutionary strategy Learning to learn with an evolutionary strategy <https://arxiv.org/abs/2310.17402>`_ 。

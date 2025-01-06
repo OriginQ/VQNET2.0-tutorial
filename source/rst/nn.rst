@@ -114,7 +114,7 @@ Module
 forward
 =================================
 
-.. py:function:: pyvqnet.nn.module.Module.forward(x, *args, **kwargs)
+.. py:method:: pyvqnet.nn.module.Module.forward(x, *args, **kwargs)
 
     Module类抽象前向计算函数
 
@@ -191,7 +191,7 @@ toGPU
         Module在不同GPU上无法进行计算。
         如果您尝试在 ID 超过验证 GPU 最大数量的 GPU 上创建 QTensor,将引发 Cuda 错误。
 
-    :param device: 当前保存QTensor的设备,默认=DEV_GPU_0。device= pyvqnet.DEV_GPU_0,存储在第一个 GPU 中,devcie = DEV_GPU_1,存储在第二个 GPU 中,依此类推
+    :param device: 当前保存QTensor的设备,默认:DEV_GPU_0。device= pyvqnet.DEV_GPU_0,存储在第一个 GPU 中,devcie = DEV_GPU_1,存储在第二个 GPU 中,依此类推
     :return: Module 移动到 GPU 设备。
 
     Examples::
@@ -220,6 +220,8 @@ toCPU
         print(test_conv.backend)
         #0
 
+
+.. _save_parameters:
 
 模型参数保存和载入
 *********************************************************
@@ -878,7 +880,7 @@ BatchNorm1d
     :param channel_num: `int` - 输入通道数。
     :param momentum: `float` - 计算指数加权平均时的动量,默认为 0.1。
     :param epsilon: `float` - 数值稳定性常数,默认为 1e-5。
-    :param affine: `bool` - 一个布尔值,当设置为 ``True`` 时,此模块具有可学习的每通道仿射参数,初始化为 1(用于权重）和 0(用于偏差）。默认值:``True``。
+    :param affine: `bool` - 一个布尔值,当设置为 ``True`` 时,此模块具有可学习的每通道仿射参数,初始化为 1(用于权重)和 0(用于偏差)。默认值:``True``。
     :param beta_initializer: `callable` - beta的初始化方式,默认全零初始化。
     :param gamma_initializer: `callable` - gamma的的初始化方式,默认全一初始化。
     :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
@@ -922,7 +924,7 @@ LayerNormNd
 
     :param norm_shape: `float` - 标准化形状。
     :param epsilon: `float` - 数值稳定性常数,默认为 1e-5。
-    :param affine: `bool` - 一个布尔值,当设置为 ``True`` 时,此模块具有可学习的每通道仿射参数,初始化为 1(用于权重）和 0(用于偏差）。默认值:``True``。
+    :param affine: `bool` - 一个布尔值,当设置为 ``True`` 时,此模块具有可学习的每通道仿射参数,初始化为 1(用于权重)和 0(用于偏差)。默认值:``True``。
     :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
     :param name: 这个模块的名字, 默认为""。
 
@@ -964,7 +966,7 @@ LayerNorm2d
 
     :param norm_size: `float` - 归一化大小,应该等于 C * H * W。
     :param epsilon: `float` - 数值稳定性常数,默认为 1e-5。
-    :param affine: `bool` - 一个布尔值,当设置为 ``True`` 时,此模块具有可学习的每通道仿射参数,初始化为 1(用于权重）和 0(用于偏差）。默认值:``True``。
+    :param affine: `bool` - 一个布尔值,当设置为 ``True`` 时,此模块具有可学习的每通道仿射参数,初始化为 1(用于权重)和 0(用于偏差)。默认值:``True``。
     :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
     :param name: 这个模块的名字, 默认为""。
 
@@ -1017,7 +1019,7 @@ LayerNorm1d
 
     :param norm_size: `float` - 归一化大小,应该等于最后一维大小。
     :param epsilon: `float` - 数值稳定性常数,默认为 1e-5。
-    :param affine: `bool` - 一个布尔值,当设置为 ``True`` 时,此模块具有可学习的每通道仿射参数,初始化为 1(用于权重）和 0(用于偏差）。默认值:``True``。
+    :param affine: `bool` - 一个布尔值,当设置为 ``True`` 时,此模块具有可学习的每通道仿射参数,初始化为 1(用于权重)和 0(用于偏差)。默认值:``True``。
     :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
     :param name: 这个模块的名字, 默认为""。
 
@@ -1060,7 +1062,7 @@ GroupNorm
     :param num_groups (int): 将通道分成的组数
     :param num_channels (int): 输入中预期的通道数
     :param eps: 添加到分母的值,以实现数值稳定性。默认值:1e-5
-    :param affine: 一个布尔值,当设置为 ``True`` 时,此模块具有可学习的每通道仿射参数,初始化为 1(用于权重）和 0(用于偏差）。默认值: ``True``。
+    :param affine: 一个布尔值,当设置为 ``True`` 时,此模块具有可学习的每通道仿射参数,初始化为 1(用于权重)和 0(用于偏差)。默认值: ``True``。
     :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
     :param name: 这个模块的名字, 默认为""。
 
@@ -1164,7 +1166,7 @@ DropPath
 
 .. py:class:: pyvqnet.nn.dropout.DropPath(dropout_rate = 0.5,name="")
 
-    DropPath 模块将逐样本丢弃路径(随机深度）。
+    DropPath 模块将逐样本丢弃路径(随机深度)。
 
     :param dropout_rate: `float` - 神经元被设置为零的概率。
     :param name: 这个模块的名字, 默认为""。
@@ -1828,7 +1830,6 @@ Interpolate
         import numpy as np
         np.random.seed(0)
 
-        from time import time
         np_ = np.random.randn(36).reshape((1, 1, 6, 6)).astype(np.float32)
         mode_ = "bilinear"
         size_ = 3
@@ -1845,15 +1846,10 @@ Interpolate
                 x = self.ln(x)
                 return 2 * x 
 
-        input_vqnet = tensor.QTensor(np_,  dtype=pyvqnet.kfloat32, requires_grad=True).toGPU()
-        model = model_vqnet().toGPU()
+        input_vqnet = tensor.QTensor(np_,  dtype=pyvqnet.kfloat32, requires_grad=True)
         loss_pyvqnet = pyvqnet.nn.MeanSquaredError()
-        time3 = time()
-        output_vqnet = model(input_vqnet)
-        time4 = time()
-        print(f"output_vqnet {output_vqnet} time {time4 - time3}")
-
-        l = loss_pyvqnet(tensor.QTensor([[1.0]]).toGPU(), output_vqnet)
+        output_vqnet = model_vqnet(input_vqnet)
+        l = loss_pyvqnet(tensor.QTensor([[1.0]]), output_vqnet)
         l.backward()
         print(model.parameters()[0].grad)
 
@@ -1864,7 +1860,7 @@ fuse_module
 
     用于模型在推理阶段的相应相邻模块融合成一个模块,减少模型推理阶段计算量, 增加模型推理速度。
 
-    目前支持的模块序列如下：
+    目前支持的模块序列如下: 
 
     conv, bn
 
@@ -2078,7 +2074,8 @@ MeanSquaredError
 
     Example::
 
-        from pyvqnet.tensor import QTensor, kfloat64
+        from pyvqnet.tensor import QTensor
+        from pyvqnet import kfloat64
         from pyvqnet.nn import MeanSquaredError
         y = QTensor([[0, 0, 1, 0, 0, 0, 0, 0, 0, 0]],
                     requires_grad=False,
@@ -2167,7 +2164,8 @@ CategoricalCrossEntropy
 
     Example::
 
-        from pyvqnet.tensor import QTensor,kfloat32,kint64
+        from pyvqnet.tensor import QTensor
+        from pyvqnet import kfloat32,kint64
         from pyvqnet.nn import CategoricalCrossEntropy
         x = QTensor([[1, 2, 3, 4, 5],
         [1, 2, 3, 4, 5],
@@ -2206,7 +2204,8 @@ SoftmaxCrossEntropy
 
     Example::
 
-        from pyvqnet.tensor import QTensor, kfloat32, kint64
+        from pyvqnet.tensor import QTensor
+        from pyvqnet import kfloat32, kint64
         from pyvqnet.nn import SoftmaxCrossEntropy
         x = QTensor([[1, 2, 3, 4, 5], [1, 2, 3, 4, 5], [1, 2, 3, 4, 5]],
                     requires_grad=True,
@@ -2251,7 +2250,8 @@ NLL_Loss
 
     Example::
 
-        from pyvqnet.tensor import QTensor, kint64
+        from pyvqnet.tensor import QTensor
+        from pyvqnet import kint64
         from pyvqnet.nn import NLL_Loss
 
         x = QTensor([
@@ -2527,6 +2527,12 @@ Gelu
 
     .. math:: \text{GELU}(x) = 0.5 * x * (1 + \text{Tanh}(\sqrt{2 / \pi} * (x + 0.044715 * x^3)))
 
+
+    :param approximate: 近似计算方式, 默认为"tanh"。
+    :param name: 激活函数层的命名,默认为""。
+
+    :return: Gelu 激活函数层实例。
+    
     Examples::
 
         from pyvqnet.tensor import randu, ones_like
@@ -2596,6 +2602,8 @@ Tanh
 优化器模块
 *********************************************************
 
+
+.. _Optimizer:
 
 Optimizer
 =================================
@@ -3038,7 +3046,8 @@ Rotosolve算法它允许相对于其他参数的固定值直接跳转到单个�
 
         from pyvqnet.optim.rotosolve import Rotosolve
         import pyqpanda as pq
-        from pyvqnet.tensor import QTensor,kfloat64
+        from pyvqnet.tensor import QTensor
+        from pyvqnet import kfloat64
         from pyvqnet.qnn.measure import expval
         machine = pq.CPUQVM()
         machine.init_qvm()
@@ -3432,19 +3441,24 @@ auc_calculate
         print("auc:", result) # 0.1111111111111111
 
 
-分布式计算模块
+.. _vqnet_dist:
+
+VQNet原生分布式计算模块
 *********************************************************
-该模块仅在linux操作系统下能够使用!
+
+该模块使用mpi启动多进程并行计算, 使用nccl进行GPU之间通信。仅在linux操作系统下能够使用。
+
+
 
 环境部署
 =================================
 
-以下介绍VQNet分别基于CPU、GPU分布式计算所需的Linux系统下环境的部署.
+以下介绍VQNet分别基于CPU、GPU分布式计算所需的Linux系统下环境的部署.该部分必须MPI的支持, 以下介绍MPI的环境部署。
 
 MPI安装
 ^^^^^^^^^^^^^^^^^^^^^^
 
-MPI为CPU间通信的常用库, VQNet中CPU的分布式计算功能则基于MPI进行实现,以下将介绍如何在Linux系统中对MPI进行安装(目前基于CPU的分布式计算功能仅在Linux上实现)。
+MPI为CPU间通信的常用库, **VQNet中CPU的分布式计算功能则基于MPI进行实现**,以下将介绍如何在Linux系统中对MPI进行安装(目前基于CPU的分布式计算功能仅在Linux上实现)。
 
 检测gcc、gfortran编译器是否安装。
 
@@ -3481,7 +3495,7 @@ MPI为CPU间通信的常用库, VQNet中CPU的分布式计算功能则基于MPI�
 
 用which来检验下配置的环境变量是否正确。显示了其路径, 则说明安装顺利完成。
 
-此外通过pip install完成mpi4py的安装即可, 若是出现以下类似错误
+此外我们还必须安装 **mpi4py** 库。通过pip install完成mpi4py的安装即可, 若是出现以下类似错误
 
 .. image:: ./images/mpi_bug.png
     :align: center
@@ -3493,20 +3507,20 @@ MPI为CPU间通信的常用库, VQNet中CPU的分布式计算功能则基于MPI�
 .. code-block::
 
     # 通过下列代码暂存当前python环境的编译器
-    pushd /root/anaconda3/envs/mpi39/compiler_compat && mv ld ld.bak && popd
+    pushd /root/anaconda3/envs/$CONDA_DEFAULT_ENV/compiler_compat && mv ld ld.bak && popd
 
     # 再次安装
     pip install mpi4py
 
     # 还原
-    pushd /root/anaconda3/envs/mpi39/compiler_compat && mv ld.bak ld && popd
+    pushd /root/anaconda3/envs/$CONDA_DEFAULT_ENV/compiler_compat && mv ld.bak ld && popd
 
 NCCL安装
 ^^^^^^^^^^^^^^^^^^^^^^
 
-NCCL为GPU间通信的常用库, VQNet中GPU的分布式计算功能则基于NCCL进行实现,以下介绍如何在Linux系统中对NCCL进行安装(目前基于GPU的分布式计算功能仅在Linux上实现).
+NCCL为GPU间通信的常用库, **VQNet中GPU的分布式计算功能则基于NCCL进行实现**,本软件默认在安装时候同时安装NCCL的动态链接库, 一般不需要安装NCCL。
+如果要安装NCCL,可以按照以下介绍如何在Linux系统中对NCCL进行安装(目前基于GPU的分布式计算功能仅在Linux上实现).
 
-该部分需要MPI的支持, 因此MPI的环境也需要进行部署。
 
 从github上将NCCL的仓库拉到本地:
 
@@ -3561,15 +3575,16 @@ NCCL为GPU间通信的常用库, VQNet中GPU的分布式计算功能则基于NCC
 节点间通信环境部署
 ^^^^^^^^^^^^^^^^^^^^^^
 
-在多节点上实现分布式计算,首先需要保证多节点上mpich环境的一致,python环境一致,其次,需要设置节点间的免密通信。
-假设需要设置node0(主节点）、node1、node2三个节点的免密通信。
+在多节点上实现分布式计算,首先 **需要保证多节点上mpich环境的一致,python环境一致** ,其次,需要设置 **节点间的免密通信** 。
+
+假设需要设置node0(主节点)、node1、node2三个节点的免密通信。
 
 .. code-block::
 
     # 在每个节点上执行
     ssh-keygen
     
-    # 之后一直回车,在.ssh文件夹下生成一个公钥(id_rsa.pub）一个私钥(id_rsa）
+    # 之后一直回车,在.ssh文件夹下生成一个公钥(id_rsa.pub)一个私钥(id_rsa)
     # 将其另外两个节点的公钥都添加到第一个节点的authorized_keys文件中,
     # 再将第一个节点authorized_keys文件传到另外两个节点便可以实现节点间的免密通信
     # 在子节点node1上执行
@@ -3584,7 +3599,7 @@ NCCL为GPU间通信的常用库, VQNet中GPU的分布式计算功能则基于NCC
 
     # 保证三个不同节点生成的公钥都在authorized_keys文件中,即可实现节点间的免密通信
 
-除此外,最好还设置一个共享目录,使得改变共享目录下的文件时,不同节点中文件也会进行更改,预防多节点运行模型时不同节点中的文件不同步的问题。
+可选的, 最好还设置一个共享目录,使得改变共享目录下的文件时,不同节点中文件也会进行更改,预防多节点运行模型时不同节点中的文件不同步的问题。
 使用nfs-utils和rpcbind实现共享目录。
 
 .. code-block::
@@ -3643,6 +3658,9 @@ H, hosts
 
         # vqnetrun -np 4 -H node0:1,node2:1 python test.py
         # vqnetrun -np 4 --hosts node0:1,node2:1 python test.py
+
+
+.. _hostfile:
 
 hostfile, f, hostfile
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -3730,38 +3748,6 @@ start-timeout
         # vqnetrun -np 4 --start-timeout 10 python test.py
 
 
-disable-cache
-^^^^^^^^^^^^^^^^^^^^^^
-
-如果不设置该标记, ``vqnetrun`` 将每 60 分钟执行一次初始化检查,前提是检查成功通过。否则,每次调用 ``vqnetrun`` 时都会执行所有检查。
-
-执行样例如下
-
-    Example::
-
-        from pyvqnet.distributed import CommController, get_host_name
-        Comm_OP = CommController("mpi") # init mpi controller
-        
-        rank = Comm_OP.getRank()
-        size = Comm_OP.getSize()
-        print(f"rank: {rank}, size {size}")
-        print(f"LocalRank {Comm_OP.getLocalRank()} hosts name {get_host_name()}")
-
-        # vqnetrun -np 4 --disable-cache python test.py
-
-cb, check-build
-^^^^^^^^^^^^^^^^^^^^^^
-
-``vqnetrun`` 接口中可以通过添加该标志后,会输出当前环境下的支持的数据通信方式。
-
-执行代码如下
-
-    .. code-block::
-
-        # vqnetrun -cb
-        # vqnetrun --check-build
-
-
 h
 ^^^^^^^^^^^^^^^^^^^^^^
 
@@ -3777,15 +3763,13 @@ h
 CommController
 =================================
 
-    分布式计算中的用于控制cpu、gpu下不同进程数据通信, 生成cpu(mpi)、gpu(nccl)不同的控制器,调用通信方法完成不同进程间数据的通信以及同步。
+.. py:class:: pyvqnet.distributed.ControllComm.CommController(backend,rank=None,world_size=None)
 
-__init__
-^^^^^^^^^^^^^^^^^^^^^^
-.. py:function:: CommController.__init__(backend="mpi")
-    
     CommController用于控制在cpu、gpu下数据通信的控制器, 通过设置参数 `backend` 来生成cpu(mpi)、gpu(nccl)的控制器。(目前分布式计算的功能仅支持linux操作系系统下使用)
 
     :param backend: 用于生成cpu或者gpu的数据通信控制器。
+    :param rank: 该参数仅在非pyvqnet后端下有用, 默认值为: None。
+    :param world_size: 该参数仅在非pyvqnet后端下有用, 默认值为: None。
 
     :return:
         CommController 实例。
@@ -3797,486 +3781,356 @@ __init__
 
         # Comm_OP = CommController("mpi") # init mpi controller
 
-getRank
-^^^^^^^^^^^^^^^^^^^^^^
-.. py:function:: CommController.getRank()
-    
-    用于获得当前进程的进程号。
-
-
-    :return: 返回当前进程的进程号。
-
-    Examples::
-
-        from pyvqnet.distributed import CommController
-        Comm_OP = CommController("nccl") # init nccl controller
+ 
+    .. py:method:: getRank()
         
-        Comm_OP.getRank()
+        用于获得当前进程的进程号。
 
-getSize
-^^^^^^^^^^^^^^^^^^^^^^
-.. py:function:: CommController.getSize()
-    
-    用于获得总共启动的进程数。
 
+        :return: 返回当前进程的进程号。
 
-    :return: 返回总共进程的数量。
+        Examples::
 
-    Examples::
-
-        from pyvqnet.distributed import CommController
-        Comm_OP = CommController("nccl") # init nccl controller
-        
-        Comm_OP.getSize()
-        # vqnetrun -n 2 python test.py 
-        # 2
-
-
-getLocalRank
-^^^^^^^^^^^^^^^^^^^^^^
-.. py:function:: CommController.getLocalRank()
-    
-    用于获得当前机器上的当前进程号。
-
-
-    :return: 当前机器上的当前进程号。
-
-    Examples::
-
-        from pyvqnet.distributed import CommController
-        Comm_OP = CommController("nccl") # init nccl controller
-        
-        Comm_OP.getLocalRank()
-        # vqnetrun -n 2 python test.py 
-
-
-ncclSplitGroup
-^^^^^^^^^^^^^^^^^^^^^^
-.. py:function:: CommController.ncclSplitGroup(rankL)
-    
-    用于划分gpu上的通信组。
-
-    :param rankL: 进程组列表。
-
-    Examples::
-
-        from pyvqnet.distributed import CommController
-        Comm_OP = CommController("nccl")
-        
-        Comm_OP.ncclSplitGroup([[0, 1]])
-        # vqnetrun -n 2 python test.py 
-
-
-barrier
-^^^^^^^^^^^^^^^^^^^^^^
-.. py:function:: CommController.barrier()
-    
-    同步。
-
-    :return: 同步操作。
-
-    Examples::
-
-        from pyvqnet.distributed import CommController
-        Comm_OP = CommController("nccl")
-        
-        Comm_OP.barrier()
-
-
-GetDeviceNum
-^^^^^^^^^^^^^^^^^^^^^^
-.. py:function:: CommController.GetDeviceNum()
-    
-    用于获得当前节点上的显卡数量, (仅支持gpu下使用)。
-
-    :return: 返回当前节点上显卡数量。
-
-    Examples::
-
-        from pyvqnet.distributed import CommController
-        Comm_OP = CommController("nccl")
-        
-        Comm_OP.GetDeviceNum()
-        # python test.py
-
-
-allreduce
-^^^^^^^^^^^^^^^^^^^^^^
-.. py:function:: CommController.allreduce(tensor, c_op = "avg")
-    
-    支持对数据作allreduce通信。
-
-    :param tensor: 输入数据.
-    :param c_op: 计算方式.
-
-    Examples::
-
-        from pyvqnet.distributed import CommController
-        from pyvqnet.tensor import tensor
-        import numpy as np
-        Comm_OP = CommController("mpi")
-
-        num = tensor.to_tensor(np.random.rand(1, 5))
-        print(f"rank {Comm_OP.getRank()}  {num}")
-
-        Comm_OP.allreduce(num, "sum")
-        print(f"rank {Comm_OP.getRank()}  {num}")
-        # vqnetrun -n 2 python test.py
-
-
-reduce
-^^^^^^^^^^^^^^^^^^^^^^
-.. py:function:: CommController.reduce(tensor, root = 0, c_op = "avg")
-    
-    支持对数据作reduce通信。
-
-    :param tensor: 输入数据。
-    :param root: 指定数据返回的节点。
-    :param c_op: 计算方式。
-
-    Examples::
-
-        from pyvqnet.distributed import CommController
-        from pyvqnet.tensor import tensor
-        import numpy as np
-        Comm_OP = CommController("mpi")
-
-        num = tensor.to_tensor(np.random.rand(1, 5))
-        print(f"rank {Comm_OP.getRank()}  {num}")
-        
-        Comm_OP.reduce(num, 1)
-        print(f"rank {Comm_OP.getRank()}  {num}")
-        # vqnetrun -n 2 python test.py
-
-
-broadcast
-^^^^^^^^^^^^^^^^^^^^^^
-.. py:function:: CommController.broadcast(tensor, root = 0)
-    
-    将指定进程root上的数据广播到所有进程上。
-
-    :param tensor: 输入数据。
-    :param root: 指定的节点。
-
-    Examples::
-
-        from pyvqnet.distributed import CommController
-        from pyvqnet.tensor import tensor
-        import numpy as np
-        Comm_OP = CommController("mpi")
-
-        num = tensor.to_tensor(np.random.rand(1, 5))
-        print(f"rank {Comm_OP.getRank()}  {num}")
-        
-        Comm_OP.broadcast(num, 1)
-        print(f"rank {Comm_OP.getRank()}  {num}")
-        # vqnetrun -n 2 python test.py
-
-allgather
-^^^^^^^^^^^^^^^^^^^^^^
-.. py:function:: CommController.allgather(tensor)
-    
-    将所有进程上数据allgather到一起。
-
-    :param tensor: 输入数据。
-
-    Examples::
-
-        from pyvqnet.distributed import CommController
-        from pyvqnet.tensor import tensor
-        import numpy as np
-        Comm_OP = CommController("mpi")
-
-        num = tensor.to_tensor(np.random.rand(1, 5))
-        print(f"rank {Comm_OP.getRank()}  {num}")
-
-        num = Comm_OP.allgather(num)
-        print(f"rank {Comm_OP.getRank()}  {num}")
-        # vqnetrun -n 2 python test.py
-
-send
-^^^^^^^^^^^^^^^^^^^^^^
-.. py:function:: CommController.send(tensor, dest)
-    
-    p2p通信接口。
-
-    :param tensor: 输入数据.
-    :param dest: 目的进程.
-
-    Examples::
-
-        from pyvqnet.distributed import CommController,get_rank
-        from pyvqnet.tensor import tensor
-        import numpy as np
-        Comm_OP = CommController("mpi")
-
-        num = tensor.to_tensor(np.random.rand(1, 5))
-        recv = tensor.zeros_like(num)
-
-        if get_rank() == 0:
-            Comm_OP.send(num, 1)
-        elif get_rank() == 1:
-            Comm_OP.recv(recv, 0)
-        print(f"rank {Comm_OP.getRank()}  {num}")
-        print(f"rank {Comm_OP.getRank()}  {recv}")
-        
-        # vqnetrun -n 2 python test.py
-
-
-recv
-^^^^^^^^^^^^^^^^^^^^^^
-.. py:function:: CommController.recv(tensor, source)
-    
-    p2p通信接口。
-
-    :param tensor: 输入数据.
-    :param source: 接受进程.
-
-    Examples::
-
-        from pyvqnet.distributed import CommController,get_rank
-        from pyvqnet.tensor import tensor
-        import numpy as np
-        Comm_OP = CommController("mpi")
-
-        num = tensor.to_tensor(np.random.rand(1, 5))
-        recv = tensor.zeros_like(num)
-
-        if get_rank() == 0:
-            Comm_OP.send(num, 1)
-        elif get_rank() == 1:
-            Comm_OP.recv(recv, 0)
-        print(f"rank {Comm_OP.getRank()}  {num}")
-        print(f"rank {Comm_OP.getRank()}  {recv}")
-        
-        # vqnetrun -n 2 python test.py
-
-
-allreduce_group
-^^^^^^^^^^^^^^^^^^^^^^
-.. py:function:: CommController.allreduce_group(tensor, c_op = "avg", GroupComm = None)
-    
-    组内allreduce通信接口。
-
-    :param tensor: 输入数据.
-    :param c_op: 计算方法.
-    :param GroupComm: 通信组, 仅mpi进行组内通信时需要.
-
-    Examples::
-
-        from pyvqnet.distributed import CommController,get_rank,get_local_rank
-        from pyvqnet.tensor import tensor
-        import numpy as np
-        Comm_OP = CommController("nccl")
-
-        Comm_OP.ncclSplitGroup([[0, 1]])
-
-        complex_data = tensor.QTensor([3+1j, 2, 1 + get_rank()],dtype=8).reshape((3,1)).toGPU(1000+ get_local_rank())
-
-        print(f"allreduce_group before rank {get_rank()}: {complex_data}")
-
-        Comm_OP.allreduce_group(complex_data, c_op="sum")
-        print(f"allreduce_group after rank {get_rank()}: {complex_data}")
-        # vqnetrun -n 2 python test.py
-
-
-reduce_group
-^^^^^^^^^^^^^^^^^^^^^^
-.. py:function:: CommController.reduce_group(tensor, root = 0, c_op = "avg", GroupComm = None)
-    
-    组内reduce通信接口。
-
-    :param tensor: 输入数据.
-    :param root: 指定进程号.
-    :param c_op: 计算方法.
-    :param GroupComm: 通信组, 仅mpi进行组内通信时需要.
-
-    Examples::
-        
-        from pyvqnet.distributed import CommController,get_rank,get_local_rank
-        from pyvqnet.tensor import tensor
-        import numpy as np
-        Comm_OP = CommController("nccl")
-
-        Comm_OP.ncclSplitGroup([[0, 1]])
-
-        complex_data = tensor.QTensor([3+1j, 2, 1 + get_rank()],dtype=8).reshape((3,1)).toGPU(1000+ get_local_rank())
-
-        print(f"reduce_group before rank {get_rank()}: {complex_data}")
-
-        Comm_OP.reduce_group(complex_data, c_op="sum")
-        print(f"reduce_group after rank {get_rank()}: {complex_data}")
-        # vqnetrun -n 2 python test.py
-
-
-broadcast_group
-^^^^^^^^^^^^^^^^^^^^^^
-.. py:function:: CommController.broadcast_group(tensor, root = 0, GroupComm = None)
-    
-    组内broadcast通信接口。
-
-    :param tensor: 输入数据.
-    :param root: 指定进程号.
-    :param GroupComm: 通信组, 仅mpi进行组内通信时需要.
-
-    Examples::
-        
-        from pyvqnet.distributed import CommController,get_rank,get_local_rank
-        from pyvqnet.tensor import tensor
-        import numpy as np
-        Comm_OP = CommController("nccl")
-
-        Comm_OP.ncclSplitGroup([[0, 1]])
-
-        complex_data = tensor.QTensor([3+1j, 2, 1 + get_rank()],dtype=8).reshape((3,1)).toGPU(1000+ get_local_rank())
-
-        print(f"broadcast_group before rank {get_rank()}: {complex_data}")
-
-        Comm_OP.broadcast_group(complex_data)
-        Comm_OP.barrier()
-        print(f"broadcast_group after rank {get_rank()}: {complex_data}")
-        # vqnetrun -n 2 python test.py
-
-
-allgather_group
-^^^^^^^^^^^^^^^^^^^^^^
-.. py:function:: CommController.allgather_group(tensor, GroupComm = None)
-    
-    组内allgather通信接口。
-
-    :param tensor: 输入数据.
-    :param GroupComm: 通信组, 仅mpi进行组内通信时需要.
-
-    Examples::
-        
-        from pyvqnet.distributed import CommController,get_rank,get_local_rank
-        from pyvqnet.tensor import tensor
-        import numpy as np
-        Comm_OP = CommController("nccl")
-
-        Comm_OP.ncclSplitGroup([[0, 1]])
-
-        complex_data = tensor.QTensor([3+1j, 2, 1 + get_rank()],dtype=8).reshape((3,1)).toGPU(1000+ get_local_rank())
-
-        print(f"allgather_group before rank {get_rank()}: {complex_data}")
-
-        complex_data = Comm_OP.allgather_group(complex_data)
-        print(f"allgather_group after rank {get_rank()}: {complex_data}")
-        # vqnetrun -n 2 python test.py
-
-
-grad_allreduce
-^^^^^^^^^^^^^^^^^^^^^^
-.. py:function:: CommController.grad_allreduce(optimizer)
-    
-    以allreduce的方式对优化器中参数的梯度进行更新。
-
-    :param optimizer: 优化器.
-
-    Examples::
-        
-        from pyvqnet.distributed import CommController,get_rank,get_local_rank
-        from pyvqnet.tensor import tensor
-        from pyvqnet.nn.module import Module
-        from pyvqnet.nn.linear import Linear
-        from pyvqnet.nn.loss import MeanSquaredError
-        from pyvqnet.optim import Adam
-        from pyvqnet.nn import activation as F
-        import numpy as np
-        Comm_OP = CommController("nccl")
-
-        class Net(Module):
-            def __init__(self):
-                super(Net, self).__init__()
-                self.fc = Linear(input_channels=5, output_channels=1)
-            def forward(self, x):
-                x = F.ReLu()(self.fc(x))
-                return x
+            from pyvqnet.distributed import CommController
+            Comm_OP = CommController("nccl") # init nccl controller
             
-        model = Net().toGPU(1000+ get_local_rank())
-        opti = Adam(model.parameters(), lr=0.01)
-        actual = tensor.QTensor([1,1,1,1,1,0,0,0,0,0],dtype=6).reshape((10,1)).toGPU(1000+ get_local_rank())
-        x = tensor.randn((10, 5)).toGPU(1000+ get_local_rank())
-        for i in range(10):
-            opti.zero_grad()
-            model.train()
-            result = model(x)
-            loss = MeanSquaredError()(actual, result)
-            loss.backward()
-            # print(f"rank {get_rank()} grad is {model.parameters()[0].grad} para {model.parameters()[0]}")
-            Comm_OP.grad_allreduce(opti)
-            # print(Comm_OP._allgather(model.parameters()[0]))
-            if get_rank() == 0 :
-                print(f"rank {get_rank()} grad is {model.parameters()[0].grad} para {model.parameters()[0]} after")
-            opti.step()
-        # vqnetrun -n 2 python test.py
+            Comm_OP.getRank()
 
-param_allreduce
-^^^^^^^^^^^^^^^^^^^^^^
-.. py:function:: CommController.param_allreduce(model)
+
+    .. py:method:: getSize()
     
-    以allreduce的方式对模型中参数进行更新。
+        用于获得总共启动的进程数。
 
-    :param model: 模型.
 
-    Examples::
-    
-        from pyvqnet.distributed import CommController,get_rank,get_local_rank
-        from pyvqnet.tensor import tensor
-        from pyvqnet.nn.module import Module
-        from pyvqnet.nn.linear import Linear
-        from pyvqnet.nn import activation as F
-        import numpy as np
-        Comm_OP = CommController("nccl")
+        :return: 返回总共进程的数量。
 
-        class Net(Module):
-            def __init__(self):
-                super(Net, self).__init__()
-                self.fc = Linear(input_channels=5, output_channels=1)
-            def forward(self, x):
-                x = F.ReLu()(self.fc(x))
-                return x
+        Examples::
+
+            from pyvqnet.distributed import CommController
+            Comm_OP = CommController("nccl") # init nccl controller
             
-        model = Net().toGPU(1000+ get_local_rank())
-        print(f"rank {get_rank()} parameters is {model.parameters()}")
-        Comm_OP.param_allreduce(model)
-            
-        if get_rank() == 0:
-            print(model.parameters())
+            Comm_OP.getSize()
+            # vqnetrun -n 2 python test.py 
+            # 2
 
-broadcast_model_params
-^^^^^^^^^^^^^^^^^^^^^^
-.. py:function:: CommController.broadcast_model_params(model, root = 0)
-    
-    将指定进程号上的模型参数进行广播。
-
-    :param model: 模型.
-    :param root: 指定进程号.
-
-    Examples::
-    
-        from pyvqnet.distributed import CommController,get_rank,get_local_rank
-        from pyvqnet.tensor import tensor
-        from pyvqnet.nn.module import Module
-        from pyvqnet.nn.linear import Linear
-        from pyvqnet.nn import activation as F
-        import numpy as np
-        Comm_OP = CommController("nccl")
-
-        class Net(Module):
-            def __init__(self):
-                super(Net, self).__init__()
-                self.fc = Linear(input_channels=5, output_channels=1)
-            def forward(self, x):
-                x = F.ReLu()(self.fc(x))
-                return x
-            
-        model = Net().toGPU(1000+ get_local_rank())
-        print(f"bcast before rank {get_rank()}:{model.parameters()}")
-        Comm_OP.broadcast_model_params(model, 0)
-        # model = model
-        print(f"bcast after rank {get_rank()}: {model.parameters()}")
+ 
+    .. py:method:: getLocalRank()
         
+        用于获得当前机器上的当前进程号。
+
+
+        :return: 当前机器上的当前进程号。
+
+        Examples::
+
+            from pyvqnet.distributed import CommController
+            Comm_OP = CommController("nccl") # init nccl controller
+            
+            Comm_OP.getLocalRank()
+            # vqnetrun -n 2 python test.py 
+
+ 
+    .. py:method:: ncclSplitGroup(rankL)
+        
+        用于划分gpu上的通信组。
+
+        :param rankL: 进程组列表。
+
+        Examples::
+
+            from pyvqnet.distributed import CommController
+            Comm_OP = CommController("nccl")
+            
+            Comm_OP.ncclSplitGroup([[0, 1]])
+            # vqnetrun -n 2 python test.py 
+
+ 
+    .. py:method:: barrier()
+        
+        同步。
+
+        :return: 同步操作。
+
+        Examples::
+
+            from pyvqnet.distributed import CommController
+            Comm_OP = CommController("nccl")
+            
+            Comm_OP.barrier()
+
+
+    .. py:method:: GetDeviceNum()
+        
+        用于获得当前节点上的显卡数量, (仅支持gpu下使用)。
+
+        :return: 返回当前节点上显卡数量。
+
+        Examples::
+
+            from pyvqnet.distributed import CommController
+            Comm_OP = CommController("nccl")
+            
+            Comm_OP.GetDeviceNum()
+            # python test.py
+
+
+    .. py:method:: allreduce(tensor, c_op = "avg")
+        
+        支持对数据作allreduce通信。
+
+        :param tensor: 输入数据.
+        :param c_op: 计算方式.
+
+        Examples::
+
+            from pyvqnet.distributed import CommController
+            from pyvqnet.tensor import tensor
+            import numpy as np
+            Comm_OP = CommController("mpi")
+
+            num = tensor.to_tensor(np.random.rand(1, 5))
+            print(f"rank {Comm_OP.getRank()}  {num}")
+
+            Comm_OP.allreduce(num, "sum")
+            print(f"rank {Comm_OP.getRank()}  {num}")
+            # vqnetrun -n 2 python test.py
+
+ 
+    .. py:method:: reduce(tensor, root = 0, c_op = "avg")
+        
+        支持对数据作reduce通信。
+
+        :param tensor: 输入数据。
+        :param root: 指定数据返回的节点。
+        :param c_op: 计算方式。
+
+        Examples::
+
+            from pyvqnet.distributed import CommController
+            from pyvqnet.tensor import tensor
+            import numpy as np
+            Comm_OP = CommController("mpi")
+
+            num = tensor.to_tensor(np.random.rand(1, 5))
+            print(f"rank {Comm_OP.getRank()}  {num}")
+            
+            Comm_OP.reduce(num, 1)
+            print(f"rank {Comm_OP.getRank()}  {num}")
+            # vqnetrun -n 2 python test.py
+
+ 
+    .. py:method:: broadcast(tensor, root = 0)
+        
+        将指定进程root上的数据广播到所有进程上。
+
+        :param tensor: 输入数据。
+        :param root: 指定的节点。
+
+        Examples::
+
+            from pyvqnet.distributed import CommController
+            from pyvqnet.tensor import tensor
+            import numpy as np
+            Comm_OP = CommController("mpi")
+
+            num = tensor.to_tensor(np.random.rand(1, 5))
+            print(f"rank {Comm_OP.getRank()}  {num}")
+            
+            Comm_OP.broadcast(num, 1)
+            print(f"rank {Comm_OP.getRank()}  {num}")
+            # vqnetrun -n 2 python test.py
+
+ 
+    .. py:method:: allgather(tensor)
+        
+        将所有进程上数据allgather到一起。
+
+        :param tensor: 输入数据。
+
+        Examples::
+
+            from pyvqnet.distributed import CommController
+            from pyvqnet.tensor import tensor
+            import numpy as np
+            Comm_OP = CommController("mpi")
+
+            num = tensor.to_tensor(np.random.rand(1, 5))
+            print(f"rank {Comm_OP.getRank()}  {num}")
+
+            num = Comm_OP.allgather(num)
+            print(f"rank {Comm_OP.getRank()}  {num}")
+            # vqnetrun -n 2 python test.py
+
+
+    .. py:method:: send(tensor, dest)
+        
+        p2p通信接口。
+
+        :param tensor: 输入数据.
+        :param dest: 目的进程.
+
+        Examples::
+
+            from pyvqnet.distributed import CommController,get_rank
+            from pyvqnet.tensor import tensor
+            import numpy as np
+            Comm_OP = CommController("mpi")
+
+            num = tensor.to_tensor(np.random.rand(1, 5))
+            recv = tensor.zeros_like(num)
+
+            if get_rank() == 0:
+                Comm_OP.send(num, 1)
+            elif get_rank() == 1:
+                Comm_OP.recv(recv, 0)
+            print(f"rank {Comm_OP.getRank()}  {num}")
+            print(f"rank {Comm_OP.getRank()}  {recv}")
+            
+            # vqnetrun -n 2 python test.py
+
+ 
+    .. py:method:: recv(tensor, source)
+        
+        p2p通信接口。
+
+        :param tensor: 输入数据.
+        :param source: 接受进程.
+
+        Examples::
+
+            from pyvqnet.distributed import CommController,get_rank
+            from pyvqnet.tensor import tensor
+            import numpy as np
+            Comm_OP = CommController("mpi")
+
+            num = tensor.to_tensor(np.random.rand(1, 5))
+            recv = tensor.zeros_like(num)
+
+            if get_rank() == 0:
+                Comm_OP.send(num, 1)
+            elif get_rank() == 1:
+                Comm_OP.recv(recv, 0)
+            print(f"rank {Comm_OP.getRank()}  {num}")
+            print(f"rank {Comm_OP.getRank()}  {recv}")
+            
+            # vqnetrun -n 2 python test.py
+
+
+    .. py:method:: allreduce_group(tensor, c_op = "avg", GroupComm = None)
+        
+        组内allreduce通信接口。
+
+        :param tensor: 输入数据.
+        :param c_op: 计算方法.
+        :param GroupComm: 通信组, 仅mpi进行组内通信时需要.
+
+        Examples::
+
+            from pyvqnet.distributed import CommController,get_rank,get_local_rank
+            from pyvqnet.tensor import tensor
+            import numpy as np
+            Comm_OP = CommController("nccl")
+
+            Comm_OP.ncclSplitGroup([[0, 1]])
+
+            complex_data = tensor.QTensor([3+1j, 2, 1 + get_rank()],dtype=8).reshape((3,1)).toGPU(1000+ get_local_rank())
+
+            print(f"allreduce_group before rank {get_rank()}: {complex_data}")
+
+            Comm_OP.allreduce_group(complex_data, c_op="sum")
+            print(f"allreduce_group after rank {get_rank()}: {complex_data}")
+            # vqnetrun -n 2 python test.py
+
+    .. py:method:: reduce_group(tensor, root = 0, c_op = "avg", GroupComm = None)
+        
+        组内reduce通信接口。
+
+        :param tensor: 输入数据.
+        :param root: 指定进程号.
+        :param c_op: 计算方法.
+        :param GroupComm: 通信组, 仅mpi进行组内通信时需要.
+
+        Examples::
+            
+            from pyvqnet.distributed import CommController,get_rank,get_local_rank
+            from pyvqnet.tensor import tensor
+            import numpy as np
+            Comm_OP = CommController("nccl")
+
+            Comm_OP.ncclSplitGroup([[0, 1]])
+
+            complex_data = tensor.QTensor([3+1j, 2, 1 + get_rank()],dtype=8).reshape((3,1)).toGPU(1000+ get_local_rank())
+
+            print(f"reduce_group before rank {get_rank()}: {complex_data}")
+
+            Comm_OP.reduce_group(complex_data, c_op="sum")
+            print(f"reduce_group after rank {get_rank()}: {complex_data}")
+            # vqnetrun -n 2 python test.py
+
+ 
+    .. py:method:: broadcast_group(tensor, root = 0, GroupComm = None)
+        
+        组内broadcast通信接口。
+
+        :param tensor: 输入数据.
+        :param root: 指定进程号.
+        :param GroupComm: 通信组, 仅mpi进行组内通信时需要.
+
+        Examples::
+            
+            from pyvqnet.distributed import CommController,get_rank,get_local_rank
+            from pyvqnet.tensor import tensor
+            import numpy as np
+            Comm_OP = CommController("nccl")
+
+            Comm_OP.ncclSplitGroup([[0, 1]])
+
+            complex_data = tensor.QTensor([3+1j, 2, 1 + get_rank()],dtype=8).reshape((3,1)).toGPU(1000+ get_local_rank())
+
+            print(f"broadcast_group before rank {get_rank()}: {complex_data}")
+
+            Comm_OP.broadcast_group(complex_data)
+            Comm_OP.barrier()
+            print(f"broadcast_group after rank {get_rank()}: {complex_data}")
+            # vqnetrun -n 2 python test.py
+
+ 
+    .. py:method:: allgather_group(tensor, GroupComm = None)
+        
+        组内allgather通信接口。
+
+        :param tensor: 输入数据.
+        :param GroupComm: 通信组, 仅mpi进行组内通信时需要.
+
+        Examples::
+            
+            from pyvqnet.distributed import CommController,get_rank,init_group
+            from pyvqnet.tensor import tensor
+
+            Comm_OP = CommController("mpi")
+            group = init_group([[0,1]])
+            #mpi init group internally
+            # A list of lists, where each sublist contains a communicator and the corresponding rank list.
+            complex_data = tensor.QTensor([3+1j, 2, 1 + get_rank()],dtype=8).reshape((3,1))
+            print(f" before rank {get_rank()}: {complex_data}")
+            for comm_ in group:
+                if Comm_OP.getRank() in comm_[1]:
+                    complex_data = Comm_OP.all_gather_group(complex_data, comm_[0])
+                    print(f"after rank {get_rank()}: {complex_data}")
+            # mpirun -n 2 python test.py
+
+            from pyvqnet.distributed import CommController,get_rank,get_local_rank
+            from pyvqnet.tensor import tensor
+            Comm_OP = CommController("nccl")
+            Comm_OP.ncclSplitGroup([[0, 1]])
+            complex_data = tensor.QTensor([3+1j, 2, 1 + get_rank()],dtype=8).reshape((3,1)).toGPU(1000+ get_local_rank())
+            print(f" before rank {get_rank()}: {complex_data}")
+            complex_data = Comm_OP.all_gather_group(complex_data)
+            print(f"after rank {get_rank()}: {complex_data}")
+            # mpirun -n 2 python test.py
+
+
+ 
 
 split_data
 =================================
@@ -4306,11 +4160,10 @@ split_data
 get_local_rank
 =================================
 
-使用 ``get_local_rank`` 得到当前机器上进程号。
 
 .. py:function:: pyvqnet.distributed.ControllComm.get_local_rank()
 
-    用于获得当前机器上的当前进程号。
+    得到当前节点上进程号。例如你在第2个节点的第3个进程,每个节点5个进程,则返回2。
 
     :return: 当前机器上的当前进程号。
 
@@ -4323,11 +4176,10 @@ get_local_rank
 
 get_rank
 =================================
-使用 ``get_rank`` 得到当前机器上进程号。
 
 .. py:function:: pyvqnet.distributed.ControllComm.get_rank()
 
-    用于获得当前进程的进程号。
+    用于获得当前进程的全局进程号。例如你在第2个节点的第3个进程,每个节点5个进程,则返回7。
 
     :return: 当前进程的进程号。
 
@@ -4340,11 +4192,11 @@ get_rank
 
 init_group
 =================================
-使用 ``init_group`` 根据给出的进程数列表来对基于cpu下的进程组进行初始化。
+
 
 .. py:function:: pyvqnet.distributed.ControllComm.init_group(rank_lists)
 
-    用于初始化进程通信组。
+    根据给出的进程数列表来对基于cpu下的进程组进行初始化。
 
     :param rank_lists: 通信进程组列表.
     :return: 初始化后的进程组列表。
@@ -4365,13 +4217,14 @@ init_group
                 print(f"rank {Comm_OP.getRank()}  {num} after")
         
         # vqnetrun -n 3 python test.py
-        
+
+
 PipelineParallelTrainingWrapper
 =================================
 .. py:class:: pyvqnet.distributed.pp.PipelineParallelTrainingWrapper(args,join_layers,trainset)
     
     Pipeline Parallel Training Wrapper 实现了 1F1B训练。仅在 Linux 平台上,且具有 GPU 的情况下可用。
-    更多算法细节可以在(https://www.deepspeed.ai/tutorials/pipeline/）找到。
+    更多算法细节可以在(https://www.deepspeed.ai/tutorials/pipeline/)找到。
 
     :param args: 参数字典。参见示例。
     :param join_layers: Sequential 模块的列表。

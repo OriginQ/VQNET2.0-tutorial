@@ -2,6 +2,31 @@
 VQNet Changelog
 ######################
 
+
+
+
+[v2.15.0] - 2024-11-19
+***************************
+
+Added
+===================
+
+- 增加 `pyvqnet.backends.set_backend()` 接口, 在用户安装 `torch` 时候, 可使用 `torch` 进行QTensor的矩阵计算, 变分量子线路计算, 具体见文档 :ref:`torch_api` 。
+- 增加 `pyvqnet.nn.torch` 下继承于 `torch.nn.Module` 的神经网络接口, 变分量子线路神经接口等, 具体见文档 :ref:`torch_api` 。
+
+Changed
+===================
+- diag接口修改。
+- 修改all_gather实现与torch.distributed.all_gather一致。
+- 修改 `QTensor` 最大支持30维度数据。
+- 修改分布式功能所需 `mpi4py` 需要4.0.1版本以上
+
+Fixed
+===================
+- 部分随机数实现由于omp无法固定种子。
+- 修复分布式启动的部分bug。
+
+
 [v2.14.0] - 2024-09-30
 ***************************
 
@@ -91,7 +116,7 @@ Fixed
 Added
 ===================
 
-- 添加新的 `QNG` （量子自然梯度）API 和演示。
+- 添加新的 `QNG` (量子自然梯度)API 和演示。
 - 添加量子电路优化,例如 `wrapper_single_qubit_op_fuse` , `wrapper_commute_controlled` , `wrapper_merge_rotations` api 和 demo。
 - 添加 `CY`, `SparseHamiltonian` , `HermitianExpval` 。
 - 添加 `is_csr`、 `is_dense`、 `dense_to_csr` 、 `csr_to_dense` 。
@@ -121,7 +146,7 @@ Added
 - 支持adjoint梯度计算的pyvqnet.qnn.vqc.QuantumLayerAdjoint接口;
 - 支持originIR与VQC相互转换的功能;
 - 支持统计VQC模型中的经典和量子模块信息;
-- 增加量子经典神经网络混合模型下的两个案例：基于小样本的量子卷积神经网络模型、用于手写数字识别的量子核函数模型;
+- 增加量子经典神经网络混合模型下的两个案例: 基于小样本的量子卷积神经网络模型、用于手写数字识别的量子核函数模型;
 - 增加对arm芯片Mac的支持;
 
 
@@ -144,9 +169,9 @@ Added
 ===========
 - 增加了现有接口支持complex128、complex64、double、float、uint8、int8、bool、int16、int32、int64等类型计算。
 - Linux版本支持gpu下的计算,需要cuda11.7版本cudatoolkit以及nvidia驱动。
-- 基于vqc的基础逻辑门：Hadamard、CNOT、I、RX、RY、PauliZ、PauliX、PauliY、S、RZ、RXX、RYY、RZZ、RZX、X1、Y1、Z1、U1、U2、U3、T、SWAP、P、TOFFOLI、CZ、CR。
-- 基于vqc的组合量子线路：VQC_HardwareEfficientAnsatz、VQC_BasicEntanglerTemplate、VQC_StronglyEntanglingTemplate、VQC_QuantumEmbedding、VQC_RotCircuit、VQC_CRotCircuit、VQC_CSWAPcircuit、VQC_Controlled_Hadamard、VQC_CCZ、VQC_FermionicSingleExcitation、VQC_FermionicDoubleExcitation、VQC_UCCSD、VQC_QuantumPoolingCircuit、VQC_BasisEmbedding、VQC_AngleEmbedding、VQC_AmplitudeEmbedding、VQC_IQPEmbedding。
-- 基于vqc的测量方法：VQC_Purity、VQC_VarMeasure、VQC_DensityMatrixFromQstate、Probability、MeasureAll。
+- 基于vqc的基础逻辑门: Hadamard、CNOT、I、RX、RY、PauliZ、PauliX、PauliY、S、RZ、RXX、RYY、RZZ、RZX、X1、Y1、Z1、U1、U2、U3、T、SWAP、P、TOFFOLI、CZ、CR。
+- 基于vqc的组合量子线路: VQC_HardwareEfficientAnsatz、VQC_BasicEntanglerTemplate、VQC_StronglyEntanglingTemplate、VQC_QuantumEmbedding、VQC_RotCircuit、VQC_CRotCircuit、VQC_CSWAPcircuit、VQC_Controlled_Hadamard、VQC_CCZ、VQC_FermionicSingleExcitation、VQC_FermionicDoubleExcitation、VQC_UCCSD、VQC_QuantumPoolingCircuit、VQC_BasisEmbedding、VQC_AngleEmbedding、VQC_AmplitudeEmbedding、VQC_IQPEmbedding。
+- 基于vqc的测量方法: VQC_Purity、VQC_VarMeasure、VQC_DensityMatrixFromQstate、Probability、MeasureAll。
 
 
 [v2.0.7] - 2023-07-03
@@ -155,7 +180,7 @@ Added
 Added
 ===========
 - 经典神经网络,增加kron,gather,scatter,broadcast_to接口。
-- 增加对不同数据精度支持：数据类型dtype支持kbool,kuint8,kint8,kint16,kint32,kint64,kfloat32,kfloat64,kcomplex64,kcomplex128.分别代表C++的 bool,uint8_t,int8_t,int16_t,int32_t,int64_t,float,double,complex<float>,complex<double>.
+- 增加对不同数据精度支持: 数据类型dtype支持kbool,kuint8,kint8,kint16,kint32,kint64,kfloat32,kfloat64,kcomplex64,kcomplex128.分别代表C++的 bool,uint8_t,int8_t,int16_t,int32_t,int64_t,float,double,complex<float>,complex<double>.
 - 支持python 3.8,3.9,3.10三个版本。
 
 Changed
@@ -170,12 +195,12 @@ Changed
 Added
 ===========
 
-- 经典神经网络,增加接口：multinomial,pixel_shuffle,pixel_unshuffle,为QTensor增加numel,增加CPU动态内存池功能,为Parameter增加init_from_tensor接口。
-- 经典神经网络,增加接口：Dynamic_LSTM,Dynamic_RNN,Dynamic_GRU。
-- 经典神经网络,增加接口：pad_sequence,pad_packed_sequence,pack_pad_sequence。
-- 量子神经网络,增加接口：CCZ,Controlled_Hadamard,FermionicSingleExcitation,UCCSD,QuantumPoolingCircuit,
-- 量子神经网络,增加接口：Quantum_Embedding,Mnist_Dataset,CIFAR10_Dataset,grad,Purity。
-- 量子神经网络,增加示例：基于梯度裁剪,quanvolution,量子线路表达力,贫瘠高原,量子强化学习QDRL。
+- 经典神经网络,增加接口: multinomial,pixel_shuffle,pixel_unshuffle,为QTensor增加numel,增加CPU动态内存池功能,为Parameter增加init_from_tensor接口。
+- 经典神经网络,增加接口: Dynamic_LSTM,Dynamic_RNN,Dynamic_GRU。
+- 经典神经网络,增加接口: pad_sequence,pad_packed_sequence,pack_pad_sequence。
+- 量子神经网络,增加接口: CCZ,Controlled_Hadamard,FermionicSingleExcitation,UCCSD,QuantumPoolingCircuit,
+- 量子神经网络,增加接口: Quantum_Embedding,Mnist_Dataset,CIFAR10_Dataset,grad,Purity。
+- 量子神经网络,增加示例: 基于梯度裁剪,quanvolution,量子线路表达力,贫瘠高原,量子强化学习QDRL。
 
 Changed
 ===========
@@ -225,7 +250,7 @@ Added
 
 - 经典神经网络,增加LayernormNd实现,支持多维数据layernorm计算。
 - 经典神经网络,增加CrossEntropyLoss以及NLL_Loss损失函数计算接口,支持1维~N维输入。
-- 量子神经网络,增加常用线路模板：HardwareEfficientAnsatz,StronglyEntanglingTemplate,BasicEntanglerTemplate。
+- 量子神经网络,增加常用线路模板: HardwareEfficientAnsatz,StronglyEntanglingTemplate,BasicEntanglerTemplate。
 - 量子神经网络,增加计算量子比特子系统互信息的Mutal_info接口、Von Neumann 熵VB_Entropy、密度矩阵DensityMatrixFromQstate。
 - 量子神经网络,增加量子感知器算法例子QuantumNeuron,增加量子傅里叶级数算法例子。
 - 量子神经网络,增加支持多进程加速运行量子线路的接口QuantumLayerMultiProcess。
@@ -249,8 +274,8 @@ Fixed
 Added
 ===========
 
-- 增加支持stack,双向的循环神经网络接口：RNN, LSTM, GRU
-- 增加常用计算性能指标的接口：MSE,RMSE, MAE, R_Square, precision_recall_f1_2_score, precision_recall_f1_Multi_scoreprecision_recall_f1_N_score, auc_calculate
+- 增加支持stack,双向的循环神经网络接口: RNN, LSTM, GRU
+- 增加常用计算性能指标的接口: MSE,RMSE, MAE, R_Square, precision_recall_f1_2_score, precision_recall_f1_Multi_scoreprecision_recall_f1_N_score, auc_calculate
 - 增加量子核SVM的算法示例
 
 Changed
@@ -308,5 +333,5 @@ Added
 - 增加损失函数4个,包括MSE,BCE,CCE,SCE等。
 - 增加激活函数10个,包括ReLu,Sigmoid,ELU等。
 - 增加优化器6个,包括SGD,RMSPROP,ADAM等。
-- 增加机器学习示例：QVC,QDRL,Q-KMEANS,QUnet,HQCNN,VSQL,量子自编码器。
-- 增加量子机器学习层：QuantumLayer,NoiseQuantumLayer。
+- 增加机器学习示例: QVC,QDRL,Q-KMEANS,QUnet,HQCNN,VSQL,量子自编码器。
+- 增加量子机器学习层: QuantumLayer,NoiseQuantumLayer。

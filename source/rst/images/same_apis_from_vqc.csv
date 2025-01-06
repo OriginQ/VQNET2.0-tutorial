@@ -1,0 +1,17 @@
+i,u3,phaseshift
+hadamard,cy,multirz
+t,cnot,sdg
+s,cr,tdg
+paulix,swap,controlledphaseshift
+pauliy,cswap,multicontrolledx
+pauliz,iswap,single_excitation
+x1,cz,double_excitation
+rx,rxx,vqc_to_originir_list
+ry,ryy,originir_to_vqc
+rz,rzz,model_summary
+crx,rzx,wrapper_single_qubit_op_fuse
+cry,toffoli,wrapper_commute_controlled
+crz,isingxx,wrapper_merge_rotations
+p,isingyy,wrapper_compile
+u1,isingzz,
+u2,isingxy,
