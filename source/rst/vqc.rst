@@ -4,7 +4,7 @@
 变分量子线路自动微分模拟
 ***********************************
 
-VQNet基于自动微分算子构建以及一些常用量子逻辑门、量子线路以及测量方法,可使用自动微分代替量子线路parameter-shift方法计算梯度。我们可以像其他 `Module` 一样,使用VQC算子构成复杂神经网络。在 `Module` 中需要定义虚拟机 `QMachine`,并且需要对machine中 `states` 根据输入的batchsize进行reset_states。请具体看下例:
+VQNet基于自动微分算子构建以及一些常用量子逻辑门、量子线路以及测量方法,可使用自动微分模拟代替量子线路parameter-shift方法计算梯度。我们可以像其他 `Module` 一样,使用VQC算子构成复杂神经网络。在 `Module` 中需要定义虚拟机 `QMachine`,并且需要对machine中 `states` 根据输入的batchsize进行reset_states。请具体看下例:
 
 .. code-block::
 
@@ -121,7 +121,7 @@ QMachine
 
     :param num_wires: 量子比特数。
     :param dtype: 计算数据的数据类型。默认值是pyvqnet。kcomplex64,对应的参数精度为pyvqnet.kfloat32。
-    :param grad_mode: 梯度计算模式,可为 "adjoint",默认值:"",使用自动微分。
+    :param grad_mode: 梯度计算模式,可为 "adjoint",默认值:"",使用自动微分模拟。
     :param save_ir: 设置为True时,将操作保存到originIR,默认值:False。
 
     :return: 输出QMachine。
