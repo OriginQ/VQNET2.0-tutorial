@@ -28,7 +28,7 @@
 
 .. code-block::
     
-    # 下载其他库
+    # 下载其他依赖库
     pip install -r requirements.txt
 
     # 安装peft_vqc
@@ -39,7 +39,7 @@
 .. code-block::
     
     # 安装VQNet
-    pip install pyvqnet==2.15.0 --index-url https://pypi.originqc.com.cn
+    pip install pyvqnet # pyvqnet>=2.15.0
 
 
 量子大模型微调训练步骤
@@ -47,7 +47,18 @@
 
 完成需求包安装后, 可以参考文件目录 ``/llama_factory_peft_vqc/examples/qlora_single_gpu/`` 下 ``train.sh`` 等脚本, 根据脚本指定训练基准模型，微调模块选择，微调模块输出路径等参数.
 
-``train.sh`` 脚本样例如下，确定基准模型、数据集、输出的路径等参数信息：
+下载 ``Qwen2.5-0.5B`` 模型可在网址 https://huggingface.co/Qwen/Qwen2.5-0.5B?clone=true 上下载， 其他模型一样:
+
+.. code-block::
+    
+    # 安装Qwen2.5-0.5B
+    git clone https://huggingface.co/Qwen/Qwen2.5-0.5B
+
+    # 或者基于ssh下载
+    git clone git@hf.co:Qwen/Qwen2.5-0.5B
+
+
+``train.sh`` 脚本样例如下，确定基准模型、数据集、输出的路径等参数信息， 其中 ``model_name_or_path`` 放入自己下载 ``Qwen2.5-0.5B`` 模型的绝对路径, 
 
 .. code-block::
 
@@ -55,14 +66,14 @@
 
     CUDA_VISIBLE_DEVICES=1 python ../../src/train_bash.py \
         --stage sft \
-        --model_name_or_path /data/kxf/models/Qwen2.5-0.5B/ \
+        --model_name_or_path /下载路径/Qwen2.5-0.5B/ \
         --dataset alpaca_gpt4_en \
         --tokenized_path ../../data/tokenized/alpaca_gpt4_en/ \
         --dataset_dir ../../data \
-        --template default \
+        --template qwen \
         --finetuning_type vqc \
         --lora_target q_proj,v_proj \
-        --output_dir ../../saves/LLaMA2-7B/lora/Qwen2.5-0.5B/vqc/alpaca_gpt4_en \
+        --output_dir ../../saves/Qwen2.5-0.5B/vqc/alpaca_gpt4_en \
         --overwrite_cache \
         --overwrite_output_dir \
         --cutoff_len 1024 \
@@ -84,6 +95,9 @@
         --plot_loss \
         --fp16 \
         --do-train \
+
+    # 在命令行执行
+    sh train.sh 
 
 在量子大模型微调模块中, 相较经典的大模型微调模块, 添加了三种额外的微调方式, 分别为：
 
@@ -103,7 +117,7 @@
 
 上图则是基于 ``Qwen2.5-0.5B`` 基准模型在数据集 ``alpaca_gpt4_en`` 下的训练结果， 其中, 可以观察到, 基于VQNet的 ``vqc`` 模块取得了最好的实验结果，以此证明了基于量子线路来做大模型微调任务的有效性。
 
-在不同的基准模型下如 ``Llama-3.2-1B`` 下同样也能取得同样的结果，在数据集 ``identity`` 上的训练脚本样例如下：
+在不同的基准模型下如 ``Llama-3.2-1B`` 下同样也能取得同样的结果，在数据集 ``identity`` 上的训练脚本样例如下,  ``Llama-3.2-1B`` 同样需要自行下载：
 
 .. code-block::
 
@@ -111,14 +125,14 @@
 
     CUDA_VISIBLE_DEVICES=1 python ../../src/train_bash.py \
         --stage sft \
-        --model_name_or_path /data/kxf/models/Llama-3.2-1B \
+        --model_name_or_path /下载路径/Llama-3.2-1B \
         --dataset identity \
         --tokenized_path ../../data/tokenized/identity/ \
         --dataset_dir ../../data \
         --template default \
-        --finetuning_type quanTA \
+        --finetuning_type vqc \
         --lora_target q_proj,v_proj \
-        --output_dir ../../saves/LLaMA2-7B/lora/Llama-3.2-1B/quanTA/identity/2024_12_05 \
+        --output_dir ../../saves/Llama-3.2-1B/vqc/identity/ \
         --overwrite_cache \
         --overwrite_output_dir \
         --cutoff_len 1024 \
@@ -141,6 +155,9 @@
         --fp16 \
         --do-train \
 
+    # 在命令行执行
+    sh train.sh 
+
 
 通过 ``finetuning_type`` 设置其他的微调模块进行微调训练，结果如下图所示:
 
@@ -150,22 +167,43 @@
 
 |
 
-上述则是在不同模型下进行训练的实验结果, 通过 ``train.sh`` 训练脚本，可以将微调训练后的模块参数保存到指定目录下，而要使用该微调模块，还需要将该微调模块与基准模型融合，生成新的大模型微调模块，
-通过相同目录 ``/llama_factory_peft_vqc/examples/qlora_single_gpu/`` 下的 ``merge.sh`` 脚本将微调模块与基准模型模块融合，并在指定路径下生成文件, 脚本内容如下：
+上述则是在不同模型下进行训练的实验结果, 通过 ``train.sh`` 训练脚本，可以将微调训练后的模块参数通过 ``--output_dir`` 参数保存到指定目录下, 
+进行评估则是通过同样目录 ``/llama_factory_peft_vqc/examples/qlora_single_gpu/``  下的 ``eval.sh`` 脚本进行评估。
 
 .. code-block::
 
     #!/bin/bash
 
-    CUDA_VISIBLE_DEVICES=0 python ../../src/export_model.py \
-        --model_name_or_path /data/kxf/models/Qwen2.5-0.5B/ \
-        --template default \
+    CUDA_VISIBLE_DEVICES=1 python ../../src/evaluate.py \
+        --model_name_or_path /下载路径/Llama-3.2-1B \
+        --template qwen \
         --finetuning_type vqc \
-        --adapter_name_or_path ../../saves/LLaMA2-7B/lora/Qwen2.5-0.5B/vqc/alpaca_gpt4_en
-        --export_dir ../../saves/export_model/Qwen2.5-0.5B/vqc/alpaca_gpt4_en \
-        --export_size 2 \
+        --task cmmlu \
+        --task_dir ../../evaluation/ \
+        --adapter_name_or_path ../../saves/Llama-3.2-1B/vqc/identity/ \
 
-随后可以调用生成后的模型进行微调训练, 查看是否能够收敛, 将脚本 ``train.sh`` 中参数 ``model_name_or_path`` 改成生成的模型路径 ``../../saves/export_model/Qwen2.5-0.5B/vqc/alpaca_gpt4_en`` 即可。
+
+    # 在命令行执行
+    sh eval.sh 
+
+通过 ``--model_name_or_path`` 指定基准模型路径, 以及根据 ``--adapter_name_or_path`` 加载已经训练好的模块来在相关任务上进行评估， ``--task`` 参数可取 ``cmmlu`` ``ceval`` ``mmlu`` 进行评估。
+
+随后通过调用 ``cli_demo.py`` 文件来进行问答，同样根据当前目录下的 ``cli.sh`` 脚本执行，脚本内容如下:
+
+.. code-block::
+
+    #!/bin/bash
+
+    CUDA_VISIBLE_DEVICES=1 python ../../src/cli_demo.py  \
+        --model_name_or_path /下载路径/Llama-3.2-1B \
+        --template qwen \
+        --finetuning_type vqc \
+        --adapter_name_or_path ../../saves/Llama-3.2-1B/vqc/identity/ \
+        --max_new_tokens 1024
+
+
+    # 在命令行执行
+    sh cli.sh 
 
 更多相关参数具体介绍
 -------------------------
@@ -206,9 +244,8 @@ plot_loss                           是否保存训练损失曲线
 fp16                                是否使用fp16混合精度训练, 在vqc模块使用float32
 do-train                            是否指定是训练任务
 adapter_name_or_path                选择训练结束后生成文件路径
-export_dir                          合成后的模型路径
-export_size                         导出模型的批次大小 
-export_legacy_format                这个参数指定是否使用旧的导出格式，确定到处格式可以在其他环境中部署
+task                                选择任务, 目前支持ceval, cmmlu, mmlu
+task_dir                            指定任务路径
 ==============================     ===================================================================
 
 其中参数详细介绍可以参考网址 https://llamafactory.readthedocs.io/zh-cn/latest/advanced/arguments.html
