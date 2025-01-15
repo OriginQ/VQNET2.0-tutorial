@@ -364,10 +364,10 @@ QuantumLayerV3
 
     .. note::
 
-        origin_qprog_func 是用户使用 pyQPanda 定义的量子电路函数:
+        origin_qprog_func 是用户使用 pyqpanda 定义的量子电路函数:
         https://pyqpanda-toturial.readthedocs.io/zh/latest/QCircuit.html。
 
-        该函数应包含以下输入参数，并返回 pyQPanda.QProg 或 originIR。
+        该函数应包含以下输入参数，并返回 pyqpanda.QProg 或 originIR。
 
         origin_qprog_func (input,param,m_machine,qubits,cubits)
 
@@ -1575,7 +1575,7 @@ DataParallelHybirdVQCQpandaQVMLayer
 基本量子逻辑门
 ============================
 
-在VQNet中，我们使用本源量子自研的 `pyQPanda <https://pyqpanda-toturial.readthedocs.io/zh/latest/>`_ 的各个逻辑门搭建量子线路，进行量子模拟。
+在VQNet中，我们使用本源量子自研的 `pyqpanda <https://pyqpanda-toturial.readthedocs.io/zh/latest/>`_ 的各个逻辑门搭建量子线路，进行量子模拟。
 当前pyQPanda支持的逻辑门可参考pyQPanda `量子逻辑门 <https://pyqpanda-toturial.readthedocs.io/zh/latest/>`_ 部分的定义。
 此外VQNet还封装了部分在量子机器学习中常用的量子逻辑门组合:
 
@@ -2603,8 +2603,8 @@ expval_qcloud
     :param machine: qpanda 创建的机器
     :param prog: qpanda 创建的量子程序
     :param pauli_str_dict: 哈密顿可观测量
-    :param qlists: pyQPanda 分配的量子位
-    :param clists: pyQPanda 分配的 cbit
+    :param qlists: pyqpanda 分配的量子位
+    :param clists: pyqpanda 分配的 cbit
     :param shots: 测量次数，默认:1000。
     :param qtype: 设置qmachine测量的类型，默认为""表示非qcloud。 为真实芯片设置`pq.real_chip_type.origin_72`。
     :return: 期望值.

@@ -85,7 +85,7 @@
 模型构建
 -------------------
 我们已经定义了可变量子线路 ``qvc_circuits`` 。我们希望将其用于我们VQNet的自动微分逻辑中，并使用VQNet的优化算法进行模型训练。我们定义了一个 Model 类，该类继承于抽象类 ``Module``。
-Model中使用 :ref:`QuantumLayer` 类这个可进行自动微分的量子计算层。``qvc_circuits`` 为我们希望运行的量子线路，24 为所有需要训练的量子线路参数的个数，"cpu" 表示这里使用 pyQPanda 的 全振幅模拟器，4表示需要申请4个量子比特。
+Model中使用 :ref:`QuantumLayer` 类这个可进行自动微分的量子计算层。``qvc_circuits`` 为我们希望运行的量子线路，24 为所有需要训练的量子线路参数的个数，"cpu" 表示这里使用 pyqpanda 的 全振幅模拟器，4表示需要申请4个量子比特。
 在 ``forward()`` 函数中，用户定义了模型前向运行的逻辑。
 
 .. code-block::
@@ -1618,7 +1618,7 @@ Quantum circuit structure learning任务的核心目标就是找到最优的带�
 构建量子线路
 -----------------
 
-在本例中，我们使用本源量子的 `pyQPanda <https://pyqpanda-toturial.readthedocs.io/zh/latest/>`_ 
+在本例中，我们使用本源量子的 `pyqpanda <https://pyqpanda-toturial.readthedocs.io/zh/latest/>`_ 
 定义了一个1量子比特的简单量子线路，该线路将经典神经网络层的输出作为输入，通过 ``H``, ``RY`` 逻辑门进行量子数据编码，并计算z方向的哈密顿期望值作为输出。
 
 .. code-block::
@@ -1628,12 +1628,12 @@ Quantum circuit structure learning任务的核心目标就是找到最优的带�
     import numpy as np
     def circuit(weights):
         num_qubits = 1
-        #pyQPanda 创建模拟器
+        #pyqpanda 创建模拟器
         machine = pq.CPUQVM()
         machine.init_qvm()
-        #pyQPanda 分配量子比特
+        #pyqpanda 分配量子比特
         qubits = machine.qAlloc_many(num_qubits)
-        #pyQPanda 分配经典比特辅助测量
+        #pyqpanda 分配经典比特辅助测量
         cbits = machine.cAlloc_many(num_qubits)
         #构建线路
         circuit = pq.QCircuit()
@@ -2666,7 +2666,7 @@ Quantum circuit structure learning任务的核心目标就是找到最优的带�
 是图像理解的重要组成部分，同时也是图像处理中最困难的问题之一。所谓图像分割是指根据灰度、彩色、空间纹理、几何形状等特征把图像
 划分成若干个互不相交的区域，使得这些特征在同一区域内表现出一致性或相似性，而在不同区域间表现出明显的不同。
 简单而言就是给定一张图片，对图片上的每一个像素点分类。将不同分属不同物体的像素区域分开。 `Unet <https://arxiv.org/abs/1505.04597>`_ 是一种用于解决经典图像分割的算法。
-在这里我们探索如何将经典神经网络部分量化，以创建适合量子数据的 `QUnet - Quantum Unet` 神经网络。我们将编写一个将 `pyQPanda <https://pyqpanda-toturial.readthedocs.io/zh/latest/>`_ 与 `VQNet` 集成的简单示例。
+在这里我们探索如何将经典神经网络部分量化，以创建适合量子数据的 `QUnet - Quantum Unet` 神经网络。我们将编写一个将 `pyqpanda <https://pyqpanda-toturial.readthedocs.io/zh/latest/>`_ 与 `VQNet` 集成的简单示例。
 QUnet主要是用于解决图像分割的技术。
 
 
@@ -2683,7 +2683,7 @@ QUnet主要是用于解决图像分割的技术。
 
 构建量子线路
 ---------------
-在本例中，我们使用本源量子的 pyQPanda 定义了一个量子线路。将输入的3通道彩色图片数据压缩为单通道的灰度图片并进行存储，
+在本例中，我们使用本源量子的 pyqpanda 定义了一个量子线路。将输入的3通道彩色图片数据压缩为单通道的灰度图片并进行存储，
 再利用量子卷积操作对数据的特征进行提取降维操作。
 
 .. image:: ./images/qunet_cir.png
@@ -3208,7 +3208,7 @@ QUnet主要是用于解决图像分割的技术。
 ==================================
 
 我们介绍并分析了提出了一种量子多层感知器 (QMLP) 架构，其特点是具有容错输入嵌入、丰富的非线性和带有参数化双量子比特纠缠门的增强变分电路模拟。`QMLP: An Error-Tolerant Nonlinear Quantum MLP Architecture using Parameterized Two-Qubit Gates <https://arxiv.org/pdf/2206.01345.pdf>`_ 。
-我们将编写一个将 `pyQPanda <https://pyqpanda-toturial.readthedocs.io/zh/latest/>`_ 与 `VQNet` 集成的简单示例。
+我们将编写一个将 `pyqpanda <https://pyqpanda-toturial.readthedocs.io/zh/latest/>`_ 与 `VQNet` 集成的简单示例。
 
 
 
@@ -3605,7 +3605,7 @@ QUnet主要是用于解决图像分割的技术。
 
 我们介绍并分析了提出了一种量子强化学习网络 (QDRL) ，其特点将经典的深度强化学习算法（如经验回放和目标网络）重塑为变分量子电路的表示。
 此外，与经典神经网络相比，我们使用量子信息编码方案来减少模型参数的数量。 `QDRL: Variational Quantum Circuits for Deep Reinforcement Learning <https://arxiv.org/pdf/1907.00397.pdf>`_ 。
-我们将编写一个将 `pyQPanda <https://pyqpanda-toturial.readthedocs.io/zh/latest/>`_ 与 `VQNet` 集成的简单示例。
+我们将编写一个将 `pyqpanda <https://pyqpanda-toturial.readthedocs.io/zh/latest/>`_ 与 `VQNet` 集成的简单示例。
 
 
 

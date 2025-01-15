@@ -66,6 +66,7 @@ VQNet是由本源量子开发的量子机器学习计算框架，它可以用于
     :maxdepth: 2
 
     rst/qnn.rst
+    rst/qnn_pq3.rst
 
 .. toctree::
     :caption: 量子神经网络自动微分模拟接口
