@@ -18,10 +18,7 @@
 
 .. code-block::
     
-    git clone git@gitlab.qpanda.cn:BY200002/quantum-llm.git
-
-    # 切换到0.1分支, 目前代码文件均在0.1分支上
-    git checkout -b 0.1 origin/0.1
+    git clone https://gitee.com/haoz1/quantum-llm.git
 
 
 随后根据 ``quantum-llm`` 中 ``README.md`` 文档中内容完成其他依赖库以及文件安装
