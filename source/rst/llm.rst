@@ -12,19 +12,19 @@
 
 该模块介绍在使用量子线路用于大模型微调中, 如何去对所需依赖包进行安装。
 
-使用量子大模型微调, 主要需要 ``llama_factory_peft_vqc`` 和 ``pyvqnet`` 两个包即可， 其中 ``llama_factory_peft_vqc`` 目前是内部文件， ``pyvqnet`` 版本要求 ``2.15.0`` 或者以上即可。
+使用量子大模型微调, 主要需要 ``quantum-llm`` 和 ``pyvqnet`` 两个包即可， 其中 ``quantum-llm`` 目前是内部文件， ``pyvqnet`` 版本要求 ``2.15.0`` 或者以上即可。
 
-首先介绍 ``llama_factory_peft_vqc`` 内部库的安装
+首先介绍 ``quantum-llm`` 库的安装
 
 .. code-block::
     
     git clone git@gitlab.qpanda.cn:BY200002/quantum-llm.git
 
-    # 切换到0.1分支，目前代码文件均在0.1分支上
+    # 切换到0.1分支, 目前代码文件均在0.1分支上
     git checkout -b 0.1 origin/0.1
 
 
-随后根据 ``llama_factory_peft_vqc`` 中 ``README.md`` 文档中内容完成其他依赖库以及文件安装
+随后根据 ``quantum-llm`` 中 ``README.md`` 文档中内容完成其他依赖库以及文件安装
 
 .. code-block::
     
@@ -34,7 +34,7 @@
     # 安装peft_vqc
     cd peft_vqc && pip install -e .
 
-完成 ``llama_factory_peft_vqc`` 库以及依赖库安装后，则对 ``pyvqnet`` 进行安装
+完成 ``quantum-llm`` 库以及依赖库安装后，则对 ``pyvqnet`` 进行安装
 
 .. code-block::
     
@@ -45,20 +45,23 @@
 量子大模型微调训练步骤
 -------------------------
 
-完成需求包安装后, 可以参考文件目录 ``/llama_factory_peft_vqc/examples/qlora_single_gpu/`` 下 ``train.sh`` 等脚本, 根据脚本指定训练基准模型，微调模块选择，微调模块输出路径等参数.
+完成需求包安装后, 可以参考文件目录 ``/quantum-llm/examples/qlora_single_gpu/`` 下 ``train.sh`` 等脚本, 根据脚本指定训练基准模型，微调模块选择，微调模块输出路径等参数.
 
 下载 ``Qwen2.5-0.5B`` 模型可在网址 https://huggingface.co/Qwen/Qwen2.5-0.5B?clone=true 上下载， 其他模型一样:
 
 .. code-block::
     
-    # 安装Qwen2.5-0.5B
+    # 下载Qwen2.5-0.5B
     git clone https://huggingface.co/Qwen/Qwen2.5-0.5B
 
     # 或者基于ssh下载
     git clone git@hf.co:Qwen/Qwen2.5-0.5B
 
 
-``train.sh`` 脚本样例如下，确定基准模型、数据集、输出的路径等参数信息， 其中 ``model_name_or_path`` 放入自己下载 ``Qwen2.5-0.5B`` 模型的绝对路径, 
+``train.sh`` 脚本样例如下，确定基准模型、数据集、输出的路径等参数信息， 其中 ``model_name_or_path`` 放入指定模型，如果不能访问，则自行下载基准模型后，放入基准模型的绝对路径。
+
+.. note::
+    ``train.sh`` ``eval.sh`` ``cli.sh`` 等脚本文件均在 ``/quantum-llm/examples/qlora_single_gpu/`` 目录下执行
 
 .. code-block::
 
@@ -109,79 +112,29 @@
 
 上述的 ``train.sh`` 样例中是 ``vqc`` 模块微调的脚本样例, 若使用另外两种微调模块则将 ``finetuning_type`` 改为 ``quanTA`` , ``tq`` 即可，将三个模块实验结果记录并绘图， 结果如下:
 
-.. image:: ./images/peft_vqc1.png
+.. image:: ./images/peft1.png
    :width: 600 px
    :align: center
 
 |
 
-上图则是基于 ``Qwen2.5-0.5B`` 基准模型在数据集 ``alpaca_gpt4_en`` 下的训练结果， 其中, 可以观察到, 基于VQNet的 ``vqc`` 模块取得了最好的实验结果，以此证明了基于量子线路来做大模型微调任务的有效性。
-
-在不同的基准模型下如 ``Llama-3.2-1B`` 下同样也能取得同样的结果，在数据集 ``identity`` 上的训练脚本样例如下,  ``Llama-3.2-1B`` 同样需要自行下载：
-
-.. code-block::
-
-    #!/bin/bash
-
-    CUDA_VISIBLE_DEVICES=1 python ../../src/train_bash.py \
-        --stage sft \
-        --model_name_or_path /下载路径/Llama-3.2-1B \
-        --dataset identity \
-        --tokenized_path ../../data/tokenized/identity/ \
-        --dataset_dir ../../data \
-        --template default \
-        --finetuning_type vqc \
-        --lora_target q_proj,v_proj \
-        --output_dir ../../saves/Llama-3.2-1B/vqc/identity/ \
-        --overwrite_cache \
-        --overwrite_output_dir \
-        --cutoff_len 1024 \
-        --preprocessing_num_workers 16 \
-        --per_device_train_batch_size 1 \
-        --per_device_eval_batch_size 1 \
-        --gradient_accumulation_steps 8 \
-        --lr_scheduler_type cosine \
-        --logging_steps 10 \
-        --warmup_steps 20 \
-        --save_steps 100 \
-        --eval_steps 100 \
-        --evaluation_strategy steps \
-        --load_best_model_at_end \
-        --learning_rate 5e-5 \
-        --num_train_epochs 3.0 \
-        --max_samples 1000 \
-        --val_size 0.1 \
-        --plot_loss \
-        --fp16 \
-        --do-train \
-
-    # 在命令行执行
-    sh train.sh 
+上图则是基于 ``Qwen2.5-0.5B`` 基准模型在数据集 ``alpaca_gpt4_en`` 下的训练结果， 其中, 可以观察到, 基于VQNet的 ``vqc`` 模块取得了最好的损失收敛效果，以此证明了基于量子线路来做大模型微调任务的有效性。
 
 
-通过 ``finetuning_type`` 设置其他的微调模块进行微调训练，结果如下图所示:
-
-.. image:: ./images/peft_vqc2.png
-   :width: 600 px
-   :align: center
-
-|
-
-上述则是在不同模型下进行训练的实验结果, 通过 ``train.sh`` 训练脚本，可以将微调训练后的模块参数通过 ``--output_dir`` 参数保存到指定目录下, 
-进行评估则是通过同样目录 ``/llama_factory_peft_vqc/examples/qlora_single_gpu/``  下的 ``eval.sh`` 脚本进行评估。
+通过 ``train.sh`` 训练脚本，可以将微调训练后的模块参数通过 ``--output_dir`` 参数保存到指定目录下, 
+随后通过同样目录 ``/quantum-llm/examples/qlora_single_gpu/``  下的 ``eval.sh`` 脚本进行评估, 脚本内容如下:
 
 .. code-block::
 
     #!/bin/bash
 
     CUDA_VISIBLE_DEVICES=1 python ../../src/evaluate.py \
-        --model_name_or_path /下载路径/Llama-3.2-1B \
+        --model_name_or_path /下载路径/Qwen2.5-0.5B/ \
         --template qwen \
         --finetuning_type vqc \
         --task cmmlu \
         --task_dir ../../evaluation/ \
-        --adapter_name_or_path ../../saves/Llama-3.2-1B/vqc/identity/ \
-
+        --adapter_name_or_path ../../saves/Qwen2.5-0.5B/vqc/alpaca_gpt4_en \
 
     # 在命令行执行
     sh eval.sh 
@@ -195,10 +148,10 @@
     #!/bin/bash
 
     CUDA_VISIBLE_DEVICES=1 python ../../src/cli_demo.py  \
-        --model_name_or_path /下载路径/Llama-3.2-1B \
+        --model_name_or_path /下载路径/Qwen2.5-0.5B/ \
         --template qwen \
         --finetuning_type vqc \
-        --adapter_name_or_path ../../saves/Llama-3.2-1B/vqc/identity/ \
+        --adapter_name_or_path ../../saves/Qwen2.5-0.5B/vqc/alpaca_gpt4_en \
         --max_new_tokens 1024
 
 
@@ -246,6 +199,6 @@ do-train                            是否指定是训练任务
 adapter_name_or_path                选择训练结束后生成文件路径
 task                                选择任务, 目前支持ceval, cmmlu, mmlu
 task_dir                            指定任务路径
+q_d                                 指定quanTA模块的张量分解数量, 默认为4
+per_dim_features                    指定quanTA模块的张量分解特征数, 默认为[16,8,4,2]
 ==============================     ===================================================================
-
-其中参数详细介绍可以参考网址 https://llamafactory.readthedocs.io/zh-cn/latest/advanced/arguments.html
