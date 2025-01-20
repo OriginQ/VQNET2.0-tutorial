@@ -44,15 +44,12 @@
 
 完成需求包安装后, 可以参考文件目录 ``/quantum-llm/examples/qlora_single_gpu/`` 下 ``train.sh`` 等脚本, 根据脚本指定训练基准模型，微调模块选择，微调模块输出路径等参数.
 
-下载 ``Qwen2.5-0.5B`` 模型可在网址 https://huggingface.co/Qwen/Qwen2.5-0.5B?clone=true 上下载， 其他模型一样:
+下载 Qwen2.5-0.5B 模型可在网址 https://huggingface.co/Qwen/Qwen2.5-0.5B?clone=true 上下载， 其他模型一样, 若无法下载，则可以针对网址上文件单一进行下载后使用:
 
 .. code-block::
     
     # 下载Qwen2.5-0.5B
     git clone https://huggingface.co/Qwen/Qwen2.5-0.5B
-
-    # 或者基于ssh下载
-    git clone git@hf.co:Qwen/Qwen2.5-0.5B
 
 
 ``train.sh`` 脚本样例如下，确定基准模型、数据集、输出的路径等参数信息， 其中 ``model_name_or_path`` 放入指定模型，如果不能访问，则自行下载基准模型后，放入基准模型的绝对路径。
