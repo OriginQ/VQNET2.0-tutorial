@@ -2216,15 +2216,20 @@ pyqpanda量子变分线路训练函数
 
 以下是使用pyqpanda以及pyqpanda3进行线路计算的训练变分量子线路接口。
 
+.. warning::
+
+    以下 TorchQpandaQuantumLayer, TorchQcloudQuantumLayer 的量子计算部分使用pyqpanda2 https://pyqpanda-toturial.readthedocs.io/zh/latest/。
+
+    由于pyqpanda2以及pyqpanda3兼容性问题,您需要自行安装pyqpnda2, `pip install pyqpanda` 
 
 TorchQpandaQuantumLayer
 ------------------------------------------------
 
-如您更加熟悉pyQPanda语法，可以使用该接口TorchQpandaQuantumLayer，自定义量子比特 ``qubits`` ,经典比特 ``cbits`` ,后端模拟器 ``machine`` 加入TorchQpandaQuantumLayer的参数 ``qprog_with_measure`` 函数中。
+如您更加熟悉pyQPanda2语法，可以使用该接口TorchQpandaQuantumLayer，自定义量子比特 ``qubits`` ,经典比特 ``cbits`` ,后端模拟器 ``machine`` 加入TorchQpandaQuantumLayer的参数 ``qprog_with_measure`` 函数中。
 
 .. py:class:: pyvqnet.qnn.vqc.torch.TorchQpandaQuantumLayer(qprog_with_measure,para_num,diff_method:str = "parameter_shift",delta:float = 0.01,dtype=None,name="")
 
-	变分量子层的抽象计算模块。对一个参数化的量子线路使用pyQPanda进行仿真，得到测量结果。该变分量子层继承了VQNet框架的梯度计算模块，可以使用参数漂移法等计算线路参数的梯度，训练变分量子线路模型或将变分量子线路嵌入混合量子和经典模型。
+	变分量子层的抽象计算模块。对一个参数化的量子线路使用pyQPanda2进行仿真，得到测量结果。该变分量子层继承了VQNet框架的梯度计算模块，可以使用参数漂移法等计算线路参数的梯度，训练变分量子线路模型或将变分量子线路嵌入混合量子和经典模型。
     
     :param qprog_with_measure: 用pyQPand构建的量子线路运行和测量函数。
     :param para_num: `int` - 参数个数。
@@ -2236,7 +2241,7 @@ TorchQpandaQuantumLayer
     :return: 一个可以计算量子线路的模块。
 
     .. note::
-        qprog_with_measure是pyQPanda中定义的量子线路函数 :https://pyqpanda-toturial.readthedocs.io/zh/latest/QCircuit.html。
+        qprog_with_measure是pyQPanda2中定义的量子线路函数 :https://pyqpanda-toturial.readthedocs.io/zh/latest/QCircuit.html。
         
         此函数必须包含以下参数作为函数入参（即使某个参数未实际使用），否则无法在本函数中正常运行。
 
@@ -2317,11 +2322,11 @@ TorchQpandaQuantumLayer
 TorchQcloudQuantumLayer
 ------------------------------------------
 
-当您安装最新版本pyqpanda,可以使用本接口定义一个变分线路，并提交到originqc的真实芯片上运行。
+当您安装最新版本pyqpanda2,可以使用本接口定义一个变分线路，并提交到originqc的真实芯片上运行。
 
 .. py:class:: pyvqnet.qnn.vqc.torch.TorchQcloudQuantumLayer(origin_qprog_func, qcloud_token, para_num, num_qubits, num_cubits, pauli_str_dict=None, shots = 1000, initializer=None, dtype=None, name="", diff_method="parameter_shift", submit_kwargs={}, query_kwargs={})
 
-    使用 pyqpanda QCLOUD 从版本 3.8.2.2 开始的 originqc 真实芯片的抽象计算模块。 它提交参数化量子电路到真实芯片并获得测量结果。
+    使用 pyqpanda QCloud 从版本 3.8.2.2 开始的 originqc 真实芯片的抽象计算模块。 它提交参数化量子电路到真实芯片并获得测量结果。
     如果 diff_method == "random_coordinate_descent" ,该层将随机选择单个参数来计算梯度,其他参数将保持为零。参考:https://arxiv.org/abs/2311.00088
 
     .. note::
@@ -2439,7 +2444,11 @@ TorchQcloudQuantumLayer
 
 
 
+.. warning::
 
+    以下TorchQcloud3QuantumLayer,TorchQpanda3QuantumLayer接口的量子计算部分使用pyqpanda3 https://qcloud.originqc.com.cn/document/qpanda-3/index.html。
+
+    如果您使用了本模块下的QCloud功能，在代码中导入pyqpanda2 或 使用pyvqnet的pyqpanda2相关封装接口会有错误。
 
 TorchQcloud3QuantumLayer
 ---------------------------------------------------

@@ -1,5 +1,11 @@
-使用pyQPanda量子机器学习模块
+使用pyQPanda2量子机器学习模块
 #################################
+
+.. warning::
+
+    以下接口的量子计算部分使用pyqpanda2 https://pyqpanda-toturial.readthedocs.io/zh/latest/。
+
+    由于pyqpanda2以及pyqpanda3兼容性问题,您需要自行安装pyqpnda2, `pip install pyqpanda` 
 
 量子计算层
 ***********************************
@@ -9,7 +15,7 @@
 QuantumLayer
 ============================
 
-QuantumLayer是一个支持量子含参线路作为参数的自动求导模块的封装类。用户定义一个函数作为参数 ``qprog_with_measure`` ，该函数需要包含pyQPanda定义的量子线路:一般包含量子线路的编码线路，演化线路和测量操作。
+QuantumLayer是一个支持量子含参线路作为参数的自动求导模块的封装类。用户定义一个函数作为参数 ``qprog_with_measure`` ，该函数需要包含pyQPanda22定义的量子线路:一般包含量子线路的编码线路，演化线路和测量操作。
 该类可以嵌入量子经典混合机器学习模型，通过经典的梯度下降法，使得量子经典混合模型的目标函数或损失函数最小。
 用户可通过参数 ``diff_method`` 指定 ``QuantumLayer`` 层中量子线路参数的梯度计算方式，``QuantumLayer`` 当前支持有限差分法 ``finite_diff`` 以及 ``parameter-shift`` 方法。
 
@@ -35,9 +41,9 @@ QuantumLayer是一个支持量子含参线路作为参数的自动求导模块�
 
     变分量子层的抽象计算模块。对一个参数化的量子线路进行仿真，得到测量结果。该变分量子层继承了VQNet框架的梯度计算模块，可以计算线路参数的梯度，训练变分量子线路模型或将变分量子线路嵌入混合量子和经典模型。
 
-    :param qprog_with_measure: 用pyQPanda构建的量子线路运行和测量函数。
+    :param qprog_with_measure: 用pyQPanda22构建的量子线路运行和测量函数。
     :param para_num: `int` - 参数个数。
-    :param machine_type_or_cloud_token: qpanda量子虚拟机类型或pyQPanda 量子云令牌 : https://pyqpanda-toturial.readthedocs.io/zh/latest/Realchip.html。
+    :param machine_type_or_cloud_token: qpanda量子虚拟机类型或pyQPanda22 量子云令牌 : https://pyqpanda-toturial.readthedocs.io/zh/latest/Realchip.html。
     :param num_of_qubits: 量子比特数。
     :param num_of_cbits: 经典比特数，默认为1。
     :param diff_method: 求解量子线路参数梯度的方法，“参数位移”或“有限差分”，默认参数偏移。
@@ -48,7 +54,7 @@ QuantumLayer是一个支持量子含参线路作为参数的自动求导模块�
     :return: 一个可以计算量子线路的模块。
 
     .. note::
-        qprog_with_measure是pyQPanda中定义的量子线路函数 :https://pyqpanda-toturial.readthedocs.io/zh/latest/QCircuit.html。
+        qprog_with_measure是pyQPanda22中定义的量子线路函数 :https://pyqpanda-toturial.readthedocs.io/zh/latest/QCircuit.html。
         
         此函数必须包含以下参数作为函数入参（即使某个参数未实际使用），否则无法在QuantumLayer中正常运行。
 
@@ -182,11 +188,11 @@ QuantumLayer是一个支持量子含参线路作为参数的自动求导模块�
 QuantumLayerV2
 ============================
 
-如您更加熟悉pyQPanda语法，可以使用该接口QuantumLayerV2，自定义量子比特 ``qubits`` ,经典比特 ``cbits`` ,后端模拟器 ``machine`` 加入QuantumLayerV2的参数 ``qprog_with_measure`` 函数中。
+如您更加熟悉pyQPanda22语法，可以使用该接口QuantumLayerV2，自定义量子比特 ``qubits`` ,经典比特 ``cbits`` ,后端模拟器 ``machine`` 加入QuantumLayerV2的参数 ``qprog_with_measure`` 函数中。
 
 .. py:class:: pyvqnet.qnn.quantumlayer.QuantumLayerV2(qprog_with_measure,para_num,diff_method:str = "parameter_shift",delta:float = 0.01,dtype=None,name="")
 
-	变分量子层的抽象计算模块。对一个参数化的量子线路使用pyQPanda进行仿真，得到测量结果。该变分量子层继承了VQNet框架的梯度计算模块，可以使用参数漂移法等计算线路参数的梯度，训练变分量子线路模型或将变分量子线路嵌入混合量子和经典模型。
+	变分量子层的抽象计算模块。对一个参数化的量子线路使用pyQPanda22进行仿真，得到测量结果。该变分量子层继承了VQNet框架的梯度计算模块，可以使用参数漂移法等计算线路参数的梯度，训练变分量子线路模型或将变分量子线路嵌入混合量子和经典模型。
     
     :param qprog_with_measure: 用pyQPand构建的量子线路运行和测量函数。
     :param para_num: `int` - 参数个数。
@@ -198,7 +204,7 @@ QuantumLayerV2
     :return: 一个可以计算量子线路的模块。
 
     .. note::
-        qprog_with_measure是pyQPanda中定义的量子线路函数 :https://pyqpanda-toturial.readthedocs.io/zh/latest/QCircuit.html。
+        qprog_with_measure是pyQPanda22中定义的量子线路函数 :https://pyqpanda-toturial.readthedocs.io/zh/latest/QCircuit.html。
         
         此函数必须包含以下参数作为函数入参（即使某个参数未实际使用），否则无法在QuantumLayerV2中正常运行。
 
@@ -688,7 +694,7 @@ QuantumBatchAsyncQcloudLayerES
 QuantumLayerMultiProcess
 ============================
 
-如您更加熟悉pyQPanda语法，可以使用QuantumLayerMultiProcess，自定义量子比特 ``qubits`` ,经典比特 ``cbits`` ,后端模拟器 ``machine`` 加入QuantumLayerMultiProcess的参数 ``qprog_with_measure`` 函数中。
+如您更加熟悉pyQPanda22语法，可以使用QuantumLayerMultiProcess，自定义量子比特 ``qubits`` ,经典比特 ``cbits`` ,后端模拟器 ``machine`` 加入QuantumLayerMultiProcess的参数 ``qprog_with_measure`` 函数中。
 
 .. py:class:: pyvqnet.qnn.quantumlayer.QuantumLayerMultiProcess(qprog_with_measure,para_num,num_of_qubits: int,num_of_cbits: int = 1,diff_method:str = "parameter_shift",delta:float = 0.01, dtype=None,name="")
 
@@ -696,7 +702,7 @@ QuantumLayerMultiProcess
     
     该层对一个参数化的量子线路进行仿真，得到测量结果。该变分量子层继承了VQNet框架的梯度计算模块，可以计算线路参数的梯度，训练变分量子线路模型或将变分量子线路嵌入混合量子和经典模型。
 
-    :param qprog_with_measure: 用pyQPanda构建的量子线路运行和测量函数。
+    :param qprog_with_measure: 用pyQPanda22构建的量子线路运行和测量函数。
     :param para_num: `int` - 参数个数。
     :param num_of_qubits: 量子比特数。
     :param num_of_cbits: 经典比特数，默认为1。
@@ -708,7 +714,7 @@ QuantumLayerMultiProcess
     :return: 一个可以计算量子线路的模块。
 
     .. note::
-        qprog_with_measure是pyQPanda中定义的量子线路函数 :https://pyqpanda-toturial.readthedocs.io/zh/latest/QCircuit.html。
+        qprog_with_measure是pyQPanda22中定义的量子线路函数 :https://pyqpanda-toturial.readthedocs.io/zh/latest/QCircuit.html。
 
         此函数应包含以下参数，否则无法在QuantumLayerMultiProcess中正常运行。
 
@@ -792,7 +798,7 @@ NoiseQuantumLayer
 在真实的量子计算机中，受制于量子比特自身的物理特性，常常存在不可避免的计算误差。为了能在量子虚拟机中更好的模拟这种误差，VQNet同样支持含噪声量子虚拟机。含噪声量子虚拟机的模拟更贴近真实的量子计算机，我们可以自定义支持的逻辑门类型，自定义逻辑门支持的噪声模型。
 现有可支持的量子噪声模型依据QPanda中定义，具体参考链接 `QPANDA2 <https://pyqpanda-toturial.readthedocs.io/zh/latest/NoiseQVM.html>`_ 中的介绍。
 
-使用 NoiseQuantumLayer 定义一个量子线路自动微分类，该类支持QPanda噪声虚拟机。用户定义一个函数作为参数 ``qprog_with_measure`` ，该函数需要包含pyQPanda定义的量子线路，同样需要传入一个参数 ``noise_set_config``，使用pyQPanda接口，设置噪声模型。
+使用 NoiseQuantumLayer 定义一个量子线路自动微分类，该类支持QPanda噪声虚拟机。用户定义一个函数作为参数 ``qprog_with_measure`` ，该函数需要包含pyQPanda22定义的量子线路，同样需要传入一个参数 ``noise_set_config``，使用pyQPanda22接口，设置噪声模型。
 
 .. py:class:: pyvqnet.qnn.quantumlayer.NoiseQuantumLayer(qprog_with_measure,para_num,machine_type,num_of_qubits:int,num_of_cbits:int=1,diff_method:str= "parameter_shift",delta:float=0.01,noise_set_config = None, dtype=None,name="")
 
@@ -800,7 +806,7 @@ NoiseQuantumLayer
 
     这一层可以在量子线路中使用噪声模型。
 
-    :param qprog_with_measure: 用pyQPanda构建的量子线路运行和测量函数。
+    :param qprog_with_measure: 用pyQPanda22构建的量子线路运行和测量函数。
     :param para_num: `int` - 参数个数。
     :param machine_type: qpanda机器类型。
     :param num_of_qubits: 量子比特数。
@@ -815,7 +821,7 @@ NoiseQuantumLayer
 
 
     .. note::
-        qprog_with_measure是pyQPanda中定义的量子线路函数 :https://pyqpanda-toturial.readthedocs.io/zh/latest/QCircuit.html。
+        qprog_with_measure是pyQPanda22中定义的量子线路函数 :https://pyqpanda-toturial.readthedocs.io/zh/latest/QCircuit.html。
         
         此函数必须包含以下参数作为函数入参（即使某个参数未实际使用），否则无法在NoiseQuantumLayer中正常运行。
         
@@ -927,8 +933,8 @@ NoiseQuantumLayer
 VQCLayer
 =========================
 
-基于pyQPanda的可变量子线路VariationalQuantumCircuit，VQNet提供了抽象量子计算层 ``VQCLayer`` 。用户只需要定义一个类 ``VQC_wrapper`` ，
-其中定义相应的量子线路逻辑门和测量函数即可基于pyQPanda的 ``VariationalQuantumCircuit`` ，进行机器学习模型的构建。
+基于pyQPanda22的可变量子线路VariationalQuantumCircuit，VQNet提供了抽象量子计算层 ``VQCLayer`` 。用户只需要定义一个类 ``VQC_wrapper`` ，
+其中定义相应的量子线路逻辑门和测量函数即可基于pyQPanda22的 ``VariationalQuantumCircuit`` ，进行机器学习模型的构建。
 
 在 ``VQC_wrapper`` 中，用户使用普通逻辑门函数 ``build_common_circuits`` 构建模型中线路结构变化的子线路，使用VQG在 ``build_vqc_circuits`` 构建结构不变，参数变化的子线路。使用
 ``run`` 函数定义线路运行方式以及测量。
@@ -1002,7 +1008,7 @@ VQCLayer
 
 .. py:class:: pyvqnet.qnn.quantumlayer.VQCLayer(vqc_wrapper,para_num,machine_type_or_cloud_token,num_of_qubits:int,num_of_cbits:int = 1,diff_method:str = "parameter_shift",delta:float = 0.01, dtype=None,name="")
 
-    pyQPanda中变分量子线路的抽象计算模块。详情请访问: https://pyqpanda-toturial.readthedocs.io/zh/latest/VQG.html。
+    pyQPanda22中变分量子线路的抽象计算模块。详情请访问: https://pyqpanda-toturial.readthedocs.io/zh/latest/VQG.html。
     
     :param vqc_wrapper: VQC_wrapper类。
     :param para_num: `int` - 参数个数。
@@ -1576,7 +1582,7 @@ DataParallelHybirdVQCQpandaQVMLayer
 ============================
 
 在VQNet中，我们使用本源量子自研的 `pyqpanda <https://pyqpanda-toturial.readthedocs.io/zh/latest/>`_ 的各个逻辑门搭建量子线路，进行量子模拟。
-当前pyQPanda支持的逻辑门可参考pyQPanda `量子逻辑门 <https://pyqpanda-toturial.readthedocs.io/zh/latest/>`_ 部分的定义。
+当前pyQPanda22支持的逻辑门可参考pyQPanda2 `量子逻辑门 <https://pyqpanda-toturial.readthedocs.io/zh/latest/>`_ 部分的定义。
 此外VQNet还封装了部分在量子机器学习中常用的量子逻辑门组合:
 
 
@@ -1629,7 +1635,7 @@ AngleEmbeddingCircuit
      ``features`` 的长度必须小于或等于量子比特的数量。如果 ``features`` 中的长度少于量子比特，则线路不应用剩余的旋转门。
 
     :param input_feat: 表示参数的numpy数组。
-    :param qubits: pyQPanda分配的量子比特。
+    :param qubits: pyQPanda2分配的量子比特。
     :param rotation: 使用什么旋转，默认为“X”。
     :return: 量子线路。
 
@@ -1682,7 +1688,7 @@ AmplitudeEmbeddingCircuit
     将 :math:`2^n` 特征编码为 :math:`n` 量子比特的振幅向量。为了表示一个有效的量子态向量， ``features`` 的L2范数必须是1。
 
     :param input_feat: 表示参数的numpy数组。
-    :param qubits: pyQPanda分配的量子比特列表。
+    :param qubits: pyQPanda2分配的量子比特列表。
     :return: 量子线路。
 
     Example::
@@ -1717,7 +1723,7 @@ IQPEmbeddingCircuits
     通过指定 ``n_repeats`` ，可以重复基本IQP线路。
 
     :param input_feat: 表示参数的numpy数组。
-    :param qubits: pyQPanda分配的量子比特列表。
+    :param qubits: pyQPanda2分配的量子比特列表。
     :param rep: 重复量子线路块,默认次数1。
     :return: 量子线路。
 
@@ -1757,7 +1763,7 @@ RotCircuit
 
 
     :param para: 表示参数  :math:`[\phi, \theta, \omega]` 的numpy数组。
-    :param qubits: pyQPanda分配的量子比特，只接受单个量子比特。
+    :param qubits: pyQPanda2分配的量子比特，只接受单个量子比特。
     :return: 量子线路。
 
     Example::
@@ -1795,8 +1801,8 @@ CRotCircuit
         \end{bmatrix}.
     
     :param para: 表示参数  :math:`[\phi, \theta, \omega]` 的numpy数组。
-    :param control_qubits: pyQPanda分配的控制量子比特，量子比特的数量应为1。
-    :param rot_qubits: 由pyQPanda分配的Rot量子比特，量子比特的数量应为1。
+    :param control_qubits: pyQPanda2分配的控制量子比特，量子比特的数量应为1。
+    :param rot_qubits: 由pyQPanda2分配的Rot量子比特，量子比特的数量应为1。
     :return: 量子线路。
 
     Example::
@@ -1841,7 +1847,7 @@ CSWAPcircuit
 
     .. note:: 提供的第一个量子比特对应于 **control qubit** 。
 
-    :param qubits: pyQPanda分配的量子比特列表第一个量子比特是控制量子比特。qlist的长度必须为3。
+    :param qubits: pyQPanda2分配的量子比特列表第一个量子比特是控制量子比特。qlist的长度必须为3。
     :return: 量子线路。
 
     Example::
@@ -2644,12 +2650,12 @@ expval
     如果观测值是 :math:`0.7Z\otimes X\otimes I+0.2I\otimes Z\otimes I`,
     那么 Hamiltonian dict 将是 ``{{'Z0, X1':0.7} ,{'Z1':0.2}}`` 。
 
-    expval api现在只支持pyQPanda ``CPUQVM`` 。更多详情请访问  https://pyqpanda-toturial.readthedocs.io/zh/latest/index.html。
+    expval api现在只支持pyQPanda2 ``CPUQVM`` 。更多详情请访问  https://pyqpanda-toturial.readthedocs.io/zh/latest/index.html。
     
-    :param machine: 由pyQPanda创建的量子虚拟机。
-    :param prog: pyQPanda创建的量子工程。
+    :param machine: 由pyQPanda2创建的量子虚拟机。
+    :param prog: pyQPanda2创建的量子工程。
     :param pauli_str_dict: 哈密顿量观测值。
-    :param qubits: pyQPanda分配的量子比特。
+    :param qubits: pyQPanda2分配的量子比特。
     :return: 期望值。
                
 
@@ -2685,9 +2691,9 @@ QuantumMeasure
     QuantumMeasure api现在只支持QPanda ``CPUQVM`` 或 ``QCloud`` 。
 
     :param measure_qubits: 列表包含测量比特索引。
-    :param prog: pyQPanda创建的量子工程。
-    :param machine: pyQPanda分配的量子虚拟机。
-    :param qubits: pyQPanda分配的量子比特。
+    :param prog: pyQPanda2创建的量子工程。
+    :param machine: pyQPanda2分配的量子虚拟机。
+    :param qubits: pyQPanda2分配的量子比特。
     :param shots: 测量次数，默认值为1000次。
     :param qtype: 设置 qmachine 测量的类型，默认为 "" 表示非 qcloud。 为真实芯片设置`pq.real_chip_type.origin_72`。
     :return: 返回通过蒙特卡罗方法获得的测量结果。
@@ -2725,12 +2731,12 @@ ProbsMeasure
     
     更多详情请访问 https://pyqpanda-toturial.readthedocs.io/zh/latest/PMeasure.html。
 
-    ProbsMeasure api现在只支持pyQPanda ``CPUQVM`` 或 ``QCloud`` 。
+    ProbsMeasure api现在只支持pyQPanda2 ``CPUQVM`` 或 ``QCloud`` 。
 
     :param measure_qubits: 列表包含测量比特索引
     :param prog: qpanda创建的量子工程。
-    :param machine: pyQPanda分配的量子虚拟机。
-    :param qubits: pyQPanda分配的量子比特。
+    :param machine: pyQPanda2分配的量子虚拟机。
+    :param qubits: pyQPanda2分配的量子比特。
     :return: 按字典顺序测量量子比特。
 
 
@@ -2845,10 +2851,10 @@ MeasurePauliSum
 
     根据提供的哈密顿观量的期望值。
 
-    :param machine: pyQPanda分配的量子虚拟机。
+    :param machine: pyQPanda2分配的量子虚拟机。
     :param prog: qpanda创建的量子工程。
     :param pauli_str_dict: 需要观测的哈密顿量。
-    :param qlists: pyQPanda分配的量子比特。
+    :param qlists: pyQPanda2分配的量子比特。
 
     :return: 期望值
 
@@ -2888,7 +2894,7 @@ VarMeasure
 
     提供的可观察量的方差。
 
-    :param machine: pyQPanda分配的量子虚拟机。
+    :param machine: pyQPanda2分配的量子虚拟机。
     :param prog: qpanda创建的量子工程。
     :param actual_qlist: 由 pyQpanda.qAlloc_many() 分配的量子位。
 
@@ -3018,7 +3024,7 @@ QGAN使用经典的GAN模型结构，分为Generator生成器与Discriminator鉴
 
 
 ``get_trained_quantum_parameters`` 获取训练参数并输出为一个numpy数组形式。如果 ``save_dir`` 不为空，则该类将保存参数到文件中。可以通过 ``load_param_and_eval`` 函数载入参数，并可以通过
-``get_circuits_with_trained_param`` 获取训练完参数的量子生成器pyQPanda线路。
+``get_circuits_with_trained_param`` 获取训练完参数的量子生成器pyQPanda2线路。
 
 .. code-block::
 
@@ -3113,7 +3119,7 @@ QGAN使用经典的GAN模型结构，分为Generator生成器与Discriminator鉴
 .. math:: 
     |\langle \phi(\mathbf{x}_j) | \phi(\mathbf{x}_i) \rangle |^2 =  |\langle 0 | U^\dagger(\mathbf{x}_j) U(\mathbf{x}_i) | 0 \rangle |^2
 
-使用VQNet和pyQPanda,我们定义一个 ``QuantumKernel_VQNet`` 产生量子核函数，并使用 ``sklearn`` 的 ``SVC`` 进行分类:
+使用VQNet和pyQPanda2,我们定义一个 ``QuantumKernel_VQNet`` 产生量子核函数，并使用 ``sklearn`` 的 ``SVC`` 进行分类:
 
 .. image:: ./images/qsvm-kernel.png
    :width: 600 px

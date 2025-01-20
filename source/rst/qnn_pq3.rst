@@ -5,6 +5,8 @@
 
     以下接口的量子计算部分使用pyqpanda3 https://qcloud.originqc.com.cn/document/qpanda-3/index.html。
 
+    如果您使用了本模块下的QCloud功能，在代码中导入pyqpanda2 或 使用pyvqnet的pyqpanda2相关封装接口会有错误。
+
 量子计算层
 ***********************************
 

@@ -1,7 +1,15 @@
-使用pyQPanda的量子机器学习示例
+使用pyQPanda2的量子机器学习示例
 #################################
 
-我们这里使用VQNet以及pyQPanda实现了多个量子机器学习示例。
+我们这里使用VQNet以及pyQPanda2实现了多个量子机器学习示例。
+
+
+.. warning::
+
+    以下接口的量子计算部分使用pyqpanda2 https://pyqpanda-toturial.readthedocs.io/zh/latest/。
+
+    由于pyqpanda2以及pyqpanda3兼容性问题,您需要自行安装pyqpnda2, `pip install pyqpanda` 
+
 
 带参量子线路在分类任务的应用
 *******************************
@@ -1878,7 +1886,7 @@ Quantum circuit structure learning任务的核心目标就是找到最优的带�
 2.混合量子经典迁移学习模型
 ===============================
 
-我们将一种称为迁移学习的机器学习方法应用于基于混合经典量子网络的图像分类器。我们将编写一个将pyQPanda与VQNet集成的简单示例。
+我们将一种称为迁移学习的机器学习方法应用于基于混合经典量子网络的图像分类器。我们将编写一个将pyQPanda2与VQNet集成的简单示例。
 迁移学习是一种成熟的人工神经网络训练技术，它基于一般直觉，即如果预训练的网络擅长解决给定的问题，那么，只需一些额外的训练，它也可以用来解决一个不同但相关的问题。
 
                                                             .. centered:: 量子部分线路图
@@ -6201,7 +6209,7 @@ vqe_func_analytic()函数是使用参数偏移计算理论梯度，vqe_func_shot
 =============================================
 
 在本源量子的qpanda提供了 `VariationalQuantumCircuit <https://qpanda-tutorial.readthedocs.io/zh/latest/VQC.html#id1>`_ 。
-线路中仅变化参数不变结构的门可以用pyQPanda的 ``VariationalQuantumGate`` 组成。
+线路中仅变化参数不变结构的门可以用pyQPanda2的 ``VariationalQuantumGate`` 组成。
 VQNet提供了封装类 ``VQC_wrapper`` ，用户使用普通逻辑门在函数 ``build_common_circuits`` 中构建模型中线路结构发生不定的子线路，
 使用VQG在 ``build_vqc_circuits`` 构建结构不变，参数变化的子线路。使用 ``run`` 函数定义线路运行方式以及测量。
 
