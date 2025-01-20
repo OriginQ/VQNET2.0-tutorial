@@ -18,7 +18,7 @@
 
 .. code-block::
     
-    git clone https://gitee.com/haoz1/quantum-llm.git
+    git clone https://gitee.com/craftsman_lei/quantum-llm.git
 
 
 随后根据 ``quantum-llm`` 中 ``README.md`` 文档中内容完成其他依赖库以及文件安装
