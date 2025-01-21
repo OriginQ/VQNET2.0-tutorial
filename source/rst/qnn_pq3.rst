@@ -491,8 +491,7 @@ HybirdVQCQpanda3QVMLayer
 
         l = HybirdVQCQpandaQVMLayer(qunatum_model,
                                 "3047DE8A59764BEDAC9C3282093B16AF1",
-                    6,
-                    6,
+
                     pauli_str_dict={'Z0':2,'Y3':3},
                     shots = 1000,
                     name="",
