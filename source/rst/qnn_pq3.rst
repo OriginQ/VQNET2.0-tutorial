@@ -506,6 +506,94 @@ HybirdVQCQpanda3QVMLayer
 
 
 
+
+QLinear
+==============
+
+QLinear 实现了一种量子全连接算法。首先将数据编码到量子态，然后通过量子线路进行演化操作和测量得到最终的全连接结果。
+
+.. image:: ./images/qlinear_cir.png
+
+.. py:class:: pyvqnet.qnn.qlinear.QLinear(input_channels,output_channels,machine: str = "CPU"))
+
+    量子全连接模块。全连接模块的输入为形状（输入通道、输出通道）。请注意，该层不带变分量子参数。
+
+    :param input_channels: `int` - 输入通道数。
+    :param output_channels: `int` - 输出通道数。
+    :param machine: `str` - 使用的虚拟机，默认使用CPU模拟。
+    :return: 量子全连接层。
+
+    Exmaple::
+
+        from pyvqnet.tensor import QTensor
+        from pyvqnet.qnn.qlinear import QLinear
+        params = [[0.37454012, 0.95071431, 0.73199394, 0.59865848, 0.15601864, 0.15599452], 
+        [1.37454012, 0.95071431, 0.73199394, 0.59865848, 0.15601864, 0.15599452],
+        [1.37454012, 1.95071431, 0.73199394, 0.59865848, 0.15601864, 0.15599452],
+        [1.37454012, 1.95071431, 1.73199394, 1.59865848, 0.15601864, 0.15599452]]
+        m = QLinear(6, 2)
+        input = QTensor(params, requires_grad=True)
+        output = m(input)
+        output.backward()
+        print(output)
+
+        #[
+        #[0.0568473, 0.1264389],
+        #[0.1524036, 0.1264389],
+        #[0.1524036, 0.1442845],
+        #[0.1524036, 0.1442845]
+        #]
+
+
+
+Qconv
+=========================
+
+Qconv是一种量子卷积算法接口。
+量子卷积操作采用量子线路对经典数据进行卷积操作，其无需计算乘法和加法操作，只需将数据编码到量子态，然后通过量子线路进行演化操作和测量得到最终的卷积结果。
+根据卷积核的范围中的输入数据数量申请相同数量的量子比特，然后构建量子线路进行计算。
+
+.. image:: ./images/qcnn.png
+
+其量子线路由每个qubit上首先插入 :math:`RY` , :math:`RZ` 门进行编码，接着在任意两个qubit上使用 :math:`Z` 以及 :math:`U3` 进行信息纠缠和交换。下图为4qubits的例子
+
+.. image:: ./images/qcnn_cir.png
+
+.. py:class:: pyvqnet.qnn.qcnn.qconv.QConv(input_channels,output_channels,quantum_number,stride=(1, 1),padding=(0, 0),kernel_initializer=normal,machine:str = "CPU", dtype=None, name ="")
+
+	量子卷积模块。用量子线路取代Conv2D内核，conv模块的输入为形状（批次大小、输入通道、高度、宽度） `Samuel et al. (2020) <https://arxiv.org/abs/2012.12177>`_ 。
+
+    :param input_channels: `int` - 输入通道数。
+    :param output_channels: `int` - 输出通道数。
+    :param quantum_number: `int` - 单个内核的大小。
+    :param stride: `tuple` - 步长，默认为（1,1）。
+    :param padding: `tuple` - 填充，默认为（0，0）。
+    :param kernel_initializer: `callable` - 默认为正态分布。
+    :param machine: `str` - 使用的虚拟机，默认使用CPU模拟。
+    :param dtype: 参数的数据类型，defaults:None，使用默认数据类型:kfloat32,代表32位浮点数。
+    :param name: 这个模块的名字， 默认为""。
+
+
+    :return: 量子卷积层。
+    
+    Example::
+
+        from pyvqnet.tensor import tensor
+        from pyvqnet.qnn.qcnn.qconv import QConv
+        x = tensor.ones([1,3,4,4])
+        layer = QConv(input_channels=3, output_channels=2, quantum_number=4, stride=(2, 2))
+        y = layer(x)
+        print(y)
+
+        # [
+        # [[[-0.0889078, -0.0889078],
+        #  [-0.0889078, -0.0889078]],
+        # [[0.7992646, 0.7992646],
+        #  [0.7992646, 0.7992646]]]
+        # ]
+
+ 
+
 量子逻辑门
 ***********************************
 
@@ -515,7 +603,7 @@ HybirdVQCQpanda3QVMLayer
 基本量子逻辑门
 ============================
 
-在VQNet中,我们使用本源量子自研的 `pyqpanda <https://qcloud.originqc.com.cn/document/qpanda-3/index.html>`_ 的各个逻辑门搭建量子线路,进行量子模拟。
+在VQNet中,我们使用本源量子自研的 `pyqpanda3 <https://qcloud.originqc.com.cn/document/qpanda-3/index.html>`_ 的各个逻辑门搭建量子线路,进行量子模拟。
 当前pyQPanda支持的逻辑门可参考pyQPanda3 `量子逻辑门 <https://qcloud.originqc.com.cn/document/qpanda-3/da/dd5/tutorial_quantum_gate.html>`_ 部分的定义。
 此外VQNet还封装了部分在量子机器学习中常用的量子逻辑门组合:
 
@@ -1120,7 +1208,6 @@ Quantum_Embedding
 
 
 
-
 对量子线路进行测量
 ***********************************
 
@@ -1253,4 +1340,114 @@ ProbsMeasure
         #[0.04796392899146941, 0, 0.4760180355042653, 0.4760180355042653]
 
 
+DensityMatrixFromQstate
+==========================
+.. py:function:: pyvqnet.qnn.pq3.measure.DensityMatrixFromQstate(state, indices)
 
+    计算量子态在一组特定量子比特上的密度矩阵。
+
+    :param state: 一维列表状态向量。 这个列表的大小应该是 ``(2**N,)`` 对于量子比特个数 ``N`` ,qstate 应该从 000 ->111 开始。
+    :param indices: 所考虑子系统中的量子比特索引列表。
+    :return: 大小为“(2**len(indices), 2**len(indices))”的密度矩阵。
+
+    Example::
+        
+        from pyvqnet.qnn.measure import DensityMatrixFromQstate
+        qstate = [(0.9306699299765968+0j), (0.18865613455240968+0j), (0.1886561345524097+0j), (0.03824249173404786+0j), -0.048171819846746615j, -0.00976491131165138j, -0.23763904794287155j, -0.048171819846746615j]
+        print(DensityMatrixFromQstate(qstate,[0,1]))
+        # [[0.86846704+0.j 0.1870241 +0.j 0.17604699+0.j 0.03791166+0.j]
+        #  [0.1870241 +0.j 0.09206345+0.j 0.03791166+0.j 0.01866219+0.j]
+        #  [0.17604699+0.j 0.03791166+0.j 0.03568649+0.j 0.00768507+0.j]
+        #  [0.03791166+0.j 0.01866219+0.j 0.00768507+0.j 0.00378301+0.j]]
+
+VN_Entropy
+==============
+.. py:function:: pyvqnet.qnn.pq3.measure.VN_Entropy(state, indices, base=None)
+
+    根据给定 qubits 列表上的状态向量计算Von Neumann熵 。
+
+    .. math::
+        S( \rho ) = -\text{Tr}( \rho \log ( \rho ))
+
+    :param state: 一维列表状态向量。 这个列表的大小应该是 ``(2**N,)`` 对于量子比特个数 ``N`` ,qstate 应该从 000 ->111 开始。
+    :param indices: 所考虑子系统中的量子比特索引列表。
+    :param base: 对数的底。 如果没有，则使用自然对数。
+
+    :return: 冯诺依曼熵的浮点值.
+
+    Example::
+
+        from pyvqnet.qnn.measure import VN_Entropy
+        qstate = [(0.9022961387408862 + 0j), -0.06676534788028633j,
+                (0.18290448232350312 + 0j), -0.3293638014158896j,
+                (0.03707657410649268 + 0j), -0.06676534788028635j,
+                (0.18290448232350312 + 0j), -0.013534006039561714j]
+        print(VN_Entropy(qstate, [0, 1]))
+        #0.14592917648464448
+
+Mutal_Info
+==============
+.. py:function:: pyvqnet.qnn.pq3.measure.Mutal_Info(state, indices0, indices1, base=None)
+
+    根据给定两个子 qubits 列表上的状态向量计算互信息 。
+
+    .. math::
+
+        I(A, B) = S(\rho^A) + S(\rho^B) - S(\rho^{AB})
+
+    其中 :math:`S` 是冯诺依曼熵。
+
+    互信息是衡量两个子系统之间相关性的指标。更具体地说，它量化了一个系统通过测量另一个系统获得的信息量。
+
+    每个状态都可以作为计算基础中的状态向量给出。
+
+    :param state: 一维列表状态向量。 这个列表的大小应该是 ``(2**N,)`` 对于量子比特个数 ``N`` , qstate 应该从 000 ->111 开始。
+    :param indices0: 第一个子系统中的量子比特索引列表。
+    :param indices1: 第二个子系统中的量子比特索引列表。
+    :param base: 对数的底。 如果为None，则使用自然对数，默认为None。
+
+    :return: 子系统之间的相互信息
+
+    Example::
+
+        from pyvqnet.qnn.measure import Mutal_Info
+        qstate = [(0.9022961387408862 + 0j), -0.06676534788028633j,
+                (0.18290448232350312 + 0j), -0.3293638014158896j,
+                (0.03707657410649268 + 0j), -0.06676534788028635j,
+                (0.18290448232350312 + 0j), -0.013534006039561714j]
+        print(Mutal_Info(qstate, [0], [2], 2))
+        #0.13763425302805887
+
+ 
+
+Purity
+=========================
+
+.. py:function:: pyvqnet.qnn.pq3.measure.Purity(state, qubits_idx)
+
+
+    从态矢中计算特定量子比特上的纯度。
+
+    .. math::
+        \gamma = \text{Tr}(\rho^2)
+
+    式中 :math:`\rho` 为密度矩阵。标准化量子态的纯度满足 :math:`\frac{1}{d} \leq \gamma \leq 1` ，
+    其中 :math:`d` 是希尔伯特空间的维数。
+    纯态的纯度是1。
+
+    :param state: 从pyqpanda get_qstate()获取的量子态
+    :param qubits_idx: 要计算纯度的量子比特位索引
+
+    :return:
+            纯度
+
+    Examples::
+
+        from pyvqnet.qnn import Purity
+        qstate = [(0.9306699299765968 + 0j), (0.18865613455240968 + 0j),
+                (0.1886561345524097 + 0j), (0.03824249173404786 + 0j),
+                -0.048171819846746615j, -0.00976491131165138j, -0.23763904794287155j,
+                -0.048171819846746615j]
+        pp = Purity(qstate, [1])
+        print(pp)
+        #0.902503479761881
