@@ -2211,7 +2211,7 @@ Tanh
 对于继承于 `TorchModule` 的经典和量子线路模块，对其中的参数 `model.paramters()` 可继续使用 :ref:`Optimizer` 下的除 `Rotosolve` 以外的优化器进行参数优化。
 
 
-pyqpanda量子变分线路训练函数
+pyqpanda2量子变分线路训练函数
 ============================================
 
 以下是使用pyqpanda以及pyqpanda3进行线路计算的训练变分量子线路接口。
