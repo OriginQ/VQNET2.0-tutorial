@@ -4437,7 +4437,7 @@ VQC_QuantumEmbedding
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
-.. py:class:: pyvqnet.qnn.vqc.torch.VQC_QuantumEmbedding(qubits, machine, num_repetitions_input, depth_input, num_unitary_layers, num_repetitions)
+.. py:class:: pyvqnet.qnn.vqc.torch.VQC_QuantumEmbedding(qubits, machine, num_repetitions_input, depth_input, num_unitary_layers, num_repetitions,initial = None,dtype = None,name= "")
 
     使用 RZ,RY,RZ 创建变分量子电路,将经典数据编码为量子态。
     参考 `Quantum embeddings for machine learning <https://arxiv.org/abs/2001.03622>`_。
@@ -4452,6 +4452,9 @@ VQC_QuantumEmbedding
     :param depth_input: 输入数据的特征维度。
     :param num_unitary_layers: 每个子模块中变分量子门的重复次数。
     :param num_repetitions: 子模块的重复次数。
+    :param initial: 参数初始化值，默认为None
+    :param dtype: 参数的类型，默认 None,使用float32.
+    :param name: 类的名字
 
     Example::
 
@@ -4476,8 +4479,7 @@ VQC_QuantumEmbedding
 
                 self.ansatz = VQC_QuantumEmbedding(num_repetitions_input, depth_input,
                                                 num_unitary_layers,
-                                                num_repetitions, pyvqnet.kfloat64,
-                                                initial=tensor.full([1],12.0))
+                                                num_repetitions, initial=tensor.full([1],12.0),dtype=pyvqnet.kfloat64)
 
                 self.measure = MeasureAll(obs={f"Z{nq-1}":1})
                 self.device = QMachine(nq)
