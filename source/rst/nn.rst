@@ -817,7 +817,7 @@ BatchNorm2d
     :param channel_num: `int` - 输入通道数。
     :param momentum: `float` - 计算指数加权平均时的动量,默认为 0.1。
     :param epsilon: `float` - 数值稳定参数, 默认 1e-5。
-    :param affine: `bool` - 一个布尔值,当设置为 ``True`` 时,此模块具有可学习的每通道仿射参数,初始化为 1(用于权重）和 0(用于偏差）。默认值:``True``。
+    :param affine: `bool` - 一个布尔值,当设置为 ``True`` 时,此模块具有可学习的每通道仿射参数,初始化为 1(用于权重)和 0(用于偏差)。默认值:``True``。
     :param beta_initializer: `callable` - beta的初始化方式,默认全零初始化。
     :param gamma_initializer: `callable` - gamma的的初始化方式,默认全一初始化。
     :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
@@ -880,7 +880,7 @@ BatchNorm1d
     :param channel_num: `int` - 输入通道数。
     :param momentum: `float` - 计算指数加权平均时的动量,默认为 0.1。
     :param epsilon: `float` - 数值稳定性常数,默认为 1e-5。
-    :param affine: `bool` - 一个布尔值,当设置为 ``True`` 时,此模块具有可学习的每通道仿射参数,初始化为 1(用于权重）和 0(用于偏差）。默认值:``True``。
+    :param affine: `bool` - 一个布尔值,当设置为 ``True`` 时,此模块具有可学习的每通道仿射参数,初始化为 1(用于权重)和 0(用于偏差)。默认值:``True``。
     :param beta_initializer: `callable` - beta的初始化方式,默认全零初始化。
     :param gamma_initializer: `callable` - gamma的的初始化方式,默认全一初始化。
     :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
@@ -924,7 +924,7 @@ LayerNormNd
 
     :param norm_shape: `float` - 标准化形状。
     :param epsilon: `float` - 数值稳定性常数,默认为 1e-5。
-    :param affine: `bool` - 一个布尔值,当设置为 ``True`` 时,此模块具有可学习的每通道仿射参数,初始化为 1(用于权重）和 0(用于偏差）。默认值:``True``。
+    :param affine: `bool` - 一个布尔值,当设置为 ``True`` 时,此模块具有可学习的每通道仿射参数,初始化为 1(用于权重)和 0(用于偏差)。默认值:``True``。
     :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
     :param name: 这个模块的名字, 默认为""。
 
@@ -966,7 +966,7 @@ LayerNorm2d
 
     :param norm_size: `float` - 归一化大小,应该等于 C * H * W。
     :param epsilon: `float` - 数值稳定性常数,默认为 1e-5。
-    :param affine: `bool` - 一个布尔值,当设置为 ``True`` 时,此模块具有可学习的每通道仿射参数,初始化为 1(用于权重）和 0(用于偏差）。默认值:``True``。
+    :param affine: `bool` - 一个布尔值,当设置为 ``True`` 时,此模块具有可学习的每通道仿射参数,初始化为 1(用于权重)和 0(用于偏差)。默认值:``True``。
     :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
     :param name: 这个模块的名字, 默认为""。
 
@@ -1019,7 +1019,7 @@ LayerNorm1d
 
     :param norm_size: `float` - 归一化大小,应该等于最后一维大小。
     :param epsilon: `float` - 数值稳定性常数,默认为 1e-5。
-    :param affine: `bool` - 一个布尔值,当设置为 ``True`` 时,此模块具有可学习的每通道仿射参数,初始化为 1(用于权重）和 0(用于偏差）。默认值:``True``。
+    :param affine: `bool` - 一个布尔值,当设置为 ``True`` 时,此模块具有可学习的每通道仿射参数,初始化为 1(用于权重)和 0(用于偏差)。默认值:``True``。
     :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
     :param name: 这个模块的名字, 默认为""。
 
@@ -1062,7 +1062,7 @@ GroupNorm
     :param num_groups (int): 将通道分成的组数
     :param num_channels (int): 输入中预期的通道数
     :param eps: 添加到分母的值,以实现数值稳定性。默认值:1e-5
-    :param affine: 一个布尔值,当设置为 ``True`` 时,此模块具有可学习的每通道仿射参数,初始化为 1(用于权重）和 0(用于偏差）。默认值: ``True``。
+    :param affine: 一个布尔值,当设置为 ``True`` 时,此模块具有可学习的每通道仿射参数,初始化为 1(用于权重)和 0(用于偏差)。默认值: ``True``。
     :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
     :param name: 这个模块的名字, 默认为""。
 
@@ -1166,7 +1166,7 @@ DropPath
 
 .. py:class:: pyvqnet.nn.dropout.DropPath(dropout_rate = 0.5,name="")
 
-    DropPath 模块将逐样本丢弃路径(随机深度）。
+    DropPath 模块将逐样本丢弃路径(随机深度)。
 
     :param dropout_rate: `float` - 神经元被设置为零的概率。
     :param name: 这个模块的名字, 默认为""。
@@ -1809,15 +1809,15 @@ Interpolate
 
     可用于选择的 `mode` 有 ``nearest`` 、``bilinear`` 、``bicubic``.
 
-    :param size: 输出大小，默认为None。
-    :param scale_factor: 缩放因子，默认为None。
+    :param size: 输出大小,默认为None。
+    :param scale_factor: 缩放因子,默认为None。
     :param mode: 用于上采样的算法  ``nearest`` | ``bilinear`` | ``bicubic``.
-    :param align_corners:  从几何学角度看，我们将输入和输出的像素点视为方形而不是点。输入和输出的像素点视为正方形，而不是点。
-            如果设置为 `true`，输入和输出张量将根据其角像素的中心点对齐。角像素的中心点对齐，保留角像素的值。
-            如果设置为 `false`，输入和输出张量将按其角像素的角点对齐，而角像素的值将保留。角像素的角点对齐，插值会使用边缘值填充
-            对超出边界的值进行填充，从而使此操作与输入大小无关。
+    :param align_corners:  从几何学角度看,我们将输入和输出的像素点视为方形而不是点。输入和输出的像素点视为正方形,而不是点。
+            如果设置为 `true`,输入和输出张量将根据其角像素的中心点对齐。角像素的中心点对齐,保留角像素的值。
+            如果设置为 `false`,输入和输出张量将按其角像素的角点对齐,而角像素的值将保留。角像素的角点对齐,插值会使用边缘值填充
+            对超出边界的值进行填充,从而使此操作与输入大小无关。
             当 ``scale_factor`` 保持不变时。这只有在 ``mode`` 为 ``bilinear`` 时才有效。
-    :param recompute_scale_factor: 重新计算缩放因子，以便在插值计算中使用。 当 ``scale_factor`` 作为参数传递时，它将用于来计算输出尺寸。
+    :param recompute_scale_factor: 重新计算缩放因子,以便在插值计算中使用。 当 ``scale_factor`` 作为参数传递时,它将用于来计算输出尺寸。
     :param name: 模块名字.
 
     Example::
@@ -1858,15 +1858,15 @@ fuse_module
 =================================
 .. py:class:: pyvqnet.nn.fuse_module(model)
 
-    用于模型在推理阶段的相应相邻模块融合成一个模块，减少模型推理阶段计算量, 增加模型推理速度。
+    用于模型在推理阶段的相应相邻模块融合成一个模块,减少模型推理阶段计算量, 增加模型推理速度。
 
-    目前支持的模块序列如下：
+    目前支持的模块序列如下: 
 
     conv, bn
 
     linear, bn
 
-    其他序列保持不变，对于这些序列将列表中的第一个模块替换成融合后的模块，其他的用 ``Identity`` 代替。
+    其他序列保持不变,对于这些序列将列表中的第一个模块替换成融合后的模块,其他的用 ``Identity`` 代替。
 
     :param input: 包括融合模块的模型。
 
@@ -1981,12 +1981,12 @@ SDPA
 =================================
 .. py:class:: pyvqnet.transformer.SDPA(attn_mask=None,dropout_p=0.,scale=None,is_causal=False)
 
-    构造计算查询、键和值张量的缩放点积注意力的类。如果输入为cpu下的QTensor,则使用数学公式计算, 如果输入在gpu下QTensor，则使用flash-attention方法计算。
+    构造计算查询、键和值张量的缩放点积注意力的类。如果输入为cpu下的QTensor,则使用数学公式计算, 如果输入在gpu下QTensor,则使用flash-attention方法计算。
 
     :param attn_mask: 注意力掩码；形状必须可以广播到注意力权重的形状。
-    :param dropout_p: Dropout 概率，如果大于 0.0, 则应用。
+    :param dropout_p: Dropout 概率,如果大于 0.0, 则应用。
     :param scale:  在 softmax 之前应用的缩放因子。
-    :param is_causal: 如果为 "true"，则假定存在左上因果注意屏蔽，如果同时设置了 attn_mask 和 is_causal, 则会出现错误。
+    :param is_causal: 如果为 "true",则假定存在左上因果注意屏蔽,如果同时设置了 attn_mask 和 is_causal, 则会出现错误。
     :return: 一个SDPA类
 
     Examples::
@@ -1997,7 +1997,7 @@ SDPA
 
     .. py:method:: forward(query,key,value)
 
-        进行前向计算，如果输入为cpu下的QTensor,则使用数学公式计算, 如果输入在gpu下QTensor，则使用flash-attention方法计算。
+        进行前向计算,如果输入为cpu下的QTensor,则使用数学公式计算, 如果输入在gpu下QTensor,则使用flash-attention方法计算。
 
         :param query: query输入QTensor。
         :param key: key输入QTensor。
@@ -2528,7 +2528,7 @@ Gelu
     .. math:: \text{GELU}(x) = 0.5 * x * (1 + \text{Tanh}(\sqrt{2 / \pi} * (x + 0.044715 * x^3)))
 
 
-    :param approximate: 近似计算方式，默认为"tanh"。
+    :param approximate: 近似计算方式, 默认为"tanh"。
     :param name: 激活函数层的命名,默认为""。
 
     :return: Gelu 激活函数层实例。
@@ -3446,7 +3446,7 @@ auc_calculate
 VQNet原生分布式计算模块
 *********************************************************
 
-该模块使用mpi启动多进程并行计算，使用nccl进行GPU之间通信。仅在linux操作系统下能够使用。
+该模块使用mpi启动多进程并行计算, 使用nccl进行GPU之间通信。仅在linux操作系统下能够使用。
 
 
 
@@ -3507,18 +3507,18 @@ MPI为CPU间通信的常用库, **VQNet中CPU的分布式计算功能则基于MP
 .. code-block::
 
     # 通过下列代码暂存当前python环境的编译器
-    pushd /root/anaconda3/envs/mpi39/compiler_compat && mv ld ld.bak && popd
+    pushd /root/anaconda3/envs/$CONDA_DEFAULT_ENV/compiler_compat && mv ld ld.bak && popd
 
     # 再次安装
     pip install mpi4py
 
     # 还原
-    pushd /root/anaconda3/envs/mpi39/compiler_compat && mv ld.bak ld && popd
+    pushd /root/anaconda3/envs/$CONDA_DEFAULT_ENV/compiler_compat && mv ld.bak ld && popd
 
 NCCL安装
 ^^^^^^^^^^^^^^^^^^^^^^
 
-NCCL为GPU间通信的常用库, **VQNet中GPU的分布式计算功能则基于NCCL进行实现**,本软件默认在安装时候同时安装NCCL的动态链接库，一般不需要安装NCCL。
+NCCL为GPU间通信的常用库, **VQNet中GPU的分布式计算功能则基于NCCL进行实现**,本软件默认在安装时候同时安装NCCL的动态链接库, 一般不需要安装NCCL。
 如果要安装NCCL,可以按照以下介绍如何在Linux系统中对NCCL进行安装(目前基于GPU的分布式计算功能仅在Linux上实现).
 
 
@@ -3584,7 +3584,7 @@ NCCL为GPU间通信的常用库, **VQNet中GPU的分布式计算功能则基于N
     # 在每个节点上执行
     ssh-keygen
     
-    # 之后一直回车,在.ssh文件夹下生成一个公钥(id_rsa.pub）一个私钥(id_rsa）
+    # 之后一直回车,在.ssh文件夹下生成一个公钥(id_rsa.pub)一个私钥(id_rsa)
     # 将其另外两个节点的公钥都添加到第一个节点的authorized_keys文件中,
     # 再将第一个节点authorized_keys文件传到另外两个节点便可以实现节点间的免密通信
     # 在子节点node1上执行
@@ -3599,7 +3599,7 @@ NCCL为GPU间通信的常用库, **VQNet中GPU的分布式计算功能则基于N
 
     # 保证三个不同节点生成的公钥都在authorized_keys文件中,即可实现节点间的免密通信
 
-可选的，最好还设置一个共享目录,使得改变共享目录下的文件时,不同节点中文件也会进行更改,预防多节点运行模型时不同节点中的文件不同步的问题。
+可选的, 最好还设置一个共享目录,使得改变共享目录下的文件时,不同节点中文件也会进行更改,预防多节点运行模型时不同节点中的文件不同步的问题。
 使用nfs-utils和rpcbind实现共享目录。
 
 .. code-block::
@@ -3768,8 +3768,8 @@ CommController
     CommController用于控制在cpu、gpu下数据通信的控制器, 通过设置参数 `backend` 来生成cpu(mpi)、gpu(nccl)的控制器。(目前分布式计算的功能仅支持linux操作系系统下使用)
 
     :param backend: 用于生成cpu或者gpu的数据通信控制器。
-    :param rank: 该参数仅在非pyvqnet后端下有用，默认值为：None。
-    :param world_size: 该参数仅在非pyvqnet后端下有用，默认值为：None。
+    :param rank: 该参数仅在非pyvqnet后端下有用, 默认值为: None。
+    :param world_size: 该参数仅在非pyvqnet后端下有用, 默认值为: None。
 
     :return:
         CommController 实例。
@@ -4224,7 +4224,7 @@ PipelineParallelTrainingWrapper
 .. py:class:: pyvqnet.distributed.pp.PipelineParallelTrainingWrapper(args,join_layers,trainset)
     
     Pipeline Parallel Training Wrapper 实现了 1F1B训练。仅在 Linux 平台上,且具有 GPU 的情况下可用。
-    更多算法细节可以在(https://www.deepspeed.ai/tutorials/pipeline/）找到。
+    更多算法细节可以在(https://www.deepspeed.ai/tutorials/pipeline/)找到。
 
     :param args: 参数字典。参见示例。
     :param join_layers: Sequential 模块的列表。
@@ -4540,18 +4540,18 @@ ColumnParallelLinear
 =================================
 .. py:class:: pyvqnet.distributed.ColumnParallelLinear(input_size,output_size,weight_initializer,bias_initializer,use_bias,dtype,name,tp_comm)
     
-    张量并行计算，列并行线性层
+    张量并行计算,列并行线性层
     
     线性层定义为 Y = XA + b。
-    其二维并行为 A = [A_1，...，A_p]。
+    其二维并行为 A = [A_1,...,A_p]。
 
     :param input_size: 矩阵 A 的第一个维度。
     :param output_size: 矩阵 A 的第二个维度。
     :param weight_initializer: `callable` 默认为 `normal`。
     :param bias_initializer: `callable` 默认为0。
     :param use_bias: `bool` - 默认为 True。
-    :param dtype: 默认 `None`，使用默认数据类型。
-    :param name: 模块名称，默认为“”。
+    :param dtype: 默认 `None`,使用默认数据类型。
+    :param name: 模块名称,默认为“”。
     :param tp_comm:  通讯控制器。
 
 
@@ -4716,9 +4716,9 @@ RowParallelLinear
 =================================
 .. py:class:: pyvqnet.distributed.RowParallelLinear(input_size,output_size,weight_initializer,bias_initializer,use_bias,dtype,name,tp_comm)
     
-    张量并行计算，行并行线性层。
+    张量并行计算,行并行线性层。
 
-    线性层的定义为 Y = XA + b。A 沿其一维并行，X 沿其二维并行。
+    线性层的定义为 Y = XA + b。A 沿其一维并行,X 沿其二维并行。
     A = transpose([A_1 ... A_p]) X = [X_1, ..., X_p]。
 
     :param input_size: 矩阵 A 的第一个维度。
@@ -4726,7 +4726,7 @@ RowParallelLinear
     :param weight_initializer: `callable` 默认为 `normal`。
     :param bias_initializer: `callable` 默认为0。
     :param use_bias: `bool` - 默认为 True。
-    :param dtype: 默认 `None`，使用默认数据类型。
+    :param dtype: 默认 `None`,使用默认数据类型。
     :param name: 模块名称。
     :param tp_comm: 通讯控制器。
 

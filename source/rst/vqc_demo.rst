@@ -1,43 +1,43 @@
-使用自动微分的量子机器学习示例
+使用自动微分模拟的量子机器学习示例
 #################################
 
-下面的例子使用 ``pyvqnet.qnn.vqc`` 下的变分量子线路接口实现一项量子机器学习算法和示例。 ``pyvqnet.qnn.vqc`` 下的变分量子线路接口使用态矢来表示量子态在量子逻辑门下的演化，通过自动微分计算变分量子线路中的梯度。
+下面的例子使用 ``pyvqnet.qnn.vqc`` 下的变分量子线路接口实现一些量子机器学习算法和示例。 ``pyvqnet.qnn.vqc`` 下的变分量子线路接口使用态矢来表示量子态在量子逻辑门下的演化,通过自动微分计算变分量子线路中的梯度。
 
-请注意下例子中 ``pyvqnet.qnn.vqc.QMachine`` 的使用，该类存放了量子态矢的数据，当计算批量数据时候或者每次进行测量之后，必须进行 ``pyvqnet.qnn.vqc.QMachine.reset_states`` 重新初始化态矢数据到输入数据的batch_size大小。
-``pyvqnet.qnn.vqc`` 还提供了 MeasureAll,Probability，Samples 等测量接口。
+请注意下例子中 ``pyvqnet.qnn.vqc.QMachine`` 的使用,该类存放了量子态矢的数据,当计算批量数据时候或者每次进行测量之后,必须进行 ``pyvqnet.qnn.vqc.QMachine.reset_states`` 重新初始化态矢数据到输入数据的batch_size大小。
+``pyvqnet.qnn.vqc`` 还提供了 MeasureAll,Probability,Samples 等测量接口。
 
-此外， ``pyvqnet.qnn.vqc.QModule`` 为用户定义的计算自动微分量子线路模型需要继承的类，需要像经典神经网络模型一样，定义 `__init__` 以及 `forward` 函数。
-当模型最后的 ``QTensor`` 运行 `backward` 后，就能使用自动微分计算出 ``QModule`` 中变分量子线路的参数梯度，并可以通过梯度下降法相关的优化器进行更新。
+此外, ``pyvqnet.qnn.vqc.QModule`` 为用户定义的计算自动微分量子线路模型需要继承的类,需要像经典神经网络模型一样,定义 `__init__` 以及 `forward` 函数。
+当模型最后的 ``QTensor`` 运行 `backward` 后,就能使用自动微分模拟计算出 ``QModule`` 中变分量子线路的参数梯度,并可以通过梯度下降法相关的优化器进行更新。
 
 
 
 量子自然梯度接口示例
 ===================================
-量子机器学习模型一般使用梯度下降法对可变量子逻辑线路中参数进行优化。经典梯度下降法公式如下：
+量子机器学习模型一般使用梯度下降法对可变量子逻辑线路中参数进行优化。经典梯度下降法公式如下:
 
 .. math:: \theta_{t+1} = \theta_t -\eta \nabla \mathcal{L}(\theta),
 
-本质上，每次迭代时候，我们将计算参数空间下，梯度下降最陡的方向作为参数变化的方向。
-在空间中任何一个方向，在局部范围内下降的速度都不如负梯度方向快。
-不同空间上，最速下降方向的推导是依赖于参数微分的范数——距离度量。距离度量在这里起着核心作用，
-不同的度量会得到不同的最速下降方向。对于经典优化问题中参数所处的欧几里得空间，最速下降方向就是负梯度方向。
-即使如此，在参数优化的每一步，由于损失函数随着参数的变化，其参数空间发生变换。使得找到另一个更优的距离范数成为可能。
+本质上,每次迭代时候,我们将计算参数空间下,梯度下降最陡的方向作为参数变化的方向。
+在空间中任何一个方向,在局部范围内下降的速度都不如负梯度方向快。
+不同空间上,最速下降方向的推导是依赖于参数微分的范数——距离度量。距离度量在这里起着核心作用,
+不同的度量会得到不同的最速下降方向。对于经典优化问题中参数所处的欧几里得空间,最速下降方向就是负梯度方向。
+即使如此,在参数优化的每一步,由于损失函数随着参数的变化,其参数空间发生变换。使得找到另一个更优的距离范数成为可能。
 
-`量子自然梯度法 <https://arxiv.org/abs/1909.02108>`_ 借鉴经典自然梯度法的概念 `Amari (1998) <https://www.mitpressjournals.org/doi/abs/10.1162/089976698300017746>`__ ，
-我们改为将优化问题视为给定输入的可能输出值的概率分布（即，最大似然估计），则更好的方法是在分布
-空间中执行梯度下降，它相对于参数化是无量纲和不变的. 因此，无论参数化如何，每个优化步骤总是会为每个参数选择最佳步长。
-在量子机器学习任务中，量子态空间拥有一个独特的不变度量张量，称为 Fubini-Study 度量张量 :math:`g_{ij}`。
+`量子自然梯度法 <https://arxiv.org/abs/1909.02108>`_ 借鉴经典自然梯度法的概念 `Amari (1998) <https://www.mitpressjournals.org/doi/abs/10.1162/089976698300017746>`__ ,
+我们改为将优化问题视为给定输入的可能输出值的概率分布(即,最大似然估计),则更好的方法是在分布
+空间中执行梯度下降,它相对于参数化是无量纲和不变的. 因此,无论参数化如何,每个优化步骤总是会为每个参数选择最佳步长。
+在量子机器学习任务中,量子态空间拥有一个独特的不变度量张量,称为 Fubini-Study 度量张量 :math:`g_{ij}`。
 该张量将量子线路参数空间中的最速下降转换为分布空间中的最速下降。
-量子自然梯度的公式如下：
+量子自然梯度的公式如下:
 
 .. math:: \theta_{t+1} = \theta_t - \eta g^{+}(\theta_t)\nabla \mathcal{L}(\theta),
 
 其中 :math:`g^{+}` 是伪逆。
 
-以下我们基于VQNet实现对一个量子变分线路参数进行量子自然梯度优化的例子，其中 ``wrapper_calculate_qng`` 是需要加到待计算量子自然梯度的模型的forward函数的装饰器。
-通过 ``pyvqnet.qnn.vqc.QNG`` 的 量子自然梯度优化器，可对模型注册的 `Parameter` 类型的参数优化。
+以下我们基于VQNet实现对一个量子变分线路参数进行量子自然梯度优化的例子,其中 ``wrapper_calculate_qng`` 是需要加到待计算量子自然梯度的模型的forward函数的装饰器。
+通过 ``pyvqnet.qnn.vqc.QNG`` 的 量子自然梯度优化器,可对模型注册的 `Parameter` 类型的参数优化。
 
-我们的目标是使如下的量子变分线路的期望最小，可见其中含有两层共3个量子含参逻辑门，第一层由0和1比特上的 RZ, RY 逻辑门构成，第二层由2比特上的RX 逻辑门构成。
+我们的目标是使如下的量子变分线路的期望最小,可见其中含有两层共3个量子含参逻辑门,第一层由0和1比特上的 RZ, RY 逻辑门构成,第二层由2比特上的RX 逻辑门构成。
 
 .. image:: ./images/qng_all_cir.png
    :width: 600 px
@@ -133,7 +133,7 @@
             return self.ma(q_machine=self.qm)
 
 
-使用SGD经典梯度下降法作为基线比较两者在相同迭代次数下的损失值变化情况，可见使用量子自然梯度，该损失函数下降更快。
+使用SGD经典梯度下降法作为基线比较两者在相同迭代次数下的损失值变化情况,可见使用量子自然梯度,该损失函数下降更快。
 
 .. code-block::
 
@@ -187,15 +187,15 @@
 用于手写数字识别的量子核函数模型
 =============================================
 
-下面的例子使用 ``pyvqnet.qnn.vqc`` 下的变分量子线路接口实现了论文 `Quantum Advantage Seeker with Kernels (QuASK): a software framework to speed up the research in quantum machine learning <https://link.springer.com/article/10.1007/s42484-023-00107-2>`_ 中的量子核函数，基于手写数字数据集来对量子核的性能进行评估。
+下面的例子使用 ``pyvqnet.qnn.vqc`` 下的变分量子线路接口实现了论文 `Quantum Advantage Seeker with Kernels (QuASK): a software framework to speed up the research in quantum machine learning <https://link.springer.com/article/10.1007/s42484-023-00107-2>`_ 中的量子核函数,基于手写数字数据集来对量子核的性能进行评估。
 
 
 本次实验基于crz、ZZFeatureMap逻辑门实现了量子核矩阵以及量子核映射中两种线路的设计。
 算法输入数据为维度8*8的手写数字数据集, 通过PCA降维, 将输入的数据降维到相应的比特数的维度如2、4、8, 之后对数据进行标准化处理后, 获取训练数据集以及测试数据用于训练, 本次实现可分为两个, 分别为量子核矩阵以及核映射。
-量子核矩阵由量子线路计算每一对数据的相似度，随后组成矩阵后输出；
+量子核矩阵由量子线路计算每一对数据的相似度,随后组成矩阵后输出；
 量子核映射则分别计算两组数据映射后计算两组数据的相似度矩阵。
 
-具体代码实现如下，需要额外安装 `sklearn`, `scipy` 等：
+具体代码实现如下,需要额外安装 `sklearn`, `scipy` 等:
 
 .. code-block::
 
@@ -428,10 +428,10 @@
 基于小样本的量子卷积神经网络模型
 =============================================
 
-下面的例子使用2.0.8新加入的 ``pyvqnet.qnn.vqc`` 下的变分线路接口，实现了论文 `Generalization in quantum machine learning from few training data <https://www.nature.com/articles/s41467-022-32550-3>`_ 中的用于小样本的量子卷积神经网络模型。用于探讨量子机器学习模型中的泛化功能。
+下面的例子使用2.0.8新加入的 ``pyvqnet.qnn.vqc`` 下的变分线路接口,实现了论文 `Generalization in quantum machine learning from few training data <https://www.nature.com/articles/s41467-022-32550-3>`_ 中的用于小样本的量子卷积神经网络模型。用于探讨量子机器学习模型中的泛化功能。
 
-为了在量子电路中构建卷积层和池化层，我们将遵循论文中提出的 QCNN 结构。前一层将提取局部相关性，而后者允许降低特征向量的维度。在量子电路中，卷积层由沿着整个图像扫描的内核组成，是一个与相邻量子位相关的两个量子位酉。
-至于池化层，我们将使用取决于相邻量子位测量的条件单量子位酉。最后，我们使用一个密集层，使用全对全单一门来纠缠最终状态的所有量子位，如下图所示：
+为了在量子电路中构建卷积层和池化层,我们将遵循论文中提出的 QCNN 结构。前一层将提取局部相关性,而后者允许降低特征向量的维度。在量子电路中,卷积层由沿着整个图像扫描的内核组成,是一个与相邻量子位相关的两个量子位酉。
+至于池化层,我们将使用取决于相邻量子位测量的条件单量子位酉。最后,我们使用一个密集层,使用全对全单一门来纠缠最终状态的所有量子位,如下图所示:
 
 .. image:: ./images/qcnn_structrue.png
    :width: 500 px
@@ -439,7 +439,7 @@
 
 |
 
-参考这种量子卷积层的设计方式，我们基于IsingXX、IsingYY、IsingZZ三个量子逻辑门对量子线路进行了构建，如下图所示：
+参考这种量子卷积层的设计方式,我们基于IsingXX、IsingYY、IsingZZ三个量子逻辑门对量子线路进行了构建,如下图所示:
 
 .. image:: ./images/Qcnn_circuit.png
    :width: 600 px
@@ -447,7 +447,7 @@
 
 |
 
-其中输入数据为维度8*8的手写数字数据集，通过数据编码层，经过第一层卷积，由IsingXX、IsingYY、IsingZZ、U3构成，，随后经过一层池化层，在0、2、5位量子比特上再经过一层卷积和一层池化，最后再经过一层Random Unitary，其中由15个随机酉矩阵构成，对应经典的Dense Layer，测量结果为对手写数据为0和1的预测概率，具体代码实现如下：
+其中输入数据为维度8*8的手写数字数据集,通过数据编码层,经过第一层卷积,由IsingXX、IsingYY、IsingZZ、U3构成,,随后经过一层池化层,在0、2、5位量子比特上再经过一层卷积和一层池化,最后再经过一层Random Unitary,其中由15个随机酉矩阵构成,对应经典的Dense Layer,测量结果为对手写数据为0和1的预测概率,具体代码实现如下:
 
 以下代码运行需要额外安装 `pandas`, `sklearn`, `seaborn`。
 
@@ -589,7 +589,7 @@
             self.weights_last = Parameter((4 ** 2 -1,1), dtype=7)
 
         def forward(self, input):
-
+            self.qm.reset_states(input.shape[0])
             return self.conv(self.qm, self.weights, self.weights_last, input)
 
 
@@ -748,7 +748,7 @@
 
 
 
-运行后的实验结果如下图所示：
+运行后的实验结果如下图所示:
 
 .. image:: ./images/result_qcnn_small.png
    :width: 1000 px
@@ -760,7 +760,7 @@
 混合量子经典神经网络的HQCNN示例
 ==========================================
 
-使用 ``pyvqnet.qnn.vqc`` 实现了HQCNN示例，使用量子经典混合网络进行Mnist数据集上图像分类。量子部分，这里定义了一个1量子比特的简单量子线路，该线路将经典神经网络层的输出作为输入，通过 ``H``, ``RY`` 逻辑门进行量子数据编码，并计算z方向的哈密顿期望值作为输出。
+使用 ``pyvqnet.qnn.vqc`` 实现了HQCNN示例,使用量子经典混合网络进行Mnist数据集上图像分类。量子部分,这里定义了一个1量子比特的简单量子线路,该线路将经典神经网络层的输出作为输入,通过 ``H``, ``RY`` 逻辑门进行量子数据编码,并计算z方向的哈密顿期望值作为输出。
 
 .. image:: ./images/hqcnn_quantum_cir.png
    :width: 600 px
@@ -768,12 +768,12 @@
 
 |
 
-由于量子线路可以和经典神经网络一起进行自动微分的计算，因此我们可以使用VQNet的2维卷积层 ``Conv2D`` ，池化层 ``MaxPool2D`` ，全连接层 ``Linear`` 以及刚才构建的量子线路构建模型。
-通过以下代码中继承于VQNet自动微分模块 ``Module`` 的 Net 以及 Hybrid 类的定义，以及模型前传函数 ``forward()`` 中对数据前向计算的定义，我们构建了一个可以自动微分的模型
-将本例中MNIST的数据进行卷积，降维，量子编码，测量，获取分类任务所需的最终特征。
+由于量子线路可以和经典神经网络一起进行自动微分的计算,因此我们可以使用VQNet的2维卷积层 ``Conv2D`` ,池化层 ``MaxPool2D`` ,全连接层 ``Linear`` 以及刚才构建的量子线路构建模型。
+通过以下代码中继承于VQNet自动微分模块 ``Module`` 的 Net 以及 Hybrid 类的定义,以及模型前传函数 ``forward()`` 中对数据前向计算的定义,我们构建了一个可以自动微分的模型
+将本例中MNIST的数据进行卷积,降维,量子编码,测量,获取分类任务所需的最终特征。
 
 
-以下首先为神经网络相关代码：
+以下首先为神经网络相关代码:
 
 .. code-block::
 
@@ -801,7 +801,7 @@
     import matplotlib
     try:
         matplotlib.use("TkAgg")
-    except:  #pylint:disable=bare-except
+    except:  
         print("Can not use matplot TkAgg")
         pass
 
@@ -867,7 +867,7 @@
             return x
 
 
-以下为数据载入，训练代码等：
+以下为数据载入,训练代码等:
 
 .. code-block::
 
@@ -1076,9 +1076,9 @@
 ==========================================
 
 以下使用 ``pyvqnet.qnn.vqc`` 下的接口构建quantum data re-uploading算法示例。
-在神经网络中，每一个神经元都接受来自上层所有神经元的信息（图a）。与之相对的，单比特量子分类器接受上一个的信息处理单元和输入（图b）。
-通俗地来说，对于传统的量子线路来说，当数据上传完成，可以直接通过若干幺正变换 :math:`U(\theta_1,\theta_2,\theta_3)` 直接得到结果。
-但是在量子数据重上传（Quantum Data Re-upLoading，QDRL）任务中，数据在幺正变换之前需要进行重新上传操作。
+在神经网络中,每一个神经元都接受来自上层所有神经元的信息(图a)。与之相对的,单比特量子分类器接受上一个的信息处理单元和输入(图b)。
+通俗地来说,对于传统的量子线路来说,当数据上传完成,可以直接通过若干幺正变换 :math:`U(\theta_1,\theta_2,\theta_3)` 直接得到结果。
+但是在量子数据重上传(Quantum Data Re-upLoading,QDRL)任务中,数据在幺正变换之前需要进行重新上传操作。
 
                                             .. centered:: QDRL与经典神经网络原理图对比
 
@@ -1088,7 +1088,7 @@
 
 |
 
-导入库以及定义量子神经网络模型：
+导入库以及定义量子神经网络模型:
 
 .. code-block::
 
@@ -1108,7 +1108,7 @@
     from pyvqnet.data import data_generator as get_minibatch_data
     try:
         matplotlib.use("TkAgg")
-    except:  #pylint:disable=bare-except
+    except:  
         print("Can not use matplot TkAgg")
         pass
 
@@ -1170,7 +1170,7 @@
 
 
 
-定义数据载入，模型训练的相关代码：
+定义数据载入,模型训练的相关代码:
 
 .. code-block::
 
@@ -1299,11 +1299,11 @@ Circuit-centric quantum classifiers算法示例
 =========================================================
 
 这个例子使用 ``pyvqnet.qnn.vqc`` 实现了论文 `Circuit-centric quantum classifiers <https://arxiv.org/pdf/1804.00633.pdf>`_ 中可变量子线路进行二分类任务。
-该例子用来判断一个二进制数是奇数还是偶数。通过将二进制数编码到量子比特上，通过优化线路中的可变参数，使得该线路z方向测量值可以指示该输入为奇数还是偶数。
-变分量子线路通常定义一个子线路，这是一种基本的电路架构，可以通过重复层构建复杂变分电路。
+该例子用来判断一个二进制数是奇数还是偶数。通过将二进制数编码到量子比特上,通过优化线路中的可变参数,使得该线路z方向测量值可以指示该输入为奇数还是偶数。
+变分量子线路通常定义一个子线路,这是一种基本的电路架构,可以通过重复层构建复杂变分电路。
 我们的电路层由多个旋转逻辑门以及将每个量子位与其相邻的量子位纠缠在一起的 ``CNOT`` 逻辑门组成。
-我们还需要一个线路将经典数据编码到量子态上，使得线路测量的输出与输入有关联。
-本例中，我们把二进制输入编码到对应顺序的量子比特上。例如输入数据1101被编码到4个量子比特。
+我们还需要一个线路将经典数据编码到量子态上,使得线路测量的输出与输入有关联。
+本例中,我们把二进制输入编码到对应顺序的量子比特上。例如输入数据1101被编码到4个量子比特。
 
 .. code-block::
 
@@ -1344,7 +1344,7 @@ Circuit-centric quantum classifiers算法示例
 
 
             def build_circult(weights, xx, nqubits,qm):
-                def Rot(weights_j, nqubits,qm):#pylint:disable=invalid-name
+                def Rot(weights_j, nqubits,qm):
                     VQC_RotCircuit(qm,nqubits,weights_j)
 
                 def basisstate(qm,xx, nqubits):
@@ -1368,7 +1368,7 @@ Circuit-centric quantum classifiers算法示例
             return qmeasure.MeasureAll(obs={'Z0': 1})(self.qm)
         
 
-数据载入，模型训练流程的代码：
+数据载入,模型训练流程的代码:
 
 .. code-block::
 
@@ -1493,9 +1493,9 @@ Circuit-centric quantum classifiers算法示例
 =============================
 
 
-可以将称为迁移学习的机器学习方法应用于基于混合经典量子网络的图像分类器。基于VQNet的 ``pyvqnet.qnn.vqc`` 接口，我们实现以下代码示例。
-迁移学习是一种成熟的人工神经网络训练技术，它基于一般直觉，即如果预训练的网络擅长解决给定的问题，那么，只需一些额外的训练，它也可以用来解决一个不同但相关的问题。
-下面首先使用经典神经网络CNN训练一个分类模型，然后将部分层参数冻结，加入一个变分量子线路构成量子经典混合神经网络进行迁移学习模型训练。
+可以将称为迁移学习的机器学习方法应用于基于混合经典量子网络的图像分类器。基于VQNet的 ``pyvqnet.qnn.vqc`` 接口,我们实现以下代码示例。
+迁移学习是一种成熟的人工神经网络训练技术,它基于一般直觉,即如果预训练的网络擅长解决给定的问题,那么,只需一些额外的训练,它也可以用来解决一个不同但相关的问题。
+下面首先使用经典神经网络CNN训练一个分类模型,然后将部分层参数冻结,加入一个变分量子线路构成量子经典混合神经网络进行迁移学习模型训练。
 
 .. code-block::
 
@@ -1526,7 +1526,7 @@ Circuit-centric quantum classifiers算法示例
     import matplotlib
     try:
         matplotlib.use("TkAgg")
-    except:  #pylint:disable=bare-except
+    except:  
         print("Can not use matplot TkAgg")
         pass
 
@@ -1597,7 +1597,7 @@ Circuit-centric quantum classifiers算法示例
             return self.ma(self.qm)
 
 
-数据载入：
+数据载入:
 
 .. code-block::
 
@@ -1687,7 +1687,7 @@ Circuit-centric quantum classifiers算法示例
         return images, labels
 
 
-经典神经网络训练,使用 ``SGD`` 对全部神经网络参数进行训练30个批次，：
+经典神经网络训练,使用 ``SGD`` 对全部神经网络参数进行训练30个批次,:
 
 .. code-block::
 
@@ -1830,14 +1830,14 @@ Circuit-centric quantum classifiers算法示例
 
 
 
-量子迁移学习模型训练，将模型的 `fc3` 替换为 量子神经网络模块，使用 ``Adam`` 以0.005学习率微调：
+量子迁移学习模型训练,将模型的 `fc3` 替换为 量子神经网络模块,使用 ``Adam`` 以0.005学习率微调:
 
 .. code-block::
 
 
     def quantum_cnn_transferlearning():
 
-        class Q_DressedQuantumNet(Module):#pylint:disable=invalid-name
+        class Q_DressedQuantumNet(Module):
 
             def __init__(self):
                 """
@@ -1996,10 +1996,10 @@ Circuit-centric quantum classifiers算法示例
 Variational Shadow Quantum Learning for Classification模型示例
 ==================================================================
 
-使用 ``pyvqnet.qnn.vqc`` 的可变量子线路接口构建2分类模型，在与相似参数精度的神经网络对比分类精度，两者精度相近。而量子线路的参数量远小于经典神经网络。
-算法基于论文：`Variational Shadow Quantum Learning for Classification Model <https://arxiv.org/abs/2012.08288>`_  复现。
+使用 ``pyvqnet.qnn.vqc`` 的可变量子线路接口构建2分类模型,在与相似参数精度的神经网络对比分类精度,两者精度相近。而量子线路的参数量远小于经典神经网络。
+算法基于论文:`Variational Shadow Quantum Learning for Classification Model <https://arxiv.org/abs/2012.08288>`_  复现。
 
-VSQL量子整体模型如下：
+VSQL量子整体模型如下:
 
 .. image:: ./images/vsql_model.PNG
    :width: 600 px
@@ -2008,7 +2008,7 @@ VSQL量子整体模型如下：
 |
 
 
-定义变分量子线路模型：
+定义变分量子线路模型:
 
 .. code-block::
 
@@ -2037,7 +2037,7 @@ VSQL量子整体模型如下：
 
     try:
         matplotlib.use("TkAgg")
-    except:  #pylint:disable=bare-except
+    except:  
         print("Can not use matplot TkAgg")
         pass
 
@@ -2058,7 +2058,7 @@ VSQL量子整体模型如下：
 
 
         def forward(self,x):
-            def get_pauli_str(n_start, n_qsc):#pylint:disable=redefined-outer-name
+            def get_pauli_str(n_start, n_qsc):
                 D = {}
                 D['wires']= [i for i in range(n_start, n_start + n_qsc)]
                 D["observables"] = ["X" for i in range(n_start, n_start + n_qsc)]
@@ -2068,7 +2068,7 @@ VSQL量子整体模型如下：
             self.qm.reset_states(x.shape[0])
             weights = self.w.reshape([depth + 1, 3, n_qsc])
             
-            def subcir(qm, weights, qlist, depth, n_qsc, n_start):#pylint:disable=redefined-outer-name
+            def subcir(qm, weights, qlist, depth, n_qsc, n_start):
 
                 for i in range(n_qsc):
                     rx(qm,qlist[n_start + i], weights[0,0,i])
@@ -2115,7 +2115,7 @@ VSQL量子整体模型如下：
             return x
 
 
-定义数据载入以及训练流程代码：
+定义数据载入以及训练流程代码:
 
 .. code-block::
 
@@ -2277,7 +2277,7 @@ VSQL量子整体模型如下：
                 optimizer.zero_grad()
                 try:
                     x = x.reshape(batch_size, 1024)
-                except:  #pylint:disable=bare-except
+                except:  
                     x = x.reshape(-1, 1024)
 
                 output = model(x)
@@ -2551,10 +2551,10 @@ QMLP模型示例
 ===================
 
 
-以下代码实现了一种量子多层感知器 (QMLP) 架构，其特点是具有容错输入嵌入、丰富的非线性和带有参数化双量子比特纠缠门的增强变分电路模拟。`QMLP: An Error-Tolerant Nonlinear Quantum MLP Architecture using Parameterized Two-Qubit Gates <https://arxiv.org/pdf/2206.01345.pdf>`_ 。
+以下代码实现了一种量子多层感知器 (QMLP) 架构,其特点是具有容错输入嵌入、丰富的非线性和带有参数化双量子比特纠缠门的增强变分电路模拟。`QMLP: An Error-Tolerant Nonlinear Quantum MLP Architecture using Parameterized Two-Qubit Gates <https://arxiv.org/pdf/2206.01345.pdf>`_ 。
 
 
-以下代码实现变分量子线路：
+以下代码实现变分量子线路:
 
 .. code-block::
 
@@ -2577,7 +2577,7 @@ QMLP模型示例
     from matplotlib import pyplot as plt
     try:
         matplotlib.use("TkAgg")
-    except:  # pylint:disable=bare-except
+    except:  
         print("Can not use matplot TkAgg")
 
     try:
@@ -2638,7 +2638,7 @@ QMLP模型示例
             return result
 
 
-以下代码为训练数据载入以及训练流程代码：
+以下代码为训练数据载入以及训练流程代码:
 
 .. code-block::
 
@@ -2723,8 +2723,8 @@ QMLP模型示例
         """
         Select data from mnist dataset.
         """
-        x_train, y_train = load_mnist("training_data")  #pylint:disable=redefined-outer-name
-        x_test, y_test = load_mnist("testing_data")  #pylint:disable=redefined-outer-name
+        x_train, y_train = load_mnist("training_data")  
+        x_test, y_test = load_mnist("testing_data")  
         idx_train = np.append(
             np.where(y_train == 0)[0][:train_num],
             np.where(y_train == 1)[0][:train_num])
@@ -2862,7 +2862,7 @@ QMLP模型示例
 使用量子经典混合神经网络模型实现一种强化学习算法的示例
 ================================================================
 
-载入必要库，定义全局变量,其中 `pygame==2.1.3，gym==0.23.0` 。
+载入必要库,定义全局变量,其中 `pygame==2.1.3,gym==0.23.0` 。
 
 .. code-block::
 
@@ -2883,7 +2883,7 @@ QMLP模型示例
     from matplotlib import pyplot as plt
     try:
         matplotlib.use("TkAgg")
-    except:  # pylint:disable=bare-except
+    except:  
         print("Can not use matplot TkAgg")
     def display_frames_as_gif(frames, c_index):
         patch = plt.imshow(frames[0])
@@ -2916,7 +2916,7 @@ QMLP模型示例
     bias = QTensor([[0.0, 0.0, 0.0, 0.0]])
 
 
-量子神经网络模型定义代码：
+量子神经网络模型定义代码:
 
 .. code-block::
 
@@ -2976,7 +2976,7 @@ QMLP模型示例
             quanutum_result = self.quantum_circuit(x)
             return quanutum_result
 
-训练代码：
+训练代码:
 
 .. code-block::
 
@@ -3301,12 +3301,12 @@ QMLP模型示例
 =================================================
 
 
-通过参数化的量子线路将数据输入映射到预测的模型，量子计算机可用于监督学习。虽然已经做了大量工作来研究这种方法的实际意义，
-但这些模型的许多重要理论特性仍然未知。在这里，我们研究了将数据编码到模型中的策略如何影响参数化量子电路作为函数逼近器的表达能力。
+通过参数化的量子线路将数据输入映射到预测的模型,量子计算机可用于监督学习。虽然已经做了大量工作来研究这种方法的实际意义,
+但这些模型的许多重要理论特性仍然未知。在这里,我们研究了将数据编码到模型中的策略如何影响参数化量子电路作为函数逼近器的表达能力。
 
 本例参照 `The effect of data encoding on the expressive power of variational quantum machine learning models <https://arxiv.org/pdf/2008.08605.pdf>`_ 论文将量子计算机设计的常见量子机器学习模型与傅里叶级数联系起来。
 
-其中量子模型为：
+其中量子模型为:
 
 .. image:: ./images/single_qubit_model_circuit.png
    :width: 600 px
@@ -3315,7 +3315,7 @@ QMLP模型示例
 |
 
 
-导入必须的库并且使用 ``pyvqnet.qnn.vqc`` 定义变分量子线路模型：
+导入必须的库并且使用 ``pyvqnet.qnn.vqc`` 定义变分量子线路模型:
 
 .. code-block::
 
@@ -3393,7 +3393,7 @@ QMLP模型示例
             return self.q_fourier_series(x)
 
 
-训练代码，我们此处使用GPU进行训练，我们需要将模型 `Model` 以及输入的 `data` , `label` 使用 ``toGPU`` 或者指定 `device` 的方式将数据放到GPU上。
+训练代码,我们此处使用GPU进行训练,我们需要将模型 `Model` 以及输入的 `data` , `label` 使用 ``toGPU`` 或者指定 `device` 的方式将数据放到GPU上。
 其他接口与使用CPU进行训练的代码没有区别。
 
 .. code-block::
@@ -3446,16 +3446,16 @@ QMLP模型示例
 
 下面例子实现论文 `Variational Quantum Singular Value Decomposition <https://arxiv.org/abs/2006.02336>`_ 中的算法。 
 
-奇异值分解 (Singular Value Decomposition，简称 ``SVD``) 是线性代数中一种重要的矩阵分解，它作为特征分解在任意维数矩阵上的推广，在机器学习领域中被广泛应用，常用于矩阵压缩、推荐系统以及自然语言处理等。
+奇异值分解 (Singular Value Decomposition,简称 ``SVD``) 是线性代数中一种重要的矩阵分解,它作为特征分解在任意维数矩阵上的推广,在机器学习领域中被广泛应用,常用于矩阵压缩、推荐系统以及自然语言处理等。
 
-变分量子奇异值分解(Variational Quantum Singular Value Decomposition，简称 ``QSVD``)将SVD转换成优化问题，并通过变分量子线路求解。
+变分量子奇异值分解(Variational Quantum Singular Value Decomposition,简称 ``QSVD``)将SVD转换成优化问题,并通过变分量子线路求解。
 
-论文中将矩阵奇异值分解分解成四个步骤求解：
+论文中将矩阵奇异值分解分解成四个步骤求解:
 
-    1. 输入带分解矩阵 :math:`\mathbf{M}`，想压缩到的阶数 :math:`\mathbf{T}`, 权重 :math:`\mathbf{W}`，参数话的酉矩阵 :math:`\mathbf{U}(\theta)` 和 :math:`\mathbf{V}(\phi)`
-    2. 搭建量子神经网络估算奇异值 :math:`m_j = Re\langle\psi_j\mid U(\theta)^\dagger M V(\phi) \mid\psi_j\rangle`，并最大化加权奇异值的和 :math:`L(\theta, \phi) = \sum_{j=1}^{T} q_j \cdot \operatorname{Re}\langle\psi_j \mid U(\theta)^\dagger MV(\phi) \mid \psi_j\rangle`, 其中，加权是为了让计算出的奇异值从大到小排列
-    3. 读出最大化时参数值，计算出 :math:`\mathbf{U}(\alpha^{*})` 和 :math:`\mathbf{V}(\beta^{*})`
-    4. 输出结果: 奇异值 :math:`m_1, \dots, m_r`，和奇异矩阵 :math:`\mathbf{U}(\alpha^{*})` 和 :math:`\mathbf{V}(\beta^{*})`
+    1. 输入带分解矩阵 :math:`\mathbf{M}`,想压缩到的阶数 :math:`\mathbf{T}`, 权重 :math:`\mathbf{W}`,参数话的酉矩阵 :math:`\mathbf{U}(\theta)` 和 :math:`\mathbf{V}(\phi)`
+    2. 搭建量子神经网络估算奇异值 :math:`m_j = Re\langle\psi_j\mid U(\theta)^\dagger M V(\phi) \mid\psi_j\rangle`,并最大化加权奇异值的和 :math:`L(\theta, \phi) = \sum_{j=1}^{T} q_j \cdot \operatorname{Re}\langle\psi_j \mid U(\theta)^\dagger MV(\phi) \mid \psi_j\rangle`, 其中,加权是为了让计算出的奇异值从大到小排列
+    3. 读出最大化时参数值,计算出 :math:`\mathbf{U}(\alpha^{*})` 和 :math:`\mathbf{V}(\beta^{*})`
+    4. 输出结果: 奇异值 :math:`m_1, \dots, m_r`,和奇异矩阵 :math:`\mathbf{U}(\alpha^{*})` 和 :math:`\mathbf{V}(\beta^{*})`
 
 .. image:: ./images/qsvd.png
    :width: 700 px
@@ -3463,7 +3463,7 @@ QMLP模型示例
 
 |
 
-伪代码如下：
+伪代码如下:
 
 .. image:: ./images/qsvd_algorithm.png
    :width: 700 px
@@ -3471,7 +3471,7 @@ QMLP模型示例
 
 |
 
-量子线路设计如下：
+量子线路设计如下:
 
 .. code-block::
 
@@ -3658,7 +3658,7 @@ QMLP模型示例
     if __name__=="__main__":
         run()
     
-运行的loss以及奇异值结果：
+运行的loss以及奇异值结果:
 
 .. code-block::
 
@@ -3688,10 +3688,10 @@ QMLP模型示例
 变分量子线路的优化
 ===================================
 
-VQNet当前提供4种方式对用户自定义的变分量子线路中的量子逻辑门进行优化：融合旋转门(commute_controlled_right，commute_controlled_left)，受控门交换(commute_controlled)，单比特逻辑门融合(single_qubit_ops_fuse)。
+VQNet当前提供4种方式对用户自定义的变分量子线路中的量子逻辑门进行优化:融合旋转门(commute_controlled_right,commute_controlled_left),受控门交换(commute_controlled),单比特逻辑门融合(single_qubit_ops_fuse)。
 
-这里使用 `wrapper_compile` 装饰器对 `QModule` 定义的模型forward函数进行装饰，会默认连续调用 `commute_controlled_right`, `merge_rotations`, `single_qubit_ops_fuse` 三个规则进行线路优化。
-最后通过 `op_history_summary` 接口，对 `QModule` 前向函数运行后产生的 `op_history` 的信息对比。
+这里使用 `wrapper_compile` 装饰器对 `QModule` 定义的模型forward函数进行装饰,会默认连续调用 `commute_controlled_right`, `merge_rotations`, `single_qubit_ops_fuse` 三个规则进行线路优化。
+最后通过 `op_history_summary` 接口,对 `QModule` 前向函数运行后产生的 `op_history` 的信息对比。
 
 
 .. code-block::
@@ -3894,15 +3894,15 @@ VQNet当前提供4种方式对用户自定义的变分量子线路中的量子�
 量子dropout实现
 ===================================
 
-神经网络（NN）通常需要具有大量可训练参数的高度灵活的模型，以便学习特定的基础函数（或数据分布）。然而，仅仅能够以较低的样本内误差进行学习是不够的；泛化能力也是非常重要的。
+神经网络(NN)通常需要具有大量可训练参数的高度灵活的模型,以便学习特定的基础函数(或数据分布)。然而,仅仅能够以较低的样本内误差进行学习是不够的；泛化能力也是非常重要的。
 
-表现力强的模型可能会出现过拟合问题，这意味着它们在训练数据上训练得太好，结果在新的未见数据上表现不佳。出现这种情况的原因是，模型学会了训练数据中的噪声，而不是可泛化到新数据的基本模式。
+表现力强的模型可能会出现过拟合问题,这意味着它们在训练数据上训练得太好,结果在新的未见数据上表现不佳。出现这种情况的原因是,模型学会了训练数据中的噪声,而不是可泛化到新数据的基本模式。
 
-Dropout是经典深度神经网络（DNN）的一种常用技术，可防止计算单元过于专业化，降低过拟合风险。
+Dropout是经典深度神经网络(DNN)的一种常用技术,可防止计算单元过于专业化,降低过拟合风险。
 
-论文 `A General Approach to Dropout in Quantum Neural Networks` 表明，使用过度参数化的 QNN 模型可以消除大量局部极小值，从而改变优化格局。一方面，参数数量的增加会使训练更快、更容易，但另一方面，它可能会使模型过度拟合数据。这也与重复编码经典数据以实现计算的非线性密切相关。正因如此，受经典 DNN 的启发，我们可以考虑在 QNN 中应用某种 "dropout" 技术。这相当于在训练过程中随机丢弃一些（组）参数化门，以达到更好的泛化效果。
+论文 `A General Approach to Dropout in Quantum Neural Networks` 表明,使用过度参数化的 QNN 模型可以消除大量局部极小值,从而改变优化格局。一方面,参数数量的增加会使训练更快、更容易,但另一方面,它可能会使模型过度拟合数据。这也与重复编码经典数据以实现计算的非线性密切相关。正因如此,受经典 DNN 的启发,我们可以考虑在 QNN 中应用某种 "dropout" 技术。这相当于在训练过程中随机丢弃一些(组)参数化门,以达到更好的泛化效果。
 
-接下来我将通过下面样例了展示如何利用量子dropout来避免在量子机器学习算法在训练中出现的过拟合问题，我们将dropout掉的逻辑门的参数设置为0来进行dropout。
+接下来我将通过下面样例了展示如何利用量子dropout来避免在量子机器学习算法在训练中出现的过拟合问题,我们将dropout掉的逻辑门的参数设置为0来进行dropout。
 
 首先是导入相应包
 
@@ -3917,6 +3917,26 @@ Dropout是经典深度神经网络（DNN）的一种常用技术，可防止计�
     from matplotlib import ticker
     import matplotlib.pyplot as plt
     from sklearn.preprocessing import MinMaxScaler
+    from pyvqnet.nn import Parameter
+
+设置全局变量
+
+.. code-block::
+
+    # 设置量子线路层数等相关全局变量
+    n_qubits = 5
+    inner_layers = 3
+    layers = 3
+    params_per_layer = n_qubits * inner_layers # 此时三个参数为全局变量, 若改成局部变量,注意样例使用地方修改
+    
+    # 设置模型训练相关参数
+    epochs = 700
+    n_run = 3
+    seed =1234
+    drop_rates = [(0.0, 0.0), (0.3, 0.2), (0.7, 0.7)]
+    train_history = {}
+    test_history = {}
+    opt_params = {}
 
 搭建简单的量子线路
 
@@ -3958,12 +3978,6 @@ Dropout是经典深度神经网络（DNN）的一种常用技术，可防止计�
                 entangler(qmachine, wires=[wires[qb], wires[qb + 1]])
             counter += 1
 
-    # quantum circuit qubits and params
-    n_qubits = 5
-    inner_layers = 3
-    params_per_layer = n_qubits * inner_layers
-
-
     def qnn_circuit(x, theta, keep_rot, n_qubits, layers, qm):
         for i in range(layers):
             embedding(x, wires=range(n_qubits), qmachine=qm)
@@ -3979,7 +3993,7 @@ Dropout是经典深度神经网络（DNN）的一种常用技术，可防止计�
         
         return expval(qm, 0, PauliZ()) 
 
-生成dropout列表，根据dropout列表来对量子线路中的逻辑门随机dropout
+生成dropout列表,根据dropout列表来对量子线路中的逻辑门随机dropout
 
 .. code-block::
 
@@ -4004,12 +4018,12 @@ Dropout是经典深度神经网络（DNN）的一种常用技术，可防止计�
                 inner_keep_r = [] 
                 for param in range(params_per_layer):
                     # 每个旋转在层内有概率 p=rot_drop_rate 被丢弃
-                    # 根据这个概率，我们为每个参数（旋转）采样
+                    # 根据这个概率,我们为每个参数(旋转)采样
                     # 是否需要丢弃它
                     out = np.random.choice(np.array(range(2)), p=np.array([1 - rot_drop_rate, rot_drop_rate]))
 
                     if out == 0:  # 如果需要保留
-                        inner_keep_r.append(param % n_qubits)  # % 是必须的，因为我们逐层工作
+                        inner_keep_r.append(param % n_qubits)  # % 是必须的,因为我们逐层工作
                     else:  # 如果旋转需要丢弃
                         inner_keep_r.append(-1)
 
@@ -4020,16 +4034,6 @@ Dropout是经典深度神经网络（DNN）的一种常用技术，可防止计�
             keep_rot.append(keep_rot_layer)
 
         return np.array(keep_rot)
-
-    seed = 42
-    layer_drop_rate = 0.5
-    rot_drop_rate = 0.5
-    layers = 5
-    n_qubits = 4
-    inner_layers = 3
-    params_per_layer = 12
-
-    result = make_dropout(seed, layer_drop_rate, rot_drop_rate, layers)
 
 将量子线路添加至量子神经网络模块
 
@@ -4110,16 +4114,6 @@ Dropout是经典深度神经网络（DNN）的一种常用技术，可防止计�
 
 .. code-block::
 
-    epochs = 700
-
-    n_run = 3
-    seed =1234
-    drop_rates = [(0.0, 0.0), (0.3, 0.2), (0.7, 0.7)]
-
-    train_history = {}
-    test_history = {}
-    opt_params = {}
-    layers = 3
 
     for layer_drop_rate, rot_drop_rate in drop_rates:
         costs_per_comb = []
@@ -4198,4 +4192,4 @@ Dropout是经典深度神经网络（DNN）的一种常用技术，可防止计�
     ## 0.3-0.2  run 2 - epoch 695/700 --- Train cost:0.392473 --- Test cost:0.20580922
     ## 0.7-0.7  run 0 - epoch 695/700 --- Train cost:0.3922218 --- Test cost:0.2057379
 
-通过在训练时对模型的参数们进行随机dropout方式，能够预防模型的过拟合问题，不过需要对dropout的概率进行合适的设计，不然也会导致模型训练结果不佳。
+通过在训练时对模型的参数们进行随机dropout方式,能够预防模型的过拟合问题,不过需要对dropout的概率进行合适的设计,不然也会导致模型训练结果不佳。

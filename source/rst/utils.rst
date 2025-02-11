@@ -16,8 +16,8 @@ set_random_seed
     :param seed: 随机数种子。
 
     .. note::
-            当指定固定随机数种子时，随机分布将依据随机种子产生固定的伪随机分布。
-            影响包括： `tensor.randu` , `tensor.randn` ，含参经典神经网络以及量子计算层的参数初始化。
+            当指定固定随机数种子时,随机分布将依据随机种子产生固定的伪随机分布。
+            影响包括: `tensor.randu` , `tensor.randn` ,含参经典神经网络以及量子计算层的参数初始化。
 
     Example::
 
@@ -113,17 +113,17 @@ get_random_seed
 VQNet2ONNX模块
 *******************************************
 
-VQNet2ONNX模块 支持将 VQNet 模型以及参数转化到 ONNX 模型格式。通过 ONNX 可以完成将 VQNet 模型到多种推理引擎的部署，包括 TensorRT/OpenVINO/MNN/TNN/NCNN，以及其它对 ONNX 开源格式进行支持的推理引擎或硬件。
+VQNet2ONNX模块 支持将 VQNet 模型以及参数转化到 ONNX 模型格式。通过 ONNX 可以完成将 VQNet 模型到多种推理引擎的部署,包括 TensorRT/OpenVINO/MNN/TNN/NCNN,以及其它对 ONNX 开源格式进行支持的推理引擎或硬件。
 
 环境依赖:onnx>=1.12.0
 
 .. note::
 
-    当前不支持QPanda量子线路模块转换为ONNX，仅支持纯经典算子构成的模型。
+    当前不支持QPanda量子线路模块转换为ONNX,仅支持纯经典算子构成的模型。
 
-使用 ``export_model`` 函数导出ONNX 模型。该函数需要两个以上的参数: 包括VQNet构建的模型 ``model`` ， 模型单输入 ``x`` 或多输入 ``*args``。
+使用 ``export_model`` 函数导出ONNX 模型。该函数需要两个以上的参数: 包括VQNet构建的模型 ``model`` , 模型单输入 ``x`` 或多输入 ``*args``。
 
-以下是对 `ResNet` 模型的ONNX导出的示例代码，并使用 onnxruntime 进行验证.
+以下是对 `ResNet` 模型的ONNX导出的示例代码,并使用 onnxruntime 进行验证.
 
 导入相关库
 
