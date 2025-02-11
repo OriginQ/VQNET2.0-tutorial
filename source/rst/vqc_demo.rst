@@ -254,8 +254,6 @@
         ), "The training and testing data must have the same dimensionality"
         N = X_1.shape[1]
 
-        # create device using JAX
-
         # create projector (measures probability of having all "00...0")
         projector = np.zeros((2**N, 2**N))
         projector[0, 0] = 1
@@ -267,16 +265,16 @@
 
             for i in range(N):
                 hadamard(q_machine=qm, wires=i)
-                rz(q_machine=qm,params=QTensor(2 * x1[i],dtype=kcomplex128), wires=i)
+                rz(q_machine=qm,params=QTensor(2 * x1[i],dtype=kfloat64), wires=i)
             for i in range(N):
                 for j in range(i + 1, N):
-                    crz(q_machine=qm,params=QTensor(2 * (np.pi - x1[i]) * (np.pi - x1[j]),dtype=kcomplex128), wires=[i, j])
+                    crz(q_machine=qm,params=QTensor(2 * (np.pi - x1[i]) * (np.pi - x1[j]),dtype=kfloat64), wires=[i, j])
 
             for i in range(N):
                 for j in range(i + 1, N):
-                    crz(q_machine=qm,params=QTensor(2 * (np.pi - x2[i]) * (np.pi - x2[j]),dtype=kcomplex128), wires=[i, j],use_dagger=True)        
+                    crz(q_machine=qm,params=QTensor(2 * (np.pi - x2[i]) * (np.pi - x2[j]),dtype=kfloat64), wires=[i, j],use_dagger=True)
             for i in range(N):
-                rz(q_machine=qm,params=QTensor(2 * x2[i],dtype=kcomplex128), wires=i,use_dagger=True)
+                rz(q_machine=qm,params=QTensor(2 * x2[i],dtype=kfloat64), wires=i,use_dagger=True)
                 hadamard(q_machine=qm, wires=i,use_dagger=True)
 
             states_1 = qm.states.reshape((1,-1))
@@ -323,9 +321,9 @@
                 VQC_ZZFeatureMap(x, qm, data_map_func=custom_data_map_func, entanglement="linear")
 
                 return (
-                    [expval(qm, i, PauliX(init_params=QTensor(1.0))).to_numpy() for i in range(N)]
-                    + [expval(qm, i, PauliY(init_params=QTensor(1.0))).to_numpy() for i in range(N)]
-                    + [expval(qm, i, PauliZ(init_params=QTensor(1.0))).to_numpy() for i in range(N)]
+                    [expval(qm, i, PauliX()).to_numpy() for i in range(N)]
+                    + [expval(qm, i, PauliY()).to_numpy() for i in range(N)]
+                    + [expval(qm, i, PauliZ()).to_numpy() for i in range(N)]
                 )
 
             # build the gram matrix
@@ -363,7 +361,7 @@
         accuracy = correct / len(testing_labels)
         return accuracy
 
-    import time 
+    import time
     qubits = [2, 4, 8]
 
     for n in qubits:
@@ -391,10 +389,10 @@
         x_tr = x_tr_norm[:tr_size]
         y_tr = y_tr[:tr_size]
 
-        te_size = 100
+        te_size = 20
         x_te = x_te_norm[:te_size]
         y_te = y_te[:te_size]
-        
+
         quantum_kernel_tr = vqnet_quantum_kernel(X_1=x_tr)
 
         projected_kernel_tr = vqnet_projected_quantum_kernel(X_1=x_tr)
@@ -402,7 +400,7 @@
         quantum_kernel_te = vqnet_quantum_kernel(X_1=x_te, X_2=x_tr)
 
         projected_kernel_te = vqnet_projected_quantum_kernel(X_1=x_te, X_2=x_tr)
-        
+
         quantum_accuracy.append(calculate_generalization_accuracy(quantum_kernel_tr, y_tr, quantum_kernel_te, y_te))
         print(f"qubits {n}, quantum_accuracy {quantum_accuracy[-1]}")
         projected_accuracy.append(calculate_generalization_accuracy(projected_kernel_tr.to_numpy(), y_tr, projected_kernel_te.to_numpy(), y_te))
