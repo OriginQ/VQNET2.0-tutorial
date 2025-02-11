@@ -20,7 +20,7 @@ Changed
 - VQC_QuantumEmbedding接口修改
 - 安装本软件包时不再同时安装pyqpanda, 而是同时安装pyqpanda3.
 - VQC接口支持入参使用 `x[,:2]`，原先只支持 `x[:,[2]]` 形式。
-
+- 本软件支持3.9~3.12版本python 不再支持python3.8
 
 Fixed
 ===================
