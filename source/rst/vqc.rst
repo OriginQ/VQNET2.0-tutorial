@@ -2875,10 +2875,14 @@ MeasureAll
     例如:
 
     {\'wires\': [0,  1], \'observables\': [\'x\', \'i\'],\'coefficient\':[0.23,-3.5]}
-    或:
+     
     {\'X0\': 0.23}
-    或:
+     
     [{\'wires\': [0, 2, 3],\'observables\': [\'X\', \'Y\', \'Z\'],\'coefficient\': [1, 0.5, 0.4]}, {\'wires\': [0, 1, 2],\'observables\': [\'X\', \'Y\', \'Z\'],\'coefficient\': [1, 0.5, 0.4]}]
+    
+    [{\'X1 Z2 I0\':4,\'Z1 Z0\':3},\{'wires\': [0,  1], \'observables\': [\'x\', \'i\'],\'coefficient\':[0.23,-3.5]}]
+
+    {\'X1 Z2 I0\':4,\'Z1 Z0\':3}
 
     :param obs: observable。
     :param name: 模块的名字,默认:""。
@@ -2922,10 +2926,10 @@ Samples
 
     获取特定线路上的带有 shot 的样本结果
 
-    :param wires: 样本量子比特索引。默认值：None,根据运行时使用模拟器的所有比特。
+    :param wires: 样本量子比特索引。默认值:None,根据运行时使用模拟器的所有比特。
     :param obs: 该值只能设为None。
-    :param shots: 样本重复次数,默认值：1。
-    :param name: 此模块的名称,默认值：“”。
+    :param shots: 样本重复次数,默认值:1。
+    :param name: 此模块的名称,默认值:“”。
     :return: 一个测量方法类
 
     Example::
@@ -3279,8 +3283,8 @@ VQC_QuantumEmbedding
     :param depth_input: 输入数据的特征维度。
     :param num_unitary_layers: 每个子模块中变分量子门的重复次数。
     :param num_repetitions: 子模块的重复次数。
-    :param initial: 参数初始化值，默认为None
-    :param dtype: 参数的类型，默认 None,使用float32.
+    :param initial: 参数初始化值,默认为None
+    :param dtype: 参数的类型,默认 None,使用float32.
     :param name: 类的名字
 
     Example::
@@ -4042,7 +4046,7 @@ vqc_qft_add_to_register
 
     .. math:: \text{Sum(k)}\vert m \rangle = \vert m + k \rangle.
 
-    实现此幺正运算的过程如下：
+    实现此幺正运算的过程如下:
     (1). 通过 将 QFT 应用于 :math:`\vert m \rangle` 状态,将状态从计算基础转换为傅里叶基础。
     (2). 使用 :math:`R_Z` 门将 :math:`j` 个量子比特旋转角度 :math:`\frac{2k\pi}{2^{j}}`,从而得到新相 :math:`\frac{2(m + k)\pi}{2^{j}}`。
     (3). 应用 QFT 逆返回计算基础并得到 :math:`m+k`。
@@ -4202,7 +4206,7 @@ VQC_LCU
     输入应为 Hermitian。
 
     :param wires: 运算符作用的 qlist 索引,可能需要辅助量子位。
-    :param check_hermitian: 检查输入是否为 Hermitian,默认值：True。
+    :param check_hermitian: 检查输入是否为 Hermitian,默认值:True。
 
     Examples::
 
@@ -4293,7 +4297,7 @@ QuantumLayerAdjoint
     使用伴随矩阵方式进行梯度计算的可自动微分的QuantumLayer层,参考  `Efficient calculation of gradients in classical simulations of variational quantum algorithms <https://arxiv.org/abs/2009.02823>`_ 。
 
     :param general_module: 一个仅使用 ``pyvqnet.qnn.vqc`` 下量子线路接口搭建的 `pyvqnet.nn.Module` 实例。
-    :param use_qpanda: 是否使用qpanda线路进行前传，默认：False。
+    :param use_qpanda: 是否使用qpanda线路进行前传,默认:False。
     :param name: 该层名字,默认为""。
 
     .. note::
@@ -4457,6 +4461,219 @@ QuantumLayerES
         #  [-0.0778451],
         #  [-0.0778451]]
 
+
+
+DataParallelVQCAdjointLayer
+---------------------------------------------------------------
+
+.. py:class:: pyvqnet.distributed.DataParallelVQCAdjointLayer(Comm_OP, vqc_module, name="")
+
+
+    使用数据并行对数据批次大小创建 vqc 使用伴随梯度计算。其中 ``vqc_module`` 必须为 ``QuantumLayerAdjoint`` 类型的VQC模块.
+    如果我们使用 N 个节点来运行此模块,
+    在每个节点中, `batch_size/N` 数据向前运行,vqc 计算梯度。
+
+    :param Comm_OP: 设置分布式环境的通信控制器。
+    :param vqc_module: 带有 forward() 的 QuantumLayerAdjoint类型的VQC模块,确保qmachine 已正确设置。
+    :param name: 模块的名称。默认值为空字符串。
+    :return: 可以计算量子电路的模块。
+
+
+    Example::
+
+        #mpirun -n 2 python test.py
+
+        import sys
+        sys.path.insert(0,"../../")
+        from pyvqnet.distributed import CommController,DataParallelVQCAdjointLayer,\
+        get_local_rank
+
+        from pyvqnet.qnn import *
+        from pyvqnet.qnn.vqc import *
+        import pyvqnet
+        from pyvqnet.nn import Module, Linear
+        from pyvqnet.device import DEV_GPU_0
+
+        bsize = 100
+
+
+        class QModel(Module):
+            def __init__(self, num_wires, dtype, grad_mode="adjoint"):
+                super(QModel, self).__init__()
+
+                self._num_wires = num_wires
+                self._dtype = dtype
+                self.qm = QMachine(num_wires, dtype=dtype, grad_mode=grad_mode)
+                self.rx_layer = RX(has_params=True, trainable=False, wires=0)
+                self.ry_layer = RY(has_params=True, trainable=False, wires=1)
+                self.rz_layer = RZ(has_params=True, trainable=False, wires=1)
+                self.u1 = U1(has_params=True, trainable=True, wires=[2])
+                self.u2 = U2(has_params=True, trainable=True, wires=[3])
+                self.u3 = U3(has_params=True, trainable=True, wires=[1])
+                self.i = I(wires=[3])
+                self.s = S(wires=[3])
+                self.x1 = X1(wires=[3])
+                self.y1 = Y1(wires=[3])
+                self.z1 = Z1(wires=[3])
+                self.x = PauliX(wires=[3])
+                self.y = PauliY(wires=[3])
+                self.z = PauliZ(wires=[3])
+                self.swap = SWAP(wires=[2, 3])
+                self.cz = CZ(wires=[2, 3])
+                self.cr = CR(has_params=True, trainable=True, wires=[2, 3])
+                self.rxx = RXX(has_params=True, trainable=True, wires=[2, 3])
+                self.rzz = RYY(has_params=True, trainable=True, wires=[2, 3])
+                self.ryy = RZZ(has_params=True, trainable=True, wires=[2, 3])
+                self.rzx = RZX(has_params=True, trainable=False, wires=[2, 3])
+                self.toffoli = Toffoli(wires=[2, 3, 4], use_dagger=True)
+
+                self.h = Hadamard(wires=[1])
+
+                self.iSWAP = iSWAP(wires=[0, 2])
+                self.tlayer = T(wires=1)
+                self.cnot = CNOT(wires=[0, 1])
+                self.measure = MeasureAll(obs={'Z0': 2})
+
+            def forward(self, x, *args, **kwargs):
+                self.qm.reset_states(x.shape[0])
+                self.i(q_machine=self.qm)
+                self.s(q_machine=self.qm)
+                self.swap(q_machine=self.qm)
+                self.cz(q_machine=self.qm)
+                self.x(q_machine=self.qm)
+                self.x1(q_machine=self.qm)
+                self.y(q_machine=self.qm)
+                self.y1(q_machine=self.qm)
+                self.z(q_machine=self.qm)
+                self.z1(q_machine=self.qm)
+                self.ryy(q_machine=self.qm)
+                self.rxx(q_machine=self.qm)
+                self.rzz(q_machine=self.qm)
+                self.rzx(q_machine=self.qm, params=x[:, [1]])
+
+                self.u1(q_machine=self.qm)
+                self.u2(q_machine=self.qm)
+                self.u3(q_machine=self.qm)
+                self.rx_layer(params=x[:, [0]], q_machine=self.qm)
+                self.cnot(q_machine=self.qm)
+                self.h(q_machine=self.qm)
+                self.iSWAP(q_machine=self.qm)
+                self.ry_layer(params=x[:, [1]], q_machine=self.qm)
+                self.tlayer(q_machine=self.qm)
+                self.rz_layer(params=x[:, [2]], q_machine=self.qm)
+                self.toffoli(q_machine=self.qm)
+                rlt = self.measure(q_machine=self.qm)
+
+                return rlt
+
+
+        pyvqnet.utils.set_random_seed(42)
+
+        Comm_OP = CommController("mpi")
+
+        input_x = tensor.QTensor([[0.1, 0.2, 0.3]])
+        input_x = tensor.broadcast_to(input_x, [bsize, 3])
+        input_x.requires_grad = True
+
+        qunatum_model = QModel(num_wires=6, dtype=pyvqnet.kcomplex64)
+
+        l = DataParallelVQCAdjointLayer(
+            Comm_OP,
+            qunatum_model,
+        )
+
+        y = l(input_x)
+
+        y.backward()    
+
+
+
+DataParallelVQCLayer
+---------------------------------------------------------------
+
+.. py:class:: pyvqnet.distributed.DataParallelVQCLayer(Comm_OP, vqc_module, name="")
+
+
+    使用数据并行对数据批次大小创建 vqc 使用自动微分计算。 
+    如果我们使用 N 个节点来运行此模块,
+    在每个节点中, `batch_size/N` 数据向前运行,vqc 计算梯度。
+
+    :param Comm_OP: 设置分布式环境的通信控制器。
+    :param vqc_module: 带有 forward() 的 VQC模块,确保qmachine 已正确设置。
+    :param name: 模块的名称。默认值为空字符串。
+    :return: 可以计算量子电路的模块。
+
+
+    Example::
+
+        #mpirun -n 2 python xxx.py
+
+        import pyvqnet.backends
+
+        from pyvqnet.qnn.vqc import QMachine, cnot, rx, rz, ry, MeasureAll
+        from pyvqnet.tensor import tensor
+
+        from pyvqnet.distributed import CommController, DataParallelVQCLayer
+
+        from pyvqnet.qnn import *
+        from pyvqnet.qnn.vqc import *
+        import pyvqnet
+        from pyvqnet.nn import Module, Linear
+        from pyvqnet.device import DEV_GPU_0
+
+
+        class QModel(Module):
+
+            def __init__(self, num_wires, num_layer, dtype, grad_mode=""):
+                super(QModel, self).__init__()
+
+                self._num_wires = num_wires
+                self._dtype = dtype
+                self.qm = QMachine(num_wires, dtype=dtype, grad_mode=grad_mode)
+
+                self.measure = MeasureAll(obs=PauliX)
+                self.n = num_wires
+                self.l = num_layer
+
+            def forward(self, param, *args, **kwargs):
+                n = self.n
+                l = self.l
+                qm = self.qm
+                qm.reset_states(param.shape[0])
+                j = 0
+
+                for j in range(l):
+                    cnot(qm, wires=[j, (j + 1) % l])
+                    for i in range(n):
+                        rx(qm, i, param[:, 3 * n * j + i])
+                    for i in range(n):
+                        rz(qm, i, param[:, 3 * n * j + i + n], i)
+                    for i in range(n):
+                        rx(qm, i, param[:, 3 * n * j + i + 2 * n], i)
+
+                y = self.measure(qm)
+                return y
+
+
+        n = 4
+        b = 4
+        l = 2
+
+        input = tensor.ones([b, 3 * n * l])
+
+        Comm = CommController("mpi")
+        
+        input.requires_grad = True
+        qunatum_model = QModel(num_wires=n, num_layer=l, dtype=pyvqnet.kcomplex64)
+        
+        layer = qunatum_model
+
+        layer = DataParallelVQCLayer(
+            Comm,
+            qunatum_model,
+        )
+        y = layer(input)
+        y.backward()
 
 
 vqc_to_originir_list

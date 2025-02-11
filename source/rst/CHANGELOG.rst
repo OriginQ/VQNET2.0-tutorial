@@ -10,7 +10,24 @@ Added
 ===================
 
 - 增加使用pyqpanda3进行量子线路计算的接口。
+- MeasureAll接口支持复合泡利算符。
+- 增加DataParallelVQCAdjointLayer以及DataParallelVQCLayer接口。
 
+Changed
+===================
+
+- 删除ONNX过时功能，删除集成pyqpanda的绝大部分接口，保留示例代码中使用的部分接口。
+- VQC_QuantumEmbedding接口修改
+- 安装本软件包时不再同时安装pyqpanda, 而是同时安装pyqpanda3.
+- VQC接口支持入参使用 `x[,:2]`，原先只支持 `x[:,[2]]` 形式。
+
+
+Fixed
+===================
+- 解决发现的内存泄漏问题;
+- 解决发现的GPU随机数问题；
+- reduce相关操作时候最大维度从8提升到30;
+- 优化代码，提升了部分情况下的python代码运行速度；
 
 [v2.15.0] - 2024-11-19
 ***************************
