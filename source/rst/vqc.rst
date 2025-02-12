@@ -4566,6 +4566,69 @@ QMLPModel
         print("Output shape:", output.shape)
 
 
+QRLModel
+-------------------------------------------------------------
+
+.. py:class:: pyvqnet.qnn.qrl.QRLModel(num_qubits, n_layers)
+
+    使用变分量子电路的量子深度强化学习模型。
+
+    :param num_qubits: int,量子电路中所使用的量子比特的数量。
+    :param n_layers: int, 变分量子电路中的层数。
+
+    
+    Example::
+        from pyvqnet.tensor import tensor, QTensor
+        from pyvqnet.qnn.qrl import QRLModel
+    
+        num_qubits = 4
+        model = QRLModel(num_qubits=num_qubits, n_layers=2)
+    
+        batch_size = 3
+        x = QTensor([[1.1, 0.3, 1.2, 0.6], [0.2, 1.1, 0, 1.1], [1.3, 1.3, 0.3, 0.3]])
+        output = model(x)
+        output.backward()
+    
+        print("Model output:", output)
+
+
+QRNN
+--------------------------------------------------------------
+
+.. py:class:: pyvqnet.qnn.qrnn.QRNN(para_num, num_of_qubits=4,input_size=100,hidden_size=100,batch_first=True)
+
+    QRNN（Quantum Recurrent Neural Network）是一种量子循环神经网络，旨在处理序列数据并捕捉序列中的长期依赖关系。
+
+
+    :param para_num: `int` 量子电路中的参数数量。
+    :param num_of_qubits: `int` 量子比特的数量。
+    :param input_size: `int` 输入数据的特征维度。
+    :param hidden_size: `int` 隐藏单元的维度。
+    :param batch_first: `bool` 输入的第一维是否为批次数量,默认为True。
+
+    Example::
+        from pyvqnet.dtype import kfloat32
+        from pyvqnet.qnn.qrnn import QRNN
+        from pyvqnet.tensor import tensor, QTensor
+        import numpy as np
+    
+        if __name__ == "__main__":
+            para_num = 8
+            num_of_qubits = 8
+            input_size = 4
+            hidden_size = 4
+            batch_size = 1
+            seq_length = 1
+            qrnn = QRNN(para_num, num_of_qubits, input_size, hidden_size, batch_first=True)
+    
+            x = tensor.QTensor(np.random.randn(batch_size, seq_length, input_size), dtype=kfloat32)
+    
+            output, h_t = qrnn(x)
+    
+            print("Output shape:", output.shape)
+            print("h_t shape:", h_t.shape)
+
+
     
 其他函数
 =====================
