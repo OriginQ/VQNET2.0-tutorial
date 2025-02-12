@@ -4373,6 +4373,82 @@ Quanvolution
             #<QTensor [8] DEV_CPU kfloat32>
 
 
+QDRL
+---------------------------------------------------------------
+.. py:class:: pyvqnet.qnn.qdrl_vqc.QDRL(nq)
+
+    量子数据重上传(Quantum Data Re-upLoading,QDRL),一种将量子电路与经典神经网络相结合的量子数据重上传模型。
+
+    :param nq:int,量子电路中所使用的量子比特（qubits的数量）。这决定了模型将要处理的量子系统的规模。
+
+
+    Example::
+        import numpy as np
+        from pyvqnet.dtype import kcomplex64
+        from pyvqnet.qnn.qdrl_vqc import QDRL
+        import pyvqnet.tensor as tensor
+    
+        # Set the number of quantum bits (qubits)
+        nq = 1
+    
+        # Initialize the model
+        model = QDRL(nq)
+    
+        # Create an example input (assume the input is a (batch_size, 3) shaped data)
+        # Suppose we have a batch_size of 4 and each input has 3 features
+        x_input = tensor.QTensor(np.random.randn(4, 3), dtype=kcomplex64)
+    
+        # Pass the input through the model
+        output = model(x_input)
+    
+        output.backward()
+    
+        # Output the result
+        print("Model output:")
+        print(output)
+
+
+QGRU
+------------------------------------------------------------
+
+.. py:class:: pyvqnet.qnn.qgru.QGRU(para_num, num_of_qubits,input_size,hidden_size,batch_first=True)
+
+    量子版的GRU（门控循环单元），通过利用量子电路来进行状态更新和记忆保持。
+
+    :param para_num: `int` 量子电路中的参数数量。
+    :param num_of_qubits: `int` 量子比特的数量。
+    :param input_size: `str` 输入数据的特征维度。
+    :param hidden_size: `str` 隐藏单元的维度。
+    :param batch_first: `bool` 输入的第一维是否为批次数量。
+
+    Example::
+        import numpy as np
+        from pyvqnet.tensor import tensor
+        from pyvqnet.qnn.qgru import QGRU
+        from pyvqnet.dtype import kfloat32
+        # Example usage
+        if __name__ == "__main__":
+            # Set parameters
+            para_num = 8
+            num_of_qubits = 8
+            input_size = 4
+            hidden_size = 4
+            batch_size = 1
+            seq_length = 1
+            # Create QGRU model
+            qgru = QGRU(para_num, num_of_qubits, input_size, hidden_size, batch_first=True)
+    
+            # Create input data
+            x = tensor.QTensor(np.random.randn(batch_size, seq_length, input_size), dtype=kfloat32)
+    
+            # Call the model
+            output, h_t = qgru(x)
+            output.backward()
+    
+            print("Output shape:", output.shape)  # Output shape
+            print("h_t shape:", h_t.shape)  # Final hidden state shape
+
+
 
 其他函数
 =====================
