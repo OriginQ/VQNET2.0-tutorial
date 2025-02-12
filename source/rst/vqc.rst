@@ -4330,6 +4330,49 @@ VQC_QSVT
             [ 0.       +0.j       , 0.       +0.j       ]]]]]
         """
 
+量子模型接口
+=====================
+
+
+
+Quanvolution
+---------------------------------------------------------------
+
+.. py:class:: pyvqnet.qnn.qcnn.Quanvolution(params_shape, strides=(1, 1), kernel_initializer=quantum_uniform, machine_type_or_cloud_token: str = "cpu")
+
+        
+        基于《Quanvolutional Neural Networks: Powering Image Recognition with Quantum Circuits》（https://arxiv.org/abs/1904.04767）实现的量子卷积，用变分量子电路替换经典的卷积滤波器，从而得到具有量子卷积滤波              器的量子卷积神经网络。
+
+        params_shape：参数的形状，应为二维。
+        strides：切片窗口的步长，默认为 (1,1)。
+        kernel_initializer：参数的卷积核初始化器。
+        machine_type_or_cloud_token：机器类型字符串或 Qcloud 令牌，默认为“cpu”。
+
+        Examples::
+
+            from pyvqnet.qnn.qcnn import Quanvolution
+            import pyvqnet.tensor as tensor
+            qlayer = Quanvolution([4,2],(3,3))
+    
+            x = tensor.arange(1,25*25*3+1).reshape([3,1,25,25])
+    
+            y = qlayer(x)
+    
+            print(y.shape)
+    
+            y.backward()
+    
+            print(qlayer.m_para)
+            print(qlayer.m_para.grad)
+            #[3, 4, 8, 8]
+
+            #[4.0270405,4.3587413,2.4935627,2.8155506,0.3314773,0.8889271,3.7357519, 0.9196261]
+            #<Parameter [8] DEV_CPU kfloat32>
+            
+            #[ -0.2364242, -0.6942478, -8.445061 , -0.0558891, -0.       ,-49.498577 ,40.339344 , 40.339344 ]
+            #<QTensor [8] DEV_CPU kfloat32>
+
+
 
 其他函数
 =====================
