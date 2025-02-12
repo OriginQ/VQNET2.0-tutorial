@@ -4448,8 +4448,125 @@ QGRU
             print("Output shape:", output.shape)  # Output shape
             print("h_t shape:", h_t.shape)  # Final hidden state shape
 
+QLinear
+--------------------------------------------------------------
+.. py:class:: pyvqnet.qnn.qlinear.QLinear(nput_channels, output_channels, machine: str = "")
+
+    QLinear 实现了一种量子全连接算法。首先将数据编码到量子态,然后通过量子线路进行演化操作和测量得到最终的全连接结果。
+
+    :param input_channels: `int` 输入通道数。
+    :param output_channels: `int` 输出通道数。
+    :param machine: `str` 使用的虚拟机,默认使用CPU模拟。
+    :return: 量子全连接层。
+
+    Example::
+        from pyvqnet.tensor import QTensor
+        from pyvqnet.qnn.qlinear import QLinear
+        params = [[0.37454012, 0.95071431, 0.73199394, 0.59865848, 0.15601864, 0.15599452],
+        [1.37454012, 0.95071431, 0.73199394, 0.59865848, 0.15601864, 0.15599452],
+        [1.37454012, 1.95071431, 0.73199394, 0.59865848, 0.15601864, 0.15599452],
+        [1.37454012, 1.95071431, 1.73199394, 1.59865848, 0.15601864, 0.15599452]]
+        m = QLinear(6, 2)
+        input = QTensor(params, requires_grad=True)
+        output = m(input)
+        output.backward()
+        print(output)
+        
+        #[
+        #[0.0568473, 0.1264389],
+        #[0.1524036, 0.1264389],
+        #[0.1524036, 0.1442845],
+        #[0.1524036, 0.1442845]
+        #]
+    
 
 
+QLSTM
+-------------------------------------------------------------
+
+.. py:class:: pyvqnet.qnn.qlstm.QLSTM(para_num, num_of_qubits,input_size, hidden_size,batch_first=True)
+
+    
+    QLSTM (Quantum Long Short-Term Memory) 是一种结合了量子计算和经典LSTM的混合模型，旨在利用量子计算的并行性和经典LSTM的记忆能力来处理序列数据。
+    
+    :param para_num: `int` 量子电路中的参数数量。
+    :param num_of_qubits: `int` 量子比特的数量。
+    :param input_size: `str` 输入数据的特征维度。
+    :param hidden_size: `str` 隐藏单元的维度。
+    :param batch_first: `bool` 输入的第一维是否为批次数量。
+
+
+    Examnple::
+        import numpy as np
+        from pyvqnet.tensor import tensor
+        from pyvqnet.qnn.qlstm import QLSTM
+        from pyvqnet.dtype import *
+        if __name__ == "__main__":
+            para_num = 4
+            num_of_qubits = 4
+            input_size = 4
+            hidden_size = 20
+            batch_size = 3
+            seq_length = 5
+            qlstm = QLSTM(para_num, num_of_qubits, input_size, hidden_size, batch_first=True)
+            x = tensor.QTensor(np.random.randn(batch_size, seq_length, input_size), dtype=kfloat32)
+
+            output, (h_t, c_t) = qlstm(x)
+
+            print("Output shape:", output.shape)
+            print("h_t shape:", h_t.shape)
+            print("c_t shape:", c_t.shape)
+
+QMLPModel
+--------------------------------------------------------------
+
+.. py:class:: pyvqnet.qnn.qmlp.qmlp.QMLPModel(input_channels: int,output_channels: int,num_qubits: int, kernel: _size_type,stride: _size_type,padding: _padding_type = "valid", 
+                weight_initializer: Union[Callable, None] = None,bias_initializer: Union[Callable, None] = None,use_bias: bool = True,dtype: Union[int, None] = None)
+    
+   
+    QMLPModel是一种量子启发式神经网络，它将量子电路与经典神经网络操作（如池化和全连接层）相结合。它旨在处理量子数据，并通过量子操作和经典层提取相关特征。
+    
+    :param input_channels: `int` 输入特征的数量。
+    :param output_channels: `int` 输出特征的数量。
+    :param num_qubits: `int` 量子比特的数量。
+    :param kernel: 平均池化窗口的大小。
+    :param stride: 下采样的步长因子。
+    :param padding: 填充方式，可选“valid”或“same”。
+    :param weight_initializer: `callable` 权重初始化器，默认为正态分布。
+    :param bias_initializer: `callable` 偏置初始化器，默认为零初始化。
+    :param use_bias: `bool` 是否使用偏置，默认为True。
+    :param dtype: default: 默认为None，使用默认数据类型。
+
+
+    Example::
+        import numpy as np
+        from pyvqnet.tensor import tensor
+        from pyvqnet.qnn.qmlp.qmlp import QMLPModel
+        from pyvqnet.dtype import *
+
+        input_channels = 16
+        output_channels = 10
+        num_qubits = 4
+        kernel = (2, 2)
+        stride = (2, 2)
+        padding = "valid"
+        batch_size = 8
+
+        model = QMLPModel(input_channels=num_qubits,
+                          output_channels=output_channels,
+                          num_qubits=num_qubits,
+                          kernel=kernel,
+                          stride=stride,
+                          padding=padding)
+
+        x = tensor.QTensor(np.random.randn(batch_size, input_channels, 32, 32),dtype=kfloat32)
+
+        output = model(x)
+
+        print("Output shape:", output.shape)
+
+
+    
 其他函数
 =====================
 
