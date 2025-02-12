@@ -15,9 +15,9 @@
 QuantumLayer
 ============================
 
-QuantumLayer是一个支持量子含参线路作为参数的自动求导模块的封装类。用户定义一个函数作为参数 ``qprog_with_measure`` ，该函数需要包含pyQPanda22定义的量子线路:一般包含量子线路的编码线路，演化线路和测量操作。
-该类可以嵌入量子经典混合机器学习模型，通过经典的梯度下降法，使得量子经典混合模型的目标函数或损失函数最小。
-用户可通过参数 ``diff_method`` 指定 ``QuantumLayer`` 层中量子线路参数的梯度计算方式，``QuantumLayer`` 当前支持有限差分法 ``finite_diff`` 以及 ``parameter-shift`` 方法。
+QuantumLayer是一个支持量子含参线路作为参数的自动求导模块的封装类。用户定义一个函数作为参数 ``qprog_with_measure`` ,该函数需要包含pyQPanda22定义的量子线路:一般包含量子线路的编码线路,演化线路和测量操作。
+该类可以嵌入量子经典混合机器学习模型,通过经典的梯度下降法,使得量子经典混合模型的目标函数或损失函数最小。
+用户可通过参数 ``diff_method`` 指定 ``QuantumLayer`` 层中量子线路参数的梯度计算方式,``QuantumLayer`` 当前支持有限差分法 ``finite_diff`` 以及 ``parameter-shift`` 方法。
 
 有限差分法是估算函数梯度最传统和最常用的数值方法之一。主要思想是用差分代替偏导数:
 
@@ -188,11 +188,11 @@ QuantumLayer是一个支持量子含参线路作为参数的自动求导模块�
 QuantumLayerV2
 ============================
 
-如您更加熟悉pyQPanda22语法，可以使用该接口QuantumLayerV2，自定义量子比特 ``qubits`` ,经典比特 ``cbits`` ,后端模拟器 ``machine`` 加入QuantumLayerV2的参数 ``qprog_with_measure`` 函数中。
+如您更加熟悉pyQPanda22语法,可以使用该接口QuantumLayerV2,自定义量子比特 ``qubits`` ,经典比特 ``cbits`` ,后端模拟器 ``machine`` 加入QuantumLayerV2的参数 ``qprog_with_measure`` 函数中。
 
 .. py:class:: pyvqnet.qnn.quantumlayer.QuantumLayerV2(qprog_with_measure,para_num,diff_method:str = "parameter_shift",delta:float = 0.01,dtype=None,name="")
 
-	变分量子层的抽象计算模块。对一个参数化的量子线路使用pyQPanda22进行仿真，得到测量结果。该变分量子层继承了VQNet框架的梯度计算模块，可以使用参数漂移法等计算线路参数的梯度，训练变分量子线路模型或将变分量子线路嵌入混合量子和经典模型。
+	变分量子层的抽象计算模块。对一个参数化的量子线路使用pyQPanda22进行仿真,得到测量结果。该变分量子层继承了VQNet框架的梯度计算模块,可以使用参数漂移法等计算线路参数的梯度,训练变分量子线路模型或将变分量子线路嵌入混合量子和经典模型。
     
     :param qprog_with_measure: 用pyQPand构建的量子线路运行和测量函数。
     :param para_num: `int` - 参数个数。
@@ -475,7 +475,7 @@ QuantumBatchAsyncQcloudLayer
 QuantumLayerMultiProcess
 ============================
 
-如您更加熟悉pyQPanda22语法，可以使用QuantumLayerMultiProcess，自定义量子比特 ``qubits`` ,经典比特 ``cbits`` ,后端模拟器 ``machine`` 加入QuantumLayerMultiProcess的参数 ``qprog_with_measure`` 函数中。
+如您更加熟悉pyQPanda22语法,可以使用QuantumLayerMultiProcess,自定义量子比特 ``qubits`` ,经典比特 ``cbits`` ,后端模拟器 ``machine`` 加入QuantumLayerMultiProcess的参数 ``qprog_with_measure`` 函数中。
 
 .. py:class:: pyvqnet.qnn.quantumlayer.QuantumLayerMultiProcess(qprog_with_measure,para_num,num_of_qubits: int,num_of_cbits: int = 1,diff_method:str = "parameter_shift",delta:float = 0.01, dtype=None,name="")
 
@@ -579,7 +579,7 @@ NoiseQuantumLayer
 在真实的量子计算机中,受制于量子比特自身的物理特性,常常存在不可避免的计算误差。为了能在量子虚拟机中更好的模拟这种误差,VQNet同样支持含噪声量子虚拟机。含噪声量子虚拟机的模拟更贴近真实的量子计算机,我们可以自定义支持的逻辑门类型,自定义逻辑门支持的噪声模型。
 现有可支持的量子噪声模型依据QPanda中定义,具体参考链接 `QPANDA2 <https://pyqpanda-toturial.readthedocs.io/zh/latest/NoiseQVM.html>`_ 中的介绍。
 
-使用 NoiseQuantumLayer 定义一个量子线路自动微分类，该类支持QPanda噪声虚拟机。用户定义一个函数作为参数 ``qprog_with_measure`` ，该函数需要包含pyQPanda22定义的量子线路，同样需要传入一个参数 ``noise_set_config``，使用pyQPanda22接口，设置噪声模型。
+使用 NoiseQuantumLayer 定义一个量子线路自动微分类,该类支持QPanda噪声虚拟机。用户定义一个函数作为参数 ``qprog_with_measure`` ,该函数需要包含pyQPanda22定义的量子线路,同样需要传入一个参数 ``noise_set_config``,使用pyQPanda22接口,设置噪声模型。
 
 .. py:class:: pyvqnet.qnn.quantumlayer.NoiseQuantumLayer(qprog_with_measure,para_num,machine_type,num_of_qubits:int,num_of_cbits:int=1,diff_method:str= "parameter_shift",delta:float=0.01,noise_set_config = None, dtype=None,name="")
 
@@ -719,13 +719,13 @@ DataParallelHybirdVQCQpandaQVMLayer
 
 .. py:class:: pyvqnet.qnn.DataParallelHybirdVQCQpandaQVMLayer(vqc_module: Module,qcloud_token: str,num_qubits: int,num_cubits: int,pauli_str_dict: Union[List[Dict], Dict, None] = None,shots: int = 1000,dtype: Union[int, None] = None,name: str = "",submit_kwargs: Dict = {},query_kwargs: Dict = {})
 
-    ``HybirdVQCQpandaQVMLayer`` 的数据并行版本，其中 ``vqc_module`` 为用户自定义的量子变分线路模型,其中的QMachine设置 ``save_ir= True`` 。
-    使用数据并行将输入数据第一个维度 批处理数量 根据 `CommController` 中分配的进程数进行分割，在多个进程中基于 `mpi` 或者 `nccl` 进行数据并行。请注意一个进程对应一个节点上的GPU设备。
-    每个进程中的该模块在前向计算时提交 批处理数量/节点数 个数据产生的量子线路，反向计算中计算 批处理数量/节点数 个数据贡献的梯度，并通过all_reduce计算多个节点上参数的平均梯度。
+    ``HybirdVQCQpandaQVMLayer`` 的数据并行版本,其中 ``vqc_module`` 为用户自定义的量子变分线路模型,其中的QMachine设置 ``save_ir= True`` 。
+    使用数据并行将输入数据第一个维度 批处理数量 根据 `CommController` 中分配的进程数进行分割,在多个进程中基于 `mpi` 或者 `nccl` 进行数据并行。请注意一个进程对应一个节点上的GPU设备。
+    每个进程中的该模块在前向计算时提交 批处理数量/节点数 个数据产生的量子线路,反向计算中计算 批处理数量/节点数 个数据贡献的梯度,并通过all_reduce计算多个节点上参数的平均梯度。
 
     .. note::
 
-        该模块内部对输入切分,并将数据移动到对应设备上。第0个进程计算[0,批处理数量/节点数]数据，第k个进程计算[(k-1)批处理数量/节点数,k*批处理数量/节点数]
+        该模块内部对输入切分,并将数据移动到对应设备上。第0个进程计算[0,批处理数量/节点数]数据,第k个进程计算[(k-1)批处理数量/节点数,k*批处理数量/节点数]
 
     :param vqc_module: 带有 forward() 的 vqc_module。
     :param qcloud_token: `str` - 量子机器的类型或用于执行的云令牌。
@@ -886,7 +886,7 @@ DataParallelHybirdVQCQpandaQVMLayer
         #rest code not changed
 
     
-    以下是进行多节点多进程并行计算的例子，请保证在不同节点的相同路径下，相同python环境下运行该脚本，并在每个节点下
+    以下是进行多节点多进程并行计算的例子,请保证在不同节点的相同路径下,相同python环境下运行该脚本,并在每个节点下
     编写ip地址映射文件 `hosts`,格式参考  :ref:`hostfile` 。
 
     Example::
@@ -895,7 +895,7 @@ DataParallelHybirdVQCQpandaQVMLayer
         10.10.7.107 slots=2
         10.10.7.109 slots=2
 
-    使用 mpi 进行2节点每节点2进程共4进程并行，则可以运行 `vqnetrun -np 4 -f hosts python xxx.py`
+    使用 mpi 进行2节点每节点2进程共4进程并行,则可以运行 `vqnetrun -np 4 -f hosts python xxx.py`
     
     Example::
 
@@ -903,7 +903,7 @@ DataParallelHybirdVQCQpandaQVMLayer
         Comm_OP = CommController("mpi")
         #rest code not changed
 
-    使用 nccl 进行2节点每节点2进程共4进程并行，则可以运行 `vqnetrun -np 4 -f hosts python xxx.py`
+    使用 nccl 进行2节点每节点2进程共4进程并行,则可以运行 `vqnetrun -np 4 -f hosts python xxx.py`
     
     Example::
 
@@ -916,13 +916,13 @@ DataParallelHybirdVQCQpandaQVMLayer
 量子逻辑门
 ***********************************
 
-处理量子比特的方式就是量子逻辑门。 使用量子逻辑门，我们有意识的使量子态发生演化。量子逻辑门是构成量子算法的基础。
+处理量子比特的方式就是量子逻辑门。 使用量子逻辑门,我们有意识的使量子态发生演化。量子逻辑门是构成量子算法的基础。
 
 
 基本量子逻辑门
 ============================
 
-在VQNet中，我们使用本源量子自研的 `pyqpanda <https://pyqpanda-toturial.readthedocs.io/zh/latest/>`_ 的各个逻辑门搭建量子线路，进行量子模拟。
+在VQNet中,我们使用本源量子自研的 `pyqpanda <https://pyqpanda-toturial.readthedocs.io/zh/latest/>`_ 的各个逻辑门搭建量子线路,进行量子模拟。
 当前pyQPanda22支持的逻辑门可参考pyQPanda2 `量子逻辑门 <https://pyqpanda-toturial.readthedocs.io/zh/latest/>`_ 部分的定义。
 此外VQNet还封装了部分在量子机器学习中常用的量子逻辑门组合:
 
@@ -934,7 +934,7 @@ AmplitudeEmbeddingCircuit
 
 .. py:function:: pyvqnet.qnn.template.AmplitudeEmbeddingCircuit(input_feat,qubits)
 
-    将 :math:`2^n` 特征编码为 :math:`n` 量子比特的振幅向量。为了表示一个有效的量子态向量， ``features`` 的L2范数必须是1。
+    将 :math:`2^n` 特征编码为 :math:`n` 量子比特的振幅向量。为了表示一个有效的量子态向量, ``features`` 的L2范数必须是1。
 
     :param input_feat: 表示参数的numpy数组。
     :param qubits: pyQPanda2分配的量子比特列表。
@@ -968,7 +968,7 @@ AmplitudeEmbeddingCircuit
 基于pyqpanda2量子机器学习算法封装接口
 ****************************************
 
-以下使用pyqpanda2构建线路，并在pyvqnet中实现了一些经典量子机器学习算法。
+以下使用pyqpanda2构建线路,并在pyvqnet中实现了一些经典量子机器学习算法。
 
 QGAN制备任意分布初态
 =======================
@@ -1037,7 +1037,7 @@ QGAN使用经典的GAN模型结构,分为Generator生成器与Discriminator鉴�
     qgan_model.eval(real_data)  #draw pdf
 
 
-``get_trained_quantum_parameters`` 获取训练参数并输出为一个numpy数组形式。如果 ``save_dir`` 不为空，则该类将保存参数到文件中。可以通过 ``load_param_and_eval`` 函数载入参数，并可以通过
+``get_trained_quantum_parameters`` 获取训练参数并输出为一个numpy数组形式。如果 ``save_dir`` 不为空,则该类将保存参数到文件中。可以通过 ``load_param_and_eval`` 函数载入参数,并可以通过
 ``get_circuits_with_trained_param`` 获取训练完参数的量子生成器pyQPanda2线路。
 
 .. code-block::
@@ -1133,7 +1133,7 @@ QGAN使用经典的GAN模型结构,分为Generator生成器与Discriminator鉴�
 .. math:: 
     |\langle \phi(\mathbf{x}_j) | \phi(\mathbf{x}_i) \rangle |^2 =  |\langle 0 | U^\dagger(\mathbf{x}_j) U(\mathbf{x}_i) | 0 \rangle |^2
 
-使用VQNet和pyQPanda2,我们定义一个 ``QuantumKernel_VQNet`` 产生量子核函数，并使用 ``sklearn`` 的 ``SVC`` 进行分类:
+使用VQNet和pyQPanda2,我们定义一个 ``QuantumKernel_VQNet`` 产生量子核函数,并使用 ``sklearn`` 的 ``SVC`` 进行分类:
 
 .. image:: ./images/qsvm-kernel.png
    :width: 600 px

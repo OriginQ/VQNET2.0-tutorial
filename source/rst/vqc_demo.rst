@@ -1,5 +1,5 @@
 使用自动微分模拟的量子机器学习示例
-#################################
+##################################################
 
 下面的例子使用 ``pyvqnet.qnn.vqc`` 下的变分量子线路接口实现一些量子机器学习算法和示例。 ``pyvqnet.qnn.vqc`` 下的变分量子线路接口使用态矢来表示量子态在量子逻辑门下的演化,通过自动微分计算变分量子线路中的梯度。
 
@@ -450,6 +450,7 @@
 其中输入数据为维度8*8的手写数字数据集,通过数据编码层,经过第一层卷积,由IsingXX、IsingYY、IsingZZ、U3构成,,随后经过一层池化层,在0、2、5位量子比特上再经过一层卷积和一层池化,最后再经过一层Random Unitary,其中由15个随机酉矩阵构成,对应经典的Dense Layer,测量结果为对手写数据为0和1的预测概率,具体代码实现如下:
 
 以下代码运行需要额外安装 `pandas`, `sklearn`, `seaborn`。
+考虑到耗时情况下面相关运行配置常数设置较小，用户可自行设置较大值。
 
 .. code-block::
 
@@ -474,7 +475,9 @@
 
     seed = 0
     rng = np.random.default_rng(seed=seed)
-
+    n_reps = 10
+    n_test = 10
+    n_epochs = 10
 
     def convolutional_layer(qm, weights, wires, skip_first_layer=True):
 
@@ -649,9 +652,7 @@
             test_acc=test_acc_epochs,
         )
 
-    n_reps = 100
-    n_test = 100
-    n_epochs = 100
+
 
     def run_iterations(n_train):
         results_df = pd.DataFrame(
@@ -660,7 +661,7 @@
 
         for _ in tqdm(range(n_reps)):
             results = train_qcnn(n_train=n_train, n_test=n_test, n_epochs=n_epochs)
-            # np.save('test_qcnn.npy', results)
+
             results_df = pd.concat(
                 [results_df, pd.DataFrame.from_dict(results)], axis=0, ignore_index=True
             )
@@ -748,7 +749,7 @@
 
 
 
-运行后的实验结果如下图所示:
+使用 `n_reps = 100, n_test = 100, n_epochs = 100` 配置运行后的实验结果如下图所示:
 
 .. image:: ./images/result_qcnn_small.png
    :width: 1000 px

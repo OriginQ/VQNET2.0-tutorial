@@ -5,7 +5,7 @@
 
     以下接口的量子计算部分使用pyqpanda3 https://qcloud.originqc.com.cn/document/qpanda-3/index.html。
 
-    如果您使用了本模块下的QCloud功能，在代码中导入pyqpanda2 或 使用pyvqnet的pyqpanda2相关封装接口会有错误。
+    如果您使用了本模块下的QCloud功能,在代码中导入pyqpanda2 或 使用pyvqnet的pyqpanda2相关封装接口会有错误。
 
 量子计算层
 ***********************************
@@ -31,7 +31,7 @@ QuantumLayer
     .. note::
         qprog_with_measure是pyQPanda中定义的量子线路函数 :https://qcloud.originqc.com.cn/document/qpanda-3/dc/d12/tutorial_quantum_program.html。
         
-        此函数必须包含输入和参数两个参数作为函数入参(即使某个参数未实际使用),输出为线路的测量结果或者期望值（需要为np.ndarray或包含数值的列表），否则无法在QpandaQCircuitVQCLayerLite中正常运行。
+        此函数必须包含输入和参数两个参数作为函数入参(即使某个参数未实际使用),输出为线路的测量结果或者期望值（需要为np.ndarray或包含数值的列表）,否则无法在QpandaQCircuitVQCLayerLite中正常运行。
 
         
         量子线路函数 qprog_with_measure (input,param)的使用可参考下面的例子。
@@ -116,7 +116,7 @@ QuantumLayerV3
 
     :param origin_qprog_func: 由 QPanda 构建的可调用量子电路函数。
     :param para_num: `int` - 参数数量；参数是一维的。
-    :param qvm_type: `str` - 使用pyqpanda3模拟器类型, `cpu` 或 `gpu` 类型，默认 `cpu` .
+    :param qvm_type: `str` - 使用pyqpanda3模拟器类型, `cpu` 或 `gpu` 类型,默认 `cpu` .
     :param pauli_str_dict: `dict|list` - 表示量子电路中的泡利算子的字典或字典列表。默认值为 None。
     :param shots: `int` - 测量镜头数。默认值为 1000。
     :param initializer: 参数值的初始化器。默认值为 None。
@@ -130,7 +130,7 @@ QuantumLayerV3
         origin_qprog_func 是用户使用 pyQPanda3 定义的量子电路函数:
         https://qcloud.originqc.com.cn/document/qpanda-3/dc/d12/tutorial_quantum_program.html。。
 
-        此函数必须包含输入和参数两个参数作为函数入参(即使某个参数未实际使用),输出为pyqpanda3.core.QProg类型数据，否则无法在QuantumLayerV3中正常运行。
+        此函数必须包含输入和参数两个参数作为函数入参(即使某个参数未实际使用),输出为pyqpanda3.core.QProg类型数据,否则无法在QuantumLayerV3中正常运行。
 
 
         origin_qprog_func (input,param )
@@ -370,7 +370,8 @@ HybirdVQCQpanda3QVMLayer
 
 
     混合 vqc 和 qpanda3 模拟计算。该层将用户 `forward` 函数定义的VQNet编写的量子线路计算转化为QPanda OriginIR,在QPanda3本地虚拟机或者云端服务上进行前向运行,并在基于自动微分计算线路参数梯度,降低了使用参数漂移法计算的时间复杂度。
-    其中 ``vqc_module`` 为用户自定义的量子变分线路模型,其中的QMachine设置 ``save_ir= True`` 。
+    其中 ``vqc_module`` 为用户自定义的量子变分线路模型,其中的QMachine设置 ``save_ir=True`` 。
+    有别名 ``HybirdVQCQpandaQVMLayer``。
 
     :param vqc_module: 带有 forward() 的 vqc_module。
     :param qcloud_token: `str` - 量子机器的类型或用于执行的云令牌。
@@ -394,8 +395,8 @@ HybirdVQCQpanda3QVMLayer
 
     Example::
 
-        rom pyvqnet.qnn.vqc  import *
-        from pyvqnet.qnn.pq3  import HybirdVQCQpandaQVMLayer
+        from pyvqnet.qnn.vqc  import *
+        from pyvqnet.qnn.pq3  import HybirdVQCQpanda3QVMLayer
         import pyvqnet
         from pyvqnet.nn import Module,Linear
 
@@ -489,7 +490,7 @@ HybirdVQCQpanda3QVMLayer
 
         qunatum_model = QModel(num_wires=6, dtype=pyvqnet.kcomplex64)
 
-        l = HybirdVQCQpandaQVMLayer(qunatum_model,
+        l = HybirdVQCQpanda3QVMLayer(qunatum_model,
                                 "3047DE8A59764BEDAC9C3282093B16AF1",
 
                     pauli_str_dict={'Z0':2,'Y3':3},
@@ -509,17 +510,17 @@ HybirdVQCQpanda3QVMLayer
 QLinear
 ==============
 
-QLinear 实现了一种量子全连接算法。首先将数据编码到量子态，然后通过量子线路进行演化操作和测量得到最终的全连接结果。
+QLinear 实现了一种量子全连接算法。首先将数据编码到量子态,然后通过量子线路进行演化操作和测量得到最终的全连接结果。
 
 .. image:: ./images/qlinear_cir.png
 
 .. py:class:: pyvqnet.qnn.qlinear.QLinear(input_channels,output_channels,machine: str = "CPU"))
 
-    量子全连接模块。全连接模块的输入为形状（输入通道、输出通道）。请注意，该层不带变分量子参数。
+    量子全连接模块。全连接模块的输入为形状（输入通道、输出通道）。请注意,该层不带变分量子参数。
 
     :param input_channels: `int` - 输入通道数。
     :param output_channels: `int` - 输出通道数。
-    :param machine: `str` - 使用的虚拟机，默认使用CPU模拟。
+    :param machine: `str` - 使用的虚拟机,默认使用CPU模拟。
     :return: 量子全连接层。
 
     Exmaple::
@@ -549,28 +550,28 @@ Qconv
 =========================
 
 Qconv是一种量子卷积算法接口。
-量子卷积操作采用量子线路对经典数据进行卷积操作，其无需计算乘法和加法操作，只需将数据编码到量子态，然后通过量子线路进行演化操作和测量得到最终的卷积结果。
-根据卷积核的范围中的输入数据数量申请相同数量的量子比特，然后构建量子线路进行计算。
+量子卷积操作采用量子线路对经典数据进行卷积操作,其无需计算乘法和加法操作,只需将数据编码到量子态,然后通过量子线路进行演化操作和测量得到最终的卷积结果。
+根据卷积核的范围中的输入数据数量申请相同数量的量子比特,然后构建量子线路进行计算。
 
 .. image:: ./images/qcnn.png
 
-其量子线路由每个qubit上首先插入 :math:`RY` , :math:`RZ` 门进行编码，接着在任意两个qubit上使用 :math:`Z` 以及 :math:`U3` 进行信息纠缠和交换。下图为4qubits的例子
+其量子线路由每个qubit上首先插入 :math:`RY` , :math:`RZ` 门进行编码,接着在任意两个qubit上使用 :math:`Z` 以及 :math:`U3` 进行信息纠缠和交换。下图为4qubits的例子
 
 .. image:: ./images/qcnn_cir.png
 
 .. py:class:: pyvqnet.qnn.qcnn.qconv.QConv(input_channels,output_channels,quantum_number,stride=(1, 1),padding=(0, 0),kernel_initializer=normal,machine:str = "CPU", dtype=None, name ="")
 
-	量子卷积模块。用量子线路取代Conv2D内核，conv模块的输入为形状（批次大小、输入通道、高度、宽度） `Samuel et al. (2020) <https://arxiv.org/abs/2012.12177>`_ 。
+	量子卷积模块。用量子线路取代Conv2D内核,conv模块的输入为形状（批次大小、输入通道、高度、宽度） `Samuel et al. (2020) <https://arxiv.org/abs/2012.12177>`_ 。
 
     :param input_channels: `int` - 输入通道数。
     :param output_channels: `int` - 输出通道数。
     :param quantum_number: `int` - 单个内核的大小。
-    :param stride: `tuple` - 步长，默认为（1,1）。
-    :param padding: `tuple` - 填充，默认为（0，0）。
+    :param stride: `tuple` - 步长,默认为（1,1）。
+    :param padding: `tuple` - 填充,默认为（0,0）。
     :param kernel_initializer: `callable` - 默认为正态分布。
-    :param machine: `str` - 使用的虚拟机，默认使用CPU模拟。
-    :param dtype: 参数的数据类型，defaults:None，使用默认数据类型:kfloat32,代表32位浮点数。
-    :param name: 这个模块的名字， 默认为""。
+    :param machine: `str` - 使用的虚拟机,默认使用CPU模拟。
+    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
+    :param name: 这个模块的名字, 默认为""。
 
 
     :return: 量子卷积层。
@@ -656,9 +657,7 @@ AngleEmbeddingCircuit
     Example::
 
         from pyvqnet.qnn.pq3.template import AngleEmbeddingCircuit
-        import pyqpanda3.core as pq
-        from pyvqnet import tensor
-        
+        import numpy as np 
         m_qlist = range(2)
 
         input_feat = np.array([2.2, 1])
@@ -1266,7 +1265,7 @@ QuantumMeasure
     :param prog: pyQPanda创建的量子工程。
     :param measure_qubits: 列表包含测量比特索引。
     :param shots: 测量次数,默认值为1000次。
-    :param qcloud_option: 设置 qcloud 配置，默认为“”，可以传入一个QCloudOptions类，只在使用qcloud 下有用。
+    :param qcloud_option: 设置 qcloud 配置,默认为“”,可以传入一个QCloudOptions类,只在使用qcloud 下有用。
     :return: 返回通过蒙特卡罗方法获得的测量结果。
 
     Example::
@@ -1308,7 +1307,7 @@ ProbsMeasure
     :param measure_qubits: 列表包含测量比特索引
     :param prog: qpanda创建的量子工程。
     :param machine: pyQPanda分配的量子虚拟机。
-    :param shots: 测量次数，默认为1，计算理论值。
+    :param shots: 测量次数,默认为1,计算理论值。
     :return: 按字典顺序测量量子比特。
 
 
@@ -1351,7 +1350,7 @@ DensityMatrixFromQstate
 
     Example::
         
-        from pyvqnet.qnn.measure import DensityMatrixFromQstate
+        from pyvqnet.qnn.pq3.measure import DensityMatrixFromQstate
         qstate = [(0.9306699299765968+0j), (0.18865613455240968+0j), (0.1886561345524097+0j), (0.03824249173404786+0j), -0.048171819846746615j, -0.00976491131165138j, -0.23763904794287155j, -0.048171819846746615j]
         print(DensityMatrixFromQstate(qstate,[0,1]))
         # [[0.86846704+0.j 0.1870241 +0.j 0.17604699+0.j 0.03791166+0.j]
@@ -1370,13 +1369,13 @@ VN_Entropy
 
     :param state: 一维列表状态向量。 这个列表的大小应该是 ``(2**N,)`` 对于量子比特个数 ``N`` ,qstate 应该从 000 ->111 开始。
     :param indices: 所考虑子系统中的量子比特索引列表。
-    :param base: 对数的底。 如果没有，则使用自然对数。
+    :param base: 对数的底。 如果没有,则使用自然对数。
 
     :return: 冯诺依曼熵的浮点值.
 
     Example::
 
-        from pyvqnet.qnn.measure import VN_Entropy
+        from pyvqnet.qnn.pq3.measure import VN_Entropy
         qstate = [(0.9022961387408862 + 0j), -0.06676534788028633j,
                 (0.18290448232350312 + 0j), -0.3293638014158896j,
                 (0.03707657410649268 + 0j), -0.06676534788028635j,
@@ -1396,20 +1395,20 @@ Mutal_Info
 
     其中 :math:`S` 是冯诺依曼熵。
 
-    互信息是衡量两个子系统之间相关性的指标。更具体地说，它量化了一个系统通过测量另一个系统获得的信息量。
+    互信息是衡量两个子系统之间相关性的指标。更具体地说,它量化了一个系统通过测量另一个系统获得的信息量。
 
     每个状态都可以作为计算基础中的状态向量给出。
 
     :param state: 一维列表状态向量。 这个列表的大小应该是 ``(2**N,)`` 对于量子比特个数 ``N`` , qstate 应该从 000 ->111 开始。
     :param indices0: 第一个子系统中的量子比特索引列表。
     :param indices1: 第二个子系统中的量子比特索引列表。
-    :param base: 对数的底。 如果为None，则使用自然对数，默认为None。
+    :param base: 对数的底。 如果为None,则使用自然对数,默认为None。
 
     :return: 子系统之间的相互信息
 
     Example::
 
-        from pyvqnet.qnn.measure import Mutal_Info
+        from pyvqnet.qnn.pq3.measure import Mutal_Info
         qstate = [(0.9022961387408862 + 0j), -0.06676534788028633j,
                 (0.18290448232350312 + 0j), -0.3293638014158896j,
                 (0.03707657410649268 + 0j), -0.06676534788028635j,
@@ -1430,7 +1429,7 @@ Purity
     .. math::
         \gamma = \text{Tr}(\rho^2)
 
-    式中 :math:`\rho` 为密度矩阵。标准化量子态的纯度满足 :math:`\frac{1}{d} \leq \gamma \leq 1` ，
+    式中 :math:`\rho` 为密度矩阵。标准化量子态的纯度满足 :math:`\frac{1}{d} \leq \gamma \leq 1` ,
     其中 :math:`d` 是希尔伯特空间的维数。
     纯态的纯度是1。
 
@@ -1442,7 +1441,7 @@ Purity
 
     Examples::
 
-        from pyvqnet.qnn import Purity
+        from pyvqnet.qnn.qp3.measure import Purity
         qstate = [(0.9306699299765968 + 0j), (0.18865613455240968 + 0j),
                 (0.1886561345524097 + 0j), (0.03824249173404786 + 0j),
                 -0.048171819846746615j, -0.00976491131165138j, -0.23763904794287155j,

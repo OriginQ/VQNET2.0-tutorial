@@ -2332,33 +2332,33 @@ pyqpanda2量子变分线路训练函数
 TorchQpandaQuantumLayer
 ------------------------------------------------
 
-如您更加熟悉pyQPanda2语法，可以使用该接口TorchQpandaQuantumLayer，自定义量子比特 ``qubits`` ,经典比特 ``cbits`` ,后端模拟器 ``machine`` 加入TorchQpandaQuantumLayer的参数 ``qprog_with_measure`` 函数中。
+如您更加熟悉pyQPanda2语法,可以使用该接口TorchQpandaQuantumLayer,自定义量子比特 ``qubits`` ,经典比特 ``cbits`` ,后端模拟器 ``machine`` 加入TorchQpandaQuantumLayer的参数 ``qprog_with_measure`` 函数中。
 
 .. py:class:: pyvqnet.qnn.vqc.torch.TorchQpandaQuantumLayer(qprog_with_measure,para_num,diff_method:str = "parameter_shift",delta:float = 0.01,dtype=None,name="")
 
-	变分量子层的抽象计算模块。对一个参数化的量子线路使用pyQPanda2进行仿真，得到测量结果。该变分量子层继承了VQNet框架的梯度计算模块，可以使用参数漂移法等计算线路参数的梯度，训练变分量子线路模型或将变分量子线路嵌入混合量子和经典模型。
+	变分量子层的抽象计算模块。对一个参数化的量子线路使用pyQPanda2进行仿真,得到测量结果。该变分量子层继承了VQNet框架的梯度计算模块,可以使用参数漂移法等计算线路参数的梯度,训练变分量子线路模型或将变分量子线路嵌入混合量子和经典模型。
     
     :param qprog_with_measure: 用pyQPand构建的量子线路运行和测量函数。
     :param para_num: `int` - 参数个数。
-    :param diff_method: 求解量子线路参数梯度的方法，“参数位移”或“有限差分”，默认参数偏移。
+    :param diff_method: 求解量子线路参数梯度的方法,“参数位移”或“有限差分”,默认参数偏移。
     :param delta: 有限差分计算梯度时的 \delta。
-    :param dtype: 参数的数据类型，defaults:None，使用默认数据类型:kfloat32,代表32位浮点数。
-    :param name: 这个模块的名字， 默认为""。
+    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
+    :param name: 这个模块的名字, 默认为""。
 
     :return: 一个可以计算量子线路的模块。
 
     .. note::
         qprog_with_measure是pyQPanda2中定义的量子线路函数 :https://pyqpanda-toturial.readthedocs.io/zh/latest/QCircuit.html。
         
-        此函数必须包含以下参数作为函数入参（即使某个参数未实际使用），否则无法在本函数中正常运行。
+        此函数必须包含以下参数作为函数入参（即使某个参数未实际使用）,否则无法在本函数中正常运行。
 
-        与QuantumLayer相比。该接口传入的变分线路运行函数中，用户应该手动创建量子比特和模拟器: https://pyqpanda-toturial.readthedocs.io/zh/latest/QuantumMachine.html,
+        与QuantumLayer相比。该接口传入的变分线路运行函数中,用户应该手动创建量子比特和模拟器: https://pyqpanda-toturial.readthedocs.io/zh/latest/QuantumMachine.html,
 
-        如果qprog_with_measure需要quantum measure，用户还需要手动创建需要分配cbits: https://pyqpanda-toturial.readthedocs.io/zh/latest/Measure.html
+        如果qprog_with_measure需要quantum measure,用户还需要手动创建需要分配cbits: https://pyqpanda-toturial.readthedocs.io/zh/latest/Measure.html
         
         量子线路函数 qprog_with_measure (input,param,nqubits,ncubits)的使用可参考下面的例子。
         
-        `input`: 输入一维经典数据。如果没有，输入 None。
+        `input`: 输入一维经典数据。如果没有,输入 None。
         
         `param`: 输入一维的变分量子线路的待训练参数。
 
@@ -2429,7 +2429,7 @@ TorchQpandaQuantumLayer
 TorchQcloudQuantumLayer
 ------------------------------------------
 
-当您安装最新版本pyqpanda2,可以使用本接口定义一个变分线路，并提交到originqc的真实芯片上运行。
+当您安装最新版本pyqpanda2,可以使用本接口定义一个变分线路,并提交到originqc的真实芯片上运行。
 
 .. py:class:: pyvqnet.qnn.vqc.torch.TorchQcloudQuantumLayer(origin_qprog_func, qcloud_token, para_num, num_qubits, num_cubits, pauli_str_dict=None, shots = 1000, initializer=None, dtype=None, name="", diff_method="parameter_shift", submit_kwargs={}, query_kwargs={})
 
@@ -2439,36 +2439,36 @@ TorchQcloudQuantumLayer
     .. note::
 
         qcloud_token 为您到 https://qcloud.originqc.com.cn/ 中申请的api token。
-        origin_qprog_func 需要返回pypqanda.QProg类型的数据，如果没有设置pauli_str_dict，需要保证该QProg中已经插入了measure。
+        origin_qprog_func 需要返回pypqanda.QProg类型的数据,如果没有设置pauli_str_dict,需要保证该QProg中已经插入了measure。
         origin_qprog_func 的形式必须按照如下:
 
         origin_qprog_func(input,param,qubits,cbits,machine)
         
-            `input`: 输入1~2维经典数据，二维的情况下，第一个维度为批处理大小。
+            `input`: 输入1~2维经典数据,二维的情况下,第一个维度为批处理大小。
             
             `param`: 输入一维的变分量子线路的待训练参数。
 
-            `machine`: 由QuantumBatchAsyncQcloudLayer创建的模拟器QCloud，无需用户额外在函数中定义。
+            `machine`: 由QuantumBatchAsyncQcloudLayer创建的模拟器QCloud,无需用户额外在函数中定义。
             
-            `qubits`: 由QuantumBatchAsyncQcloudLayer创建的模拟器QCloud创建的量子比特,数量为  `num_qubits`, 类型为pyQpanda.Qubits，无需用户额外在函数中定义。
+            `qubits`: 由QuantumBatchAsyncQcloudLayer创建的模拟器QCloud创建的量子比特,数量为  `num_qubits`, 类型为pyQpanda.Qubits,无需用户额外在函数中定义。
             
-            `cbits`: 由QuantumBatchAsyncQcloudLayer分配的经典比特, 数量为  `num_cubits`, 类型为 pyQpanda.ClassicalCondition，无需用户额外在函数中定义。。
+            `cbits`: 由QuantumBatchAsyncQcloudLayer分配的经典比特, 数量为  `num_cubits`, 类型为 pyQpanda.ClassicalCondition,无需用户额外在函数中定义。。
             
 
 
-    :param origin_qprog_func: QPanda 构建的变分量子电路函数，必须返回QProg。
+    :param origin_qprog_func: QPanda 构建的变分量子电路函数,必须返回QProg。
     :param qcloud_token: `str` - 量子机的类型或用于执行的云令牌。
-    :param para_num: `int` - 参数数量，参数是大小为[para_num]的QTensor。
+    :param para_num: `int` - 参数数量,参数是大小为[para_num]的QTensor。
     :param num_qubits: `int` - 量子电路中的量子比特数量。
     :param num_cubits: `int` - 量子电路中用于测量的经典比特数量。
-    :param pauli_str_dict: `dict|list` - 表示量子电路中泡利运算符的字典或字典列表。 默认为“无”，则进行测量操作，如果输入泡利算符的字典，则会计算单个期望或者多个期望。
+    :param pauli_str_dict: `dict|list` - 表示量子电路中泡利运算符的字典或字典列表。 默认为“无”,则进行测量操作,如果输入泡利算符的字典,则会计算单个期望或者多个期望。
     :param shot: `int` - 测量次数。 默认值为 1000。
-    :param initializer: 参数值的初始化器。 默认为“无”，使用0~2*pi正态分布。
-    :param dtype: 参数的数据类型。 默认值为 None，即使用默认数据类型pyvqnet.kfloat32。
+    :param initializer: 参数值的初始化器。 默认为“无”,使用0~2*pi正态分布。
+    :param dtype: 参数的数据类型。 默认值为 None,即使用默认数据类型pyvqnet.kfloat32。
     :param name: 模块的名称。 默认为空字符串。
     :param diff_method: 梯度计算的微分方法。 默认为“parameter_shift”,"random_coordinate_descent"。
-    :param submit_kwargs: 用于提交量子电路的附加关键字参数，默认:{"chip_id":pyqpanda.real_chip_type.origin_72,"is_amend":True,"is_mapping":True,"is_optimization":True,"compile_level":3,"default_task_group_size":200,"test_qcloud_fake":False},当设置test_qcloud_fake为True则本地CPUQVM模拟。
-    :param query_kwargs: 用于查询量子结果的附加关键字参数，默认:{"timeout":2,"print_query_info":True,"sub_circuits_split_size":1}。
+    :param submit_kwargs: 用于提交量子电路的附加关键字参数,默认:{"chip_id":pyqpanda.real_chip_type.origin_72,"is_amend":True,"is_mapping":True,"is_optimization":True,"compile_level":3,"default_task_group_size":200,"test_qcloud_fake":False},当设置test_qcloud_fake为True则本地CPUQVM模拟。
+    :param query_kwargs: 用于查询量子结果的附加关键字参数,默认:{"timeout":2,"print_query_info":True,"sub_circuits_split_size":1}。
     :return: 一个可以计算量子电路的模块。
     
     Example::
@@ -2555,12 +2555,12 @@ TorchQcloudQuantumLayer
 
     以下TorchQcloud3QuantumLayer,TorchQpanda3QuantumLayer接口的量子计算部分使用pyqpanda3 https://qcloud.originqc.com.cn/document/qpanda-3/index.html。
 
-    如果您使用了本模块下的QCloud功能，在代码中导入pyqpanda2 或 使用pyvqnet的pyqpanda2相关封装接口会有错误。
+    如果您使用了本模块下的QCloud功能,在代码中导入pyqpanda2 或 使用pyvqnet的pyqpanda2相关封装接口会有错误。
 
 TorchQcloud3QuantumLayer
 ---------------------------------------------------
 
-当您安装最新版本pyqpanda3,可以使用本接口定义一个变分线路，并提交到originqc的真实芯片上运行。
+当您安装最新版本pyqpanda3,可以使用本接口定义一个变分线路,并提交到originqc的真实芯片上运行。
 
 .. py:class:: pyvqnet.qnn.vqc.torch.TorchQcloud3QuantumLayer(origin_qprog_func, qcloud_token, para_num, pauli_str_dict=None, shots = 1000, initializer=None, dtype=None, name="", diff_method="parameter_shift", submit_kwargs={}, query_kwargs={})
 
@@ -2570,35 +2570,35 @@ TorchQcloud3QuantumLayer
     .. note::
 
         qcloud_token 为您到 https://qcloud.originqc.com.cn/ 中申请的api token。
-        origin_qprog_func 需要返回pypqanda3.core.QProg类型的数据，如果没有设置pauli_str_dict，需要保证该QProg中已经插入了measure。
+        origin_qprog_func 需要返回pypqanda3.core.QProg类型的数据,如果没有设置pauli_str_dict,需要保证该QProg中已经插入了measure。
         origin_qprog_func 的形式必须按照如下:
 
         origin_qprog_func(input,param )
         
-            `input`: 输入1~2维经典数据，二维的情况下，第一个维度为批处理大小。
+            `input`: 输入1~2维经典数据,二维的情况下,第一个维度为批处理大小。
             
             `param`: 输入一维的变分量子线路的待训练参数。
 
     .. warning::
 
-        该类继承于 ``pyvqnet.nn.Module`` 以及 ``torch.nn.Module``，可以作为 ``torch.nn.Module`` 的一个子模块加入torch的模型中。
+        该类继承于 ``pyvqnet.nn.Module`` 以及 ``torch.nn.Module``,可以作为 ``torch.nn.Module`` 的一个子模块加入torch的模型中。
 
         该类的 ``_buffers`` 中的数据为 ``torch.Tensor`` 类型。
         该类的 ``_parmeters`` 中的数据为 ``torch.nn.Parameter`` 类型。
 
 
 
-    :param origin_qprog_func: QPanda 构建的变分量子电路函数，必须返回QProg。
+    :param origin_qprog_func: QPanda 构建的变分量子电路函数,必须返回QProg。
     :param qcloud_token: `str` - 量子机的类型或用于执行的云令牌。
-    :param para_num: `int` - 参数数量，参数是大小为[para_num]的QTensor。
-    :param pauli_str_dict: `dict|list` - 表示量子电路中泡利运算符的字典或字典列表。 默认为“无”，则进行测量操作，如果输入泡利算符的字典，则会计算单个期望或者多个期望。
+    :param para_num: `int` - 参数数量,参数是大小为[para_num]的QTensor。
+    :param pauli_str_dict: `dict|list` - 表示量子电路中泡利运算符的字典或字典列表。 默认为“无”,则进行测量操作,如果输入泡利算符的字典,则会计算单个期望或者多个期望。
     :param shot: `int` - 测量次数。 默认值为 1000。
-    :param initializer: 参数值的初始化器。 默认为“无”，使用0~2*pi正态分布。
-    :param dtype: 参数的数据类型。 默认值为 None，即使用默认数据类型pyvqnet.kfloat32。
+    :param initializer: 参数值的初始化器。 默认为“无”,使用0~2*pi正态分布。
+    :param dtype: 参数的数据类型。 默认值为 None,即使用默认数据类型pyvqnet.kfloat32。
     :param name: 模块的名称。 默认为空字符串。
     :param diff_method: 梯度计算的微分方法。 默认为“parameter_shift”,"random_coordinate_descent"。
-    :param submit_kwargs: 用于提交量子电路的附加关键字参数，默认:{"chip_id":pyqpanda.real_chip_type.origin_72,"is_amend":True,"is_mapping":True,"is_optimization":True,"compile_level":3,"default_task_group_size":200,"test_qcloud_fake":False},当设置test_qcloud_fake为True则本地CPUQVM模拟。
-    :param query_kwargs: 用于查询量子结果的附加关键字参数，默认:{"timeout":2,"print_query_info":True,"sub_circuits_split_size":1}。
+    :param submit_kwargs: 用于提交量子电路的附加关键字参数,默认:{"chip_id":pyqpanda.real_chip_type.origin_72,"is_amend":True,"is_mapping":True,"is_optimization":True,"compile_level":3,"default_task_group_size":200,"test_qcloud_fake":False},当设置test_qcloud_fake为True则本地CPUQVM模拟。
+    :param query_kwargs: 用于查询量子结果的附加关键字参数,默认:{"timeout":2,"print_query_info":True,"sub_circuits_split_size":1}。
     :return: 一个可以计算量子电路的模块。
 
     Example::
@@ -2687,29 +2687,29 @@ TorchQcloud3QuantumLayer
 TorchQpanda3QuantumLayer
 ------------------------------------------
 
-如您更加熟悉pyQPanda3语法，可以使用该接口TorchQpanda3QuantumLayer。
+如您更加熟悉pyQPanda3语法,可以使用该接口TorchQpanda3QuantumLayer。
 
 .. py:class:: pyvqnet.qnn.vqc.torch.TorchQpanda3QuantumLayer(qprog_with_measure,para_num,diff_method:str = "parameter_shift",delta:float = 0.01,dtype=None,name="")
 
-	变分量子层的抽象计算模块。对一个参数化的量子线路使用pyQPanda3进行仿真，得到测量结果。该变分量子层继承了VQNet框架的梯度计算模块，可以使用参数漂移法等计算线路参数的梯度，训练变分量子线路模型或将变分量子线路嵌入混合量子和经典模型。
+	变分量子层的抽象计算模块。对一个参数化的量子线路使用pyQPanda3进行仿真,得到测量结果。该变分量子层继承了VQNet框架的梯度计算模块,可以使用参数漂移法等计算线路参数的梯度,训练变分量子线路模型或将变分量子线路嵌入混合量子和经典模型。
     
     :param qprog_with_measure: 用pyQPand构建的量子线路运行和测量函数。
     :param para_num: `int` - 参数个数。
-    :param diff_method: 求解量子线路参数梯度的方法，“参数位移”或“有限差分”，默认参数偏移。
+    :param diff_method: 求解量子线路参数梯度的方法,“参数位移”或“有限差分”,默认参数偏移。
     :param delta: 有限差分计算梯度时的 \delta。
-    :param dtype: 参数的数据类型，defaults:None，使用默认数据类型:kfloat32,代表32位浮点数。
-    :param name: 这个模块的名字， 默认为""。
+    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
+    :param name: 这个模块的名字, 默认为""。
 
     :return: 一个可以计算量子线路的模块。
 
     .. note::
         qprog_with_measure是pyQPanda中定义的量子线路函数 :https://qcloud.originqc.com.cn/document/qpanda-3/db/d6c/tutorial_circuit_and_program.html.。
         
-        此函数必须包含以下参数作为函数入参（即使某个参数未实际使用），否则无法在本函数中正常运行。
+        此函数必须包含以下参数作为函数入参（即使某个参数未实际使用）,否则无法在本函数中正常运行。
 
         量子线路函数 qprog_with_measure (input,param,nqubits,ncubits)的使用可参考下面的例子。
         
-        `input`: 输入一维经典数据。如果没有，输入 None。
+        `input`: 输入一维经典数据。如果没有,输入 None。
         
         `param`: 输入一维的变分量子线路的待训练参数。
 
@@ -4661,8 +4661,8 @@ VQC_QuantumEmbedding
     :paramdepth_input: 输入维数。
     :param num_unitary_layers: 变分量子门的重复次数。
     :param num_repetitions: 子模块的重复次数。
-    :param initial: 参数初始化值，默认为None
-    :param dtype: 参数的类型，默认 None,使用float32.
+    :param initial: 参数初始化值,默认为None
+    :param dtype: 参数的类型,默认 None,使用float32.
     :param name: 类的名字
 
     Example::
@@ -5621,7 +5621,7 @@ TorchHybirdVQCQpanda3QVMLayer
 .. py:class:: pyvqnet.qnn.vqc.torch.TorchHybirdVQCQpanda3QVMLayer(vqc_module: Module,qcloud_token: str,pauli_str_dict: Union[List[Dict], Dict, None] = None,shots: int = 1000,dtype: Union[int, None] = None,name: str = "",submit_kwargs: Dict = {},query_kwargs: Dict = {})
 
 
-    使用torch后端，混合 vqc 和 qpanda3 模拟计算。该层将用户 `forward` 函数定义的VQNet编写的量子线路计算转化为QPanda OriginIR,在QPanda3本地虚拟机或者云端服务上进行前向运行,并在基于自动微分计算线路参数梯度,降低了使用参数漂移法计算的时间复杂度。
+    使用torch后端,混合 vqc 和 qpanda3 模拟计算。该层将用户 `forward` 函数定义的VQNet编写的量子线路计算转化为QPanda OriginIR,在QPanda3本地虚拟机或者云端服务上进行前向运行,并在基于自动微分计算线路参数梯度,降低了使用参数漂移法计算的时间复杂度。
     其中 ``vqc_module`` 为用户自定义的量子变分线路模型,其中的QMachine设置 ``save_ir= True`` 。
 
     :param vqc_module: 带有 forward() 的 vqc_module。
