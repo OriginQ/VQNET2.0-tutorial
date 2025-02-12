@@ -4629,6 +4629,63 @@ QRNN
             print("h_t shape:", h_t.shape)
 
 
+TTOLayer
+----------------------------------------------------------------
+
+.. py:class:: pyvqnet.qnn.ttolayer.TTOLayer(inp_modes,out_modes,mat_ranks,cores_initializer=nn.init.xavier_uniform_,cores_regularizer=None,biases_initializer=torch.zeros,
+                 biases_regularizer=None,trainable=True,cpu_variables=False,scope=None)
+
+    TTOLayer对输入张量进行分解，从而实现对高维数据的高效表示。该层允许在秩约束条件下学习张量分解，相比于传统的全连接层，能够降低计算复杂度和内存使用。
+
+
+    :param inp_modes: list of int,输入张量的维度。
+    :param out_modes: list of int,输出张量的维度。
+    :param mat_ranks: list of int,张量分解中张量核（分解秩）的秩。
+    :param cores_initializer: 默认为nn.init.xavier_uniform_,张量核的初始化函数。
+    :param cores_regularizer: 默认为None,张量核的正则化函数。
+    :param biases_initializer: 默认为torch.zeros,偏置的初始化函数。
+    :param biases_regularizer: 默认为None,偏置的正则化函数。
+    :param trainable: bool, 默认为True,指示参数（张量核和偏置）是否可训练。
+    :param cpu_variables: bool, 默认为False,指示变量（张量核和偏置）是否应存储在CPU上而不是GPU上。如果使用CPU存储，则设置为True。
+    :param scope: string, 默认为None,个可选的层范围或名称，用于模型组织或在处理大型模型时进行跟踪。
+
+
+    Example::
+        import torch
+        from pyvqnet.qnn.ttolayer import TTOLayer
+        import numpy as np
+    
+        inp_modes = [4, 5]
+        out_modes = [4, 5]
+        mat_ranks = [1, 3, 1]
+        tto_layer = TTOLayer(inp_modes, out_modes, mat_ranks)
+    
+        batch_size = 2
+        len = 4
+        embed_size = 5
+        inp = torch.randn(batch_size, len, embed_size)
+    
+        output = tto_layer(inp)
+
+        print("Input shape:", inp.shape)
+        print("Output shape:", output.shape)
+
+        target = torch.randn_like(output)
+
+        loss_fn = torch.nn.MSELoss()
+        loss = loss_fn(output, target)
+
+        print("Loss:", loss.item())
+
+        loss.backward()
+
+        for name, param in tto_layer.named_parameters():
+            if param.grad is not None:
+                print(f"Gradient for {name}: {param.grad}")
+            else:
+                print(f"No gradient for {name}")
+
+
     
 其他函数
 =====================
