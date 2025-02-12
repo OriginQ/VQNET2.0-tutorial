@@ -4378,7 +4378,7 @@ QDRL
 .. py:class:: pyvqnet.qnn.qdrl_vqc.QDRL(nq)
 
 
-    量子数据重上传(Quantum Data Re-upLoading,QDRL),一种将量子电路与经典神经网络相结合的量子数据重上传模型。
+    基于《Data re-uploading for a universal quantum classifier》（https://arxiv.org/abs/1907.02085）实现的量子数据重上传(Quantum Data Re-upLoading,QDRL)算法是一种将量子电路与经典神经网络相结合的量子数据重上传模型。
 
     :param nq: 量子电路中所使用的量子比特（qubits的数量）。这决定了模型将要处理的量子系统的规模。
 
@@ -4415,13 +4415,13 @@ QGRU
 
 .. py:class:: pyvqnet.qnn.qgru.QGRU(para_num, num_of_qubits,input_size,hidden_size,batch_first=True)
 
-    量子版的GRU（门控循环单元），通过利用量子电路来进行状态更新和记忆保持。
+    基于量子量子变分线路实现的GRU（门控循环单元），通过利用量子电路来进行状态更新和记忆保持。
 
-    :param para_num: `int` 量子电路中的参数数量。
-    :param num_of_qubits: `int` 量子比特的数量。
-    :param input_size: `str` 输入数据的特征维度。
-    :param hidden_size: `str` 隐藏单元的维度。
-    :param batch_first: `bool` 输入的第一维是否为批次数量。
+    :param para_num: 量子电路中的参数数量。
+    :param num_of_qubits: 量子比特的数量。
+    :param input_size: 输入数据的特征维度。
+    :param hidden_size: 隐藏单元的维度。
+    :param batch_first:  输入的第一维是否为批次数量。
 
     Example::
 
@@ -4457,9 +4457,9 @@ QLinear
 
     QLinear 实现了一种量子全连接算法。首先将数据编码到量子态,然后通过量子线路进行演化操作和测量得到最终的全连接结果。
 
-    :param input_channels: `int` 输入通道数。
-    :param output_channels: `int` 输出通道数。
-    :param machine: `str` 使用的虚拟机,默认使用CPU模拟。
+    :param input_channels: 输入通道数。
+    :param output_channels: 输出通道数。
+    :param machine:  使用的虚拟机,默认使用CPU模拟。
 
     Example::
 
@@ -4492,11 +4492,11 @@ QLSTM
 
     QLSTM (Quantum Long Short-Term Memory) 是一种结合了量子计算和经典LSTM的混合模型，旨在利用量子计算的并行性和经典LSTM的记忆能力来处理序列数据。
 
-    :param para_num: `int` 量子电路中的参数数量。
-    :param num_of_qubits: `int` 量子比特的数量。
-    :param input_size: `str` 输入数据的特征维度。
-    :param hidden_size: `str` 隐藏单元的维度。
-    :param batch_first: `bool` 输入的第一维是否为批次数量。
+    :param para_num: 量子电路中的参数数量。
+    :param num_of_qubits: 量子比特的数量。
+    :param input_size: 输入数据的特征维度。
+    :param hidden_size: 隐藏单元的维度。
+    :param batch_first: 输入的第一维是否为批次数量。
 
 
     Examnple::
@@ -4527,18 +4527,18 @@ QMLPModel
 .. py:class:: pyvqnet.qnn.qmlp.qmlp.QMLPModel(input_channels: int,output_channels: int,num_qubits: int, kernel: _size_type,stride: _size_type,padding: _padding_type = "valid",weight_initializer: Union[Callable, None] = None,bias_initializer: Union[Callable, None] = None,use_bias: bool = True,dtype: Union[int, None] = None)
 
 
-    QMLPModel是一种量子启发式神经网络，它将量子电路与经典神经网络操作（如池化和全连接层）相结合。它旨在处理量子数据，并通过量子操作和经典层提取相关特征。
+    QMLPModel是基于《QMLP: An Error-Tolerant Nonlinear Quantum MLP Architecture using Parameterized Two-Qubit Gates》（https://arxiv.org/abs/2206.01345）实现的量子启发式神经网络，QMLPModel将量子电路与经典神经网络操作（如池化和全连接层）相结合。它旨在处理量子数据，并通过量子操作和经典层提取相关特征。
 
-    :param input_channels: `int` 输入特征的数量。
-    :param output_channels: `int` 输出特征的数量。
-    :param num_qubits: `int` 量子比特的数量。
+    :param input_channels: 输入特征的数量。
+    :param output_channels: 输出特征的数量。
+    :param num_qubits: 量子比特的数量。
     :param kernel: 平均池化窗口的大小。
     :param stride: 下采样的步长因子。
     :param padding: 填充方式，可选“valid”或“same”。
-    :param weight_initializer: `callable` 权重初始化器，默认为正态分布。
-    :param bias_initializer: `callable` 偏置初始化器，默认为零初始化。
-    :param use_bias: `bool` 是否使用偏置，默认为True。
-    :param dtype: default: 默认为None，使用默认数据类型。
+    :param weight_initializer: 权重初始化器，默认为正态分布。
+    :param bias_initializer: 偏置初始化器，默认为零初始化。
+    :param use_bias: 是否使用偏置，默认为True。
+    :param dtype: 默认为None，使用默认数据类型。
 
 
     Example::
@@ -4577,8 +4577,8 @@ QRLModel
 
     使用变分量子电路的量子深度强化学习模型。
 
-    :param num_qubits: int,量子电路中所使用的量子比特的数量。
-    :param n_layers: int, 变分量子电路中的层数。
+    :param num_qubits: 量子电路中所使用的量子比特的数量。
+    :param n_layers: 变分量子电路中的层数。
 
 
     Example::
@@ -4606,11 +4606,11 @@ QRNN
     QRNN（Quantum Recurrent Neural Network）是一种量子循环神经网络，旨在处理序列数据并捕捉序列中的长期依赖关系。
 
 
-    :param para_num: `int` 量子电路中的参数数量。
-    :param num_of_qubits: `int` 量子比特的数量。
-    :param input_size: `int` 输入数据的特征维度。
-    :param hidden_size: `int` 隐藏单元的维度。
-    :param batch_first: `bool` 输入的第一维是否为批次数量,默认为True。
+    :param para_num: 量子电路中的参数数量。
+    :param num_of_qubits: 量子比特的数量。
+    :param input_size: 输入数据的特征维度。
+    :param hidden_size: 隐藏单元的维度。
+    :param batch_first: 输入的第一维是否为批次数量,默认为True。
 
     Example::
 
@@ -4642,19 +4642,19 @@ TTOLayer
 .. py:class:: pyvqnet.qnn.ttolayer.TTOLayer(inp_modes,out_modes,mat_ranks,cores_initializer=nn.init.xavier_uniform_,cores_regularizer=None,biases_initializer=torch.zeros,biases_regularizer=None,trainable=True,cpu_variables=False,scope=None)
 
 
-    TTOLayer对输入张量进行分解，从而实现对高维数据的高效表示。该层允许在秩约束条件下学习张量分解，相比于传统的全连接层，能够降低计算复杂度和内存使用。
+    基于《Compressing deep neural networks by matrix product operators》（https://arxiv.org/abs/1904.06194）实现的TTOLayer对输入张量进行分解，从而实现对高维数据的高效表示。该层允许在秩约束条件下学习张量分解，相比于传统的全连接层，能够降低计算复杂度和内存使用。
 
 
-    :param inp_modes: list of int,输入张量的维度。
-    :param out_modes: list of int,输出张量的维度。
-    :param mat_ranks: list of int,张量分解中张量核（分解秩）的秩。
-    :param cores_initializer: 默认为nn.init.xavier_uniform_,张量核的初始化函数。
+    :param inp_modes: 输入张量的维度。
+    :param out_modes: 输出张量的维度。
+    :param mat_ranks: 张量分解中张量核（分解秩）的秩。
+    :param cores_initializer: 张量核的初始化函数。
     :param cores_regularizer: 默认为None,张量核的正则化函数。
-    :param biases_initializer: 默认为torch.zeros,偏置的初始化函数。
+    :param biases_initializer: 偏置的初始化函数。
     :param biases_regularizer: 默认为None,偏置的正则化函数。
-    :param trainable: bool, 默认为True,指示参数（张量核和偏置）是否可训练。
-    :param cpu_variables: bool, 默认为False,指示变量（张量核和偏置）是否应存储在CPU上而不是GPU上。如果使用CPU存储，则设置为True。
-    :param scope: string, 默认为None,个可选的层范围或名称，用于模型组织或在处理大型模型时进行跟踪。
+    :param trainable: 默认为True,指示参数（张量核和偏置）是否可训练。
+    :param cpu_variables: 默认为False,指示变量（张量核和偏置）是否应存储在CPU上而不是GPU上。如果使用CPU存储，则设置为True。
+    :param scope: 默认为None,个可选的层范围或名称，用于模型组织或在处理大型模型时进行跟踪。
 
 
     Example::
@@ -4694,370 +4694,6 @@ TTOLayer
                 print(f"No gradient for {name}")
 
 
-
-
-量子机器学习模型接口
-=====================
-
-
-Quanvolution
----------------------------------------------------------------
-
-.. py:class:: pyvqnet.qnn.qcnn.Quanvolution(params_shape, strides=(1, 1), kernel_initializer=quantum_uniform, machine_type_or_cloud_token: str = "cpu")
-
-
-    基于《Quanvolutional Neural Networks: Powering Image Recognition with Quantum Circuits》（https://arxiv.org/abs/1904.04767）实现的量子卷积，用变分量子电路替换经典的卷积滤波器，从而得到具有量子卷积滤波器的量子卷积神经网络。
-
-    :param params_shape: 参数的形状，应为二维。
-    :param strides: 切片窗口的步长，默认为 (1,1)。
-    :param kernel_initializer: 参数的卷积核初始化器。
-    :param machine_type_or_cloud_token: 机器类型字符串或 Qcloud 令牌，默认为“cpu”。
-
-    Examples::
-
-        from pyvqnet.qnn.qcnn import Quanvolution
-        import pyvqnet.tensor as tensor
-        qlayer = Quanvolution([4,2],(3,3))
-
-        x = tensor.arange(1,25*25*3+1).reshape([3,1,25,25])
-
-        y = qlayer(x)
-
-        print(y.shape)
-
-        y.backward()
-
-        print(qlayer.m_para)
-        print(qlayer.m_para.grad)
-        #[3, 4, 8, 8]
-
-        #[4.0270405,4.3587413,2.4935627,2.8155506,0.3314773,0.8889271,3.7357519, 0.9196261]
-        #<Parameter [8] DEV_CPU kfloat32>
-
-        #[ -0.2364242, -0.6942478, -8.445061 , -0.0558891, -0.       ,-49.498577 ,40.339344 , 40.339344 ]
-        #<QTensor [8] DEV_CPU kfloat32>
-
-
-QDRL
----------------------------------------------------------------
-
-.. py:class:: pyvqnet.qnn.qdrl_vqc.QDRL(nq)
-
-
-    量子数据重上传(Quantum Data Re-upLoading,QDRL),一种将量子电路与经典神经网络相结合的量子数据重上传模型。
-
-    :param nq: 量子电路中所使用的量子比特（qubits的数量）。这决定了模型将要处理的量子系统的规模。
-
-
-    Example::
-
-        import numpy as np
-        from pyvqnet.dtype import kcomplex64
-        from pyvqnet.qnn.qdrl_vqc import QDRL
-        import pyvqnet.tensor as tensor
-
-        # Set the number of quantum bits (qubits)
-        nq = 1
-
-        # Initialize the model
-        model = QDRL(nq)
-
-        # Create an example input (assume the input is a (batch_size, 3) shaped data)
-        # Suppose we have a batch_size of 4 and each input has 3 features
-        x_input = tensor.QTensor(np.random.randn(4, 3), dtype=kcomplex64)
-
-        # Pass the input through the model
-        output = model(x_input)
-
-        output.backward()
-
-        # Output the result
-        print("Model output:")
-        print(output)
-
-
-QGRU
-------------------------------------------------------------
-
-.. py:class:: pyvqnet.qnn.qgru.QGRU(para_num, num_of_qubits,input_size,hidden_size,batch_first=True)
-
-    量子版的GRU（门控循环单元），通过利用量子电路来进行状态更新和记忆保持。
-
-    :param para_num: `int` 量子电路中的参数数量。
-    :param num_of_qubits: `int` 量子比特的数量。
-    :param input_size: `str` 输入数据的特征维度。
-    :param hidden_size: `str` 隐藏单元的维度。
-    :param batch_first: `bool` 输入的第一维是否为批次数量。
-
-    Example::
-
-        import numpy as np
-        from pyvqnet.tensor import tensor
-        from pyvqnet.qnn.qgru import QGRU
-        from pyvqnet.dtype import kfloat32
-        # Example usage
-        if __name__ == "__main__":
-            # Set parameters
-            para_num = 8
-            num_of_qubits = 8
-            input_size = 4
-            hidden_size = 4
-            batch_size = 1
-            seq_length = 1
-            # Create QGRU model
-            qgru = QGRU(para_num, num_of_qubits, input_size, hidden_size, batch_first=True)
-
-            # Create input data
-            x = tensor.QTensor(np.random.randn(batch_size, seq_length, input_size), dtype=kfloat32)
-
-            # Call the model
-            output, h_t = qgru(x)
-            output.backward()
-
-            print("Output shape:", output.shape)  # Output shape
-            print("h_t shape:", h_t.shape)  # Final hidden state shape
-
-QLinear
---------------------------------------------------------------
-.. py:class:: pyvqnet.qnn.qlinear.QLinear(nput_channels, output_channels, machine: str = "")
-
-    QLinear 实现了一种量子全连接算法。首先将数据编码到量子态,然后通过量子线路进行演化操作和测量得到最终的全连接结果。
-
-    :param input_channels: `int` 输入通道数。
-    :param output_channels: `int` 输出通道数。
-    :param machine: `str` 使用的虚拟机,默认使用CPU模拟。
-
-    Example::
-
-        from pyvqnet.tensor import QTensor
-        from pyvqnet.qnn.qlinear import QLinear
-        params = [[0.37454012, 0.95071431, 0.73199394, 0.59865848, 0.15601864, 0.15599452],
-        [1.37454012, 0.95071431, 0.73199394, 0.59865848, 0.15601864, 0.15599452],
-        [1.37454012, 1.95071431, 0.73199394, 0.59865848, 0.15601864, 0.15599452],
-        [1.37454012, 1.95071431, 1.73199394, 1.59865848, 0.15601864, 0.15599452]]
-        m = QLinear(6, 2)
-        input = QTensor(params, requires_grad=True)
-        output = m(input)
-        output.backward()
-        print(output)
-
-        #[
-        #[0.0568473, 0.1264389],
-        #[0.1524036, 0.1264389],
-        #[0.1524036, 0.1442845],
-        #[0.1524036, 0.1442845]
-        #]
-
-
-
-QLSTM
--------------------------------------------------------------
-
-.. py:class:: pyvqnet.qnn.qlstm.QLSTM(para_num, num_of_qubits,input_size, hidden_size,batch_first=True)
-
-
-    QLSTM (Quantum Long Short-Term Memory) 是一种结合了量子计算和经典LSTM的混合模型，旨在利用量子计算的并行性和经典LSTM的记忆能力来处理序列数据。
-
-    :param para_num: `int` 量子电路中的参数数量。
-    :param num_of_qubits: `int` 量子比特的数量。
-    :param input_size: `str` 输入数据的特征维度。
-    :param hidden_size: `str` 隐藏单元的维度。
-    :param batch_first: `bool` 输入的第一维是否为批次数量。
-
-
-    Examnple::
-
-        import numpy as np
-        from pyvqnet.tensor import tensor
-        from pyvqnet.qnn.qlstm import QLSTM
-        from pyvqnet.dtype import *
-        if __name__ == "__main__":
-            para_num = 4
-            num_of_qubits = 4
-            input_size = 4
-            hidden_size = 20
-            batch_size = 3
-            seq_length = 5
-            qlstm = QLSTM(para_num, num_of_qubits, input_size, hidden_size, batch_first=True)
-            x = tensor.QTensor(np.random.randn(batch_size, seq_length, input_size), dtype=kfloat32)
-
-            output, (h_t, c_t) = qlstm(x)
-
-            print("Output shape:", output.shape)
-            print("h_t shape:", h_t.shape)
-            print("c_t shape:", c_t.shape)
-
-QMLPModel
---------------------------------------------------------------
-
-.. py:class:: pyvqnet.qnn.qmlp.qmlp.QMLPModel(input_channels: int,output_channels: int,num_qubits: int, kernel: _size_type,stride: _size_type,padding: _padding_type = "valid",weight_initializer: Union[Callable, None] = None,bias_initializer: Union[Callable, None] = None,use_bias: bool = True,dtype: Union[int, None] = None)
-
-
-    QMLPModel是一种量子启发式神经网络，它将量子电路与经典神经网络操作（如池化和全连接层）相结合。它旨在处理量子数据，并通过量子操作和经典层提取相关特征。
-
-    :param input_channels: `int` 输入特征的数量。
-    :param output_channels: `int` 输出特征的数量。
-    :param num_qubits: `int` 量子比特的数量。
-    :param kernel: 平均池化窗口的大小。
-    :param stride: 下采样的步长因子。
-    :param padding: 填充方式，可选“valid”或“same”。
-    :param weight_initializer: `callable` 权重初始化器，默认为正态分布。
-    :param bias_initializer: `callable` 偏置初始化器，默认为零初始化。
-    :param use_bias: `bool` 是否使用偏置，默认为True。
-    :param dtype: default: 默认为None，使用默认数据类型。
-
-
-    Example::
-
-        import numpy as np
-        from pyvqnet.tensor import tensor
-        from pyvqnet.qnn.qmlp.qmlp import QMLPModel
-        from pyvqnet.dtype import *
-
-        input_channels = 16
-        output_channels = 10
-        num_qubits = 4
-        kernel = (2, 2)
-        stride = (2, 2)
-        padding = "valid"
-        batch_size = 8
-
-        model = QMLPModel(input_channels=num_qubits,
-                          output_channels=output_channels,
-                          num_qubits=num_qubits,
-                          kernel=kernel,
-                          stride=stride,
-                          padding=padding)
-
-        x = tensor.QTensor(np.random.randn(batch_size, input_channels, 32, 32),dtype=kfloat32)
-
-        output = model(x)
-
-        print("Output shape:", output.shape)
-
-
-QRLModel
--------------------------------------------------------------
-
-.. py:class:: pyvqnet.qnn.qrl.QRLModel(num_qubits, n_layers)
-
-    使用变分量子电路的量子深度强化学习模型。
-
-    :param num_qubits: int,量子电路中所使用的量子比特的数量。
-    :param n_layers: int, 变分量子电路中的层数。
-
-
-    Example::
-
-        from pyvqnet.tensor import tensor, QTensor
-        from pyvqnet.qnn.qrl import QRLModel
-
-        num_qubits = 4
-        model = QRLModel(num_qubits=num_qubits, n_layers=2)
-
-        batch_size = 3
-        x = QTensor([[1.1, 0.3, 1.2, 0.6], [0.2, 1.1, 0, 1.1], [1.3, 1.3, 0.3, 0.3]])
-        output = model(x)
-        output.backward()
-
-        print("Model output:", output)
-
-
-QRNN
---------------------------------------------------------------
-
-.. py:class:: pyvqnet.qnn.qrnn.QRNN(para_num, num_of_qubits=4,input_size=100,hidden_size=100,batch_first=True)
-
-
-    QRNN（Quantum Recurrent Neural Network）是一种量子循环神经网络，旨在处理序列数据并捕捉序列中的长期依赖关系。
-
-
-    :param para_num: `int` 量子电路中的参数数量。
-    :param num_of_qubits: `int` 量子比特的数量。
-    :param input_size: `int` 输入数据的特征维度。
-    :param hidden_size: `int` 隐藏单元的维度。
-    :param batch_first: `bool` 输入的第一维是否为批次数量,默认为True。
-
-    Example::
-
-        from pyvqnet.dtype import kfloat32
-        from pyvqnet.qnn.qrnn import QRNN
-        from pyvqnet.tensor import tensor, QTensor
-        import numpy as np
-
-        if __name__ == "__main__":
-            para_num = 8
-            num_of_qubits = 8
-            input_size = 4
-            hidden_size = 4
-            batch_size = 1
-            seq_length = 1
-            qrnn = QRNN(para_num, num_of_qubits, input_size, hidden_size, batch_first=True)
-
-            x = tensor.QTensor(np.random.randn(batch_size, seq_length, input_size), dtype=kfloat32)
-
-            output, h_t = qrnn(x)
-
-            print("Output shape:", output.shape)
-            print("h_t shape:", h_t.shape)
-
-
-TTOLayer
-----------------------------------------------------------------
-
-.. py:class:: pyvqnet.qnn.ttolayer.TTOLayer(inp_modes,out_modes,mat_ranks,cores_initializer=nn.init.xavier_uniform_,cores_regularizer=None,biases_initializer=torch.zeros,biases_regularizer=None,trainable=True,cpu_variables=False,scope=None)
-
-
-    TTOLayer对输入张量进行分解，从而实现对高维数据的高效表示。该层允许在秩约束条件下学习张量分解，相比于传统的全连接层，能够降低计算复杂度和内存使用。
-
-
-    :param inp_modes: list of int,输入张量的维度。
-    :param out_modes: list of int,输出张量的维度。
-    :param mat_ranks: list of int,张量分解中张量核（分解秩）的秩。
-    :param cores_initializer: 默认为nn.init.xavier_uniform_,张量核的初始化函数。
-    :param cores_regularizer: 默认为None,张量核的正则化函数。
-    :param biases_initializer: 默认为torch.zeros,偏置的初始化函数。
-    :param biases_regularizer: 默认为None,偏置的正则化函数。
-    :param trainable: bool, 默认为True,指示参数（张量核和偏置）是否可训练。
-    :param cpu_variables: bool, 默认为False,指示变量（张量核和偏置）是否应存储在CPU上而不是GPU上。如果使用CPU存储，则设置为True。
-    :param scope: string, 默认为None,个可选的层范围或名称，用于模型组织或在处理大型模型时进行跟踪。
-
-
-    Example::
-
-        import torch
-        from pyvqnet.qnn.ttolayer import TTOLayer
-        import numpy as np
-
-        inp_modes = [4, 5]
-        out_modes = [4, 5]
-        mat_ranks = [1, 3, 1]
-        tto_layer = TTOLayer(inp_modes, out_modes, mat_ranks)
-
-        batch_size = 2
-        len = 4
-        embed_size = 5
-        inp = torch.randn(batch_size, len, embed_size)
-
-        output = tto_layer(inp)
-
-        print("Input shape:", inp.shape)
-        print("Output shape:", output.shape)
-
-        target = torch.randn_like(output)
-
-        loss_fn = torch.nn.MSELoss()
-        loss = loss_fn(output, target)
-
-        print("Loss:", loss.item())
-
-        loss.backward()
-
-        for name, param in tto_layer.named_parameters():
-            if param.grad is not None:
-                print(f"Gradient for {name}: {param.grad}")
-            else:
-                print(f"No gradient for {name}")
 
 
 

@@ -5734,7 +5734,7 @@ e^{-i(\phi-\omega)/2}\sin(\theta/2) &amp; e^{i(\phi+\omega)/2}\cos(\theta/2)
 <dl class="py class">
 <dt class="sig sig-object py" id="pyvqnet.qnn.qdrl_vqc.QDRL">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyvqnet.qnn.qdrl_vqc.</span></span><span class="sig-name descname"><span class="pre">QDRL</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nq</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyvqnet.qnn.qdrl_vqc.QDRL" title="Link to this definition">¶</a></dt>
-<dd><p>量子数据重上传(Quantum Data Re-upLoading,QDRL),一种将量子电路与经典神经网络相结合的量子数据重上传模型。</p>
+<dd><p>基于《Data re-uploading for a universal quantum classifier》（<a class="reference external" href="https://arxiv.org/abs/1907.02085">https://arxiv.org/abs/1907.02085</a>）实现的量子数据重上传(Quantum Data Re-upLoading,QDRL)算法是一种将量子电路与经典神经网络相结合的量子数据重上传模型。</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>nq</strong> – 量子电路中所使用的量子比特（qubits的数量）。这决定了模型将要处理的量子系统的规模。</p>
@@ -5778,11 +5778,11 @@ e^{-i(\phi-\omega)/2}\sin(\theta/2) &amp; e^{i(\phi+\omega)/2}\cos(\theta/2)
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>para_num</strong> – <cite>int</cite> 量子电路中的参数数量。</p></li>
-<li><p><strong>num_of_qubits</strong> – <cite>int</cite> 量子比特的数量。</p></li>
-<li><p><strong>input_size</strong> – <cite>str</cite> 输入数据的特征维度。</p></li>
-<li><p><strong>hidden_size</strong> – <cite>str</cite> 隐藏单元的维度。</p></li>
-<li><p><strong>batch_first</strong> – <cite>bool</cite> 输入的第一维是否为批次数量。</p></li>
+<li><p><strong>para_num</strong> – 量子电路中的参数数量。</p></li>
+<li><p><strong>num_of_qubits</strong> – 量子比特的数量。</p></li>
+<li><p><strong>input_size</strong> – 输入数据的特征维度。</p></li>
+<li><p><strong>hidden_size</strong> – 隐藏单元的维度。</p></li>
+<li><p><strong>batch_first</strong> – 输入的第一维是否为批次数量。</p></li>
 </ul>
 </dd>
 </dl>
@@ -5826,9 +5826,9 @@ e^{-i(\phi-\omega)/2}\sin(\theta/2) &amp; e^{i(\phi+\omega)/2}\cos(\theta/2)
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>input_channels</strong> – <cite>int</cite> 输入通道数。</p></li>
-<li><p><strong>output_channels</strong> – <cite>int</cite> 输出通道数。</p></li>
-<li><p><strong>machine</strong> – <cite>str</cite> 使用的虚拟机,默认使用CPU模拟。</p></li>
+<li><p><strong>input_channels</strong> – 输入通道数。</p></li>
+<li><p><strong>output_channels</strong> – 输出通道数。</p></li>
+<li><p><strong>machine</strong> – 使用的虚拟机,默认使用CPU模拟。</p></li>
 </ul>
 </dd>
 </dl>
@@ -5865,11 +5865,11 @@ e^{-i(\phi-\omega)/2}\sin(\theta/2) &amp; e^{i(\phi+\omega)/2}\cos(\theta/2)
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>para_num</strong> – <cite>int</cite> 量子电路中的参数数量。</p></li>
-<li><p><strong>num_of_qubits</strong> – <cite>int</cite> 量子比特的数量。</p></li>
-<li><p><strong>input_size</strong> – <cite>str</cite> 输入数据的特征维度。</p></li>
-<li><p><strong>hidden_size</strong> – <cite>str</cite> 隐藏单元的维度。</p></li>
-<li><p><strong>batch_first</strong> – <cite>bool</cite> 输入的第一维是否为批次数量。</p></li>
+<li><p><strong>para_num</strong> – 量子电路中的参数数量。</p></li>
+<li><p><strong>num_of_qubits</strong> – 量子比特的数量。</p></li>
+<li><p><strong>input_size</strong> – 输入数据的特征维度。</p></li>
+<li><p><strong>hidden_size</strong> – 隐藏单元的维度。</p></li>
+<li><p><strong>batch_first</strong> – 输入的第一维是否为批次数量。</p></li>
 </ul>
 </dd>
 </dl>
@@ -5903,20 +5903,20 @@ e^{-i(\phi-\omega)/2}\sin(\theta/2) &amp; e^{i(\phi+\omega)/2}\cos(\theta/2)
 <dl class="py class">
 <dt class="sig sig-object py" id="pyvqnet.qnn.qmlp.qmlp.QMLPModel">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyvqnet.qnn.qmlp.qmlp.</span></span><span class="sig-name descname"><span class="pre">QMLPModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_channels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_channels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_qubits</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_size_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stride</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_size_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">padding</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_padding_type</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'valid'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight_initializer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bias_initializer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_bias</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyvqnet.qnn.qmlp.qmlp.QMLPModel" title="Link to this definition">¶</a></dt>
-<dd><p>QMLPModel是一种量子启发式神经网络，它将量子电路与经典神经网络操作（如池化和全连接层）相结合。它旨在处理量子数据，并通过量子操作和经典层提取相关特征。</p>
+<dd><p>《QMLP: An Error-Tolerant Nonlinear Quantum MLP Architecture using Parameterized Two-Qubit Gates》是一种量子启发式神经网络，QMLPModel将量子电路与经典神经网络操作（如池化和全连接层）相结合。它旨在处理量子数据，并通过量子操作和经典层提取相关特征。</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>input_channels</strong> – <cite>int</cite> 输入特征的数量。</p></li>
-<li><p><strong>output_channels</strong> – <cite>int</cite> 输出特征的数量。</p></li>
-<li><p><strong>num_qubits</strong> – <cite>int</cite> 量子比特的数量。</p></li>
+<li><p><strong>input_channels</strong> – 输入特征的数量。</p></li>
+<li><p><strong>output_channels</strong> – 输出特征的数量。</p></li>
+<li><p><strong>num_qubits</strong> – 量子比特的数量。</p></li>
 <li><p><strong>kernel</strong> – 平均池化窗口的大小。</p></li>
 <li><p><strong>stride</strong> – 下采样的步长因子。</p></li>
 <li><p><strong>padding</strong> – 填充方式，可选“valid”或“same”。</p></li>
-<li><p><strong>weight_initializer</strong> – <cite>callable</cite> 权重初始化器，默认为正态分布。</p></li>
-<li><p><strong>bias_initializer</strong> – <cite>callable</cite> 偏置初始化器，默认为零初始化。</p></li>
-<li><p><strong>use_bias</strong> – <cite>bool</cite> 是否使用偏置，默认为True。</p></li>
-<li><p><strong>dtype</strong> – default: 默认为None，使用默认数据类型。</p></li>
+<li><p><strong>weight_initializer</strong> – 权重初始化器，默认为正态分布。</p></li>
+<li><p><strong>bias_initializer</strong> – 偏置初始化器，默认为零初始化。</p></li>
+<li><p><strong>use_bias</strong> – 是否使用偏置，默认为True。</p></li>
+<li><p><strong>dtype</strong> – 默认为None，使用默认数据类型。</p></li>
 </ul>
 </dd>
 </dl>
@@ -5960,8 +5960,8 @@ e^{-i(\phi-\omega)/2}\sin(\theta/2) &amp; e^{i(\phi+\omega)/2}\cos(\theta/2)
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>num_qubits</strong> – int,量子电路中所使用的量子比特的数量。</p></li>
-<li><p><strong>n_layers</strong> – int, 变分量子电路中的层数。</p></li>
+<li><p><strong>num_qubits</strong> – 量子电路中所使用的量子比特的数量。</p></li>
+<li><p><strong>n_layers</strong> – 变分量子电路中的层数。</p></li>
 </ul>
 </dd>
 </dl>
@@ -5992,11 +5992,11 @@ e^{-i(\phi-\omega)/2}\sin(\theta/2) &amp; e^{i(\phi+\omega)/2}\cos(\theta/2)
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>para_num</strong> – <cite>int</cite> 量子电路中的参数数量。</p></li>
-<li><p><strong>num_of_qubits</strong> – <cite>int</cite> 量子比特的数量。</p></li>
-<li><p><strong>input_size</strong> – <cite>int</cite> 输入数据的特征维度。</p></li>
-<li><p><strong>hidden_size</strong> – <cite>int</cite> 隐藏单元的维度。</p></li>
-<li><p><strong>batch_first</strong> – <cite>bool</cite> 输入的第一维是否为批次数量,默认为True。</p></li>
+<li><p><strong>para_num</strong> – 量子电路中的参数数量。</p></li>
+<li><p><strong>num_of_qubits</strong> – 量子比特的数量。</p></li>
+<li><p><strong>input_size</strong> – 输入数据的特征维度。</p></li>
+<li><p><strong>hidden_size</strong> – 隐藏单元的维度。</p></li>
+<li><p><strong>batch_first</strong> – 输入的第一维是否为批次数量,默认为True。</p></li>
 </ul>
 </dd>
 </dl>
@@ -6031,20 +6031,20 @@ e^{-i(\phi-\omega)/2}\sin(\theta/2) &amp; e^{i(\phi+\omega)/2}\cos(\theta/2)
 <dl class="py class">
 <dt class="sig sig-object py" id="pyvqnet.qnn.ttolayer.TTOLayer">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyvqnet.qnn.ttolayer.</span></span><span class="sig-name descname"><span class="pre">TTOLayer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inp_modes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_modes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mat_ranks</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cores_initializer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">nn.init.xavier_uniform_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cores_regularizer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">biases_initializer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">torch.zeros</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">biases_regularizer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trainable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cpu_variables</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scope</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyvqnet.qnn.ttolayer.TTOLayer" title="Link to this definition">¶</a></dt>
-<dd><p>TTOLayer对输入张量进行分解，从而实现对高维数据的高效表示。该层允许在秩约束条件下学习张量分解，相比于传统的全连接层，能够降低计算复杂度和内存使用。</p>
+<dd><p>基于《Compressing deep neural networks by matrix product operators》（<a class="reference external" href="https://arxiv.org/abs/1904.06194">https://arxiv.org/abs/1904.06194</a>）实现的TTOLayer对输入张量进行分解，从而实现对高维数据的高效表示。该层允许在秩约束条件下学习张量分解，相比于传统的全连接层，能够降低计算复杂度和内存使用。</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>inp_modes</strong> – list of int,输入张量的维度。</p></li>
-<li><p><strong>out_modes</strong> – list of int,输出张量的维度。</p></li>
-<li><p><strong>mat_ranks</strong> – list of int,张量分解中张量核（分解秩）的秩。</p></li>
-<li><p><strong>cores_initializer</strong> – <a href="#id47"><span class="problematic" id="id48">默认为nn.init.xavier_uniform_</span></a>,张量核的初始化函数。</p></li>
+<li><p><strong>inp_modes</strong> – 输入张量的维度。</p></li>
+<li><p><strong>out_modes</strong> – 输出张量的维度。</p></li>
+<li><p><strong>mat_ranks</strong> – 张量分解中张量核（分解秩）的秩。</p></li>
+<li><p><strong>cores_initializer</strong> – 张量核的初始化函数。</p></li>
 <li><p><strong>cores_regularizer</strong> – 默认为None,张量核的正则化函数。</p></li>
-<li><p><strong>biases_initializer</strong> – 默认为torch.zeros,偏置的初始化函数。</p></li>
+<li><p><strong>biases_initializer</strong> – 偏置的初始化函数。</p></li>
 <li><p><strong>biases_regularizer</strong> – 默认为None,偏置的正则化函数。</p></li>
-<li><p><strong>trainable</strong> – bool, 默认为True,指示参数（张量核和偏置）是否可训练。</p></li>
-<li><p><strong>cpu_variables</strong> – bool, 默认为False,指示变量（张量核和偏置）是否应存储在CPU上而不是GPU上。如果使用CPU存储，则设置为True。</p></li>
-<li><p><strong>scope</strong> – string, 默认为None,个可选的层范围或名称，用于模型组织或在处理大型模型时进行跟踪。</p></li>
+<li><p><strong>trainable</strong> – 默认为True,指示参数（张量核和偏置）是否可训练。</p></li>
+<li><p><strong>cpu_variables</strong> – 默认为False,指示变量（张量核和偏置）是否应存储在CPU上而不是GPU上。如果使用CPU存储，则设置为True。</p></li>
+<li><p><strong>scope</strong> – 默认为None,个可选的层范围或名称，用于模型组织或在处理大型模型时进行跟踪。</p></li>
 </ul>
 </dd>
 </dl>

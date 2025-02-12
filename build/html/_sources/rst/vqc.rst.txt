@@ -4378,7 +4378,7 @@ QDRL
 .. py:class:: pyvqnet.qnn.qdrl_vqc.QDRL(nq)
 
 
-    量子数据重上传(Quantum Data Re-upLoading,QDRL),一种将量子电路与经典神经网络相结合的量子数据重上传模型。
+    基于《Data re-uploading for a universal quantum classifier》（https://arxiv.org/abs/1907.02085）实现的量子数据重上传(Quantum Data Re-upLoading,QDRL)算法是一种将量子电路与经典神经网络相结合的量子数据重上传模型。
 
     :param nq: 量子电路中所使用的量子比特（qubits的数量）。这决定了模型将要处理的量子系统的规模。
 
@@ -4417,11 +4417,11 @@ QGRU
 
     量子版的GRU（门控循环单元），通过利用量子电路来进行状态更新和记忆保持。
 
-    :param para_num: `int` 量子电路中的参数数量。
-    :param num_of_qubits: `int` 量子比特的数量。
-    :param input_size: `str` 输入数据的特征维度。
-    :param hidden_size: `str` 隐藏单元的维度。
-    :param batch_first: `bool` 输入的第一维是否为批次数量。
+    :param para_num: 量子电路中的参数数量。
+    :param num_of_qubits: 量子比特的数量。
+    :param input_size: 输入数据的特征维度。
+    :param hidden_size: 隐藏单元的维度。
+    :param batch_first:  输入的第一维是否为批次数量。
 
     Example::
 
@@ -4457,9 +4457,9 @@ QLinear
 
     QLinear 实现了一种量子全连接算法。首先将数据编码到量子态,然后通过量子线路进行演化操作和测量得到最终的全连接结果。
 
-    :param input_channels: `int` 输入通道数。
-    :param output_channels: `int` 输出通道数。
-    :param machine: `str` 使用的虚拟机,默认使用CPU模拟。
+    :param input_channels: 输入通道数。
+    :param output_channels: 输出通道数。
+    :param machine:  使用的虚拟机,默认使用CPU模拟。
 
     Example::
 
@@ -4492,11 +4492,11 @@ QLSTM
 
     QLSTM (Quantum Long Short-Term Memory) 是一种结合了量子计算和经典LSTM的混合模型，旨在利用量子计算的并行性和经典LSTM的记忆能力来处理序列数据。
 
-    :param para_num: `int` 量子电路中的参数数量。
-    :param num_of_qubits: `int` 量子比特的数量。
-    :param input_size: `str` 输入数据的特征维度。
-    :param hidden_size: `str` 隐藏单元的维度。
-    :param batch_first: `bool` 输入的第一维是否为批次数量。
+    :param para_num: 量子电路中的参数数量。
+    :param num_of_qubits: 量子比特的数量。
+    :param input_size: 输入数据的特征维度。
+    :param hidden_size: 隐藏单元的维度。
+    :param batch_first: 输入的第一维是否为批次数量。
 
 
     Examnple::
@@ -4527,18 +4527,18 @@ QMLPModel
 .. py:class:: pyvqnet.qnn.qmlp.qmlp.QMLPModel(input_channels: int,output_channels: int,num_qubits: int, kernel: _size_type,stride: _size_type,padding: _padding_type = "valid",weight_initializer: Union[Callable, None] = None,bias_initializer: Union[Callable, None] = None,use_bias: bool = True,dtype: Union[int, None] = None)
 
 
-    QMLPModel是一种量子启发式神经网络，它将量子电路与经典神经网络操作（如池化和全连接层）相结合。它旨在处理量子数据，并通过量子操作和经典层提取相关特征。
+    《QMLP: An Error-Tolerant Nonlinear Quantum MLP Architecture using Parameterized Two-Qubit Gates》是一种量子启发式神经网络，QMLPModel将量子电路与经典神经网络操作（如池化和全连接层）相结合。它旨在处理量子数据，并通过量子操作和经典层提取相关特征。
 
-    :param input_channels: `int` 输入特征的数量。
-    :param output_channels: `int` 输出特征的数量。
-    :param num_qubits: `int` 量子比特的数量。
+    :param input_channels: 输入特征的数量。
+    :param output_channels: 输出特征的数量。
+    :param num_qubits: 量子比特的数量。
     :param kernel: 平均池化窗口的大小。
     :param stride: 下采样的步长因子。
     :param padding: 填充方式，可选“valid”或“same”。
-    :param weight_initializer: `callable` 权重初始化器，默认为正态分布。
-    :param bias_initializer: `callable` 偏置初始化器，默认为零初始化。
-    :param use_bias: `bool` 是否使用偏置，默认为True。
-    :param dtype: default: 默认为None，使用默认数据类型。
+    :param weight_initializer: 权重初始化器，默认为正态分布。
+    :param bias_initializer: 偏置初始化器，默认为零初始化。
+    :param use_bias: 是否使用偏置，默认为True。
+    :param dtype: 默认为None，使用默认数据类型。
 
 
     Example::
@@ -4577,8 +4577,8 @@ QRLModel
 
     使用变分量子电路的量子深度强化学习模型。
 
-    :param num_qubits: int,量子电路中所使用的量子比特的数量。
-    :param n_layers: int, 变分量子电路中的层数。
+    :param num_qubits: 量子电路中所使用的量子比特的数量。
+    :param n_layers: 变分量子电路中的层数。
 
 
     Example::
@@ -4606,11 +4606,11 @@ QRNN
     QRNN（Quantum Recurrent Neural Network）是一种量子循环神经网络，旨在处理序列数据并捕捉序列中的长期依赖关系。
 
 
-    :param para_num: `int` 量子电路中的参数数量。
-    :param num_of_qubits: `int` 量子比特的数量。
-    :param input_size: `int` 输入数据的特征维度。
-    :param hidden_size: `int` 隐藏单元的维度。
-    :param batch_first: `bool` 输入的第一维是否为批次数量,默认为True。
+    :param para_num: 量子电路中的参数数量。
+    :param num_of_qubits: 量子比特的数量。
+    :param input_size: 输入数据的特征维度。
+    :param hidden_size: 隐藏单元的维度。
+    :param batch_first: 输入的第一维是否为批次数量,默认为True。
 
     Example::
 
@@ -4642,19 +4642,19 @@ TTOLayer
 .. py:class:: pyvqnet.qnn.ttolayer.TTOLayer(inp_modes,out_modes,mat_ranks,cores_initializer=nn.init.xavier_uniform_,cores_regularizer=None,biases_initializer=torch.zeros,biases_regularizer=None,trainable=True,cpu_variables=False,scope=None)
 
 
-    TTOLayer对输入张量进行分解，从而实现对高维数据的高效表示。该层允许在秩约束条件下学习张量分解，相比于传统的全连接层，能够降低计算复杂度和内存使用。
+    基于《Compressing deep neural networks by matrix product operators》（https://arxiv.org/abs/1904.06194）实现的TTOLayer对输入张量进行分解，从而实现对高维数据的高效表示。该层允许在秩约束条件下学习张量分解，相比于传统的全连接层，能够降低计算复杂度和内存使用。
 
 
-    :param inp_modes: list of int,输入张量的维度。
-    :param out_modes: list of int,输出张量的维度。
-    :param mat_ranks: list of int,张量分解中张量核（分解秩）的秩。
-    :param cores_initializer: 默认为nn.init.xavier_uniform_,张量核的初始化函数。
+    :param inp_modes: 输入张量的维度。
+    :param out_modes: 输出张量的维度。
+    :param mat_ranks: 张量分解中张量核（分解秩）的秩。
+    :param cores_initializer: 张量核的初始化函数。
     :param cores_regularizer: 默认为None,张量核的正则化函数。
-    :param biases_initializer: 默认为torch.zeros,偏置的初始化函数。
+    :param biases_initializer: 偏置的初始化函数。
     :param biases_regularizer: 默认为None,偏置的正则化函数。
-    :param trainable: bool, 默认为True,指示参数（张量核和偏置）是否可训练。
-    :param cpu_variables: bool, 默认为False,指示变量（张量核和偏置）是否应存储在CPU上而不是GPU上。如果使用CPU存储，则设置为True。
-    :param scope: string, 默认为None,个可选的层范围或名称，用于模型组织或在处理大型模型时进行跟踪。
+    :param trainable: 默认为True,指示参数（张量核和偏置）是否可训练。
+    :param cpu_variables: 默认为False,指示变量（张量核和偏置）是否应存储在CPU上而不是GPU上。如果使用CPU存储，则设置为True。
+    :param scope: 默认为None,个可选的层范围或名称，用于模型组织或在处理大型模型时进行跟踪。
 
 
     Example::
@@ -4696,6 +4696,8 @@ TTOLayer
 
 
 
+
+    
 其他函数
 =====================
 
