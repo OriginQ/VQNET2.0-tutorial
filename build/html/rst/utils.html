@@ -1,0 +1,602 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>实用函数 &mdash; VQNET v2.15.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/documentation_options.js?v=a149e6fc"></script>
+      <script src="../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="使用pyQPanda2量子机器学习模块" href="qnn.html" />
+    <link rel="prev" title="经典神经网络模块" href="nn.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            VQNET
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">安装介绍</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="install.html">VQNet 安装步骤</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">上手实例</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="vqc_demo.html">使用自动微分模拟的量子机器学习示例</a></li>
+<li class="toctree-l1"><a class="reference internal" href="qml_demo.html">使用pyQPanda2的量子机器学习示例</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">经典神经网络接口介绍</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="QTensor.html">QTensor 模块</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nn.html">经典神经网络模块</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">实用函数</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#id2">随机种子生成</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#set-random-seed">set_random_seed</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pyvqnet.utils.set_random_seed"><code class="docutils literal notranslate"><span class="pre">pyvqnet.utils.set_random_seed()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#get-random-seed">get_random_seed</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pyvqnet.utils.get_random_seed"><code class="docutils literal notranslate"><span class="pre">pyvqnet.utils.get_random_seed()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#vqnet2onnx">VQNet2ONNX模块</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">使用pyqpanda的量子神经网络接口</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="qnn.html">使用pyQPanda2量子机器学习模块</a></li>
+<li class="toctree-l1"><a class="reference internal" href="qnn_pq3.html">使用pyQPanda3量子机器学习模块</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">量子神经网络自动微分模拟接口</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="vqc.html">变分量子线路自动微分模拟</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">量子大模型微调</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="llm.html">量子大模型微调示例</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">其他</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="torch_api.html">VQNet使用torch进行底层计算</a></li>
+<li class="toctree-l1"><a class="reference internal" href="FAQ.html">常见问题</a></li>
+<li class="toctree-l1"><a class="reference internal" href="CHANGELOG.html">VQNet Changelog</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">VQNET</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">实用函数</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/rst/utils.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="id1">
+<h1>实用函数<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h1>
+<section id="id2">
+<h2>随机种子生成<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h2>
+<section id="set-random-seed">
+<h3>set_random_seed<a class="headerlink" href="#set-random-seed" title="Link to this heading">¶</a></h3>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyvqnet.utils.set_random_seed">
+<span class="sig-prename descclassname"><span class="pre">pyvqnet.utils.</span></span><span class="sig-name descname"><span class="pre">set_random_seed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seed</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyvqnet.utils.set_random_seed" title="Link to this definition">¶</a></dt>
+<dd><p>设定全局随机种子。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>seed</strong> – 随机数种子。</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>当指定固定随机数种子时,随机分布将依据随机种子产生固定的伪随机分布。
+影响包括: <cite>tensor.randu</cite> , <cite>tensor.randn</cite> ,含参经典神经网络以及量子计算层的参数初始化。</p>
+</div>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pyvqnet.tensor</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">tensor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyvqnet.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_random_seed</span><span class="p">,</span> <span class="n">set_random_seed</span>
+
+<span class="n">set_random_seed</span><span class="p">(</span><span class="mi">256</span><span class="p">)</span>
+
+
+<span class="n">rn</span> <span class="o">=</span> <span class="n">tensor</span><span class="o">.</span><span class="n">randn</span><span class="p">([</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">rn</span><span class="p">)</span>
+<span class="n">rn</span> <span class="o">=</span> <span class="n">tensor</span><span class="o">.</span><span class="n">randn</span><span class="p">([</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">rn</span><span class="p">)</span>
+<span class="n">rn</span> <span class="o">=</span> <span class="n">tensor</span><span class="o">.</span><span class="n">randu</span><span class="p">([</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">rn</span><span class="p">)</span>
+<span class="n">rn</span> <span class="o">=</span> <span class="n">tensor</span><span class="o">.</span><span class="n">randu</span><span class="p">([</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">rn</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;########################################################&quot;</span><span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyvqnet.nn.parameter</span><span class="w"> </span><span class="kn">import</span> <span class="n">Parameter</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyvqnet.utils.initializer</span><span class="w"> </span><span class="kn">import</span> <span class="n">he_normal</span><span class="p">,</span> <span class="n">he_uniform</span><span class="p">,</span> <span class="n">xavier_normal</span><span class="p">,</span> <span class="n">xavier_uniform</span><span class="p">,</span> <span class="n">uniform</span><span class="p">,</span> <span class="n">quantum_uniform</span><span class="p">,</span> <span class="n">normal</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">Parameter</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="n">initializer</span><span class="o">=</span><span class="n">he_normal</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">Parameter</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="n">initializer</span><span class="o">=</span><span class="n">he_uniform</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">Parameter</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="n">initializer</span><span class="o">=</span><span class="n">xavier_normal</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">Parameter</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="n">initializer</span><span class="o">=</span><span class="n">xavier_uniform</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">Parameter</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="n">initializer</span><span class="o">=</span><span class="n">uniform</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">Parameter</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="n">initializer</span><span class="o">=</span><span class="n">quantum_uniform</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">Parameter</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="n">initializer</span><span class="o">=</span><span class="n">normal</span><span class="p">))</span>
+<span class="c1"># [</span>
+<span class="c1"># [-1.2093765, 1.1265280, 0.0796480],</span>
+<span class="c1">#  [0.2420146, 1.2623813, 0.2844022]</span>
+<span class="c1"># ]</span>
+<span class="c1"># [</span>
+<span class="c1"># [-1.2093765, 1.1265280, 0.0796480],</span>
+<span class="c1">#  [0.2420146, 1.2623813, 0.2844022]</span>
+<span class="c1"># ]</span>
+<span class="c1"># [</span>
+<span class="c1"># [0.3151870, 0.6721524, 0.0416874],</span>
+<span class="c1">#  [0.8232620, 0.6537889, 0.9672953]</span>
+<span class="c1"># ]</span>
+<span class="c1"># [</span>
+<span class="c1"># [0.3151870, 0.6721524, 0.0416874],</span>
+<span class="c1">#  [0.8232620, 0.6537889, 0.9672953]</span>
+<span class="c1"># ]</span>
+<span class="c1"># ########################################################</span>
+<span class="c1"># [</span>
+<span class="c1"># [-0.9874518, 0.9198063, 0.0650323],</span>
+<span class="c1">#  [0.1976041, 1.0307300, 0.2322134]</span>
+<span class="c1"># ]</span>
+<span class="c1"># [</span>
+<span class="c1"># [-0.2134037, 0.1987845, -0.5292138],</span>
+<span class="c1">#  [0.3732708, 0.1775801, 0.5395861]</span>
+<span class="c1"># ]</span>
+<span class="c1"># [</span>
+<span class="c1"># [-0.7648768, 0.7124789, 0.0503738],</span>
+<span class="c1">#  [0.1530635, 0.7984000, 0.1798717]</span>
+<span class="c1"># ]</span>
+<span class="c1"># [</span>
+<span class="c1"># [-0.4049051, 0.3771670, -1.0041126],</span>
+<span class="c1">#  [0.7082316, 0.3369346, 1.0237927]</span>
+<span class="c1"># ]</span>
+<span class="c1"># [</span>
+<span class="c1"># [0.3151870, 0.6721524, 0.0416874],</span>
+<span class="c1">#  [0.8232620, 0.6537889, 0.9672953]</span>
+<span class="c1"># ]</span>
+<span class="c1"># [</span>
+<span class="c1"># [1.9803783, 4.2232580, 0.2619299],</span>
+<span class="c1">#  [5.1727076, 4.1078768, 6.0776958]</span>
+<span class="c1"># ]</span>
+<span class="c1"># [</span>
+<span class="c1"># [-1.2093765, 1.1265280, 0.0796480],</span>
+<span class="c1">#  [0.2420146, 1.2623813, 0.2844022]</span>
+<span class="c1"># ]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+<section id="get-random-seed">
+<h3>get_random_seed<a class="headerlink" href="#get-random-seed" title="Link to this heading">¶</a></h3>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyvqnet.utils.get_random_seed">
+<span class="sig-prename descclassname"><span class="pre">pyvqnet.utils.</span></span><span class="sig-name descname"><span class="pre">get_random_seed</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyvqnet.utils.get_random_seed" title="Link to this definition">¶</a></dt>
+<dd><p>获取当前随机数种子。</p>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pyvqnet.tensor</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">tensor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyvqnet.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_random_seed</span><span class="p">,</span> <span class="n">set_random_seed</span>
+
+<span class="n">set_random_seed</span><span class="p">(</span><span class="mi">256</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">get_random_seed</span><span class="p">())</span>
+<span class="c1">#256</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+</section>
+<section id="vqnet2onnx">
+<h2>VQNet2ONNX模块<a class="headerlink" href="#vqnet2onnx" title="Link to this heading">¶</a></h2>
+<p>VQNet2ONNX模块 支持将 VQNet 模型以及参数转化到 ONNX 模型格式。通过 ONNX 可以完成将 VQNet 模型到多种推理引擎的部署,包括 TensorRT/OpenVINO/MNN/TNN/NCNN,以及其它对 ONNX 开源格式进行支持的推理引擎或硬件。</p>
+<p>环境依赖:onnx&gt;=1.12.0</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>当前不支持QPanda量子线路模块转换为ONNX,仅支持纯经典算子构成的模型。</p>
+</div>
+<p>使用 <code class="docutils literal notranslate"><span class="pre">export_model</span></code> 函数导出ONNX 模型。该函数需要两个以上的参数: 包括VQNet构建的模型 <code class="docutils literal notranslate"><span class="pre">model</span></code> , 模型单输入 <code class="docutils literal notranslate"><span class="pre">x</span></code> 或多输入 <code class="docutils literal notranslate"><span class="pre">*args</span></code>。</p>
+<p>以下是对 <cite>ResNet</cite> 模型的ONNX导出的示例代码,并使用 onnxruntime 进行验证.</p>
+<p>导入相关库</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyvqnet.tensor</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyvqnet.nn</span><span class="w"> </span><span class="kn">import</span> <span class="n">Module</span><span class="p">,</span> <span class="n">BatchNorm2d</span><span class="p">,</span> <span class="n">Conv2D</span><span class="p">,</span> <span class="n">ReLu</span><span class="p">,</span> <span class="n">AvgPool2D</span><span class="p">,</span> <span class="n">Linear</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyvqnet.onnx.export</span><span class="w"> </span><span class="kn">import</span> <span class="n">export_model</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">onnx</span><span class="w"> </span><span class="kn">import</span> <span class="n">__version__</span><span class="p">,</span> <span class="n">IR_VERSION</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">onnx.defs</span><span class="w"> </span><span class="kn">import</span> <span class="n">onnx_opset_version</span>
+<span class="nb">print</span><span class="p">(</span>
+    <span class="sa">f</span><span class="s2">&quot;onnx.__version__=</span><span class="si">{</span><span class="n">__version__</span><span class="si">!r}</span><span class="s2">, opset=</span><span class="si">{</span><span class="n">onnx_opset_version</span><span class="p">()</span><span class="si">}</span><span class="s2">, IR_VERSION=</span><span class="si">{</span><span class="n">IR_VERSION</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>模型定义</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">BasicBlock</span><span class="p">(</span><span class="n">Module</span><span class="p">):</span>
+
+    <span class="n">expansion</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">in_chals</span><span class="p">,</span> <span class="n">out_chals</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conv2d1</span> <span class="o">=</span> <span class="n">Conv2D</span><span class="p">(</span><span class="n">in_chals</span><span class="p">,</span>
+                            <span class="n">out_chals</span><span class="p">,</span>
+                            <span class="n">kernel_size</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
+                            <span class="n">stride</span><span class="o">=</span><span class="p">(</span><span class="n">stride</span><span class="p">,</span> <span class="n">stride</span><span class="p">),</span>
+                            <span class="n">padding</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="n">use_bias</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">BatchNorm2d1</span> <span class="o">=</span> <span class="n">BatchNorm2d</span><span class="p">(</span><span class="n">out_chals</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conv2d2</span> <span class="o">=</span> <span class="n">Conv2D</span><span class="p">(</span><span class="n">out_chals</span><span class="p">,</span>
+                            <span class="n">out_chals</span> <span class="o">*</span> <span class="n">BasicBlock</span><span class="o">.</span><span class="n">expansion</span><span class="p">,</span>
+                            <span class="n">kernel_size</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
+                            <span class="n">padding</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="n">use_bias</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">BatchNorm2d2</span> <span class="o">=</span> <span class="n">BatchNorm2d</span><span class="p">(</span><span class="n">out_chals</span> <span class="o">*</span> <span class="n">BasicBlock</span><span class="o">.</span><span class="n">expansion</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Relu</span> <span class="o">=</span> <span class="n">ReLu</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;relu&quot;</span><span class="p">)</span>
+        <span class="c1">#shortcut</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">shortcut_conv2d</span> <span class="o">=</span> <span class="n">Conv2D</span><span class="p">(</span><span class="n">in_chals</span><span class="p">,</span>
+                                    <span class="n">out_chals</span> <span class="o">*</span> <span class="n">BasicBlock</span><span class="o">.</span><span class="n">expansion</span><span class="p">,</span>
+                                    <span class="n">kernel_size</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                                    <span class="n">stride</span><span class="o">=</span><span class="p">(</span><span class="n">stride</span><span class="p">,</span> <span class="n">stride</span><span class="p">),</span>
+                                    <span class="n">use_bias</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">shortcut_bn2d</span> <span class="o">=</span> <span class="n">BatchNorm2d</span><span class="p">(</span><span class="n">out_chals</span> <span class="o">*</span> <span class="n">BasicBlock</span><span class="o">.</span><span class="n">expansion</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">need_match_dim</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">stride</span> <span class="o">!=</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">in_chals</span> <span class="o">!=</span> <span class="n">BasicBlock</span><span class="o">.</span><span class="n">expansion</span> <span class="o">*</span> <span class="n">out_chals</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">need_match_dim</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv2d1</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">BatchNorm2d1</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Relu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conv2d2</span><span class="p">(</span><span class="n">y</span><span class="p">))</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">BatchNorm2d2</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Relu</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">need_match_dim</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">y</span> <span class="o">+</span> <span class="n">x</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">y1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shortcut_conv2d</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="n">y1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shortcut_bn2d</span><span class="p">(</span><span class="n">y1</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">y</span> <span class="o">+</span> <span class="n">y1</span>
+
+<span class="n">resize</span> <span class="o">=</span> <span class="mi">32</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">ResNet</span><span class="p">(</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_classes</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">in_chals</span> <span class="o">=</span> <span class="mi">64</span> <span class="o">//</span> <span class="n">resize</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conv1</span> <span class="o">=</span> <span class="n">Conv2D</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span>
+                            <span class="mi">64</span> <span class="o">//</span> <span class="n">resize</span><span class="p">,</span>
+                            <span class="n">kernel_size</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
+                            <span class="n">padding</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="n">use_bias</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bn1</span> <span class="o">=</span> <span class="n">BatchNorm2d</span><span class="p">(</span><span class="mi">64</span> <span class="o">//</span> <span class="n">resize</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">relu</span> <span class="o">=</span> <span class="n">ReLu</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conv2_x_1</span> <span class="o">=</span> <span class="n">BasicBlock</span><span class="p">(</span><span class="mi">64</span> <span class="o">//</span> <span class="n">resize</span><span class="p">,</span> <span class="mi">64</span> <span class="o">//</span> <span class="n">resize</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conv2_x_2</span> <span class="o">=</span> <span class="n">BasicBlock</span><span class="p">(</span><span class="mi">64</span> <span class="o">//</span> <span class="n">resize</span><span class="p">,</span> <span class="mi">64</span> <span class="o">//</span> <span class="n">resize</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conv3_x_1</span> <span class="o">=</span> <span class="n">BasicBlock</span><span class="p">(</span><span class="mi">64</span> <span class="o">//</span> <span class="n">resize</span><span class="p">,</span> <span class="mi">128</span> <span class="o">//</span> <span class="n">resize</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conv3_x_2</span> <span class="o">=</span> <span class="n">BasicBlock</span><span class="p">(</span><span class="mi">128</span> <span class="o">//</span> <span class="n">resize</span><span class="p">,</span> <span class="mi">128</span> <span class="o">//</span> <span class="n">resize</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conv4_x_1</span> <span class="o">=</span> <span class="n">BasicBlock</span><span class="p">(</span><span class="mi">128</span> <span class="o">//</span> <span class="n">resize</span><span class="p">,</span> <span class="mi">256</span> <span class="o">//</span> <span class="n">resize</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conv4_x_2</span> <span class="o">=</span> <span class="n">BasicBlock</span><span class="p">(</span><span class="mi">256</span> <span class="o">//</span> <span class="n">resize</span><span class="p">,</span> <span class="mi">256</span> <span class="o">//</span> <span class="n">resize</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conv5_x_1</span> <span class="o">=</span> <span class="n">BasicBlock</span><span class="p">(</span><span class="mi">256</span> <span class="o">//</span> <span class="n">resize</span><span class="p">,</span> <span class="mi">512</span> <span class="o">//</span> <span class="n">resize</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conv5_x_2</span> <span class="o">=</span> <span class="n">BasicBlock</span><span class="p">(</span><span class="mi">512</span> <span class="o">//</span> <span class="n">resize</span><span class="p">,</span> <span class="mi">512</span> <span class="o">//</span> <span class="n">resize</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">avg_pool</span> <span class="o">=</span> <span class="n">AvgPool2D</span><span class="p">([</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;valid&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fc</span> <span class="o">=</span> <span class="n">Linear</span><span class="p">(</span><span class="mi">512</span> <span class="o">//</span> <span class="n">resize</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">)</span>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv1</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bn1</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv2_x_1</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv2_x_2</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv3_x_1</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv3_x_2</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv4_x_1</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv4_x_2</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv5_x_1</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv5_x_2</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">avg_pool</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="n">tensor</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fc</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">output</span>
+</pre></div>
+</div>
+<p>测试代码</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">test_resnet</span><span class="p">():</span>
+
+    <span class="n">x</span> <span class="o">=</span> <span class="n">tensor</span><span class="o">.</span><span class="n">ones</span><span class="p">([</span><span class="mi">4</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">32</span><span class="p">,</span><span class="mi">32</span><span class="p">])</span><span class="c1">#任意输入一个正确shape的QTensor数据</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">ResNet</span><span class="p">()</span>
+    <span class="n">m</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span><span class="c1">#为了导出BatchNorm的global mean 以及global variance</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">m</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">vqnet_y</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">CPU</span><span class="p">()</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+
+    <span class="c1">#导出onnx model</span>
+    <span class="n">onnx_model</span> <span class="o">=</span> <span class="n">export_model</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+
+    <span class="c1">#保存到文件</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;demo.onnx&quot;</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">onnx_model</span><span class="o">.</span><span class="n">SerializeToString</span><span class="p">())</span>
+
+    <span class="c1">#onnxruntime 对比运行结果</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">onnxruntime</span>
+    <span class="n">session</span> <span class="o">=</span> <span class="n">onnxruntime</span><span class="o">.</span><span class="n">InferenceSession</span><span class="p">(</span><span class="s1">&#39;demo.onnx&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">input_name</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">get_inputs</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">name</span>
+
+    <span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">([</span><span class="mi">4</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">32</span><span class="p">,</span><span class="mi">32</span><span class="p">])</span>
+    <span class="n">v</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="n">inputs</span> <span class="o">=</span> <span class="p">[</span><span class="n">v</span><span class="p">]</span>
+    <span class="n">test_data_num</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
+    <span class="n">outputs</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">run</span><span class="p">([],</span> <span class="p">{</span><span class="n">input_name</span><span class="p">:</span> <span class="n">inputs</span><span class="p">[</span><span class="n">i</span><span class="p">]})[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">test_data_num</span><span class="p">)</span>
+    <span class="p">]</span>
+    <span class="n">onnx_y</span> <span class="o">=</span> <span class="n">outputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">onnx_y</span><span class="p">,</span> <span class="n">vqnet_y</span><span class="p">)</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">test_resnet</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>使用 <a class="reference external" href="https://netron.app/">https://netron.app/</a> 可以可视化VQNet导出的ONNX模型 demo.onnx</p>
+<a class="reference internal image-reference" href="../_images/resnet_onnx.png"><img alt="../_images/resnet_onnx.png" class="align-center" src="../_images/resnet_onnx.png" style="width: 100px;" />
+</a>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>以下是支持的VQNet模块</p>
+<table class="docutils align-default" id="id3">
+<caption><span class="caption-text">已支持VQNet接口列表</span><a class="headerlink" href="#id3" title="Link to this table">¶</a></caption>
+<tbody>
+<tr class="row-odd"><td><p>operator</p></td>
+<td><p>operator</p></td>
+<td><p>operator</p></td>
+</tr>
+<tr class="row-even"><td><p>ones</p></td>
+<td><p>floor</p></td>
+<td><p>nonzero</p></td>
+</tr>
+<tr class="row-odd"><td><p>ons_like</p></td>
+<td><p>ceil</p></td>
+<td><p>isfinite</p></td>
+</tr>
+<tr class="row-even"><td><p>full</p></td>
+<td><p>round</p></td>
+<td><p>isinf</p></td>
+</tr>
+<tr class="row-odd"><td><p>full_like</p></td>
+<td><p>sort</p></td>
+<td><p>isnan</p></td>
+</tr>
+<tr class="row-even"><td><p>zeros</p></td>
+<td><p>argosrt</p></td>
+<td><p>isneginf</p></td>
+</tr>
+<tr class="row-odd"><td><p>zeros_like</p></td>
+<td><p>topK</p></td>
+<td><p>isposinf</p></td>
+</tr>
+<tr class="row-even"><td><p>arange</p></td>
+<td><p>argtopK</p></td>
+<td><p>logical_and</p></td>
+</tr>
+<tr class="row-odd"><td><p>linspace</p></td>
+<td><p>add</p></td>
+<td><p>logical_or</p></td>
+</tr>
+<tr class="row-even"><td><p>logspace</p></td>
+<td><p>sub</p></td>
+<td><p>logical_not</p></td>
+</tr>
+<tr class="row-odd"><td><p>eye</p></td>
+<td><p>mul</p></td>
+<td><p>logical_xor</p></td>
+</tr>
+<tr class="row-even"><td><p>randu</p></td>
+<td><p>divide</p></td>
+<td><p>greater</p></td>
+</tr>
+<tr class="row-odd"><td><p>randn</p></td>
+<td><p>sums</p></td>
+<td><p>greater_equal</p></td>
+</tr>
+<tr class="row-even"><td><p>tiru</p></td>
+<td><p>cumsum</p></td>
+<td><p>less</p></td>
+</tr>
+<tr class="row-odd"><td><p>tril</p></td>
+<td><p>mean</p></td>
+<td><p>less_equal</p></td>
+</tr>
+<tr class="row-even"><td><p>__getitem__</p></td>
+<td><p>median</p></td>
+<td><p>equal</p></td>
+</tr>
+<tr class="row-odd"><td><p>__setitem__</p></td>
+<td><p>std</p></td>
+<td><p>not_equal</p></td>
+</tr>
+<tr class="row-even"><td><p>concatenate</p></td>
+<td><p>var</p></td>
+<td><p>Conv2D</p></td>
+</tr>
+<tr class="row-odd"><td><p>stack</p></td>
+<td><p>matmul</p></td>
+<td><p>Conv1D</p></td>
+</tr>
+<tr class="row-even"><td><p>permute</p></td>
+<td><p>reciprocal</p></td>
+<td><p>ConvT2D</p></td>
+</tr>
+<tr class="row-odd"><td><p>transpose</p></td>
+<td><p>sign</p></td>
+<td><p>Linear</p></td>
+</tr>
+<tr class="row-even"><td><p>tile</p></td>
+<td><p>neg</p></td>
+<td><p>Sigmoid</p></td>
+</tr>
+<tr class="row-odd"><td><p>squeeze</p></td>
+<td><p>exp</p></td>
+<td><p>Softplus</p></td>
+</tr>
+<tr class="row-even"><td><p>unsqueeze</p></td>
+<td><p>acos</p></td>
+<td><p>Softsign</p></td>
+</tr>
+<tr class="row-odd"><td><p>swapaxis</p></td>
+<td><p>asin</p></td>
+<td><p>Softmax</p></td>
+</tr>
+<tr class="row-even"><td><p>masked_fill</p></td>
+<td><p>atan</p></td>
+<td><p>HardSigmoid</p></td>
+</tr>
+<tr class="row-odd"><td><p>flatten</p></td>
+<td><p>sin</p></td>
+<td><p>ReLu</p></td>
+</tr>
+<tr class="row-even"><td><p>reshape</p></td>
+<td><p>cos</p></td>
+<td><p>LeakyReLu</p></td>
+</tr>
+<tr class="row-odd"><td><p>flip</p></td>
+<td><p>tan</p></td>
+<td><p>ELU</p></td>
+</tr>
+<tr class="row-even"><td><p>maximum</p></td>
+<td><p>tanh</p></td>
+<td><p>Tanh</p></td>
+</tr>
+<tr class="row-odd"><td><p>minimum</p></td>
+<td><p>sinh</p></td>
+<td><p>BatchNorm2d</p></td>
+</tr>
+<tr class="row-even"><td><p>min</p></td>
+<td><p>cosh</p></td>
+<td><p>BatchNorm1d</p></td>
+</tr>
+<tr class="row-odd"><td><p>max</p></td>
+<td><p>power</p></td>
+<td><p>Dropout</p></td>
+</tr>
+<tr class="row-even"><td><p>clip</p></td>
+<td><p>abs</p></td>
+<td><p>Embedding</p></td>
+</tr>
+<tr class="row-odd"><td><p>where</p></td>
+<td><p>log</p></td>
+<td><p>LayerNormNd</p></td>
+</tr>
+<tr class="row-even"><td></td>
+<td><p>sqrt</p></td>
+<td><p>LayerNorm1d</p></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p>square</p></td>
+<td><p>LayerNorm2d</p></td>
+</tr>
+<tr class="row-even"><td></td>
+<td><p>frobenius_norm</p></td>
+<td><p>MaxPool1D</p></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p>log_softmax</p></td>
+<td><p>MaxPool2D</p></td>
+</tr>
+<tr class="row-even"><td></td>
+<td></td>
+<td><p>AvgPool2D</p></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td></td>
+<td><p>AvgPool1D</p></td>
+</tr>
+<tr class="row-even"><td></td>
+<td></td>
+<td><p>GRU</p></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td></td>
+<td><p>LSTM</p></td>
+</tr>
+<tr class="row-even"><td></td>
+<td></td>
+<td><p>RNN</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="nn.html" class="btn btn-neutral float-left" title="经典神经网络模块" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="qnn.html" class="btn btn-neutral float-right" title="使用pyQPanda2量子机器学习模块" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Original Quantum.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

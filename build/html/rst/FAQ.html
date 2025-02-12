@@ -1,0 +1,220 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>常见问题 &mdash; VQNET v2.15.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/documentation_options.js?v=a149e6fc"></script>
+      <script src="../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="VQNet Changelog" href="CHANGELOG.html" />
+    <link rel="prev" title="VQNet使用torch进行底层计算" href="torch_api.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            VQNET
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">安装介绍</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="install.html">VQNet 安装步骤</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">上手实例</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="vqc_demo.html">使用自动微分模拟的量子机器学习示例</a></li>
+<li class="toctree-l1"><a class="reference internal" href="qml_demo.html">使用pyQPanda2的量子机器学习示例</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">经典神经网络接口介绍</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="QTensor.html">QTensor 模块</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nn.html">经典神经网络模块</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">实用函数</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">使用pyqpanda的量子神经网络接口</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="qnn.html">使用pyQPanda2量子机器学习模块</a></li>
+<li class="toctree-l1"><a class="reference internal" href="qnn_pq3.html">使用pyQPanda3量子机器学习模块</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">量子神经网络自动微分模拟接口</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="vqc.html">变分量子线路自动微分模拟</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">量子大模型微调</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="llm.html">量子大模型微调示例</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">其他</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="torch_api.html">VQNet使用torch进行底层计算</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">常见问题</a></li>
+<li class="toctree-l1"><a class="reference internal" href="CHANGELOG.html">VQNet Changelog</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">VQNET</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">常见问题</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/rst/FAQ.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="id1">
+<h1>常见问题<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h1>
+<p><strong>问: VQNet有哪些特性</strong></p>
+<p>答: VQNet是基于本源量子pyQPanda开发的量子机器学习工具集。VQNet提供了丰富、易用的经典神经网络计算模块接口,可以方便地进行机器学习的优化,
+模型定义方式与主流机器学习框架一致,降低了用户学习成本。
+同时,基于本源量子研发的高性能量子模拟器pyQPanda,VQNet在个人笔记本电脑上也能支持大数量量子比特的运算。
+最后,VQNet还有丰富的 <a class="reference internal" href="qml_demo.html"><span class="doc">使用pyQPanda2的量子机器学习示例</span></a> 供大家参考和学习。</p>
+<p><strong>问: 如何使用VQNet进行量子机器学习模型的训练</strong></p>
+<p>答: 量子机器学习算法中有一类是基于量子变分线路构建可微的量子机器学习模型。
+VQNet可以使用梯度下降法对这类量子机器学习模型进行训练。一般步骤如下: 首先在本地计算机上,用户可以通过pyQPanda的 <code class="docutils literal notranslate"><span class="pre">CPUQVM()</span></code> 构建虚拟机,并结合VQNet中提供的接口构建量子、量子经典混合模型 <code class="docutils literal notranslate"><span class="pre">Module</span></code> ; 其次,调用 <code class="docutils literal notranslate"><span class="pre">Module</span></code> 的 <code class="docutils literal notranslate"><span class="pre">forward()</span></code> 可按用户定义的运行方式进行量子线路模拟以及经典神经网络前向运算；
+当调用 <code class="docutils literal notranslate"><span class="pre">Module</span></code> 的 <code class="docutils literal notranslate"><span class="pre">backward()</span></code> 用户构建的模型可以像PyTorch等经典机器学习框架一样进行自动微分,计算量子变分线路以及经典计算层中的参数梯度；最后结合优化器的 <code class="docutils literal notranslate"><span class="pre">step()</span></code> 功能进行参数的优化。</p>
+<p>在VQNet中,我们使用 <a class="reference external" href="https://arxiv.org/abs/1803.00745">parameter-shift</a> 计算量子变分线路的梯度。用户可使用
+VQNet提供的 <code class="docutils literal notranslate"><span class="pre">QuantumLayer</span></code> 以及 <code class="docutils literal notranslate"><span class="pre">QuantumLayerV2</span></code> 类已经封装了量子变分线路的自动微分,用户仅需按一定格式定义量子变分线路作为参数构建以上类即可。
+具体可参考本文档相关接口以及示例代码。</p>
+<p><strong>问: 在Windows中,安装VQNet遇到错误: “importError: DLL load failed while importing _core: 找不到指定的模块。”</strong></p>
+<p>答: 用户在Windows上可能需要安装VC++ 运行时库。
+可参考 <a class="reference external" href="https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170">https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170</a> 安装合适的运行库。
+此外,VQNet当前仅支持python3.8, 3.9, 3.10 版本,故请确认你的python版本。</p>
+<p><strong>问: 如何调用本源量子云以及量子芯片进行计算</strong></p>
+<p>答: 使用pyQPanda的云端资源,可以在量子线路模拟中使用高性能计算机集群或真实的量子计算机,用云计算的方式替代本地量子线路模拟。在VQNet中,若用户使用 <code class="docutils literal notranslate"><span class="pre">QuantumLayerV2</span></code> 构建变分量子线路模块,可使用pyQPanda的云服务接口 <code class="docutils literal notranslate"><span class="pre">QCloud()</span></code> 接口
+代替本地全振幅模拟器 <code class="docutils literal notranslate"><span class="pre">CPUQVM()</span></code>,测量函数也进行相应修改,具体参见 <a class="reference external" href="https://pyqpanda-toturial.readthedocs.io/zh/latest/QCloudServer.html">QCloudServer</a> 。
+若用户使用 <code class="docutils literal notranslate"><span class="pre">QuantumLayer</span></code> 构建变分量子线路模块,使用 <cite>machine_type_or_cloud_token</cite> 参数输入申请的QCloud token,该模块可内部构建一个云端虚拟机。</p>
+<p><strong>问: 为什么我定义的模型参数在训练时候不更新</strong></p>
+<p>答: 构建VQNet的模型需要保证其中所使用的所有模块是可微分。当模型某个模块无法计算梯度,则会导致该模块以及之前的模块无法使用链式法则计算梯度。
+若用户自定义一个量子变分线路,请使用VQNet提供的 <code class="docutils literal notranslate"><span class="pre">QuantumLayer</span></code> 以及 <code class="docutils literal notranslate"><span class="pre">QuantumLayerV2</span></code> 接口。对于经典机器学习模块,需要使用 <a class="reference internal" href="QTensor.html"><span class="doc">QTensor 模块</span></a> 以及 <a class="reference internal" href="nn.html"><span class="doc">经典神经网络模块</span></a> 定义的接口,这些接口封装了梯度计算的函数,VQNet可以进行自动微分。</p>
+<p>若用户想在 <cite>Module</cite> 中使用包含多个模块的列表作为子模块,请不要使用python自带的List,需要使用 pyvqnet.nn.module.ModuleList 代替 List。这样,子模块的训练参数可以被注册到整个模型中,可以进行自动微分训练。以下是例子:</p>
+<blockquote>
+<div><p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyvqnet.tensor</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyvqnet.nn</span><span class="w"> </span><span class="kn">import</span> <span class="n">Module</span><span class="p">,</span><span class="n">Linear</span><span class="p">,</span><span class="n">ModuleList</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyvqnet.qnn</span><span class="w"> </span><span class="kn">import</span> <span class="n">ProbsMeasure</span><span class="p">,</span><span class="n">QuantumLayer</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pyqpanda</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pq</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">pqctest</span> <span class="p">(</span><span class="nb">input</span><span class="p">,</span><span class="n">param</span><span class="p">,</span><span class="n">qubits</span><span class="p">,</span><span class="n">cubits</span><span class="p">,</span><span class="n">m_machine</span><span class="p">):</span>
+    <span class="n">circuit</span> <span class="o">=</span> <span class="n">pq</span><span class="o">.</span><span class="n">QCircuit</span><span class="p">()</span>
+    <span class="n">circuit</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">pq</span><span class="o">.</span><span class="n">H</span><span class="p">(</span><span class="n">qubits</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+    <span class="n">circuit</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">pq</span><span class="o">.</span><span class="n">H</span><span class="p">(</span><span class="n">qubits</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+    <span class="n">circuit</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">pq</span><span class="o">.</span><span class="n">H</span><span class="p">(</span><span class="n">qubits</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
+    <span class="n">circuit</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">pq</span><span class="o">.</span><span class="n">H</span><span class="p">(</span><span class="n">qubits</span><span class="p">[</span><span class="mi">3</span><span class="p">]))</span>
+
+    <span class="n">circuit</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">pq</span><span class="o">.</span><span class="n">RZ</span><span class="p">(</span><span class="n">qubits</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="nb">input</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+    <span class="n">circuit</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">pq</span><span class="o">.</span><span class="n">RZ</span><span class="p">(</span><span class="n">qubits</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="nb">input</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+    <span class="n">circuit</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">pq</span><span class="o">.</span><span class="n">RZ</span><span class="p">(</span><span class="n">qubits</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span><span class="nb">input</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
+    <span class="n">circuit</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">pq</span><span class="o">.</span><span class="n">RZ</span><span class="p">(</span><span class="n">qubits</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span><span class="nb">input</span><span class="p">[</span><span class="mi">3</span><span class="p">]))</span>
+
+    <span class="n">circuit</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">pq</span><span class="o">.</span><span class="n">CNOT</span><span class="p">(</span><span class="n">qubits</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">qubits</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+    <span class="n">circuit</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">pq</span><span class="o">.</span><span class="n">RZ</span><span class="p">(</span><span class="n">qubits</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">param</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+    <span class="n">circuit</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">pq</span><span class="o">.</span><span class="n">CNOT</span><span class="p">(</span><span class="n">qubits</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">qubits</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
+    <span class="n">circuit</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">pq</span><span class="o">.</span><span class="n">CNOT</span><span class="p">(</span><span class="n">qubits</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">qubits</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
+    <span class="n">circuit</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">pq</span><span class="o">.</span><span class="n">RZ</span><span class="p">(</span><span class="n">qubits</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span><span class="n">param</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+    <span class="n">circuit</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">pq</span><span class="o">.</span><span class="n">CNOT</span><span class="p">(</span><span class="n">qubits</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">qubits</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
+
+    <span class="n">circuit</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">pq</span><span class="o">.</span><span class="n">CNOT</span><span class="p">(</span><span class="n">qubits</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span><span class="n">qubits</span><span class="p">[</span><span class="mi">3</span><span class="p">]))</span>
+    <span class="n">circuit</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">pq</span><span class="o">.</span><span class="n">RZ</span><span class="p">(</span><span class="n">qubits</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span><span class="n">param</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
+    <span class="n">circuit</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">pq</span><span class="o">.</span><span class="n">CNOT</span><span class="p">(</span><span class="n">qubits</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span><span class="n">qubits</span><span class="p">[</span><span class="mi">3</span><span class="p">]))</span>
+    <span class="c1">#print(circuit)</span>
+
+    <span class="n">prog</span> <span class="o">=</span> <span class="n">pq</span><span class="o">.</span><span class="n">QProg</span><span class="p">()</span>
+    <span class="n">prog</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">circuit</span><span class="p">)</span>
+
+    <span class="n">rlt_prob</span> <span class="o">=</span> <span class="n">ProbsMeasure</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">],</span><span class="n">prog</span><span class="p">,</span><span class="n">m_machine</span><span class="p">,</span><span class="n">qubits</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">rlt_prob</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">M</span><span class="p">(</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="c1">#应该使用ModuleList构建</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pqc2</span> <span class="o">=</span> <span class="n">ModuleList</span><span class="p">([</span><span class="n">QuantumLayer</span><span class="p">(</span><span class="n">pqctest</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="s2">&quot;cpu&quot;</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="n">Linear</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+        <span class="p">])</span>
+        <span class="c1">#直接使用list 是无法保存pqc3中的参数的。</span>
+        <span class="c1">#self.pqc3 = [QuantumLayer(pqctest,3,&quot;cpu&quot;,4,1), Linear(4,1)</span>
+        <span class="c1">#]</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pqc2</span><span class="p">[</span><span class="mi">0</span><span class="p">](</span><span class="n">x</span><span class="p">)</span>  <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">pqc2</span><span class="p">[</span><span class="mi">1</span><span class="p">](</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">y</span>
+
+<span class="n">mm</span> <span class="o">=</span> <span class="n">M</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">mm</span><span class="o">.</span><span class="n">state_dict</span><span class="p">()</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p><strong>问: 为什么原先的代码在2.0.7及以后版本无法运行</strong></p>
+<p>答: 自v2.0.7版本中,我们为QTensor增加了不同数据类型,dtype属性,并参照pytorch对输入进行了限制。例如:  Emedding层输入需要为kint64,CategoricalCrossEntropy, SoftmaxCrossEntropy, NLL_Loss, CrossEntropyLoss 的标签需要为kint64。
+你可以使用 <cite>astype()</cite> 接口进行类型转化为指定数据类型,或使用对应的数据类型numpy数组初始化QTensor。</p>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="torch_api.html" class="btn btn-neutral float-left" title="VQNet使用torch进行底层计算" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="CHANGELOG.html" class="btn btn-neutral float-right" title="VQNet Changelog" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Original Quantum.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

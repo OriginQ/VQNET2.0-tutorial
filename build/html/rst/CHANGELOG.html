@@ -1,0 +1,617 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VQNet Changelog &mdash; VQNET v2.15.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/documentation_options.js?v=a149e6fc"></script>
+      <script src="../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="常见问题" href="FAQ.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            VQNET
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">安装介绍</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="install.html">VQNet 安装步骤</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">上手实例</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="vqc_demo.html">使用自动微分模拟的量子机器学习示例</a></li>
+<li class="toctree-l1"><a class="reference internal" href="qml_demo.html">使用pyQPanda2的量子机器学习示例</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">经典神经网络接口介绍</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="QTensor.html">QTensor 模块</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nn.html">经典神经网络模块</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">实用函数</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">使用pyqpanda的量子神经网络接口</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="qnn.html">使用pyQPanda2量子机器学习模块</a></li>
+<li class="toctree-l1"><a class="reference internal" href="qnn_pq3.html">使用pyQPanda3量子机器学习模块</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">量子神经网络自动微分模拟接口</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="vqc.html">变分量子线路自动微分模拟</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">量子大模型微调</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="llm.html">量子大模型微调示例</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">其他</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="torch_api.html">VQNet使用torch进行底层计算</a></li>
+<li class="toctree-l1"><a class="reference internal" href="FAQ.html">常见问题</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">VQNet Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#v2-16-0-2025-1-15">[v2.16.0] - 2025-1-15</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#added">Added</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#changed">Changed</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fixed">Fixed</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#v2-15-0-2024-11-19">[v2.15.0] - 2024-11-19</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id1">Added</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id2">Changed</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id3">Fixed</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#v2-14-0-2024-09-30">[v2.14.0] - 2024-09-30</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id4">Added</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id5">Changed</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id6">Fixed</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#v2-13-0-2024-07-30">[v2.13.0] - 2024-07-30</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id7">Added</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id8">Changed</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id9">Fixed</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#v2-12-0-2024-05-01">[v2.12.0] - 2024-05-01</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id10">Added</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id11">Changed</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id12">Fixed</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#v2-11-0-2024-03-01">[v2.11.0] - 2024-03-01</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id13">Added</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id14">Changed</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id15">Fixed</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#v2-10-0-2023-12-30">[v2.10.0] - 2023-12-30</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id16">Added</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#v2-9-0-2023-11-15">[v2.9.0] - 2023-11-15</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id17">Added</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id18">Changed</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#v2-0-8-2023-09-26">[v2.0.8] - 2023-09-26</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id19">Added</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#v2-0-7-2023-07-03">[v2.0.7] - 2023-07-03</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id20">Added</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id21">Changed</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#v2-0-6-2023-02-22">[v2.0.6] - 2023-02-22</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id22">Added</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id23">Changed</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id24">Fixed</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#v2-0-5-2022-12-25">[v2.0.5] - 2022-12-25</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id25">Added</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id26">Changed</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id27">Fixed</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#v2-0-4-2022-09-20">[v2.0.4] - 2022-09-20</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id28">Added</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id29">Changed</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id30">Fixed</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#v2-0-3-2022-07-15">[v2.0.3] - 2022-07-15</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id31">Added</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id32">Changed</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id33">Fixed</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#v2-0-2-2022-05-15">[v2.0.2] - 2022-05-15</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id34">Added</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id35">Changed</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id36">Fixed</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#v2-0-1-2022-03-30">[v2.0.1] - 2022-03-30</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id37">Added</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">VQNET</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">VQNet Changelog</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/rst/CHANGELOG.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="vqnet-changelog">
+<h1>VQNet Changelog<a class="headerlink" href="#vqnet-changelog" title="Link to this heading">¶</a></h1>
+<section id="v2-16-0-2025-1-15">
+<h2>[v2.16.0] - 2025-1-15<a class="headerlink" href="#v2-16-0-2025-1-15" title="Link to this heading">¶</a></h2>
+<section id="added">
+<h3>Added<a class="headerlink" href="#added" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>增加使用pyqpanda3进行量子线路计算的接口。</p></li>
+<li><p>MeasureAll接口支持复合泡利算符。</p></li>
+<li><p>增加DataParallelVQCAdjointLayer以及DataParallelVQCLayer接口。</p></li>
+</ul>
+</section>
+<section id="changed">
+<h3>Changed<a class="headerlink" href="#changed" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>删除ONNX过时功能,删除集成pyqpanda的绝大部分接口,保留示例代码中使用的部分接口。</p></li>
+<li><p>VQC_QuantumEmbedding接口修改</p></li>
+<li><p>安装本软件包时不再同时安装pyqpanda, 而是同时安装pyqpanda3.</p></li>
+<li><p>VQC接口支持入参使用 <cite>x[,:2]</cite>,原先只支持 <cite>x[:,[2]]</cite> 形式。</p></li>
+<li><p>本软件支持3.9~3.12版本python 不再支持python3.8</p></li>
+</ul>
+</section>
+<section id="fixed">
+<h3>Fixed<a class="headerlink" href="#fixed" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>解决发现的内存泄漏问题;</p></li>
+<li><p>解决发现的GPU随机数问题；</p></li>
+<li><p>reduce相关操作时候最大维度从8提升到30;</p></li>
+<li><p>优化代码,提升了部分情况下的python代码运行速度；</p></li>
+</ul>
+</section>
+</section>
+<section id="v2-15-0-2024-11-19">
+<h2>[v2.15.0] - 2024-11-19<a class="headerlink" href="#v2-15-0-2024-11-19" title="Link to this heading">¶</a></h2>
+<section id="id1">
+<h3>Added<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>增加 <cite>pyvqnet.backends.set_backend()</cite> 接口, 在用户安装 <cite>torch</cite> 时候, 可使用 <cite>torch</cite> 进行QTensor的矩阵计算, 变分量子线路计算, 具体见文档 <a class="reference internal" href="torch_api.html#torch-api"><span class="std std-ref">VQNet使用torch进行底层计算</span></a> 。</p></li>
+<li><p>增加 <cite>pyvqnet.nn.torch</cite> 下继承于 <cite>torch.nn.Module</cite> 的神经网络接口, 变分量子线路神经接口等, 具体见文档 <a class="reference internal" href="torch_api.html#torch-api"><span class="std std-ref">VQNet使用torch进行底层计算</span></a> 。</p></li>
+</ul>
+</section>
+<section id="id2">
+<h3>Changed<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>diag接口修改。</p></li>
+<li><p>修改all_gather实现与torch.distributed.all_gather一致。</p></li>
+<li><p>修改 <cite>QTensor</cite> 最大支持30维度数据。</p></li>
+<li><p>修改分布式功能所需 <cite>mpi4py</cite> 需要4.0.1版本以上</p></li>
+</ul>
+</section>
+<section id="id3">
+<h3>Fixed<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>部分随机数实现由于omp无法固定种子。</p></li>
+<li><p>修复分布式启动的部分bug。</p></li>
+</ul>
+</section>
+</section>
+<section id="v2-14-0-2024-09-30">
+<h2>[v2.14.0] - 2024-09-30<a class="headerlink" href="#v2-14-0-2024-09-30" title="Link to this heading">¶</a></h2>
+<section id="id4">
+<h3>Added<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>增加 <cite>VQC_LCU</cite>, <cite>VQC_FABLE</cite>, <cite>VQC_QSVT</cite> 的block-encoding算法, 以及qpanda算法实现 <cite>QPANDA_QSVT</cite>, <cite>QPANDA_LCU</cite>, <cite>QPANDA_FABLE</cite> 接口.</p></li>
+<li><p>增加整数加到量子比特上 <cite>vqc_qft_add_to_register</cite>, 两个量子比特上的数加法 <cite>vqc_qft_add_two_register</cite>,两个量子比特上的数乘法的 <cite>vqc_qft_mul</cite>.</p></li>
+<li><p>增加混合qpanda与vqc的训练模块 <cite>HybirdVQCQpandaQVMLayer</cite>.</p></li>
+<li><p>增加 <cite>einsum</cite>, <cite>moveaxis</cite>, <cite>eigh</cite>, <cite>dignoal</cite> 等接口实现.</p></li>
+<li><p>增加分布式计算中张量并行计算功能 <cite>ColumnParallelLinear</cite>, <cite>RowParallelLinear</cite>.</p></li>
+<li><p>增加分布式计算中Zero stage-1 功能 <cite>ZeroModelInitial</cite>.</p></li>
+<li><p><cite>QuantumBatchAsyncQcloudLayer</cite> 指定 diff_method == “random_coordinate_descent” 时候不会使用PSR而是随机对量子参数选择一个进行梯度计算.</p></li>
+</ul>
+</section>
+<section id="id5">
+<h3>Changed<a class="headerlink" href="#id5" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>删除了xtensor部分。</p></li>
+<li><p>api文档进行部分修改。区分了基于自动微分的量子机器学习示例以及基于qpanda的机器学习示例,区别基于自动微分的量子机器学习接口以及基于qpanda的机器学习示例接口。</p></li>
+<li><p><cite>matmul</cite> 支持1d&#64;1d,2d&#64;1d,1d&#64;2d。</p></li>
+<li><p>增加了一些量子计算层别名: <cite>QpandaQCircuitVQCLayer`</cite> = <cite>QuantumLayer</cite> , <cite>QpandaQCircuitVQCLayerLite</cite> = <cite>QuantumLayerV2</cite>, <cite>QpandaQProgVQCLayer</cite> = <cite>QuantumLayerV3</cite>.</p></li>
+</ul>
+</section>
+<section id="id6">
+<h3>Fixed<a class="headerlink" href="#id6" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>修改分布式计算功能中底层通信接口 <cite>allreduce</cite>, <cite>allgather</cite>, <cite>reduce</cite>, <cite>broadcast</cite> , 添加对 <cite>core.Tensor</cite> 数据通信支持</p></li>
+<li><p>解决随机数生成的bug。</p></li>
+<li><p>解决了 VQC的 <cite>RXX</cite>, <cite>RYY</cite>, <cite>RZZ</cite>, <cite>RZX</cite> 转换成originIR的错误。</p></li>
+</ul>
+</section>
+</section>
+<section id="v2-13-0-2024-07-30">
+<h2>[v2.13.0] - 2024-07-30<a class="headerlink" href="#v2-13-0-2024-07-30" title="Link to this heading">¶</a></h2>
+<section id="id7">
+<h3>Added<a class="headerlink" href="#id7" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>增加 <cite>no_grad</cite>, <cite>GroupNorm</cite>, <cite>Interpolate</cite>, <cite>contiguous</cite>, <cite>QuantumLayerV3</cite>, <cite>fuse_model</cite>, <cite>SDPA</cite>, <cite>quantum_fisher</cite> 接口。</p></li>
+<li><p>为解决量子机器学习过程中出现的过拟合问题添加量子Dropout样例.</p></li>
+</ul>
+</section>
+<section id="id8">
+<h3>Changed<a class="headerlink" href="#id8" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><cite>BatchNorm</cite>, <cite>LayerNorm</cite>, <cite>GroupNorm</cite> 增加affine接口。</p></li>
+<li><p><cite>diag</cite> 接口在2d输入时候现在返回对角线上的1d输出,与torch一致。</p></li>
+<li><p>slice,permute等操作会尝试使用view方式返回共享内存的QTensor。</p></li>
+<li><p>所有接口支持非contiguous的输入。</p></li>
+<li><p><cite>Adam</cite> 支持 weight_decay 参数。</p></li>
+</ul>
+</section>
+<section id="id9">
+<h3>Fixed<a class="headerlink" href="#id9" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>修改 VQC 部分逻辑门分解函数的错误。</p></li>
+<li><p>修复部分函数的内存泄露问题。</p></li>
+<li><p>修复 <cite>QuantumLayerMultiProcess</cite> 不支持GPU输入的问题。</p></li>
+<li><p>修改 <cite>Linear</cite> 的默认参数初始化话方式</p></li>
+</ul>
+</section>
+</section>
+<section id="v2-12-0-2024-05-01">
+<h2>[v2.12.0] - 2024-05-01<a class="headerlink" href="#v2-12-0-2024-05-01" title="Link to this heading">¶</a></h2>
+<section id="id10">
+<h3>Added<a class="headerlink" href="#id10" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>添加流水线并行PipelineParallelTrainingWrapper接口。</p></li>
+<li><p>添加 <cite>Gelu</cite>, <cite>DropPath</cite>, <cite>binomial</cite>, <cite>adamW</cite> 接口。</p></li>
+<li><p>添加 <cite>QuantumBatchAsyncQcloudLayer</cite> 支持pyqpanda的本地虚拟机模拟计算。</p></li>
+<li><p>添加 xtensor的 <cite>QuantumBatchAsyncQcloudLayer</cite> 支持pyqpanda的本地虚拟机模拟计算以及真机计算。</p></li>
+<li><p>使得QTensor 可以被deepcopy以及pickle。</p></li>
+<li><p>添加分布式计算启动命令 <cite>vqnetrun</cite>, 使用分布式计算接口时使用。</p></li>
+<li><p>添加ES梯度计算方法真机接口 <cite>QuantumBatchAsyncQcloudLayerES</cite> 支持pyqpanda的本地虚拟机模拟计算以及真机计算。</p></li>
+<li><p>添加在分布式计算中支持QTensor的数据通信接口 <cite>allreduce</cite>, <cite>reduce</cite>, <cite>broadcast</cite>, <cite>allgather</cite>, <cite>send</cite>, <cite>recv</cite> 等。</p></li>
+</ul>
+</section>
+<section id="id11">
+<h3>Changed<a class="headerlink" href="#id11" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>安装包新加入依赖 “Pillow”, “hjson”, linux系统下安装包添加新依赖 “psutil”。 “cloudpickle”。</p></li>
+<li><p>优化softmax以及tranpose在GPU下运行速度。</p></li>
+<li><p>使用cuda11.8编译。</p></li>
+<li><p>整合了基于cpu、gpu下的分布式计算接口。</p></li>
+</ul>
+</section>
+<section id="id12">
+<h3>Fixed<a class="headerlink" href="#id12" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>降低Linux-GPU版本启动时候的显存消耗。</p></li>
+<li><p>修复select以及power函数的内存泄露问题。</p></li>
+<li><p>删除了cpu、gpu下基于reduce方法的模型参数以及梯度更新方法 <cite>nccl_average_parameters_reduce</cite>, <cite>nccl_average_grad_reduce</cite>。</p></li>
+</ul>
+</section>
+</section>
+<section id="v2-11-0-2024-03-01">
+<h2>[v2.11.0] - 2024-03-01<a class="headerlink" href="#v2-11-0-2024-03-01" title="Link to this heading">¶</a></h2>
+<section id="id13">
+<h3>Added<a class="headerlink" href="#id13" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>添加新的 <cite>QNG</cite> (量子自然梯度)API 和演示。</p></li>
+<li><p>添加量子电路优化,例如 <cite>wrapper_single_qubit_op_fuse</cite> , <cite>wrapper_commute_controlled</cite> , <cite>wrapper_merge_rotations</cite> api 和 demo。</p></li>
+<li><p>添加 <cite>CY</cite>, <cite>SparseHamiltonian</cite> , <cite>HermitianExpval</cite> 。</p></li>
+<li><p>添加 <cite>is_csr</cite>、 <cite>is_dense</cite>、 <cite>dense_to_csr</cite> 、 <cite>csr_to_dense</cite> 。</p></li>
+<li><p>添加 <cite>QuantumBatchAsyncQcloudLayer</cite> 支持pyqpanda的QCloud真实芯片计算, <cite>expval_qcloud</cite>。</p></li>
+<li><p>添加基于NCCL的单节点下多GPU分布式计算数据并行模型训练的相关接口实现 <cite>nccl_average_parameters_allreduce</cite>, <cite>nccl_average_parameters_reduce</cite>, <cite>nccl_average_grad_allreduce</cite>, <cite>nccl_average_grad_reduce</cite> 以及控制NCCL初始化以及相关操作的类 <cite>NCCL_api</cite>。</p></li>
+<li><p>添加量子线路进化策略梯度计算方法 <cite>QuantumLayerES</cite> 接口。</p></li>
+</ul>
+</section>
+<section id="id14">
+<h3>Changed<a class="headerlink" href="#id14" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>将 <cite>VQC_CSWAP</cite> 电路重构为 <cite>CSWAP</cite>。</p></li>
+<li><p>删除旧的 QNG 文档。</p></li>
+<li><p>从 <cite>pyvqnet.qnn.vqc</cite> 中删除函数和类无用的 <cite>num_wires</cite> 参数。</p></li>
+<li><p>重构 <cite>MeasureAll</cite>, <cite>Probability</cite> api。</p></li>
+<li><p>为 <cite>QuantumMeasure</cite> 增加qtype参数。</p></li>
+</ul>
+</section>
+<section id="id15">
+<h3>Fixed<a class="headerlink" href="#id15" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>将 <cite>QuantumMeasure</cite> 的 slots 改为 shots。</p></li>
+</ul>
+</section>
+</section>
+<section id="v2-10-0-2023-12-30">
+<h2>[v2.10.0] - 2023-12-30<a class="headerlink" href="#v2-10-0-2023-12-30" title="Link to this heading">¶</a></h2>
+<section id="id16">
+<h3>Added<a class="headerlink" href="#id16" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>增加了pyvqnet.qnn.vqc下的新接口:IsingXX、IsingXY、IsingYY、IsingZZ、SDG、TDG、PhaseShift、MutliRZ、MultiCnot、MultixCnot、ControlledPhaseShift、SingleExcitation、DoubleExcitation、VQC_AllSinglesDoubles,ExpressiveEntanglingAnsatz等；</p></li>
+<li><p>支持adjoint梯度计算的pyvqnet.qnn.vqc.QuantumLayerAdjoint接口;</p></li>
+<li><p>支持originIR与VQC相互转换的功能;</p></li>
+<li><p>支持统计VQC模型中的经典和量子模块信息;</p></li>
+<li><p>增加量子经典神经网络混合模型下的两个案例: 基于小样本的量子卷积神经网络模型、用于手写数字识别的量子核函数模型;</p></li>
+<li><p>增加对arm芯片Mac的支持;</p></li>
+</ul>
+</section>
+</section>
+<section id="v2-9-0-2023-11-15">
+<h2>[v2.9.0] - 2023-11-15<a class="headerlink" href="#v2-9-0-2023-11-15" title="Link to this heading">¶</a></h2>
+<section id="id17">
+<h3>Added<a class="headerlink" href="#id17" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>增加了xtensor接口定义,支持经典神经网络模块自动并行和CPU/GPU多后端,包含对多维数组的常用数学,逻辑,矩阵计算,以及常见的经典神经网络层,优化器等150余个接口。</p></li>
+</ul>
+</section>
+<section id="id18">
+<h3>Changed<a class="headerlink" href="#id18" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>从本版本开始,版本号从2.0.8 升级为2.9.0。</p></li>
+<li><p>自本版本开始,软件包上传到 <a class="reference external" href="https://pypi.originqc.com.cn">https://pypi.originqc.com.cn</a>, 使用 <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">pyvqnet</span> <span class="pre">--index-url</span> <span class="pre">https://pypi.originqc.com.cn</span></code> 安装。</p></li>
+</ul>
+</section>
+</section>
+<section id="v2-0-8-2023-09-26">
+<h2>[v2.0.8] - 2023-09-26<a class="headerlink" href="#v2-0-8-2023-09-26" title="Link to this heading">¶</a></h2>
+<section id="id19">
+<h3>Added<a class="headerlink" href="#id19" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>增加了现有接口支持complex128、complex64、double、float、uint8、int8、bool、int16、int32、int64等类型计算。</p></li>
+<li><p>Linux版本支持gpu下的计算,需要cuda11.7版本cudatoolkit以及nvidia驱动。</p></li>
+<li><p>基于vqc的基础逻辑门: Hadamard、CNOT、I、RX、RY、PauliZ、PauliX、PauliY、S、RZ、RXX、RYY、RZZ、RZX、X1、Y1、Z1、U1、U2、U3、T、SWAP、P、TOFFOLI、CZ、CR。</p></li>
+<li><p>基于vqc的组合量子线路: VQC_HardwareEfficientAnsatz、VQC_BasicEntanglerTemplate、VQC_StronglyEntanglingTemplate、VQC_QuantumEmbedding、VQC_RotCircuit、VQC_CRotCircuit、VQC_CSWAPcircuit、VQC_Controlled_Hadamard、VQC_CCZ、VQC_FermionicSingleExcitation、VQC_FermionicDoubleExcitation、VQC_UCCSD、VQC_QuantumPoolingCircuit、VQC_BasisEmbedding、VQC_AngleEmbedding、VQC_AmplitudeEmbedding、VQC_IQPEmbedding。</p></li>
+<li><p>基于vqc的测量方法: VQC_Purity、VQC_VarMeasure、VQC_DensityMatrixFromQstate、Probability、MeasureAll。</p></li>
+</ul>
+</section>
+</section>
+<section id="v2-0-7-2023-07-03">
+<h2>[v2.0.7] - 2023-07-03<a class="headerlink" href="#v2-0-7-2023-07-03" title="Link to this heading">¶</a></h2>
+<section id="id20">
+<h3>Added<a class="headerlink" href="#id20" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>经典神经网络,增加kron,gather,scatter,broadcast_to接口。</p></li>
+<li><p>增加对不同数据精度支持: 数据类型dtype支持kbool,kuint8,kint8,kint16,kint32,kint64,kfloat32,kfloat64,kcomplex64,kcomplex128.分别代表C++的 bool,uint8_t,int8_t,int16_t,int32_t,int64_t,float,double,complex&lt;float&gt;,complex&lt;double&gt;.</p></li>
+<li><p>支持python 3.8,3.9,3.10三个版本。</p></li>
+</ul>
+</section>
+<section id="id21">
+<h3>Changed<a class="headerlink" href="#id21" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>QTensor 以及Module类的init函数增加 <cite>dtype</cite> 参数。对QTensor索引、 部分神经网络层的输入进行了类型限制。</p></li>
+<li><p>量子神经网络,由于MacOS兼容性问题,去掉了Mnist_Dataset,CIFAR10_Dataset接口。</p></li>
+</ul>
+</section>
+</section>
+<section id="v2-0-6-2023-02-22">
+<h2>[v2.0.6] - 2023-02-22<a class="headerlink" href="#v2-0-6-2023-02-22" title="Link to this heading">¶</a></h2>
+<section id="id22">
+<h3>Added<a class="headerlink" href="#id22" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>经典神经网络,增加接口: multinomial,pixel_shuffle,pixel_unshuffle,为QTensor增加numel,增加CPU动态内存池功能,为Parameter增加init_from_tensor接口。</p></li>
+<li><p>经典神经网络,增加接口: Dynamic_LSTM,Dynamic_RNN,Dynamic_GRU。</p></li>
+<li><p>经典神经网络,增加接口: pad_sequence,pad_packed_sequence,pack_pad_sequence。</p></li>
+<li><p>量子神经网络,增加接口: CCZ,Controlled_Hadamard,FermionicSingleExcitation,UCCSD,QuantumPoolingCircuit,</p></li>
+<li><p>量子神经网络,增加接口: Quantum_Embedding,Mnist_Dataset,CIFAR10_Dataset,grad,Purity。</p></li>
+<li><p>量子神经网络,增加示例: 基于梯度裁剪,quanvolution,量子线路表达力,贫瘠高原,量子强化学习QDRL。</p></li>
+</ul>
+</section>
+<section id="id23">
+<h3>Changed<a class="headerlink" href="#id23" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>API文档,重构内容结构,增加 <cite>量子机器学习研究</cite> 模块,将 <cite>VQNet2ONNX模块</cite> 改为 <cite>其他函数</cite> 。</p></li>
+</ul>
+</section>
+<section id="id24">
+<h3>Fixed<a class="headerlink" href="#id24" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>经典神经网络,解决相同随机种子跨平台产生不同正态分布的问题。</p></li>
+<li><p>量子神经网络,实现expval,ProbMeasure,QuantumMeasure 对QPanda GPU虚拟机的支持。</p></li>
+</ul>
+</section>
+</section>
+<section id="v2-0-5-2022-12-25">
+<h2>[v2.0.5] - 2022-12-25<a class="headerlink" href="#v2-0-5-2022-12-25" title="Link to this heading">¶</a></h2>
+<section id="id25">
+<h3>Added<a class="headerlink" href="#id25" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>经典神经网络,增加log_softmax实现,增加模型转ONNX的接口export_model函数。</p></li>
+<li><p>经典神经网络,支持当前已有的绝大多数经典神经网络模块转换为ONNX,详情参考API文档 “VQNet2ONNX模块”。</p></li>
+<li><p>量子神经网络,增加VarMeasure,MeasurePauliSum,Quantum_Embedding,SPSA等接口</p></li>
+<li><p>量子神经网络,增加LinearGNN,ConvGNN,ConvGNN,QMLP,量子自然梯度,量子随机parameter-shift算法,DoublySGD算法等。</p></li>
+</ul>
+</section>
+<section id="id26">
+<h3>Changed<a class="headerlink" href="#id26" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>经典神经网络,为BN1d,BN2d接口增加维度检查。</p></li>
+</ul>
+</section>
+<section id="id27">
+<h3>Fixed<a class="headerlink" href="#id27" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>解决maxpooling参数检查的bug。</p></li>
+<li><p>解决[::-1]的切片bug。</p></li>
+</ul>
+</section>
+</section>
+<section id="v2-0-4-2022-09-20">
+<h2>[v2.0.4] - 2022-09-20<a class="headerlink" href="#v2-0-4-2022-09-20" title="Link to this heading">¶</a></h2>
+<section id="id28">
+<h3>Added<a class="headerlink" href="#id28" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>经典神经网络,增加LayernormNd实现,支持多维数据layernorm计算。</p></li>
+<li><p>经典神经网络,增加CrossEntropyLoss以及NLL_Loss损失函数计算接口,支持1维~N维输入。</p></li>
+<li><p>量子神经网络,增加常用线路模板: HardwareEfficientAnsatz,StronglyEntanglingTemplate,BasicEntanglerTemplate。</p></li>
+<li><p>量子神经网络,增加计算量子比特子系统互信息的Mutal_info接口、Von Neumann 熵VB_Entropy、密度矩阵DensityMatrixFromQstate。</p></li>
+<li><p>量子神经网络,增加量子感知器算法例子QuantumNeuron,增加量子傅里叶级数算法例子。</p></li>
+<li><p>量子神经网络,增加支持多进程加速运行量子线路的接口QuantumLayerMultiProcess。</p></li>
+</ul>
+</section>
+<section id="id29">
+<h3>Changed<a class="headerlink" href="#id29" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>经典神经网络,支持组卷积参数group,空洞卷积dilation_rate,任意数值padding作为一维卷积Conv1d、二维卷积Conv2d、反卷积ConvT2d的参数。</p></li>
+<li><p>在相同维度的数据跳过广播操作,减少不必要运行逻辑。</p></li>
+</ul>
+</section>
+<section id="id30">
+<h3>Fixed<a class="headerlink" href="#id30" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>解决stack函数在部分参数下计算错误的问题。</p></li>
+</ul>
+</section>
+</section>
+<section id="v2-0-3-2022-07-15">
+<h2>[v2.0.3] - 2022-07-15<a class="headerlink" href="#v2-0-3-2022-07-15" title="Link to this heading">¶</a></h2>
+<section id="id31">
+<h3>Added<a class="headerlink" href="#id31" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>增加支持stack,双向的循环神经网络接口: RNN, LSTM, GRU</p></li>
+<li><p>增加常用计算性能指标的接口: MSE,RMSE, MAE, R_Square, precision_recall_f1_2_score, precision_recall_f1_Multi_scoreprecision_recall_f1_N_score, auc_calculate</p></li>
+<li><p>增加量子核SVM的算法示例</p></li>
+</ul>
+</section>
+<section id="id32">
+<h3>Changed<a class="headerlink" href="#id32" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>加快QTensor数据过多时候的print速度</p></li>
+<li><p>Windows和linux下使用openmp加速运算。</p></li>
+</ul>
+</section>
+<section id="id33">
+<h3>Fixed<a class="headerlink" href="#id33" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>解决部分python import方式无法导入的问题</p></li>
+<li><p>解决批归一化BN层重复计算的问题</p></li>
+<li><p>解决QTensor.reshape,transpose接口无法计算梯度的bug</p></li>
+<li><p>为tensor.power接口增加入参形状判断</p></li>
+</ul>
+</section>
+</section>
+<section id="v2-0-2-2022-05-15">
+<h2>[v2.0.2] - 2022-05-15<a class="headerlink" href="#v2-0-2-2022-05-15" title="Link to this heading">¶</a></h2>
+<section id="id34">
+<h3>Added<a class="headerlink" href="#id34" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>增加topK, argtoK</p></li>
+<li><p>增加cumsum</p></li>
+<li><p>增加masked_fill</p></li>
+<li><p>增加triu,tril</p></li>
+<li><p>增加QGAN生成随机分布的示例</p></li>
+</ul>
+</section>
+<section id="id35">
+<h3>Changed<a class="headerlink" href="#id35" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>支持高级切片索引和普通切片索引</p></li>
+<li><p>matmul支持3D,4D张量运算</p></li>
+<li><p>修改HardSigmoid函数实现</p></li>
+</ul>
+</section>
+<section id="id36">
+<h3>Fixed<a class="headerlink" href="#id36" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>解决卷积,批归一化,反卷积,池化层等层没有缓存内部变量,导致一次前传后多次反传时计算梯度的问题</p></li>
+<li><p>修正QLinear层的实现和示例</p></li>
+<li><p>解决MAC在conda环境中导入VQNet时候 Image not load的问题。</p></li>
+</ul>
+</section>
+</section>
+<section id="v2-0-1-2022-03-30">
+<h2>[v2.0.1] - 2022-03-30<a class="headerlink" href="#v2-0-1-2022-03-30" title="Link to this heading">¶</a></h2>
+<section id="id37">
+<h3>Added<a class="headerlink" href="#id37" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>增加基本数据结构QTensor接口100余个,包括创建函数,逻辑函数,数学函数,矩阵操作。</p></li>
+<li><p>增加基本神经网络网络函数14个,包括卷积,反卷积,池化等。</p></li>
+<li><p>增加损失函数4个,包括MSE,BCE,CCE,SCE等。</p></li>
+<li><p>增加激活函数10个,包括ReLu,Sigmoid,ELU等。</p></li>
+<li><p>增加优化器6个,包括SGD,RMSPROP,ADAM等。</p></li>
+<li><p>增加机器学习示例: QVC,QDRL,Q-KMEANS,QUnet,HQCNN,VSQL,量子自编码器。</p></li>
+<li><p>增加量子机器学习层: QuantumLayer,NoiseQuantumLayer。</p></li>
+</ul>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="FAQ.html" class="btn btn-neutral float-left" title="常见问题" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Original Quantum.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

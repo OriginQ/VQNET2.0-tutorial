@@ -1,0 +1,313 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VQNet &mdash; VQNET v2.15.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/documentation_options.js?v=a149e6fc"></script>
+      <script src="_static/doctools.js?v=9a2dae69"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="VQNet 安装步骤" href="rst/install.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="#" class="icon icon-home">
+            VQNET
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">安装介绍</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="rst/install.html">VQNet 安装步骤</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">上手实例</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="rst/vqc_demo.html">使用自动微分模拟的量子机器学习示例</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rst/qml_demo.html">使用pyQPanda2的量子机器学习示例</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">经典神经网络接口介绍</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="rst/QTensor.html">QTensor 模块</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rst/nn.html">经典神经网络模块</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rst/utils.html">实用函数</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">使用pyqpanda的量子神经网络接口</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="rst/qnn.html">使用pyQPanda2量子机器学习模块</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rst/qnn_pq3.html">使用pyQPanda3量子机器学习模块</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">量子神经网络自动微分模拟接口</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="rst/vqc.html">变分量子线路自动微分模拟</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">量子大模型微调</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="rst/llm.html">量子大模型微调示例</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">其他</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="rst/torch_api.html">VQNet使用torch进行底层计算</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rst/FAQ.html">常见问题</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rst/CHANGELOG.html">VQNet Changelog</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">VQNET</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="#" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">VQNet</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="vqnet">
+<h1>VQNet<a class="headerlink" href="#vqnet" title="Link to this heading">¶</a></h1>
+<p><strong>一种功能齐全,运行高效的量子软件开发工具包</strong></p>
+<p>VQNet是由本源量子开发的量子机器学习计算框架,它可以用于构建、运行和优化量子算法。
+本使用文档是VQNet的api以及示例文档。英文版本可见:  <a class="reference external" href="https://vqnet20-tutorial-en.readthedocs.io/en/latest/">VQNet API DOC.</a></p>
+<p><strong>什么是量子机器学习？</strong></p>
+<p>量子机器学习是一个探索量子计算和机器学习思想相互作用的研究领域。
+例如,我们可能想知道量子计算机是否可以加快训练或评估机器学习模型所需的时间。另一方面,我们可以利用机器学习技术来帮助我们发现量子纠错码、估计量子系统的特性或开发新的量子算法。</p>
+<p><strong>量子计算机作为人工智能加速器</strong></p>
+<p>机器可以学习的极限一直由我们运行算法的计算机硬件定义——例如,现代神经网络深度学习的成功是由并行 GPU 集群实现的。
+量子机器学习通过一种全新类型的计算设备——量子计算机,扩展了机器学习的硬件池。量子计算机的信息处理依赖于被称为量子理论的完全不同的物理定律。
+在现代观点中,量子计算机可以像神经网络一样使用和训练。我们可以系统地调整例如电磁场强度或激光脉冲频率这种物理参数来构建可变量子线路。
+使用这种可变量子线路电路将图像编码为设备的物理状态并进行测量,可用于对图像内容进行分类。</p>
+<p><strong>更大的视野: 可微分编程</strong></p>
+<p>但我们的目标不仅仅是使用量子计算机来解决机器学习问题。量子电路是可微的,量子计算机本身可以计算在给定任务中变得更好所需的控制参数的变化。
+可微分编程是深度学习的基础,可微分编程不仅仅是深度学习：它是一种编程范式,其中算法不是手工编码的,而是自动学习的。<cite>VQNet</cite> 同样基于可微分编程的思想实现。
+训练量子计算机的意义比量子机器学习更加深远。可训练的量子电路可用于其他领域,如量子化学或量子优化。它可以提升多种应用,例如量子算法的设计、量子纠错方案的发现以及物理系统的理解。</p>
+<p><strong>VQNet特点</strong></p>
+<ul class="simple">
+<li><p>统一性。支持混合量子和经典神经网络模型的训练,支持量子计算机与经典计算机等多种硬件上的模型运行。</p></li>
+<li><p>实用性。使用python作为前端语言,接口友好、支持自动微分。</p></li>
+<li><p>高效性。设计统一架构，使用本源量子的QPanda量子计算库，以及自带的经典计算层提高量子机器学习的效率。</p></li>
+<li><p>应用丰富。提供丰富量子机器学习示例快速上手。</p></li>
+</ul>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">安装介绍</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="rst/install.html">VQNet 安装步骤</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="rst/install.html#vqnet-python">VQNet python包安装</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/install.html#id1">VQNet 测试安装成功</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/install.html#vqnet-gpu">VQNet 测试GPU功能</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/install.html#id2">VQNet 的一个简单例子</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">上手实例</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="rst/vqc_demo.html">使用自动微分模拟的量子机器学习示例</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="rst/vqc_demo.html#id2">量子自然梯度接口示例</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/vqc_demo.html#id4">用于手写数字识别的量子核函数模型</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/vqc_demo.html#id5">基于小样本的量子卷积神经网络模型</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/vqc_demo.html#hqcnn">混合量子经典神经网络的HQCNN示例</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/vqc_demo.html#id6">量子重载入算法示例</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/vqc_demo.html#circuit-centric-quantum-classifiers">Circuit-centric quantum classifiers算法示例</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/vqc_demo.html#id8">量子经典迁移学习的示例</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/vqc_demo.html#variational-shadow-quantum-learning-for-classification">Variational Shadow Quantum Learning for Classification模型示例</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/vqc_demo.html#qmlp">QMLP模型示例</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/vqc_demo.html#id9">使用量子经典混合神经网络模型实现一种强化学习算法的示例</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/vqc_demo.html#gpu">使用量子变分线路在GPU上拟合一个傅里叶级数的示例</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/vqc_demo.html#id10">量子奇异值分解</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/vqc_demo.html#id11">变分量子线路的优化</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/vqc_demo.html#dropout">量子dropout实现</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="rst/qml_demo.html">使用pyQPanda2的量子机器学习示例</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="rst/qml_demo.html#id1">带参量子线路在分类任务的应用</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/qml_demo.html#id5">量子自编码器模型</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/qml_demo.html#id7">量子线路结构学习</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/qml_demo.html#id9">量子经典神经网络混合模型</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/qml_demo.html#id29">无监督学习</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/qml_demo.html#id39">量子机器学习研究</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/qml_demo.html#id48">在VQNet使用量子计算层进行模型训练</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">经典神经网络接口介绍</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="rst/QTensor.html">QTensor 模块</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="rst/QTensor.html#qtensor-s">QTensor’s 函数与属性</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/QTensor.html#id3">创建函数</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/QTensor.html#id5">数学函数</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/QTensor.html#id6">逻辑函数</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/QTensor.html#id7">变换函数</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/QTensor.html#id8">实用函数</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="rst/nn.html">经典神经网络模块</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="rst/nn.html#id2">基本例子</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/nn.html#module">Module类</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/nn.html#save-parameters">模型参数保存和载入</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/nn.html#modulelist">ModuleList</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/nn.html#parameterlist">ParameterList</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/nn.html#sequential">Sequential</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/nn.html#id6">经典神经网络层</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/nn.html#id7">损失函数层</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/nn.html#id8">激活函数</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/nn.html#id9">优化器模块</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/nn.html#id11">指标模块</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/nn.html#vqnet">VQNet原生分布式计算模块</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="rst/utils.html">实用函数</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="rst/utils.html#id2">随机种子生成</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/utils.html#vqnet2onnx">VQNet2ONNX模块</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">使用pyqpanda的量子神经网络接口</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="rst/qnn.html">使用pyQPanda2量子机器学习模块</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="rst/qnn.html#id1">量子计算层</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/qnn.html#id3">量子逻辑门</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/qnn.html#id6">基于pyqpanda2量子机器学习算法封装接口</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="rst/qnn_pq3.html">使用pyQPanda3量子机器学习模块</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="rst/qnn_pq3.html#id1">量子计算层</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/qnn_pq3.html#id2">量子逻辑门</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/qnn_pq3.html#id7">常用量子线路组合</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/qnn_pq3.html#id8">对量子线路进行测量</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">量子神经网络自动微分模拟接口</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="rst/vqc.html">变分量子线路自动微分模拟</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="rst/vqc.html#id2">模拟器</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/vqc.html#id3">量子逻辑门接口</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/vqc.html#id42">测量接口</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/vqc.html#id43">常用量子变分线路模板</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/vqc.html#id45">量子机器学习模型接口</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/vqc.html#id46">其他函数</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">量子大模型微调</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="rst/llm.html">量子大模型微调示例</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="rst/llm.html#id2">量子大模型微调依赖包安装</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/llm.html#id3">量子大模型微调训练步骤</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/llm.html#id4">更多相关参数具体介绍</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">其他</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="rst/torch_api.html">VQNet使用torch进行底层计算</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="rst/torch_api.html#id1">计算后端基本设置</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/torch_api.html#qtensor">QTensor函数</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/torch_api.html#id2">经典神经网络类以及变分量子神经网络模块</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/torch_api.html#pyqpanda2">pyqpanda2量子变分线路训练函数</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/torch_api.html#id9">基于自动微分的变分量子线路模块和接口</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/torch_api.html#id15">分布式接口</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="rst/FAQ.html">常见问题</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rst/CHANGELOG.html">VQNet Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="rst/CHANGELOG.html#v2-16-0-2025-1-15">[v2.16.0] - 2025-1-15</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/CHANGELOG.html#v2-15-0-2024-11-19">[v2.15.0] - 2024-11-19</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/CHANGELOG.html#v2-14-0-2024-09-30">[v2.14.0] - 2024-09-30</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/CHANGELOG.html#v2-13-0-2024-07-30">[v2.13.0] - 2024-07-30</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/CHANGELOG.html#v2-12-0-2024-05-01">[v2.12.0] - 2024-05-01</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/CHANGELOG.html#v2-11-0-2024-03-01">[v2.11.0] - 2024-03-01</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/CHANGELOG.html#v2-10-0-2023-12-30">[v2.10.0] - 2023-12-30</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/CHANGELOG.html#v2-9-0-2023-11-15">[v2.9.0] - 2023-11-15</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/CHANGELOG.html#v2-0-8-2023-09-26">[v2.0.8] - 2023-09-26</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/CHANGELOG.html#v2-0-7-2023-07-03">[v2.0.7] - 2023-07-03</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/CHANGELOG.html#v2-0-6-2023-02-22">[v2.0.6] - 2023-02-22</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/CHANGELOG.html#v2-0-5-2022-12-25">[v2.0.5] - 2022-12-25</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/CHANGELOG.html#v2-0-4-2022-09-20">[v2.0.4] - 2022-09-20</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/CHANGELOG.html#v2-0-3-2022-07-15">[v2.0.3] - 2022-07-15</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/CHANGELOG.html#v2-0-2-2022-05-15">[v2.0.2] - 2022-05-15</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rst/CHANGELOG.html#v2-0-1-2022-03-30">[v2.0.1] - 2022-03-30</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="rst/install.html" class="btn btn-neutral float-right" title="VQNet 安装步骤" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Original Quantum.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

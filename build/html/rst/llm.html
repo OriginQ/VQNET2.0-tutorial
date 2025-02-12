@@ -1,0 +1,382 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>量子大模型微调示例 &mdash; VQNET v2.15.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/documentation_options.js?v=a149e6fc"></script>
+      <script src="../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="VQNet使用torch进行底层计算" href="torch_api.html" />
+    <link rel="prev" title="变分量子线路自动微分模拟" href="vqc.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            VQNET
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">安装介绍</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="install.html">VQNet 安装步骤</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">上手实例</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="vqc_demo.html">使用自动微分模拟的量子机器学习示例</a></li>
+<li class="toctree-l1"><a class="reference internal" href="qml_demo.html">使用pyQPanda2的量子机器学习示例</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">经典神经网络接口介绍</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="QTensor.html">QTensor 模块</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nn.html">经典神经网络模块</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">实用函数</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">使用pyqpanda的量子神经网络接口</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="qnn.html">使用pyQPanda2量子机器学习模块</a></li>
+<li class="toctree-l1"><a class="reference internal" href="qnn_pq3.html">使用pyQPanda3量子机器学习模块</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">量子神经网络自动微分模拟接口</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="vqc.html">变分量子线路自动微分模拟</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">量子大模型微调</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">量子大模型微调示例</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#id2">量子大模型微调依赖包安装</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id3">量子大模型微调训练步骤</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id4">更多相关参数具体介绍</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">其他</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="torch_api.html">VQNet使用torch进行底层计算</a></li>
+<li class="toctree-l1"><a class="reference internal" href="FAQ.html">常见问题</a></li>
+<li class="toctree-l1"><a class="reference internal" href="CHANGELOG.html">VQNet Changelog</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">VQNET</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">量子大模型微调示例</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/rst/llm.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="id1">
+<h1>量子大模型微调示例<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h1>
+<p>近些年随着大模型的普及,以及大模型规模的逐渐增加,导致训练大规模的量子机器学习模型会导致训练成本显著增加,为了减少大模型在微调过程中所需要的训练资源,
+一些大模型微调方法被提出,不再对大模型全参数进行微调,而是通过提出的微调方法对少量的参数进行训练,从而使大模型在下游任务中依旧能取得不弱于全参数微调的效果,
+而基于量子线路来进行微调的方式尚未得到普及。</p>
+<p><code class="docutils literal notranslate"><span class="pre">VQNet</span></code> 通过与 <code class="docutils literal notranslate"><span class="pre">Llama</span> <span class="pre">factory</span></code>, <code class="docutils literal notranslate"><span class="pre">peft</span></code> 结合, 实现基于量子线路来进行大模型微调任务。</p>
+<section id="id2">
+<h2>量子大模型微调依赖包安装<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h2>
+<p>该模块介绍在使用量子线路用于大模型微调中, 如何去对所需依赖包进行安装。</p>
+<p>使用量子大模型微调, 主要需要 <code class="docutils literal notranslate"><span class="pre">quantum-llm</span></code> 和 <code class="docutils literal notranslate"><span class="pre">pyvqnet</span></code> 两个包即可, 其中 <code class="docutils literal notranslate"><span class="pre">quantum-llm</span></code> 目前是内部文件, <code class="docutils literal notranslate"><span class="pre">pyvqnet</span></code> 版本要求 <code class="docutils literal notranslate"><span class="pre">2.15.0</span></code> 或者以上即可。</p>
+<p>首先介绍 <code class="docutils literal notranslate"><span class="pre">quantum-llm</span></code> 库的安装</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">gitee</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">craftsman_lei</span><span class="o">/</span><span class="n">quantum</span><span class="o">-</span><span class="n">llm</span><span class="o">.</span><span class="n">git</span>
+</pre></div>
+</div>
+<p>随后根据 <code class="docutils literal notranslate"><span class="pre">quantum-llm</span></code> 中 <code class="docutils literal notranslate"><span class="pre">README.md</span></code> 文档中内容完成其他依赖库以及文件安装</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># 下载其他依赖库</span>
+<span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">r</span> <span class="n">requirements</span><span class="o">.</span><span class="n">txt</span>
+
+<span class="c1"># 安装peft_vqc</span>
+<span class="n">cd</span> <span class="n">peft_vqc</span> <span class="o">&amp;&amp;</span> <span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">e</span> <span class="o">.</span>
+</pre></div>
+</div>
+<p>完成 <code class="docutils literal notranslate"><span class="pre">quantum-llm</span></code> 库以及依赖库安装后,则对 <code class="docutils literal notranslate"><span class="pre">pyvqnet</span></code> 进行安装</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># 安装VQNet</span>
+<span class="n">pip</span> <span class="n">install</span> <span class="n">pyvqnet</span> <span class="c1"># pyvqnet&gt;=2.15.0</span>
+</pre></div>
+</div>
+</section>
+<section id="id3">
+<h2>量子大模型微调训练步骤<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h2>
+<p>完成需求包安装后, 可以参考文件目录 <code class="docutils literal notranslate"><span class="pre">/quantum-llm/examples/qlora_single_gpu/</span></code> 下 <code class="docutils literal notranslate"><span class="pre">train.sh</span></code> 等脚本, 根据脚本指定训练基准模型,微调模块选择,微调模块输出路径等参数.</p>
+<p>下载 Qwen2.5-0.5B 模型可在网址 <a class="reference external" href="https://huggingface.co/Qwen/Qwen2.5-0.5B?clone=true">https://huggingface.co/Qwen/Qwen2.5-0.5B?clone=true</a> 上下载, 其他模型一样, 若无法下载,则可以针对网址上文件单一进行下载后使用:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># 下载Qwen2.5-0.5B</span>
+<span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">huggingface</span><span class="o">.</span><span class="n">co</span><span class="o">/</span><span class="n">Qwen</span><span class="o">/</span><span class="n">Qwen2</span><span class="mf">.5</span><span class="o">-</span><span class="mf">0.5</span><span class="n">B</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">train.sh</span></code> 脚本样例如下,确定基准模型、数据集、输出的路径等参数信息, 其中 <code class="docutils literal notranslate"><span class="pre">model_name_or_path</span></code> 放入指定模型,如果不能访问,则自行下载基准模型后,放入基准模型的绝对路径。</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code class="docutils literal notranslate"><span class="pre">train.sh</span></code> <code class="docutils literal notranslate"><span class="pre">eval.sh</span></code> <code class="docutils literal notranslate"><span class="pre">cli.sh</span></code> 等脚本文件均在 <code class="docutils literal notranslate"><span class="pre">/quantum-llm/examples/qlora_single_gpu/</span></code> 目录下执行</p>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
+
+<span class="n">CUDA_VISIBLE_DEVICES</span><span class="o">=</span><span class="mi">1</span> <span class="n">python</span> <span class="o">../../</span><span class="n">src</span><span class="o">/</span><span class="n">train_bash</span><span class="o">.</span><span class="n">py</span> \
+    <span class="o">--</span><span class="n">stage</span> <span class="n">sft</span> \
+    <span class="o">--</span><span class="n">model_name_or_path</span> <span class="o">/</span><span class="n">下载路径</span><span class="o">/</span><span class="n">Qwen2</span><span class="mf">.5</span><span class="o">-</span><span class="mf">0.5</span><span class="n">B</span><span class="o">/</span> \
+    <span class="o">--</span><span class="n">dataset</span> <span class="n">alpaca_gpt4_en</span> \
+    <span class="o">--</span><span class="n">tokenized_path</span> <span class="o">../../</span><span class="n">data</span><span class="o">/</span><span class="n">tokenized</span><span class="o">/</span><span class="n">alpaca_gpt4_en</span><span class="o">/</span> \
+    <span class="o">--</span><span class="n">dataset_dir</span> <span class="o">../../</span><span class="n">data</span> \
+    <span class="o">--</span><span class="n">template</span> <span class="n">qwen</span> \
+    <span class="o">--</span><span class="n">finetuning_type</span> <span class="n">vqc</span> \
+    <span class="o">--</span><span class="n">lora_target</span> <span class="n">q_proj</span><span class="p">,</span><span class="n">v_proj</span> \
+    <span class="o">--</span><span class="n">output_dir</span> <span class="o">../../</span><span class="n">saves</span><span class="o">/</span><span class="n">Qwen2</span><span class="mf">.5</span><span class="o">-</span><span class="mf">0.5</span><span class="n">B</span><span class="o">/</span><span class="n">vqc</span><span class="o">/</span><span class="n">alpaca_gpt4_en</span> \
+    <span class="o">--</span><span class="n">overwrite_cache</span> \
+    <span class="o">--</span><span class="n">overwrite_output_dir</span> \
+    <span class="o">--</span><span class="n">cutoff_len</span> <span class="mi">1024</span> \
+    <span class="o">--</span><span class="n">preprocessing_num_workers</span> <span class="mi">16</span> \
+    <span class="o">--</span><span class="n">per_device_train_batch_size</span> <span class="mi">1</span> \
+    <span class="o">--</span><span class="n">per_device_eval_batch_size</span> <span class="mi">1</span> \
+    <span class="o">--</span><span class="n">gradient_accumulation_steps</span> <span class="mi">8</span> \
+    <span class="o">--</span><span class="n">lr_scheduler_type</span> <span class="n">cosine</span> \
+    <span class="o">--</span><span class="n">logging_steps</span> <span class="mi">10</span> \
+    <span class="o">--</span><span class="n">warmup_steps</span> <span class="mi">20</span> \
+    <span class="o">--</span><span class="n">save_steps</span> <span class="mi">100</span> \
+    <span class="o">--</span><span class="n">eval_steps</span> <span class="mi">100</span> \
+    <span class="o">--</span><span class="n">evaluation_strategy</span> <span class="n">steps</span> \
+    <span class="o">--</span><span class="n">load_best_model_at_end</span> \
+    <span class="o">--</span><span class="n">learning_rate</span> <span class="mf">5e-5</span> \
+    <span class="o">--</span><span class="n">num_train_epochs</span> <span class="mf">3.0</span> \
+    <span class="o">--</span><span class="n">max_samples</span> <span class="mi">1000</span> \
+    <span class="o">--</span><span class="n">val_size</span> <span class="mf">0.1</span> \
+    <span class="o">--</span><span class="n">plot_loss</span> \
+    <span class="o">--</span><span class="n">fp16</span> \
+    <span class="o">--</span><span class="n">do</span><span class="o">-</span><span class="n">train</span> \
+
+<span class="c1"># 在命令行执行</span>
+<span class="n">sh</span> <span class="n">train</span><span class="o">.</span><span class="n">sh</span>
+</pre></div>
+</div>
+<p>在量子大模型微调模块中, 相较经典的大模型微调模块, 添加了三种额外的微调方式, 分别为：</p>
+<p><code class="docutils literal notranslate"><span class="pre">vqc</span></code> : 基于VQNet实现的vqc微调模块</p>
+<p><code class="docutils literal notranslate"><span class="pre">quanTA</span></code> : 量子张量分解模块</p>
+<p><code class="docutils literal notranslate"><span class="pre">tq</span></code> : 基于torch quantum实现的vqc模块</p>
+<p>上述的 <code class="docutils literal notranslate"><span class="pre">train.sh</span></code> 样例中是 <code class="docutils literal notranslate"><span class="pre">vqc</span></code> 模块微调的脚本样例, 若使用另外两种微调模块则将 <code class="docutils literal notranslate"><span class="pre">finetuning_type</span></code> 改为 <code class="docutils literal notranslate"><span class="pre">quanTA</span></code> , <code class="docutils literal notranslate"><span class="pre">tq</span></code> 即可,将三个模块实验结果记录并绘图, 结果如下:</p>
+<a class="reference internal image-reference" href="../_images/peft1.png"><img alt="../_images/peft1.png" class="align-center" src="../_images/peft1.png" style="width: 600px;" />
+</a>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>上图则是基于 <code class="docutils literal notranslate"><span class="pre">Qwen2.5-0.5B</span></code> 基准模型在数据集 <code class="docutils literal notranslate"><span class="pre">alpaca_gpt4_en</span></code> 下的训练结果, 其中, 可以观察到, 基于VQNet的 <code class="docutils literal notranslate"><span class="pre">vqc</span></code> 模块取得了最好的损失收敛效果,以此证明了基于量子线路来做大模型微调任务的有效性。</p>
+<p>通过 <code class="docutils literal notranslate"><span class="pre">train.sh</span></code> 训练脚本,可以将微调训练后的模块参数通过 <code class="docutils literal notranslate"><span class="pre">--output_dir</span></code> 参数保存到指定目录下,
+随后通过同样目录 <code class="docutils literal notranslate"><span class="pre">/quantum-llm/examples/qlora_single_gpu/</span></code>  下的 <code class="docutils literal notranslate"><span class="pre">eval.sh</span></code> 脚本进行评估, 脚本内容如下:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
+
+<span class="n">CUDA_VISIBLE_DEVICES</span><span class="o">=</span><span class="mi">1</span> <span class="n">python</span> <span class="o">../../</span><span class="n">src</span><span class="o">/</span><span class="n">evaluate</span><span class="o">.</span><span class="n">py</span> \
+    <span class="o">--</span><span class="n">model_name_or_path</span> <span class="o">/</span><span class="n">下载路径</span><span class="o">/</span><span class="n">Qwen2</span><span class="mf">.5</span><span class="o">-</span><span class="mf">0.5</span><span class="n">B</span><span class="o">/</span> \
+    <span class="o">--</span><span class="n">template</span> <span class="n">qwen</span> \
+    <span class="o">--</span><span class="n">finetuning_type</span> <span class="n">vqc</span> \
+    <span class="o">--</span><span class="n">task</span> <span class="n">cmmlu</span> \
+    <span class="o">--</span><span class="n">task_dir</span> <span class="o">../../</span><span class="n">evaluation</span><span class="o">/</span> \
+    <span class="o">--</span><span class="n">adapter_name_or_path</span> <span class="o">../../</span><span class="n">saves</span><span class="o">/</span><span class="n">Qwen2</span><span class="mf">.5</span><span class="o">-</span><span class="mf">0.5</span><span class="n">B</span><span class="o">/</span><span class="n">vqc</span><span class="o">/</span><span class="n">alpaca_gpt4_en</span> \
+
+<span class="c1"># 在命令行执行</span>
+<span class="n">sh</span> <span class="nb">eval</span><span class="o">.</span><span class="n">sh</span>
+</pre></div>
+</div>
+<p>通过 <code class="docutils literal notranslate"><span class="pre">--model_name_or_path</span></code> 指定基准模型路径, 以及根据 <code class="docutils literal notranslate"><span class="pre">--adapter_name_or_path</span></code> 加载已经训练好的模块来在相关任务上进行评估, <code class="docutils literal notranslate"><span class="pre">--task</span></code> 参数可取 <code class="docutils literal notranslate"><span class="pre">cmmlu</span></code> <code class="docutils literal notranslate"><span class="pre">ceval</span></code> <code class="docutils literal notranslate"><span class="pre">mmlu</span></code> 进行评估。</p>
+<p>随后通过调用 <code class="docutils literal notranslate"><span class="pre">cli_demo.py</span></code> 文件来进行问答,同样根据当前目录下的 <code class="docutils literal notranslate"><span class="pre">cli.sh</span></code> 脚本执行,脚本内容如下:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
+
+<span class="n">CUDA_VISIBLE_DEVICES</span><span class="o">=</span><span class="mi">1</span> <span class="n">python</span> <span class="o">../../</span><span class="n">src</span><span class="o">/</span><span class="n">cli_demo</span><span class="o">.</span><span class="n">py</span>  \
+    <span class="o">--</span><span class="n">model_name_or_path</span> <span class="o">/</span><span class="n">下载路径</span><span class="o">/</span><span class="n">Qwen2</span><span class="mf">.5</span><span class="o">-</span><span class="mf">0.5</span><span class="n">B</span><span class="o">/</span> \
+    <span class="o">--</span><span class="n">template</span> <span class="n">qwen</span> \
+    <span class="o">--</span><span class="n">finetuning_type</span> <span class="n">vqc</span> \
+    <span class="o">--</span><span class="n">adapter_name_or_path</span> <span class="o">../../</span><span class="n">saves</span><span class="o">/</span><span class="n">Qwen2</span><span class="mf">.5</span><span class="o">-</span><span class="mf">0.5</span><span class="n">B</span><span class="o">/</span><span class="n">vqc</span><span class="o">/</span><span class="n">alpaca_gpt4_en</span> \
+    <span class="o">--</span><span class="n">max_new_tokens</span> <span class="mi">1024</span>
+
+
+<span class="c1"># 在命令行执行</span>
+<span class="n">sh</span> <span class="n">cli</span><span class="o">.</span><span class="n">sh</span>
+</pre></div>
+</div>
+</section>
+<section id="id4">
+<h2>更多相关参数具体介绍<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h2>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head" colspan="2"><p>微调模块参数介绍</p></th>
+</tr>
+<tr class="row-even"><th class="head"><p>参数名</p></th>
+<th class="head"><p>详细介绍</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-odd"><td><p>stage</p></td>
+<td><p>确定大模型训练模式, pt为预训练, sft为微调阶段, 实验为sft.</p></td>
+</tr>
+<tr class="row-even"><td><p>model_name_or_path</p></td>
+<td><p>选择基准模型的路径.</p></td>
+</tr>
+<tr class="row-odd"><td><p>dataset</p></td>
+<td><p>选择数据集, 如identity, alpaca_gpt4_zh等.</p></td>
+</tr>
+<tr class="row-even"><td><p>tokenized_path</p></td>
+<td><p>选择数据集tokenized路径.</p></td>
+</tr>
+<tr class="row-odd"><td><p>dataset_dir</p></td>
+<td><p>选择数据集路径.</p></td>
+</tr>
+<tr class="row-even"><td><p>template</p></td>
+<td><p>模型模板类型, 如llama3等.</p></td>
+</tr>
+<tr class="row-odd"><td><p>finetuning_type</p></td>
+<td><p>指定微调方法, 如lora, tq, vqc, quanTA.</p></td>
+</tr>
+<tr class="row-even"><td><p>lora_target</p></td>
+<td><p>作用模块为q_proj,v_proj</p></td>
+</tr>
+<tr class="row-odd"><td><p>output_dir</p></td>
+<td><p>微调模块保存路径</p></td>
+</tr>
+<tr class="row-even"><td><p>overwrite_cache</p></td>
+<td><p>是否覆盖缓存的训练集和评估集</p></td>
+</tr>
+<tr class="row-odd"><td><p>overwrite_output_dir</p></td>
+<td><p>是否覆盖输出目录中已存在的文件</p></td>
+</tr>
+<tr class="row-even"><td><p>cutoff_len</p></td>
+<td><p>指定处理数据时的截断长度</p></td>
+</tr>
+<tr class="row-odd"><td><p>preprocessing_num_workers</p></td>
+<td><p>指定预处理数据时使用的工作进程数量</p></td>
+</tr>
+<tr class="row-even"><td><p>per_device_train_batch_size</p></td>
+<td><p>每个gpu的批处理大小, 训练参数</p></td>
+</tr>
+<tr class="row-odd"><td><p>per_device_eval_batch_size</p></td>
+<td><p>评估时批次,训练参数</p></td>
+</tr>
+<tr class="row-even"><td><p>gradient_accumulation_steps</p></td>
+<td><p>梯度累计的步数,训练参数</p></td>
+</tr>
+<tr class="row-odd"><td><p>lr_scheduler_type</p></td>
+<td><p>学习率调度器,训练参数</p></td>
+</tr>
+<tr class="row-even"><td><p>logging_steps</p></td>
+<td><p>打印间隔</p></td>
+</tr>
+<tr class="row-odd"><td><p>warmup_steps</p></td>
+<td><p>预热步数</p></td>
+</tr>
+<tr class="row-even"><td><p>save_steps</p></td>
+<td><p>模型保存间隔</p></td>
+</tr>
+<tr class="row-odd"><td><p>eval_steps</p></td>
+<td><p>评估保存间隔</p></td>
+</tr>
+<tr class="row-even"><td><p>evaluation_strategy</p></td>
+<td><p>评估策略,这里设置为按步骤评估</p></td>
+</tr>
+<tr class="row-odd"><td><p>load_best_model_at_end</p></td>
+<td><p>训练结束时加载表现最好的模型</p></td>
+</tr>
+<tr class="row-even"><td><p>learning_rate</p></td>
+<td><p>学习率,训练参数</p></td>
+</tr>
+<tr class="row-odd"><td><p>num_train_epochs</p></td>
+<td><p>需要执行的训练轮数,训练参数</p></td>
+</tr>
+<tr class="row-even"><td><p>max_samples</p></td>
+<td><p>训练最大样本数</p></td>
+</tr>
+<tr class="row-odd"><td><p>val_size</p></td>
+<td><p>验证集大小</p></td>
+</tr>
+<tr class="row-even"><td><p>plot_loss</p></td>
+<td><p>是否保存训练损失曲线</p></td>
+</tr>
+<tr class="row-odd"><td><p>fp16</p></td>
+<td><p>是否使用fp16混合精度训练, 在vqc模块使用float32</p></td>
+</tr>
+<tr class="row-even"><td><p>do-train</p></td>
+<td><p>是否指定是训练任务</p></td>
+</tr>
+<tr class="row-odd"><td><p>adapter_name_or_path</p></td>
+<td><p>选择训练结束后生成文件路径</p></td>
+</tr>
+<tr class="row-even"><td><p>task</p></td>
+<td><p>选择任务, 目前支持ceval, cmmlu, mmlu</p></td>
+</tr>
+<tr class="row-odd"><td><p>task_dir</p></td>
+<td><p>指定任务路径</p></td>
+</tr>
+<tr class="row-even"><td><p>q_d</p></td>
+<td><p>指定quanTA模块的张量分解数量, 默认为4</p></td>
+</tr>
+<tr class="row-odd"><td><p>per_dim_features</p></td>
+<td><p>指定quanTA模块的张量分解特征数, 默认为[16,8,4,2]</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="vqc.html" class="btn btn-neutral float-left" title="变分量子线路自动微分模拟" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="torch_api.html" class="btn btn-neutral float-right" title="VQNet使用torch进行底层计算" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Original Quantum.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
