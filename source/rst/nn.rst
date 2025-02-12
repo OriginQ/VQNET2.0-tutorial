@@ -4259,7 +4259,7 @@ PipelineParallelTrainingWrapper
 
         from pyvqnet.tensor import tensor
         from pyvqnet.distributed.pp import PipelineParallelTrainingWrapper
-        from pyvqnet.distributed.pp import comm as dist
+        from pyvqnet.distributed.configs import comm as dist
         from pyvqnet.distributed import *
 
 
@@ -4334,6 +4334,7 @@ PipelineParallelTrainingWrapper
             "backend":'nccl',  
             "train_batch_size" : 64,
             "train_micro_batch_size_per_gpu" : 32,
+            "epochs":5,
         "optimizer": {
             "type": "Adam",
             "params": {
@@ -4347,7 +4348,12 @@ PipelineParallelTrainingWrapper
             trainset = cifar_trainset_vqnet(args["local_rank"])
             w = PipelineParallelTrainingWrapper(args,join_layers(Model()),trainset)
 
-            w.train_batch()
+            all_loss = {}
+
+            for i in range(args["epochs"]):
+                w.train_batch()
+                
+            all_loss = w.loss_dict
 
 
 ZeroModelInitial
