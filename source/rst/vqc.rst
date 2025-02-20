@@ -4639,7 +4639,7 @@ QRNN
 TTOLayer
 ----------------------------------------------------------------
 
-.. py:class:: pyvqnet.qnn.ttolayer.TTOLayer(inp_modes,out_modes,mat_ranks,cores_initializer=nn.init.xavier_uniform_,cores_regularizer=None,biases_initializer=torch.zeros,biases_regularizer=None,trainable=True,cpu_variables=False,scope=None)
+.. py:class:: pyvqnet.qnn.ttolayer.TTOLayer(inp_modes,out_modes,mat_ranks,biases_initializer=tensor.zeros)
 
 
     基于《Compressing deep neural networks by matrix product operators》（https://arxiv.org/abs/1904.06194）实现的TTOLayer对输入张量进行分解，从而实现对高维数据的高效表示。该层允许在秩约束条件下学习张量分解，相比于传统的全连接层，能够降低计算复杂度和内存使用。
@@ -4648,21 +4648,13 @@ TTOLayer
     :param inp_modes: 输入张量的维度。
     :param out_modes: 输出张量的维度。
     :param mat_ranks: 张量分解中张量核（分解秩）的秩。
-    :param cores_initializer: 张量核的初始化函数。
-    :param cores_regularizer: 默认为None,张量核的正则化函数。
     :param biases_initializer: 偏置的初始化函数。
-    :param biases_regularizer: 默认为None,偏置的正则化函数。
-    :param trainable: 默认为True,指示参数（张量核和偏置）是否可训练。
-    :param cpu_variables: 默认为False,指示变量（张量核和偏置）是否应存储在CPU上而不是GPU上。如果使用CPU存储，则设置为True。
-    :param scope: 默认为None,个可选的层范围或名称，用于模型组织或在处理大型模型时进行跟踪。
-
 
     Example::
 
-        import torch
-        from pyvqnet.qnn.ttolayer import TTOLayer
+        from pyvqnet.tensor import tensor
         import numpy as np
-
+        from pyvqnet.dtype import kfloat32
         inp_modes = [4, 5]
         out_modes = [4, 5]
         mat_ranks = [1, 3, 1]
@@ -4671,33 +4663,17 @@ TTOLayer
         batch_size = 2
         len = 4
         embed_size = 5
-        inp = torch.randn(batch_size, len, embed_size)
+        inp = tensor.QTensor(np.random.randn(batch_size, len, embed_size), dtype=kfloat32)
 
         output = tto_layer(inp)
 
         print("Input shape:", inp.shape)
         print("Output shape:", output.shape)
 
-        target = torch.randn_like(output)
-
-        loss_fn = torch.nn.MSELoss()
-        loss = loss_fn(output, target)
-
-        print("Loss:", loss.item())
-
-        loss.backward()
-
-        for name, param in tto_layer.named_parameters():
-            if param.grad is not None:
-                print(f"Gradient for {name}: {param.grad}")
-            else:
-                print(f"No gradient for {name}")
 
 
 
-
-
-    
+ 
 其他函数
 =====================
 

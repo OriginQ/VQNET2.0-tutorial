@@ -4415,7 +4415,7 @@ QGRU
 
 .. py:class:: pyvqnet.qnn.qgru.QGRU(para_num, num_of_qubits,input_size,hidden_size,batch_first=True)
 
-    量子版的GRU（门控循环单元），通过利用量子电路来进行状态更新和记忆保持。
+    基于量子量子变分线路实现的GRU（门控循环单元），通过利用量子电路来进行状态更新和记忆保持。
 
     :param para_num: 量子电路中的参数数量。
     :param num_of_qubits: 量子比特的数量。
@@ -4527,7 +4527,7 @@ QMLPModel
 .. py:class:: pyvqnet.qnn.qmlp.qmlp.QMLPModel(input_channels: int,output_channels: int,num_qubits: int, kernel: _size_type,stride: _size_type,padding: _padding_type = "valid",weight_initializer: Union[Callable, None] = None,bias_initializer: Union[Callable, None] = None,use_bias: bool = True,dtype: Union[int, None] = None)
 
 
-    《QMLP: An Error-Tolerant Nonlinear Quantum MLP Architecture using Parameterized Two-Qubit Gates》是一种量子启发式神经网络，QMLPModel将量子电路与经典神经网络操作（如池化和全连接层）相结合。它旨在处理量子数据，并通过量子操作和经典层提取相关特征。
+    QMLPModel是基于《QMLP: An Error-Tolerant Nonlinear Quantum MLP Architecture using Parameterized Two-Qubit Gates》（https://arxiv.org/abs/2206.01345）实现的量子启发式神经网络，QMLPModel将量子电路与经典神经网络操作（如池化和全连接层）相结合。它旨在处理量子数据，并通过量子操作和经典层提取相关特征。
 
     :param input_channels: 输入特征的数量。
     :param output_channels: 输出特征的数量。
