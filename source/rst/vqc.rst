@@ -4386,7 +4386,7 @@ QDRL
     Example::
 
         import numpy as np
-        from pyvqnet.dtype import kcomplex64
+        from pyvqnet.dtype import kfloat32
         from pyvqnet.qnn.qdrl_vqc import QDRL
         import pyvqnet.tensor as tensor
 
@@ -4398,7 +4398,7 @@ QDRL
 
         # Create an example input (assume the input is a (batch_size, 3) shaped data)
         # Suppose we have a batch_size of 4 and each input has 3 features
-        x_input = tensor.QTensor(np.random.randn(4, 3), dtype=kcomplex64)
+        x_input = tensor.QTensor(np.random.randn(4, 3), dtype=kfloat32)
 
         # Pass the input through the model
         output = model(x_input)
@@ -4654,7 +4654,9 @@ TTOLayer
 
         from pyvqnet.tensor import tensor
         import numpy as np
+        from pyvqnet.qnn.ttolayer import TTOLayer
         from pyvqnet.dtype import kfloat32
+
         inp_modes = [4, 5]
         out_modes = [4, 5]
         mat_ranks = [1, 3, 1]
