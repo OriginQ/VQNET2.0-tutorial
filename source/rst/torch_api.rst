@@ -4644,7 +4644,7 @@ VQC_QuantumEmbedding
 """"""""""""""""""""""""""""""""""""""""
 
 
-.. py:class:: pyvqnet.qnn.vqc.torch.VQC_QuantumEmbedding(qubits, machine, num_repetitions_input, depth_input, num_unitary_layers, num_repetitions,initial = None,dtype = None,name= "")
+.. py:class:: pyvqnet.qnn.vqc.torch.VQC_QuantumEmbedding(  num_repetitions_input, depth_input, num_unitary_layers, num_repetitions,initial = None,dtype = None,name= "")
 
     使用 RZ,RY,RZ 创建变分量子电路,将经典数据编码为量子态。
     参考 `Quantum embeddings for machine learning <https://arxiv.org/abs/2001.03622>`_。
