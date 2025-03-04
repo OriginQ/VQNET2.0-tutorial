@@ -4,7 +4,7 @@ VQNet 安装步骤
 VQNet python包安装
 ----------------------------------
 
-我们提供了Linux, Windows, x86_64 OSX >=10.12, arm64 OSX>=13.0 上的python预编译包供安装,需要 **python3.9, 3.10, 3.11 或 3.12** 。
+我们提供了Linux, Windows, x86_64 OSX >=10.12, arm64 OSX>=13.0 上的python预编译包供安装,需要 **python3.9, 3.10, 3.11 ** 。
 
 对于Linux系统,pyvqnet提供了基于Nvidia GPU对经典神经网络计算加速功能,当您的电脑的GPU是GTX10系列及其以后的型号,可使用pyvqnet的GPU功能运行模型。
 

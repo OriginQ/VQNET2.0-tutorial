@@ -16,18 +16,18 @@ Added
 Changed
 ===================
 
-- 删除ONNX过时功能,删除集成pyqpanda的绝大部分接口,保留示例代码中使用的部分接口。
+- 移除ONNX过时功能,移除集成pyqpanda的绝大部分接口,保留示例代码中使用的部分接口。
 - VQC_QuantumEmbedding接口修改
 - 安装本软件包时不再同时安装pyqpanda, 而是同时安装pyqpanda3.
 - VQC接口支持入参使用 `x[,:2]`,原先只支持 `x[:,[2]]` 形式。
-- 本软件支持3.9~3.12版本python 不再支持python3.8
+- 本软件支持3.9,3.10,3.11版本python 不再支持python3.8
 
 Fixed
 ===================
 - 解决发现的内存泄漏问题;
-- 解决发现的GPU随机数问题；
-- reduce相关操作时候最大维度从8提升到30;
-- 优化代码,提升了部分情况下的python代码运行速度；
+- 解决发现的GPU随机数问题;
+- reduce相关操作,可支持的数组的最大维度从8提升到30;
+- 优化代码,提升了部分情况下的python代码运行速度;
 
 [v2.15.0] - 2024-11-19
 ***************************
@@ -67,7 +67,7 @@ Added
 
 Changed
 ===================
-- 删除了xtensor部分。
+- 移除了xtensor部分。
 - api文档进行部分修改。区分了基于自动微分的量子机器学习示例以及基于qpanda的机器学习示例,区别基于自动微分的量子机器学习接口以及基于qpanda的机器学习示例接口。
 - `matmul` 支持1d@1d,2d@1d,1d@2d。
 - 增加了一些量子计算层别名: `QpandaQCircuitVQCLayer`` = `QuantumLayer` , `QpandaQCircuitVQCLayerLite` = `QuantumLayerV2`, `QpandaQProgVQCLayer` = `QuantumLayerV3`.
@@ -132,7 +132,7 @@ Fixed
 ===================
 - 降低Linux-GPU版本启动时候的显存消耗。
 - 修复select以及power函数的内存泄露问题。
-- 删除了cpu、gpu下基于reduce方法的模型参数以及梯度更新方法 `nccl_average_parameters_reduce`, `nccl_average_grad_reduce`。
+- 移除了cpu、gpu下基于reduce方法的模型参数以及梯度更新方法 `nccl_average_parameters_reduce`, `nccl_average_grad_reduce`。
 
 [v2.11.0] - 2024-03-01
 ***************************
@@ -152,8 +152,8 @@ Changed
 ===================
 
 - 将 `VQC_CSWAP` 电路重构为 `CSWAP`。
-- 删除旧的 QNG 文档。
-- 从 `pyvqnet.qnn.vqc` 中删除函数和类无用的 `num_wires` 参数。
+- 移除旧的 QNG 文档。
+- 从 `pyvqnet.qnn.vqc` 中移除函数和类无用的 `num_wires` 参数。
 - 重构 `MeasureAll`, `Probability` api。
 - 为 `QuantumMeasure` 增加qtype参数。
 
@@ -166,7 +166,7 @@ Fixed
 
 Added
 ===========
-- 增加了pyvqnet.qnn.vqc下的新接口:IsingXX、IsingXY、IsingYY、IsingZZ、SDG、TDG、PhaseShift、MutliRZ、MultiCnot、MultixCnot、ControlledPhaseShift、SingleExcitation、DoubleExcitation、VQC_AllSinglesDoubles,ExpressiveEntanglingAnsatz等；
+- 增加了pyvqnet.qnn.vqc下的新接口:IsingXX、IsingXY、IsingYY、IsingZZ、SDG、TDG、PhaseShift、MutliRZ、MultiCnot、MultixCnot、ControlledPhaseShift、SingleExcitation、DoubleExcitation、VQC_AllSinglesDoubles,ExpressiveEntanglingAnsatz等;
 - 支持adjoint梯度计算的pyvqnet.qnn.vqc.QuantumLayerAdjoint接口;
 - 支持originIR与VQC相互转换的功能;
 - 支持统计VQC模型中的经典和量子模块信息;
