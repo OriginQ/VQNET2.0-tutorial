@@ -1433,7 +1433,7 @@ Circuit-centric quantum classifiers算法示例
         optimizer = sgd.SGD(model.parameters(), lr=0.5)
 
         epoch = 25
-        #loss = CategoricalCrossEntropy()
+
         print("start training..............")
         model.train()
 

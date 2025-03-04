@@ -106,7 +106,6 @@ QuantumLayer是一个支持量子含参线路作为参数的自动求导模块�
             circuit.insert(pq.CNOT(qubits[2],qubits[3]))
             circuit.insert(pq.RZ(qubits[3],param[2]))  
             circuit.insert(pq.CNOT(qubits[2],qubits[3]))
-            #print(circuit)
 
             prog = pq.QProg()    
             prog.insert(circuit)    
@@ -162,7 +161,6 @@ QuantumLayer是一个支持量子含参线路作为参数的自动求导模块�
             circuit.insert(pq.CNOT(qubits[2],qubits[3]))
             circuit.insert(pq.RZ(qubits[3],param[2]))
             circuit.insert(pq.CNOT(qubits[2],qubits[3]))
-            #print(circuit)
 
             prog = pq.QProg()
             prog.insert(circuit)
@@ -258,7 +256,6 @@ QuantumLayerV2
             circuit.insert(pq.CNOT(qubits[2],qubits[3]))
             circuit.insert(pq.RZ(qubits[3],param[2]))  
             circuit.insert(pq.CNOT(qubits[2],qubits[3]))
-            #print(circuit)
 
             prog = pq.QProg()    
             prog.insert(circuit)    
@@ -323,7 +320,6 @@ QuantumLayerV2
             circuit.insert(pq.CNOT(qubits[2],qubits[3]))
             circuit.insert(pq.RZ(qubits[3],param[2]))  
             circuit.insert(pq.CNOT(qubits[2],qubits[3]))
-            #print(circuit)
 
             prog = pq.QProg()    
             prog.insert(circuit)    
@@ -547,7 +543,6 @@ QuantumLayerMultiProcess
             circuit.insert(pq.CNOT(qubits[2],qubits[3]))
             circuit.insert(pq.RZ(qubits[3],param[2]))
             circuit.insert(pq.CNOT(qubits[2],qubits[3]))
-            #print(circuit)
 
             prog = pq.QProg()
             prog.insert(circuit)
@@ -802,7 +797,6 @@ DataParallelHybirdVQCQpandaQVMLayer
                 self.ryy = RZZ(has_params=True, trainable=True, wires=[2, 3])
                 self.rzx = RZX(has_params=True, trainable=False, wires=[2, 3])
                 self.toffoli = Toffoli(wires=[2, 3, 4], use_dagger=True)
-                #self.rz_layer2 = RZ(has_params=True, trainable=True, wires=1)
                 self.h = Hadamard(wires=[1])
 
                 self.iSWAP = iSWAP(True, True, wires=[0, 2])
@@ -881,7 +875,6 @@ DataParallelHybirdVQCQpandaQVMLayer
         from pyvqnet.distributed import *
 
         Comm_OP = CommController("nccl")
-        #input_x = tensor.QTensor([[0.1, 0.2, 0.3]])
         input_x = tensor.QTensor([[0.1, 0.2, 0.3]],device=Comm_OP.get_local_rank() + pyvqnet.DEV_GPU_0)
         #rest code not changed
 
@@ -909,7 +902,6 @@ DataParallelHybirdVQCQpandaQVMLayer
 
         from pyvqnet.distributed import *
         Comm_OP = CommController("nccl")
-        #input_x = tensor.QTensor([[0.1, 0.2, 0.3]])
         input_x = tensor.QTensor([[0.1, 0.2, 0.3]],device=Comm_OP.get_local_rank() + pyvqnet.DEV_GPU_0)
         #rest code not changed
 

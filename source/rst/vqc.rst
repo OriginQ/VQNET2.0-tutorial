@@ -3433,8 +3433,6 @@ ExpressiveEntanglingAnsatz
 
         input_x = tensor.QTensor([[0.1, 0.2, 0.3]])
 
-        #input_x = tensor.broadcast_to(input_x,[2,3])
-
         input_x.requires_grad = True
 
         qunatum_model = QModel(num_wires=3, dtype=pyvqnet.kcomplex64)
@@ -4451,36 +4449,6 @@ QGRU
             print("Output shape:", output.shape)  # Output shape
             print("h_t shape:", h_t.shape)  # Final hidden state shape
 
-QLinear
---------------------------------------------------------------
-.. py:class:: pyvqnet.qnn.qlinear.QLinear(nput_channels, output_channels, machine: str = "")
-
-    QLinear 实现了一种量子全连接算法。首先将数据编码到量子态,然后通过量子线路进行演化操作和测量得到最终的全连接结果。
-
-    :param input_channels: 输入通道数。
-    :param output_channels: 输出通道数。
-    :param machine:  使用的虚拟机,默认使用CPU模拟。
-
-    Example::
-
-        from pyvqnet.tensor import QTensor
-        from pyvqnet.qnn.qlinear import QLinear
-        params = [[0.37454012, 0.95071431, 0.73199394, 0.59865848, 0.15601864, 0.15599452],
-        [1.37454012, 0.95071431, 0.73199394, 0.59865848, 0.15601864, 0.15599452],
-        [1.37454012, 1.95071431, 0.73199394, 0.59865848, 0.15601864, 0.15599452],
-        [1.37454012, 1.95071431, 1.73199394, 1.59865848, 0.15601864, 0.15599452]]
-        m = QLinear(6, 2)
-        input = QTensor(params, requires_grad=True)
-        output = m(input)
-        output.backward()
-        print(output)
-
-        #[
-        #[0.0568473, 0.1264389],
-        #[0.1524036, 0.1264389],
-        #[0.1524036, 0.1442845],
-        #[0.1524036, 0.1442845]
-        #]
 
 
 
@@ -5121,7 +5089,7 @@ vqc_to_originir_list
                 self.ryy = RZZ(has_params=True,trainable=True,wires=[2,3])
                 self.rzx = RZX(has_params=True,trainable=False, wires=[2,3])
                 self.toffoli = Toffoli(wires=[2,3,4],use_dagger=True)
-                #self.rz_layer2 = RZ(has_params=True, trainable=True, wires=1)
+
                 self.h =Hadamard(wires=[1])
                 self.rot = VQC_HardwareEfficientAnsatz(6, ["rx", "RY", "rz"],
                                                     entangle_gate="cnot",
@@ -5435,7 +5403,7 @@ QNG
 
                 self.l_train1(q_machine=self.qm)
                 self.l_train2(q_machine=self.qm)
-                #rx(q_machine=self.qm, wires=2, params=x[:, [3]])
+
                 rz(q_machine=self.qm, wires=1, params=x[:, [2]])
                 ry(q_machine=self.qm, wires=0, params=np.pi / 7)
                 rz(q_machine=self.qm, wires=1, params=x[:, [2]])

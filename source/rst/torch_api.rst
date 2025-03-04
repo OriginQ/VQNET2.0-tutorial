@@ -2752,7 +2752,6 @@ TorchQpanda3QuantumLayer
             circuit<<pq.CNOT(qubits[2],qubits[3])
             circuit<<pq.RZ(qubits[3],param[2])
             circuit<<pq.CNOT(qubits[2],qubits[3])
-            #print(circuit)
 
             prog = pq.QProg()
             prog<<circuit
