@@ -4543,7 +4543,7 @@ QRLModel
 
 .. py:class:: pyvqnet.qnn.qrl.QRLModel(num_qubits, n_layers)
 
-    使用变分量子电路的量子深度强化学习模型。
+    使用变分量子电路的量子深度强化学习模型,参考 :ref:`QDRL_DEMO` 中的线路实现。
 
     :param num_qubits: 量子电路中所使用的量子比特的数量。
     :param n_layers: 变分量子电路中的层数。
