@@ -2318,8 +2318,8 @@ Tanh
 对于继承于 `TorchModule` 的VQNet的经典和量子线路模块,其中参数同样可以被 `torch.nn.Module.parameters()` 获取,可同样使用 torch 的优化器进行优化。
 
 
-pyqpanda2量子变分线路训练函数
-============================================
+使用pyqpanda进行计算的量子变分线路训练函数
+------------------------------------------
 
 以下是使用pyqpanda以及pyqpanda3进行线路计算的训练变分量子线路接口。
 
@@ -2330,7 +2330,7 @@ pyqpanda2量子变分线路训练函数
     由于pyqpanda2以及pyqpanda3兼容性问题,您需要自行安装pyqpnda2, `pip install pyqpanda` 
 
 TorchQpandaQuantumLayer
-------------------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 如您更加熟悉pyQPanda2语法,可以使用该接口TorchQpandaQuantumLayer,自定义量子比特 ``qubits`` ,经典比特 ``cbits`` ,后端模拟器 ``machine`` 加入TorchQpandaQuantumLayer的参数 ``qprog_with_measure`` 函数中。
 
@@ -2427,7 +2427,7 @@ TorchQpandaQuantumLayer
 
 
 TorchQcloudQuantumLayer
-------------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 当您安装最新版本pyqpanda2,可以使用本接口定义一个变分线路,并提交到originqc的真实芯片上运行。
 
@@ -2558,7 +2558,7 @@ TorchQcloudQuantumLayer
     如果您使用了本模块下的QCloud功能,在代码中导入pyqpanda2 或 使用pyvqnet的pyqpanda2相关封装接口会有错误。
 
 TorchQcloud3QuantumLayer
----------------------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 当您安装最新版本pyqpanda3,可以使用本接口定义一个变分线路,并提交到originqc的真实芯片上运行。
 
@@ -2685,7 +2685,7 @@ TorchQcloud3QuantumLayer
 
 
 TorchQpanda3QuantumLayer
-------------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 如您更加熟悉pyQPanda3语法,可以使用该接口TorchQpanda3QuantumLayer。
 
@@ -2778,16 +2778,16 @@ TorchQpanda3QuantumLayer
 
 
 基于自动微分的变分量子线路模块和接口
-=================================================
+--------------------------------------------------
 
 
 基类
----------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 编写变分量子线路模型需要继承于 ``QModule``。
 
 QModule
-^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""
 
 .. py:class:: pyvqnet.qnn.vqc.torch.QModule(name="")
 
@@ -2805,7 +2805,7 @@ QModule
 
 
 QMachine
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""
 
 .. py:class:: pyvqnet.qnn.vqc.torch.QMachine(num_wires, dtype=pyvqnet.kcomplex64,grad_mode="",save_ir=False)
 
@@ -2846,7 +2846,7 @@ QMachine
 
 
 变分量子逻辑门模块
---------------------------
+""""""""""""""""""""""""
 
 
 以下 ``pyvqnet.qnn.vqc`` 中的函数接口直接支持 ``torch`` 后端的 ``QTensor`` 进行计算。
@@ -2866,7 +2866,7 @@ QMachine
     这些类如果有参数成员变量 ``_parmeters`` ,则其中的数据为 ``torch.nn.Parameter`` 类型。
 
 I
-^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""
 
 .. py:class:: pyvqnet.qnn.vqc.torch.I(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
@@ -2899,7 +2899,7 @@ I
 
 
 Hadamard
-^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""
 
 .. py:class:: pyvqnet.qnn.vqc.torch.Hadamard(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
@@ -2932,7 +2932,7 @@ Hadamard
 
 
 T
-^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""
 
 .. py:class:: pyvqnet.qnn.vqc.torch.T(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
@@ -2966,7 +2966,7 @@ T
 
 
 S
-^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""
 
 .. py:class:: pyvqnet.qnn.vqc.torch.S(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
@@ -2999,7 +2999,7 @@ S
 
 
 PauliX
-^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""
 
 .. py:class:: pyvqnet.qnn.vqc.torch.PauliX(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
@@ -3033,7 +3033,7 @@ PauliX
 
 
 PauliY
-^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""
 
 .. py:class:: pyvqnet.qnn.vqc.torch.PauliY(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
@@ -3068,7 +3068,7 @@ PauliY
 
 
 PauliZ
-^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""
 
 .. py:class:: pyvqnet.qnn.vqc.torch.PauliZ(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
@@ -3103,7 +3103,7 @@ PauliZ
 
 
 X1
-^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""
 
 .. py:class:: pyvqnet.qnn.vqc.torch.X1(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
@@ -3136,7 +3136,7 @@ X1
 
 
 RX
-^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""
 
 .. py:class:: pyvqnet.qnn.vqc.torch.RX(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
@@ -3171,7 +3171,7 @@ RX
 
 
 RY
-^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""
 
 .. py:class:: pyvqnet.qnn.vqc.torch.RY(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
@@ -3204,7 +3204,7 @@ RY
 
 
 RZ
-^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""
 
 .. py:class:: pyvqnet.qnn.vqc.torch.RZ(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
@@ -3237,7 +3237,7 @@ RZ
 
 
 CRX
-^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""
 
 .. py:class:: pyvqnet.qnn.vqc.torch.CRX(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
@@ -3270,8 +3270,7 @@ CRX
 
 
 CRY
-^^^^^^^^^^^^^^^^^^^^^^
-
+""""""""""""""""""""""""
 
 .. py:class:: pyvqnet.qnn.vqc.torch.CRY(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
@@ -3304,7 +3303,7 @@ CRY
 
 
 CRZ
-^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""
 
 
 .. py:class:: pyvqnet.qnn.vqc.torch.CRZ(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
@@ -3339,7 +3338,7 @@ CRZ
 
 
 U1
-^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""
 
 .. py:class:: pyvqnet.qnn.vqc.torch.U1(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
@@ -3371,7 +3370,7 @@ U1
         print(device.states)
 
 U2
-^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""
 
 
 .. py:class:: pyvqnet.qnn.vqc.torch.U2(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
@@ -3405,7 +3404,7 @@ U2
 
 
 U3
-^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""
 
 
 .. py:class:: pyvqnet.qnn.vqc.torch.U3(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
@@ -3440,7 +3439,7 @@ U3
 
 
 CNOT
-^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""
 
 .. py:class:: pyvqnet.qnn.vqc.torch.CNOT(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
@@ -3472,7 +3471,7 @@ CNOT
         print(device.states)
 
 CY
-^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""
 
 .. py:class:: pyvqnet.qnn.vqc.torch.CY(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
@@ -3505,7 +3504,7 @@ CY
 
 
 CZ
-^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""
 
 .. py:class:: pyvqnet.qnn.vqc.torch.CZ(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
@@ -3540,7 +3539,7 @@ CZ
 
 
 CR
-^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""
 
 .. py:class:: pyvqnet.qnn.vqc.torch.CR(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
@@ -3575,7 +3574,7 @@ CR
 
 
 SWAP
-^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""
 
 
 .. py:class:: pyvqnet.qnn.vqc.torch.SWAP(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
@@ -3609,7 +3608,7 @@ SWAP
 
 
 CSWAP
-^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""
 
 .. py:class:: pyvqnet.qnn.vqc.torch.CSWAP(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
@@ -3652,7 +3651,7 @@ CSWAP
         print(device.states)
 
 RXX
-^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""
 
 
 .. py:class:: pyvqnet.qnn.vqc.torch.RXX(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
@@ -3685,7 +3684,7 @@ RXX
         print(device.states)
 
 RYY
-^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""
 
 .. py:class:: pyvqnet.qnn.vqc.torch.RYY(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
@@ -3718,7 +3717,7 @@ RYY
 
 
 RZZ
-^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""
 
 .. py:class:: pyvqnet.qnn.vqc.torch.RZZ(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
@@ -3752,7 +3751,7 @@ RZZ
 
 
 RZX
-^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""
 
 .. py:class:: pyvqnet.qnn.vqc.torch.RZX(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
@@ -3784,7 +3783,7 @@ RZX
         print(device.states)
 
 Toffoli
-^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""
 
 
 .. py:class:: pyvqnet.qnn.vqc.torch.Toffoli(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
@@ -3817,7 +3816,7 @@ Toffoli
         print(device.states)
 
 IsingXX
-^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""
 
 
 .. py:class:: pyvqnet.qnn.vqc.torch.IsingXX(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
@@ -3851,7 +3850,7 @@ IsingXX
 
 
 IsingYY
-^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""
 
 
 .. py:class:: pyvqnet.qnn.vqc.torch.IsingYY(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
@@ -3885,7 +3884,7 @@ IsingYY
 
 
 IsingZZ
-^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""
 
 .. py:class:: pyvqnet.qnn.vqc.torch.IsingZZ(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
@@ -3919,7 +3918,7 @@ IsingZZ
 
 
 IsingXY
-^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""
 
 
 .. py:class:: pyvqnet.qnn.vqc.torch.IsingXY(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
@@ -3953,7 +3952,7 @@ IsingXY
 
 
 PhaseShift
-^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""
 
 
 .. py:class:: pyvqnet.qnn.vqc.torch.PhaseShift(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
@@ -3987,7 +3986,7 @@ PhaseShift
 
 
 MultiRZ
-^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""
 
 .. py:class:: pyvqnet.qnn.vqc.torch.MultiRZ(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
@@ -4021,7 +4020,7 @@ MultiRZ
 
 
 SDG
-^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""
 
 
 .. py:class:: pyvqnet.qnn.vqc.torch.SDG(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
@@ -4057,7 +4056,7 @@ SDG
 
 
 TDG
-^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""
 
 .. py:class:: pyvqnet.qnn.vqc.torch.TDG(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
@@ -4091,7 +4090,7 @@ TDG
 
 
 ControlledPhaseShift
-^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""
 
 
 .. py:class:: pyvqnet.qnn.vqc.torch.ControlledPhaseShift(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
@@ -4126,7 +4125,7 @@ ControlledPhaseShift
 
 
 MultiControlledX
-^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""
 
 .. py:class:: pyvqnet.qnn.vqc.torch.MultiControlledX(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False,control_values=None)
     
@@ -4165,10 +4164,10 @@ MultiControlledX
 
 
 测量接口
---------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^
 
 Probability
-^^^^^^^^^^^^^^^^^^^^^^
+"""""""""""""""""""""
 
 
 .. py:class:: pyvqnet.qnn.vqc.torch.Probability(wires=None, name="")
@@ -4205,7 +4204,7 @@ Probability
 
 
 MeasureAll
-^^^^^^^^^^^^^^^^^^^^^^
+"""""""""""""""""""""
 
 .. py:class:: pyvqnet.qnn.vqc.torch.MeasureAll(obs=None, name="")
 
@@ -4260,7 +4259,7 @@ MeasureAll
 
 
 Samples
-^^^^^^^^^^^^^^^^^^^^^^
+"""""""""""""""""""""
 
 .. py:class:: pyvqnet.qnn.vqc.torch.Samples(wires=None, obs=None, shots = 1,name="")
 
@@ -4304,7 +4303,7 @@ Samples
 
 
 SparseHamiltonian
-^^^^^^^^^^^^^^^^^^^^^^
+"""""""""""""""""""""
 
 .. py:class:: pyvqnet.qnn.vqc.torch.SparseHamiltonian(obs=None, name="")
 
@@ -4393,7 +4392,7 @@ SparseHamiltonian
 
 
 HermitianExpval
-^^^^^^^^^^^^^^^^^^^^^^
+"""""""""""""""""""""
 
 .. py:class:: pyvqnet.qnn.vqc.torch.HermitianExpval(obs=None, name="")
 
@@ -4463,10 +4462,10 @@ HermitianExpval
         print(batch_y)
 
 量子线路常见模板
------------------------------- 
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 VQC_HardwareEfficientAnsatz
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""""""""""""""""""
 
 .. py:class:: pyvqnet.qnn.vqc.torch.VQC_HardwareEfficientAnsatz(n_qubits,single_rot_gate_list,entangle_gate="CNOT",entangle_rules='linear',depth=1,initial = None,dtype=None)
 
@@ -4528,7 +4527,7 @@ VQC_HardwareEfficientAnsatz
 
 
 VQC_BasicEntanglerTemplate
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""""""""""""""""""
 
 .. py:class:: pyvqnet.qnn.vqc.torch.VQC_BasicEntanglerTemplate(num_layer=1, num_qubits=1, rotation="RX", initial=None, dtype=None)
 
@@ -4585,7 +4584,7 @@ VQC_BasicEntanglerTemplate
 
 
 VQC_StronglyEntanglingTemplate
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""""""""""""""""""
 
 .. py:class:: pyvqnet.qnn.vqc.torch.VQC_StronglyEntanglingTemplate(num_layers=1, num_qubits=1, rotation = "RX", initial = None, dtype: = None)
 
@@ -4642,7 +4641,7 @@ VQC_StronglyEntanglingTemplate
 
 
 VQC_QuantumEmbedding
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""""""""""""""""""
 
 
 .. py:class:: pyvqnet.qnn.vqc.torch.VQC_QuantumEmbedding(qubits, machine, num_repetitions_input, depth_input, num_unitary_layers, num_repetitions,initial = None,dtype = None,name= "")
@@ -4705,7 +4704,7 @@ VQC_QuantumEmbedding
 
 
 ExpressiveEntanglingAnsatz
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""""""""""""""""""
 
 .. py:class:: pyvqnet.qnn.vqc.torch.ExpressiveEntanglingAnsatz(type: int, num_wires: int, depth: int, dtype=None, name: str = "")
 
@@ -4769,7 +4768,7 @@ ExpressiveEntanglingAnsatz
 
 
 vqc_basis_embedding
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""""""""""""""""""
 
 .. py:function:: pyvqnet.qnn.vqc.torch.vqc_basis_embedding(basis_state,q_machine)
 
@@ -4794,7 +4793,7 @@ vqc_basis_embedding
 
 
 vqc_angle_embedding
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""""""""""""""""""
 
 
 .. py:function:: pyvqnet.qnn.vqc.torch.vqc_angle_embedding(input_feat, wires, q_machine: pyvqnet.qnn.vqc.torch.QMachine, rotation: str = "X")
@@ -4835,7 +4834,7 @@ vqc_angle_embedding
 
 
 vqc_amplitude_embedding
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""""""""""""""""""
 
 .. py:function:: pyvqnet.qnn.vqc.torch.vqc_amplitude_embeddingVQC_AmplitudeEmbeddingCircuit(input_feature, q_machine)
 
@@ -4858,8 +4857,7 @@ vqc_amplitude_embedding
 
 
 vqc_iqp_embedding
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
+""""""""""""""""""""""""""""""""""""""""
 .. py:function:: pyvqnet.qnn.vqc.vqc_iqp_embedding(input_feat, q_machine: pyvqnet.qnn.vqc.torch.QMachine, rep: int = 1)
 
     使用IQP线路的对角门将 :math:`n` 特征编码为 :math:`n` 量子比特。该函数别名:  ``VQC_IQPEmbedding`` 。
@@ -4886,7 +4884,7 @@ vqc_iqp_embedding
 
 
 vqc_rotcircuit
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""""""""""""""""""
 
 .. py:function:: pyvqnet.qnn.vqc.torch.vqc_rotcircuit(q_machine, wire, params)
 
@@ -4917,7 +4915,7 @@ vqc_rotcircuit
 
 
 vqc_crot_circuit
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""""""""""""""""""
 
 
 .. py:function:: pyvqnet.qnn.vqc.torch.vqc_crot_circuit(para,control_qubits,rot_wire,q_machine)
@@ -4954,7 +4952,7 @@ vqc_crot_circuit
 
 
 vqc_controlled_hadamard
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""""""""""""""""""
 
 
 .. py:function:: pyvqnet.qnn.vqc.torch.vqc_controlled_hadamard(wires, q_machine)
@@ -4990,7 +4988,7 @@ vqc_controlled_hadamard
 
 
 vqc_ccz
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""""""""""""""""""
 
 .. py:function:: pyvqnet.qnn.vqc.torch.vqc_ccz(wires, q_machine)
 
@@ -5032,7 +5030,7 @@ vqc_ccz
 
 
 vqc_fermionic_single_excitation
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""""""""""""""""""
 
 .. py:function:: pyvqnet.qnn.vqc.torch.vqc_fermionic_single_excitation(weight, wires, q_machine)
 
@@ -5071,7 +5069,7 @@ vqc_fermionic_single_excitation
 
 
 vqc_fermionic_double_excitation
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""""""""""""""""""
 
 
 .. py:function:: pyvqnet.qnn.vqc.torch.vqc_fermionic_double_excitation(weight, wires1, wires2, q_machine)
@@ -5124,7 +5122,7 @@ vqc_fermionic_double_excitation
  
 
 vqc_uccsd
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""""""""""""""""""
 
 
 .. py:function:: pyvqnet.qnn.vqc.torch.vqc_uccsd(weights, wires, s_wires, d_wires, init_state, q_machine)
@@ -5185,7 +5183,7 @@ vqc_uccsd
 
 
 vqc_zfeaturemap
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""""""""""""""""""
 
 .. py:function:: pyvqnet.qnn.vqc.torch.vqc_zfeaturemap(input_feat, q_machine: pyvqnet.qnn.vqc.torch.QMachine, data_map_func=None, rep: int = 2)
 
@@ -5224,7 +5222,7 @@ vqc_zfeaturemap
  
 
 vqc_zzfeaturemap
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""""""""""""""""""
 
 .. py:function:: pyvqnet.qnn.vqc.torch.vqc_zzfeaturemap(input_feat, q_machine: pyvqnet.qnn.vqc.torch.QMachine, data_map_func=None, entanglement: Union[str, List[List[int]],Callable[[int], List[int]]] = "full",rep: int = 2)
 
@@ -5269,8 +5267,7 @@ vqc_zzfeaturemap
 
 
 vqc_allsinglesdoubles
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
+""""""""""""""""""""""""""""""""""""""""
 
 .. py:function:: pyvqnet.qnn.vqc.torch.vqc_allsinglesdoubles(weights, q_machine: pyvqnet.qnn.vqc.torch.QMachine, hf_state, wires, singles=None, doubles=None)
 
@@ -5308,7 +5305,7 @@ vqc_allsinglesdoubles
         print(qm.states)
 
 vqc_basisrotation
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""""""""""""""""""
 
 .. py:function:: pyvqnet.qnn.vqc.torch.vqc_basisrotation(q_machine: pyvqnet.qnn.vqc.torch.QMachine, wires, unitary_matrix: QTensor, check=False)
 
@@ -5354,7 +5351,7 @@ vqc_basisrotation
 
 
 vqc_quantumpooling_circuit
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""""""""""""""""""
 
 .. py:function:: pyvqnet.qnn.vqc.torch.vqc_quantumpooling_circuit(ignored_wires, sinks_wires, params, q_machine)
 
@@ -5388,7 +5385,7 @@ vqc_quantumpooling_circuit
 
 
 QuantumLayerAdjoint
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""""""""""""""""""
 
 .. py:class:: pyvqnet.qnn.vqc.torch.QuantumLayerAdjoint(general_module, q_machine,name="")
 
@@ -5473,7 +5470,7 @@ QuantumLayerAdjoint
 
 
 HybirdVQCQpandaQVMLayer
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""""""""""""""""""
 
 .. py:class:: pyvqnet.qnn.vqc.torch.HybirdVQCQpandaQVMLayer(vqc_module: Module,qcloud_token: str,num_qubits: int,num_cubits: int,pauli_str_dict: Union[List[Dict], Dict, None] = None,shots: int = 1000,dtype: Union[int, None] = None,name: str = "",submit_kwargs: Dict = {},query_kwargs: Dict = {})
 
@@ -5615,7 +5612,7 @@ HybirdVQCQpandaQVMLayer
 
 
 TorchHybirdVQCQpanda3QVMLayer
-------------------------------------------------
+""""""""""""""""""""""""""""""""""""""""
 
 .. py:class:: pyvqnet.qnn.vqc.torch.TorchHybirdVQCQpanda3QVMLayer(vqc_module: Module,qcloud_token: str,pauli_str_dict: Union[List[Dict], Dict, None] = None,shots: int = 1000,dtype: Union[int, None] = None,name: str = "",submit_kwargs: Dict = {},query_kwargs: Dict = {})
 
