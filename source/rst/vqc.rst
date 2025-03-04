@@ -4428,26 +4428,26 @@ QGRU
         from pyvqnet.qnn.qgru import QGRU
         from pyvqnet.dtype import kfloat32
         # Example usage
-        if __name__ == "__main__":
-            # Set parameters
-            para_num = 8
-            num_of_qubits = 8
-            input_size = 4
-            hidden_size = 4
-            batch_size = 1
-            seq_length = 1
-            # Create QGRU model
-            qgru = QGRU(para_num, num_of_qubits, input_size, hidden_size, batch_first=True)
+ 
+        # Set parameters
+        para_num = 8
+        num_of_qubits = 8
+        input_size = 4
+        hidden_size = 4
+        batch_size = 1
+        seq_length = 1
+        # Create QGRU model
+        qgru = QGRU(para_num, num_of_qubits, input_size, hidden_size, batch_first=True)
 
-            # Create input data
-            x = tensor.QTensor(np.random.randn(batch_size, seq_length, input_size), dtype=kfloat32)
+        # Create input data
+        x = tensor.QTensor(np.random.randn(batch_size, seq_length, input_size), dtype=kfloat32)
 
-            # Call the model
-            output, h_t = qgru(x)
-            output.backward()
+        # Call the model
+        output, h_t = qgru(x)
+        output.backward()
 
-            print("Output shape:", output.shape)  # Output shape
-            print("h_t shape:", h_t.shape)  # Final hidden state shape
+        print("Output shape:", output.shape)  # Output shape
+        print("h_t shape:", h_t.shape)  # Final hidden state shape
 
 
 
@@ -4467,27 +4467,27 @@ QLSTM
     :param batch_first: 输入的第一维是否为批次数量。
 
 
-    Examnple::
+    Example::
 
         import numpy as np
         from pyvqnet.tensor import tensor
         from pyvqnet.qnn.qlstm import QLSTM
         from pyvqnet.dtype import *
-        if __name__ == "__main__":
-            para_num = 4
-            num_of_qubits = 4
-            input_size = 4
-            hidden_size = 20
-            batch_size = 3
-            seq_length = 5
-            qlstm = QLSTM(para_num, num_of_qubits, input_size, hidden_size, batch_first=True)
-            x = tensor.QTensor(np.random.randn(batch_size, seq_length, input_size), dtype=kfloat32)
+ 
+        para_num = 4
+        num_of_qubits = 4
+        input_size = 4
+        hidden_size = 20
+        batch_size = 3
+        seq_length = 5
+        qlstm = QLSTM(para_num, num_of_qubits, input_size, hidden_size, batch_first=True)
+        x = tensor.QTensor(np.random.randn(batch_size, seq_length, input_size), dtype=kfloat32)
 
-            output, (h_t, c_t) = qlstm(x)
+        output, (h_t, c_t) = qlstm(x)
 
-            print("Output shape:", output.shape)
-            print("h_t shape:", h_t.shape)
-            print("c_t shape:", c_t.shape)
+        print("Output shape:", output.shape)
+        print("h_t shape:", h_t.shape)
+        print("c_t shape:", c_t.shape)
 
 QMLPModel
 --------------------------------------------------------------
@@ -4587,21 +4587,21 @@ QRNN
         from pyvqnet.tensor import tensor, QTensor
         import numpy as np
 
-        if __name__ == "__main__":
-            para_num = 8
-            num_of_qubits = 8
-            input_size = 4
-            hidden_size = 4
-            batch_size = 1
-            seq_length = 1
-            qrnn = QRNN(para_num, num_of_qubits, input_size, hidden_size, batch_first=True)
 
-            x = tensor.QTensor(np.random.randn(batch_size, seq_length, input_size), dtype=kfloat32)
+        para_num = 8
+        num_of_qubits = 8
+        input_size = 4
+        hidden_size = 4
+        batch_size = 1
+        seq_length = 1
+        qrnn = QRNN(para_num, num_of_qubits, input_size, hidden_size, batch_first=True)
 
-            output, h_t = qrnn(x)
+        x = tensor.QTensor(np.random.randn(batch_size, seq_length, input_size), dtype=kfloat32)
 
-            print("Output shape:", output.shape)
-            print("h_t shape:", h_t.shape)
+        output, h_t = qrnn(x)
+
+        print("Output shape:", output.shape)
+        print("h_t shape:", h_t.shape)
 
 
 TTOLayer
@@ -4652,7 +4652,7 @@ TTOLayer
 QuantumLayerAdjoint
 ---------------------------------------------------------------
 
-.. py:class:: pyvqnet.qnn.vqc.QuantumLayerAdjoint(general_module: pyvqnet.nn.Module,q_machine, name="")
+.. py:class:: pyvqnet.qnn.vqc.QuantumLayerAdjoint(general_module: pyvqnet.nn.Module,use_qpanda=False, name="")
 
 
     使用伴随矩阵方式进行梯度计算的可自动微分的QuantumLayer层,参考  `Efficient calculation of gradients in classical simulations of variational quantum algorithms <https://arxiv.org/abs/2009.02823>`_ 。
