@@ -714,7 +714,7 @@ DataParallelHybirdVQCQpandaQVMLayer
 
 .. py:class:: pyvqnet.qnn.DataParallelHybirdVQCQpandaQVMLayer(vqc_module: Module,qcloud_token: str,num_qubits: int,num_cubits: int,pauli_str_dict: Union[List[Dict], Dict, None] = None,shots: int = 1000,dtype: Union[int, None] = None,name: str = "",submit_kwargs: Dict = {},query_kwargs: Dict = {})
 
-    ``HybirdVQCQpandaQVMLayer`` 的数据并行版本,其中 ``vqc_module`` 为用户自定义的量子变分线路模型,其中的QMachine设置 ``save_ir= True`` 。
+    混合 vqc 和 qpanda QVM 层。该层将用户 `forward` 函数定义的VQNet编写的量子线路计算转化为QPanda OriginIR,可在QPanda 本地虚拟机或者云端服务上进行前向运行,并在本地CPU上模拟计算线路参数梯度,降低了使用参数漂移法计算的时间复杂度。
     使用数据并行将输入数据第一个维度 批处理数量 根据 `CommController` 中分配的进程数进行分割,在多个进程中基于 `mpi` 或者 `nccl` 进行数据并行。请注意一个进程对应一个节点上的GPU设备。
     每个进程中的该模块在前向计算时提交 批处理数量/节点数 个数据产生的量子线路,反向计算中计算 批处理数量/节点数 个数据贡献的梯度,并通过all_reduce计算多个节点上参数的平均梯度。
 

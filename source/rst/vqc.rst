@@ -5442,7 +5442,6 @@ wrapper_single_qubit_op_fuse
     Example::
 
         from pyvqnet import tensor
-        from pyvqnet.qnn.vqc import QMachine, Operation, apply_unitary_bmm
         from pyvqnet import kcomplex128
         from pyvqnet.tensor import adjoint
         import numpy as np
