@@ -799,7 +799,7 @@ DataParallelHybirdVQCQpandaQVMLayer
                 self.toffoli = Toffoli(wires=[2, 3, 4], use_dagger=True)
                 self.h = Hadamard(wires=[1])
 
-                self.iSWAP = iSWAP(True, True, wires=[0, 2])
+                self.iSWAP = iSWAP(  wires=[0, 2])
                 self.tlayer = T(wires=1)
                 self.cnot = CNOT(wires=[0, 1])
                 self.measure = MeasureAll(obs={'Z0': 2, 'Y3': 3})

@@ -162,17 +162,17 @@ QuantumLayerV3
             cir<<pq.RZ(m_qlist[0], input[0])
             cir<<pq.RX(m_qlist[2], input[2])
             
-            qcir = pq.RX(m_qlist[1], param[1]).add_control(m_qlist[0])
+            qcir = pq.RX(m_qlist[1], param[1]).control(m_qlist[0])
         
             cir<<qcir
 
-            qcir = pq.RY(m_qlist[0], param[2]).add_control(m_qlist[1])
+            qcir = pq.RY(m_qlist[0], param[2]).control(m_qlist[1])
         
             cir<<qcir
 
             cir<<pq.RY(m_qlist[0], input[1])
 
-            qcir = pq.RZ(m_qlist[0], param[3]).add_control(m_qlist[1])
+            qcir = pq.RZ(m_qlist[0], param[3]).control(m_qlist[1])
         
             cir<<qcir
             m_prog<<cir
@@ -1443,7 +1443,7 @@ Purity
 
     Examples::
 
-        from pyvqnet.qnn.qp3.measure import Purity
+        from pyvqnet.qnn.pq3.measure import Purity
         qstate = [(0.9306699299765968 + 0j), (0.18865613455240968 + 0j),
                 (0.1886561345524097 + 0j), (0.03824249173404786 + 0j),
                 -0.048171819846746615j, -0.00976491131165138j, -0.23763904794287155j,
