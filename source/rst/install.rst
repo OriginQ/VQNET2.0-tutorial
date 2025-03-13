@@ -4,9 +4,9 @@ VQNet 安装步骤
 VQNet python包安装
 ----------------------------------
 
-我们提供了Linux, Windows, x86_64 OSX >=10.12, arm64 OSX>=13.0 上的python预编译包供安装,需要 **python3.8, 3.9 或 3.10** 。
+我们提供了Linux, Windows, x86_64 OSX >=10.12, arm64 OSX>=13.0 上的python预编译包供安装,需要 **python3.9, 3.10, 3.11** 。
 
-对于Linux系统,pyvqnet提供了基于Nvidia GPU对经典神经网络计算加速功能,当您的电脑的GPU是GTX10系列及其以后的型号,可使用pyvqnet的GPU功能构建模型。
+对于Linux系统,pyvqnet提供了基于Nvidia GPU对经典神经网络计算加速功能,当您的电脑的GPU是GTX10系列及其以后的型号,可使用pyvqnet的GPU功能运行模型。
 
 .. code-block::
 
@@ -60,7 +60,7 @@ VQNet支持将量子计算模块与经典计算模块(例如: 卷积,池化,全�
 
 .. figure:: ./images/classic-quantum.PNG
 
-在量子计算模块,VQNet支持使用本源量子高效的量子软件计算包 `pyQPanda <https://pyqpanda-toturial.readthedocs.io/zh/latest/>`_  进行量子模块构建。
+在量子计算模块,VQNet支持使用本源量子高效的量子软件计算包 `pyqpanda <https://pyqpanda-toturial.readthedocs.io/zh/latest/>`_  进行量子模块构建。
 使用pyQPanda提供的各种常用 `量子逻辑门函数接口 <https://pyqpanda-toturial.readthedocs.io/zh/latest/QGate.html>`_ , `量子线路接口 <https://pyqpanda-toturial.readthedocs.io/zh/latest/QCircuit.html>`_ , `量子虚拟机函数接口 <https://pyqpanda-toturial.readthedocs.io/zh/latest/QuantumMachine.html>`_ , `测量函数接口 <https://pyqpanda-toturial.readthedocs.io/zh/latest/Measure.html>`_,用户可以快速构建量子计算模块。
 
 接下来的例子我们使用pyQPanda构建了一个量子计算模块。通过VQNet,该量子计算模块可以直接嵌入到混合机器学习模型中进行量子线路参数训练。

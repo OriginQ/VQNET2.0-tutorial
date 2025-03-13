@@ -1,5 +1,5 @@
 使用自动微分模拟的量子机器学习示例
-#################################
+##################################################
 
 下面的例子使用 ``pyvqnet.qnn.vqc`` 下的变分量子线路接口实现一些量子机器学习算法和示例。 ``pyvqnet.qnn.vqc`` 下的变分量子线路接口使用态矢来表示量子态在量子逻辑门下的演化,通过自动微分计算变分量子线路中的梯度。
 
@@ -254,8 +254,6 @@
         ), "The training and testing data must have the same dimensionality"
         N = X_1.shape[1]
 
-        
-
         # create projector (measures probability of having all "00...0")
         projector = np.zeros((2**N, 2**N))
         projector[0, 0] = 1
@@ -267,16 +265,16 @@
 
             for i in range(N):
                 hadamard(q_machine=qm, wires=i)
-                rz(q_machine=qm,params=QTensor(2 * x1[i],dtype=kcomplex128), wires=i)
+                rz(q_machine=qm,params=QTensor(2 * x1[i],dtype=kfloat64), wires=i)
             for i in range(N):
                 for j in range(i + 1, N):
-                    crz(q_machine=qm,params=QTensor(2 * (np.pi - x1[i]) * (np.pi - x1[j]),dtype=kcomplex128), wires=[i, j])
+                    crz(q_machine=qm,params=QTensor(2 * (np.pi - x1[i]) * (np.pi - x1[j]),dtype=kfloat64), wires=[i, j])
 
             for i in range(N):
                 for j in range(i + 1, N):
-                    crz(q_machine=qm,params=QTensor(2 * (np.pi - x2[i]) * (np.pi - x2[j]),dtype=kcomplex128), wires=[i, j],use_dagger=True)        
+                    crz(q_machine=qm,params=QTensor(2 * (np.pi - x2[i]) * (np.pi - x2[j]),dtype=kfloat64), wires=[i, j],use_dagger=True)
             for i in range(N):
-                rz(q_machine=qm,params=QTensor(2 * x2[i],dtype=kcomplex128), wires=i,use_dagger=True)
+                rz(q_machine=qm,params=QTensor(2 * x2[i],dtype=kfloat64), wires=i,use_dagger=True)
                 hadamard(q_machine=qm, wires=i,use_dagger=True)
 
             states_1 = qm.states.reshape((1,-1))
@@ -323,9 +321,9 @@
                 VQC_ZZFeatureMap(x, qm, data_map_func=custom_data_map_func, entanglement="linear")
 
                 return (
-                    [expval(qm, i, PauliX(init_params=QTensor(1.0))).to_numpy() for i in range(N)]
-                    + [expval(qm, i, PauliY(init_params=QTensor(1.0))).to_numpy() for i in range(N)]
-                    + [expval(qm, i, PauliZ(init_params=QTensor(1.0))).to_numpy() for i in range(N)]
+                    [expval(qm, i, PauliX()).to_numpy() for i in range(N)]
+                    + [expval(qm, i, PauliY()).to_numpy() for i in range(N)]
+                    + [expval(qm, i, PauliZ()).to_numpy() for i in range(N)]
                 )
 
             # build the gram matrix
@@ -363,7 +361,7 @@
         accuracy = correct / len(testing_labels)
         return accuracy
 
-    import time 
+    import time
     qubits = [2, 4, 8]
 
     for n in qubits:
@@ -391,10 +389,10 @@
         x_tr = x_tr_norm[:tr_size]
         y_tr = y_tr[:tr_size]
 
-        te_size = 100
+        te_size = 20
         x_te = x_te_norm[:te_size]
         y_te = y_te[:te_size]
-        
+
         quantum_kernel_tr = vqnet_quantum_kernel(X_1=x_tr)
 
         projected_kernel_tr = vqnet_projected_quantum_kernel(X_1=x_tr)
@@ -402,7 +400,7 @@
         quantum_kernel_te = vqnet_quantum_kernel(X_1=x_te, X_2=x_tr)
 
         projected_kernel_te = vqnet_projected_quantum_kernel(X_1=x_te, X_2=x_tr)
-        
+
         quantum_accuracy.append(calculate_generalization_accuracy(quantum_kernel_tr, y_tr, quantum_kernel_te, y_te))
         print(f"qubits {n}, quantum_accuracy {quantum_accuracy[-1]}")
         projected_accuracy.append(calculate_generalization_accuracy(projected_kernel_tr.to_numpy(), y_tr, projected_kernel_te.to_numpy(), y_te))
@@ -452,6 +450,7 @@
 其中输入数据为维度8*8的手写数字数据集,通过数据编码层,经过第一层卷积,由IsingXX、IsingYY、IsingZZ、U3构成,,随后经过一层池化层,在0、2、5位量子比特上再经过一层卷积和一层池化,最后再经过一层Random Unitary,其中由15个随机酉矩阵构成,对应经典的Dense Layer,测量结果为对手写数据为0和1的预测概率,具体代码实现如下:
 
 以下代码运行需要额外安装 `pandas`, `sklearn`, `seaborn`。
+考虑到耗时情况下面相关运行配置常数设置较小，用户可自行设置较大值。
 
 .. code-block::
 
@@ -476,7 +475,9 @@
 
     seed = 0
     rng = np.random.default_rng(seed=seed)
-
+    n_reps = 10
+    n_test = 10
+    n_epochs = 10
 
     def convolutional_layer(qm, weights, wires, skip_first_layer=True):
 
@@ -651,9 +652,7 @@
             test_acc=test_acc_epochs,
         )
 
-    n_reps = 100
-    n_test = 100
-    n_epochs = 100
+
 
     def run_iterations(n_train):
         results_df = pd.DataFrame(
@@ -662,7 +661,7 @@
 
         for _ in tqdm(range(n_reps)):
             results = train_qcnn(n_train=n_train, n_test=n_test, n_epochs=n_epochs)
-            # np.save('test_qcnn.npy', results)
+
             results_df = pd.concat(
                 [results_df, pd.DataFrame.from_dict(results)], axis=0, ignore_index=True
             )
@@ -750,7 +749,7 @@
 
 
 
-运行后的实验结果如下图所示:
+使用 `n_reps = 100, n_test = 100, n_epochs = 100` 配置运行后的实验结果如下图所示:
 
 .. image:: ./images/result_qcnn_small.png
    :width: 1000 px
@@ -1434,7 +1433,7 @@ Circuit-centric quantum classifiers算法示例
         optimizer = sgd.SGD(model.parameters(), lr=0.5)
 
         epoch = 25
-        #loss = CategoricalCrossEntropy()
+
         print("start training..............")
         model.train()
 

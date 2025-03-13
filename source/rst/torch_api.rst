@@ -2318,18 +2318,476 @@ Tanh
 对于继承于 `TorchModule` 的VQNet的经典和量子线路模块,其中参数同样可以被 `torch.nn.Module.parameters()` 获取,可同样使用 torch 的优化器进行优化。
 
 
+使用pyqpanda进行计算的量子变分线路训练函数
+------------------------------------------
+
+以下是使用pyqpanda以及pyqpanda3进行线路计算的训练变分量子线路接口。
+
+.. warning::
+
+    以下 TorchQpandaQuantumLayer, TorchQcloudQuantumLayer 的量子计算部分使用pyqpanda2 https://pyqpanda-toturial.readthedocs.io/zh/latest/。
+
+    由于pyqpanda2以及pyqpanda3兼容性问题,您需要自行安装pyqpnda2, `pip install pyqpanda` 
+
+TorchQpandaQuantumLayer
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+如您更加熟悉pyqpanda2语法,可以使用该接口TorchQpandaQuantumLayer,自定义量子比特 ``qubits`` ,经典比特 ``cbits`` ,后端模拟器 ``machine`` 加入TorchQpandaQuantumLayer的参数 ``qprog_with_measure`` 函数中。
+
+.. py:class:: pyvqnet.qnn.vqc.torch.TorchQpandaQuantumLayer(qprog_with_measure,para_num,diff_method:str = "parameter_shift",delta:float = 0.01,dtype=None,name="")
+
+	变分量子层的抽象计算模块。对一个参数化的量子线路使用pyqpanda2进行仿真,得到测量结果。该变分量子层继承了VQNet框架的梯度计算模块,可以使用参数漂移法等计算线路参数的梯度,训练变分量子线路模型或将变分量子线路嵌入混合量子和经典模型。
+    
+    :param qprog_with_measure: 用pyQPand构建的量子线路运行和测量函数。
+    :param para_num: `int` - 参数个数。
+    :param diff_method: 求解量子线路参数梯度的方法,“参数位移”或“有限差分”,默认参数偏移。
+    :param delta: 有限差分计算梯度时的 \delta。
+    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
+    :param name: 这个模块的名字, 默认为""。
+
+    :return: 一个可以计算量子线路的模块。
+
+    .. note::
+        qprog_with_measure是pyqpanda2中定义的量子线路函数 :https://pyqpanda-toturial.readthedocs.io/zh/latest/QCircuit.html。
+        
+        此函数必须包含以下参数作为函数入参（即使某个参数未实际使用）,否则无法在本函数中正常运行。
+
+        与QuantumLayer相比。该接口传入的变分线路运行函数中,用户应该手动创建量子比特和模拟器: https://pyqpanda-toturial.readthedocs.io/zh/latest/QuantumMachine.html,
+
+        如果qprog_with_measure需要quantum measure,用户还需要手动创建需要分配cbits: https://pyqpanda-toturial.readthedocs.io/zh/latest/Measure.html
+        
+        量子线路函数 qprog_with_measure (input,param,nqubits,ncubits)的使用可参考下面的例子。
+        
+        `input`: 输入一维经典数据。如果没有,输入 None。
+        
+        `param`: 输入一维的变分量子线路的待训练参数。
+
+
+    Example::
+
+        import pyqpanda as pq
+        from pyvqnet.qnn import ProbsMeasure
+        import numpy as np
+        from pyvqnet.tensor import QTensor
+        import pyvqnet
+        pyvqnet.backends.set_backend("torch")
+        from pyvqnet.qnn.vqc.torch import TorchQpandaQuantumLayer
+        def pqctest (input,param):
+            num_of_qubits = 4
+
+            m_machine = pq.CPUQVM()# outside
+            m_machine.init_qvm()# outside
+            qubits = m_machine.qAlloc_many(num_of_qubits)
+
+            circuit = pq.QCircuit()
+            circuit.insert(pq.H(qubits[0]))
+            circuit.insert(pq.H(qubits[1]))
+            circuit.insert(pq.H(qubits[2]))
+            circuit.insert(pq.H(qubits[3]))
+
+            circuit.insert(pq.RZ(qubits[0],input[0]))
+            circuit.insert(pq.RZ(qubits[1],input[1]))
+            circuit.insert(pq.RZ(qubits[2],input[2]))
+            circuit.insert(pq.RZ(qubits[3],input[3]))
+
+            circuit.insert(pq.CNOT(qubits[0],qubits[1]))
+            circuit.insert(pq.RZ(qubits[1],param[0]))
+            circuit.insert(pq.CNOT(qubits[0],qubits[1]))
+
+            circuit.insert(pq.CNOT(qubits[1],qubits[2]))
+            circuit.insert(pq.RZ(qubits[2],param[1]))
+            circuit.insert(pq.CNOT(qubits[1],qubits[2]))
+
+            circuit.insert(pq.CNOT(qubits[2],qubits[3]))
+            circuit.insert(pq.RZ(qubits[3],param[2]))
+            circuit.insert(pq.CNOT(qubits[2],qubits[3]))
+
+            prog = pq.QProg()
+            prog.insert(circuit)
+
+            rlt_prob = ProbsMeasure([0,2],prog,m_machine,qubits)
+            return rlt_prob
+
+        pqc = TorchQpandaQuantumLayer(pqctest,3)
+
+        #classic data as input
+        input = QTensor([[1.0,2,3,4],[4,2,2,3],[3,3,2,2]],requires_grad=True)
+
+        #forward circuits
+        rlt = pqc(input)
+
+        print(rlt)
+
+        grad =  QTensor(np.ones(rlt.data.shape)*1000)
+        #backward circuits
+        rlt.backward(grad)
+
+        print(pqc.m_para.grad)
+        print(input.grad)
+
+
+TorchQcloudQuantumLayer
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+当您安装最新版本pyqpanda2,可以使用本接口定义一个变分线路,并提交到originqc的真实芯片上运行。
+
+.. py:class:: pyvqnet.qnn.vqc.torch.TorchQcloudQuantumLayer(origin_qprog_func, qcloud_token, para_num, num_qubits, num_cubits, pauli_str_dict=None, shots = 1000, initializer=None, dtype=None, name="", diff_method="parameter_shift", submit_kwargs={}, query_kwargs={})
+
+    使用 pyqpanda QCloud 从版本 3.8.2.2 开始的 originqc 真实芯片的抽象计算模块。 它提交参数化量子电路到真实芯片并获得测量结果。
+    如果 diff_method == "random_coordinate_descent" ,该层将随机选择单个参数来计算梯度,其他参数将保持为零。参考:https://arxiv.org/abs/2311.00088
+
+    .. note::
+
+        qcloud_token 为您到 https://qcloud.originqc.com.cn/ 中申请的api token。
+        origin_qprog_func 需要返回pypqanda.QProg类型的数据,如果没有设置pauli_str_dict,需要保证该QProg中已经插入了measure。
+        origin_qprog_func 的形式必须按照如下:
+
+        origin_qprog_func(input,param,qubits,cbits,machine)
+        
+            `input`: 输入1~2维经典数据,二维的情况下,第一个维度为批处理大小。
+            
+            `param`: 输入一维的变分量子线路的待训练参数。
+
+            `machine`: 由QuantumBatchAsyncQcloudLayer创建的模拟器QCloud,无需用户额外在函数中定义。
+            
+            `qubits`: 由QuantumBatchAsyncQcloudLayer创建的模拟器QCloud创建的量子比特,数量为  `num_qubits`, 类型为pyQpanda.Qubits,无需用户额外在函数中定义。
+            
+            `cbits`: 由QuantumBatchAsyncQcloudLayer分配的经典比特, 数量为  `num_cubits`, 类型为 pyQpanda.ClassicalCondition,无需用户额外在函数中定义。。
+            
+
+
+    :param origin_qprog_func: QPanda 构建的变分量子电路函数,必须返回QProg。
+    :param qcloud_token: `str` - 量子机的类型或用于执行的云令牌。
+    :param para_num: `int` - 参数数量,参数是大小为[para_num]的QTensor。
+    :param num_qubits: `int` - 量子电路中的量子比特数量。
+    :param num_cubits: `int` - 量子电路中用于测量的经典比特数量。
+    :param pauli_str_dict: `dict|list` - 表示量子电路中泡利运算符的字典或字典列表。 默认为“无”,则进行测量操作,如果输入泡利算符的字典,则会计算单个期望或者多个期望。
+    :param shot: `int` - 测量次数。 默认值为 1000。
+    :param initializer: 参数值的初始化器。 默认为“无”,使用0~2*pi正态分布。
+    :param dtype: 参数的数据类型。 默认值为 None,即使用默认数据类型pyvqnet.kfloat32。
+    :param name: 模块的名称。 默认为空字符串。
+    :param diff_method: 梯度计算的微分方法。 默认为“parameter_shift”,"random_coordinate_descent"。
+    :param submit_kwargs: 用于提交量子电路的附加关键字参数,默认:{"chip_id":pyqpanda.real_chip_type.origin_72,"is_amend":True,"is_mapping":True,"is_optimization":True,"compile_level":3,"default_task_group_size":200,"test_qcloud_fake":False},当设置test_qcloud_fake为True则本地CPUQVM模拟。
+    :param query_kwargs: 用于查询量子结果的附加关键字参数,默认:{"timeout":2,"print_query_info":True,"sub_circuits_split_size":1}。
+    :return: 一个可以计算量子电路的模块。
+    
+    Example::
+
+        import pyqpanda as pq
+        import pyvqnet
+        from pyvqnet.qnn.vqc.torch import TorchQcloudQuantumLayer
+
+        pyvqnet.backends.set_backend("torch")
+        def qfun(input,param, m_machine, m_qlist,cubits):
+            measure_qubits = [0,2]
+            m_prog = pq.QProg()
+            cir = pq.QCircuit()
+            cir.insert(pq.RZ(m_qlist[0],input[0]))
+            cir.insert(pq.CNOT(m_qlist[0],m_qlist[1]))
+            cir.insert(pq.RY(m_qlist[1],param[0]))
+            cir.insert(pq.CNOT(m_qlist[0],m_qlist[2]))
+            cir.insert(pq.RZ(m_qlist[1],input[1]))
+            cir.insert(pq.RY(m_qlist[2],param[1]))
+            cir.insert(pq.H(m_qlist[2]))
+            m_prog.insert(cir)
+
+            for idx, ele in enumerate(measure_qubits):
+                m_prog << pq.Measure(m_qlist[ele], cubits[idx])  # pylint: disable=expression-not-assigned
+            return m_prog
+
+        l = TorchQcloudQuantumLayer(qfun,
+                        "3047DE8A59764BEDAC9C3282093B16AF1",
+                        2,
+                        6,
+                        6,
+                        pauli_str_dict=None,
+                        shots = 1000,
+                        initializer=None,
+                        dtype=None,
+                        name="",
+                        diff_method="parameter_shift",
+                        submit_kwargs={"test_qcloud_fake":True},
+                        query_kwargs={})
+        x = pyvqnet.tensor.QTensor([[0.56,1.2],[0.56,1.2],[0.56,1.2],[0.56,1.2],[0.56,1.2]],requires_grad= True)
+        y = l(x)
+        print(y)
+        y.backward()
+        print(l.m_para.grad)
+        print(x.grad)
+
+        def qfun2(input,param, m_machine, m_qlist,cubits):
+            measure_qubits = [0,2]
+            m_prog = pq.QProg()
+            cir = pq.QCircuit()
+            cir.insert(pq.RZ(m_qlist[0],input[0]))
+            cir.insert(pq.CNOT(m_qlist[0],m_qlist[1]))
+            cir.insert(pq.RY(m_qlist[1],param[0]))
+            cir.insert(pq.CNOT(m_qlist[0],m_qlist[2]))
+            cir.insert(pq.RZ(m_qlist[1],input[1]))
+            cir.insert(pq.RY(m_qlist[2],param[1]))
+            cir.insert(pq.H(m_qlist[2]))
+            m_prog.insert(cir)
+
+            return m_prog
+        l = TorchQcloudQuantumLayer(qfun2,
+                "3047DE8A59764BEDAC9C3282093B16AF",
+                2,
+                6,
+                6,
+                pauli_str_dict={'Z0 X1':10,'':-0.5,'Y2':-0.543},
+                shots = 1000,
+                initializer=None,
+                dtype=None,
+                name="",
+                diff_method="parameter_shift",
+                submit_kwargs={"test_qcloud_fake":True},
+                query_kwargs={})
+        x = pyvqnet.tensor.QTensor([[0.56,1.2],[0.56,1.2],[0.56,1.2],[0.56,1.2]],requires_grad= True)
+        y = l(x)
+        print(y)
+        y.backward()
+        print(l.m_para.grad)
+        print(x.grad)
+
+
+
+.. warning::
+
+    以下TorchQcloud3QuantumLayer,TorchQpanda3QuantumLayer接口的量子计算部分使用pyqpanda3 https://qcloud.originqc.com.cn/document/qpanda-3/index.html。
+
+    如果您使用了本模块下的QCloud功能,在代码中导入pyqpanda2 或 使用pyvqnet的pyqpanda2相关封装接口会有错误。
+
+TorchQcloud3QuantumLayer
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+当您安装最新版本pyqpanda3,可以使用本接口定义一个变分线路,并提交到originqc的真实芯片上运行。
+
+.. py:class:: pyvqnet.qnn.vqc.torch.TorchQcloud3QuantumLayer(origin_qprog_func, qcloud_token, para_num, pauli_str_dict=None, shots = 1000, initializer=None, dtype=None, name="", diff_method="parameter_shift", submit_kwargs={}, query_kwargs={})
+
+    使用 pyqpanda3的 originqc 真实芯片的抽象计算模块。 它提交参数化量子电路到真实芯片并获得测量结果。
+    如果 diff_method == "random_coordinate_descent" ,该层将随机选择单个参数来计算梯度,其他参数将保持为零。参考:https://arxiv.org/abs/2311.00088
+
+    .. note::
+
+        qcloud_token 为您到 https://qcloud.originqc.com.cn/ 中申请的api token。
+        origin_qprog_func 需要返回pypqanda3.core.QProg类型的数据,如果没有设置pauli_str_dict,需要保证该QProg中已经插入了measure。
+        origin_qprog_func 的形式必须按照如下:
+
+        origin_qprog_func(input,param )
+        
+            `input`: 输入1~2维经典数据,二维的情况下,第一个维度为批处理大小。
+            
+            `param`: 输入一维的变分量子线路的待训练参数。
+
+    .. warning::
+
+        该类继承于 ``pyvqnet.nn.Module`` 以及 ``torch.nn.Module``,可以作为 ``torch.nn.Module`` 的一个子模块加入torch的模型中。
+
+        该类的 ``_buffers`` 中的数据为 ``torch.Tensor`` 类型。
+        该类的 ``_parmeters`` 中的数据为 ``torch.nn.Parameter`` 类型。
+
+
+
+    :param origin_qprog_func: QPanda 构建的变分量子电路函数,必须返回QProg。
+    :param qcloud_token: `str` - 量子机的类型或用于执行的云令牌。
+    :param para_num: `int` - 参数数量,参数是大小为[para_num]的QTensor。
+    :param pauli_str_dict: `dict|list` - 表示量子电路中泡利运算符的字典或字典列表。 默认为“无”,则进行测量操作,如果输入泡利算符的字典,则会计算单个期望或者多个期望。
+    :param shot: `int` - 测量次数。 默认值为 1000。
+    :param initializer: 参数值的初始化器。 默认为“无”,使用0~2*pi正态分布。
+    :param dtype: 参数的数据类型。 默认值为 None,即使用默认数据类型pyvqnet.kfloat32。
+    :param name: 模块的名称。 默认为空字符串。
+    :param diff_method: 梯度计算的微分方法。 默认为“parameter_shift”,"random_coordinate_descent"。
+    :param submit_kwargs: 用于提交量子电路的附加关键字参数,默认:{"chip_id":pyqpanda.real_chip_type.origin_72,"is_amend":True,"is_mapping":True,"is_optimization":True,"compile_level":3,"default_task_group_size":200,"test_qcloud_fake":False},当设置test_qcloud_fake为True则本地CPUQVM模拟。
+    :param query_kwargs: 用于查询量子结果的附加关键字参数,默认:{"timeout":2,"print_query_info":True,"sub_circuits_split_size":1}。
+    :return: 一个可以计算量子电路的模块。
+
+    Example::
+
+        import pyqpanda3.core as pq
+        import pyvqnet
+        from pyvqnet.qnn.vqc.torch import TorchQcloud3QuantumLayer
+
+        pyvqnet.backends.set_backend("torch")
+        def qfun(input,param):
+
+            m_qlist = range(6)
+            cubits = range(6)
+            measure_qubits = [0,2]
+            m_prog = pq.QProg()
+            cir = pq.QCircuit()
+            cir<<pq.RZ(m_qlist[0],input[0])
+            cir<<pq.CNOT(m_qlist[0],m_qlist[1])
+            cir<<pq.RY(m_qlist[1],param[0])
+            cir<<pq.CNOT(m_qlist[0],m_qlist[2])
+            cir<<pq.RZ(m_qlist[1],input[1])
+            cir<<pq.RY(m_qlist[2],param[1])
+            cir<<pq.H(m_qlist[2])
+            m_prog<<cir
+
+            for idx, ele in enumerate(measure_qubits):
+                m_prog << pq.measure(m_qlist[ele], cubits[idx])  # pylint: disable=expression-not-assigned
+            return m_prog
+
+        l = TorchQcloud3QuantumLayer(qfun,
+                        "3047DE8A59764BEDAC9C3282093B16AF1",
+                        2,
+                        pauli_str_dict=None,
+                        shots = 1000,
+                        initializer=None,
+                        dtype=None,
+                        name="",
+                        diff_method="parameter_shift",
+                        submit_kwargs={"test_qcloud_fake":True},
+                        query_kwargs={})
+        x = pyvqnet.tensor.QTensor([[0.56,1.2],[0.56,1.2],[0.56,1.2],[0.56,1.2],[0.56,1.2]],requires_grad= True)
+        y = l(x)
+        print(y)
+        y.backward()
+        print(l.m_para.grad)
+        print(x.grad)
+
+        def qfun2(input,param ):
+
+            m_qlist = range(6)
+            cubits = range(6)
+            measure_qubits = [0,2]
+            m_prog = pq.QProg()
+            cir = pq.QCircuit()
+            cir<<pq.RZ(m_qlist[0],input[0])
+            cir<<pq.CNOT(m_qlist[0],m_qlist[1])
+            cir<<pq.RY(m_qlist[1],param[0])
+            cir<<pq.CNOT(m_qlist[0],m_qlist[2])
+            cir<<pq.RZ(m_qlist[1],input[1])
+            cir<<pq.RY(m_qlist[2],param[1])
+            cir<<pq.H(m_qlist[2])
+            m_prog<<cir
+
+            return m_prog
+        l = TorchQcloud3QuantumLayer(qfun2,
+                "3047DE8A59764BEDAC9C3282093B16AF",
+                2,
+
+                pauli_str_dict={'Z0 X1':10,'':-0.5,'Y2':-0.543},
+                shots = 1000,
+                initializer=None,
+                dtype=None,
+                name="",
+                diff_method="parameter_shift",
+                submit_kwargs={"test_qcloud_fake":True},
+                query_kwargs={})
+        x = pyvqnet.tensor.QTensor([[0.56,1.2],[0.56,1.2],[0.56,1.2],[0.56,1.2]],requires_grad= True)
+        y = l(x)
+        print(y)
+        y.backward()
+        print(l.m_para.grad)
+        print(x.grad)
+
+
+
+TorchQpanda3QuantumLayer
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+如您更加熟悉pyQPanda3语法,可以使用该接口TorchQpanda3QuantumLayer。
+
+.. py:class:: pyvqnet.qnn.vqc.torch.TorchQpanda3QuantumLayer(qprog_with_measure,para_num,diff_method:str = "parameter_shift",delta:float = 0.01,dtype=None,name="")
+
+	变分量子层的抽象计算模块。对一个参数化的量子线路使用pyQPanda3进行仿真,得到测量结果。该变分量子层继承了VQNet框架的梯度计算模块,可以使用参数漂移法等计算线路参数的梯度,训练变分量子线路模型或将变分量子线路嵌入混合量子和经典模型。
+    
+    :param qprog_with_measure: 用pyQPand构建的量子线路运行和测量函数。
+    :param para_num: `int` - 参数个数。
+    :param diff_method: 求解量子线路参数梯度的方法,“参数位移”或“有限差分”,默认参数偏移。
+    :param delta: 有限差分计算梯度时的 \delta。
+    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
+    :param name: 这个模块的名字, 默认为""。
+
+    :return: 一个可以计算量子线路的模块。
+
+    .. note::
+        qprog_with_measure是pyQPanda中定义的量子线路函数 :https://qcloud.originqc.com.cn/document/qpanda-3/db/d6c/tutorial_circuit_and_program.html.。
+        
+        此函数必须包含以下参数作为函数入参（即使某个参数未实际使用）,否则无法在本函数中正常运行。
+
+        量子线路函数 qprog_with_measure (input,param,nqubits,ncubits)的使用可参考下面的例子。
+        
+        `input`: 输入一维经典数据。如果没有,输入 None。
+        
+        `param`: 输入一维的变分量子线路的待训练参数。
+
+
+    Example::
+
+        import pyqpanda3.core as pq
+        from pyvqnet.qnn.pq3 import ProbsMeasure
+        import numpy as np
+        from pyvqnet.tensor import QTensor
+        import pyvqnet
+        pyvqnet.backends.set_backend("torch")
+        from pyvqnet.qnn.vqc.torch import TorchQpanda3QuantumLayer
+        def pqctest (input,param):
+            num_of_qubits = 4
+
+            m_machine = pq.CPUQVM()# outside
+        
+            qubits =range(num_of_qubits)
+
+            circuit = pq.QCircuit()
+            circuit<<pq.H(qubits[0])
+            circuit<<pq.H(qubits[1])
+            circuit<<pq.H(qubits[2])
+            circuit<<pq.H(qubits[3])
+
+            circuit<<pq.RZ(qubits[0],input[0])
+            circuit<<pq.RZ(qubits[1],input[1])
+            circuit<<pq.RZ(qubits[2],input[2])
+            circuit<<pq.RZ(qubits[3],input[3])
+
+            circuit<<pq.CNOT(qubits[0],qubits[1])
+            circuit<<pq.RZ(qubits[1],param[0])
+            circuit<<pq.CNOT(qubits[0],qubits[1])
+
+            circuit<<pq.CNOT(qubits[1],qubits[2])
+            circuit<<pq.RZ(qubits[2],param[1])
+            circuit<<pq.CNOT(qubits[1],qubits[2])
+
+            circuit<<pq.CNOT(qubits[2],qubits[3])
+            circuit<<pq.RZ(qubits[3],param[2])
+            circuit<<pq.CNOT(qubits[2],qubits[3])
+
+            prog = pq.QProg()
+            prog<<circuit
+
+            rlt_prob = ProbsMeasure(m_machine,prog,[0,2])
+            return rlt_prob
+
+        pqc = TorchQpanda3QuantumLayer(pqctest,3)
+
+        #classic data as input
+        input = QTensor([[1.0,2,3,4],[4,2,2,3],[3,3,2,2]],requires_grad=True)
+
+        #forward circuits
+        rlt = pqc(input)
+
+        print(rlt)
+
+        grad =  QTensor(np.ones(rlt.data.shape)*1000)
+        #backward circuits
+        rlt.backward(grad)
+
+        print(pqc.m_para.grad)
+        print(input.grad)
+
 
 基于自动微分的变分量子线路模块和接口
-=================================================
+--------------------------------------------------
 
 
 基类
----------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 编写变分量子线路模型需要继承于 ``QModule``。
 
 QModule
-^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""
 
 .. py:class:: pyvqnet.qnn.vqc.torch.QModule(name="")
 
@@ -2347,7 +2805,7 @@ QModule
 
 
 QMachine
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""
 
 .. py:class:: pyvqnet.qnn.vqc.torch.QMachine(num_wires, dtype=pyvqnet.kcomplex64,grad_mode="",save_ir=False)
 
@@ -2388,7 +2846,7 @@ QMachine
 
 
 变分量子逻辑门模块
---------------------------
+""""""""""""""""""""""""
 
 
 以下 ``pyvqnet.qnn.vqc`` 中的函数接口直接支持 ``torch`` 后端的 ``QTensor`` 进行计算。
@@ -2408,7 +2866,7 @@ QMachine
     这些类如果有参数成员变量 ``_parmeters`` ,则其中的数据为 ``torch.nn.Parameter`` 类型。
 
 I
-^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""
 
 .. py:class:: pyvqnet.qnn.vqc.torch.I(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
@@ -2441,7 +2899,7 @@ I
 
 
 Hadamard
-^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""
 
 .. py:class:: pyvqnet.qnn.vqc.torch.Hadamard(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
@@ -2474,7 +2932,7 @@ Hadamard
 
 
 T
-^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""
 
 .. py:class:: pyvqnet.qnn.vqc.torch.T(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
@@ -2508,7 +2966,7 @@ T
 
 
 S
-^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""
 
 .. py:class:: pyvqnet.qnn.vqc.torch.S(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
@@ -2541,7 +2999,7 @@ S
 
 
 PauliX
-^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""
 
 .. py:class:: pyvqnet.qnn.vqc.torch.PauliX(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
@@ -2575,7 +3033,7 @@ PauliX
 
 
 PauliY
-^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""
 
 .. py:class:: pyvqnet.qnn.vqc.torch.PauliY(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
@@ -2610,7 +3068,7 @@ PauliY
 
 
 PauliZ
-^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""
 
 .. py:class:: pyvqnet.qnn.vqc.torch.PauliZ(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
@@ -2645,7 +3103,7 @@ PauliZ
 
 
 X1
-^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""
 
 .. py:class:: pyvqnet.qnn.vqc.torch.X1(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
@@ -2678,7 +3136,7 @@ X1
 
 
 RX
-^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""
 
 .. py:class:: pyvqnet.qnn.vqc.torch.RX(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
@@ -2713,7 +3171,7 @@ RX
 
 
 RY
-^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""
 
 .. py:class:: pyvqnet.qnn.vqc.torch.RY(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
@@ -2746,7 +3204,7 @@ RY
 
 
 RZ
-^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""
 
 .. py:class:: pyvqnet.qnn.vqc.torch.RZ(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
@@ -2779,7 +3237,7 @@ RZ
 
 
 CRX
-^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""
 
 .. py:class:: pyvqnet.qnn.vqc.torch.CRX(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
@@ -2812,8 +3270,7 @@ CRX
 
 
 CRY
-^^^^^^^^^^^^^^^^^^^^^^
-
+""""""""""""""""""""""""
 
 .. py:class:: pyvqnet.qnn.vqc.torch.CRY(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
@@ -2846,7 +3303,7 @@ CRY
 
 
 CRZ
-^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""
 
 
 .. py:class:: pyvqnet.qnn.vqc.torch.CRZ(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
@@ -2881,7 +3338,7 @@ CRZ
 
 
 U1
-^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""
 
 .. py:class:: pyvqnet.qnn.vqc.torch.U1(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
@@ -2913,7 +3370,7 @@ U1
         print(device.states)
 
 U2
-^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""
 
 
 .. py:class:: pyvqnet.qnn.vqc.torch.U2(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
@@ -2947,7 +3404,7 @@ U2
 
 
 U3
-^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""
 
 
 .. py:class:: pyvqnet.qnn.vqc.torch.U3(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
@@ -2982,7 +3439,7 @@ U3
 
 
 CNOT
-^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""
 
 .. py:class:: pyvqnet.qnn.vqc.torch.CNOT(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
@@ -3014,7 +3471,7 @@ CNOT
         print(device.states)
 
 CY
-^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""
 
 .. py:class:: pyvqnet.qnn.vqc.torch.CY(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
@@ -3047,7 +3504,7 @@ CY
 
 
 CZ
-^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""
 
 .. py:class:: pyvqnet.qnn.vqc.torch.CZ(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
@@ -3082,7 +3539,7 @@ CZ
 
 
 CR
-^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""
 
 .. py:class:: pyvqnet.qnn.vqc.torch.CR(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
@@ -3117,7 +3574,7 @@ CR
 
 
 SWAP
-^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""
 
 
 .. py:class:: pyvqnet.qnn.vqc.torch.SWAP(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
@@ -3151,7 +3608,7 @@ SWAP
 
 
 CSWAP
-^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""
 
 .. py:class:: pyvqnet.qnn.vqc.torch.CSWAP(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
@@ -3194,7 +3651,7 @@ CSWAP
         print(device.states)
 
 RXX
-^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""
 
 
 .. py:class:: pyvqnet.qnn.vqc.torch.RXX(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
@@ -3227,7 +3684,7 @@ RXX
         print(device.states)
 
 RYY
-^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""
 
 .. py:class:: pyvqnet.qnn.vqc.torch.RYY(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
@@ -3260,7 +3717,7 @@ RYY
 
 
 RZZ
-^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""
 
 .. py:class:: pyvqnet.qnn.vqc.torch.RZZ(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
@@ -3294,7 +3751,7 @@ RZZ
 
 
 RZX
-^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""
 
 .. py:class:: pyvqnet.qnn.vqc.torch.RZX(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
@@ -3326,7 +3783,7 @@ RZX
         print(device.states)
 
 Toffoli
-^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""
 
 
 .. py:class:: pyvqnet.qnn.vqc.torch.Toffoli(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
@@ -3359,7 +3816,7 @@ Toffoli
         print(device.states)
 
 IsingXX
-^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""
 
 
 .. py:class:: pyvqnet.qnn.vqc.torch.IsingXX(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
@@ -3393,7 +3850,7 @@ IsingXX
 
 
 IsingYY
-^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""
 
 
 .. py:class:: pyvqnet.qnn.vqc.torch.IsingYY(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
@@ -3427,7 +3884,7 @@ IsingYY
 
 
 IsingZZ
-^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""
 
 .. py:class:: pyvqnet.qnn.vqc.torch.IsingZZ(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
@@ -3461,7 +3918,7 @@ IsingZZ
 
 
 IsingXY
-^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""
 
 
 .. py:class:: pyvqnet.qnn.vqc.torch.IsingXY(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
@@ -3495,7 +3952,7 @@ IsingXY
 
 
 PhaseShift
-^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""
 
 
 .. py:class:: pyvqnet.qnn.vqc.torch.PhaseShift(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
@@ -3529,7 +3986,7 @@ PhaseShift
 
 
 MultiRZ
-^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""
 
 .. py:class:: pyvqnet.qnn.vqc.torch.MultiRZ(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
@@ -3563,7 +4020,7 @@ MultiRZ
 
 
 SDG
-^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""
 
 
 .. py:class:: pyvqnet.qnn.vqc.torch.SDG(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
@@ -3599,7 +4056,7 @@ SDG
 
 
 TDG
-^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""
 
 .. py:class:: pyvqnet.qnn.vqc.torch.TDG(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
@@ -3633,7 +4090,7 @@ TDG
 
 
 ControlledPhaseShift
-^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""
 
 
 .. py:class:: pyvqnet.qnn.vqc.torch.ControlledPhaseShift(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
@@ -3668,7 +4125,7 @@ ControlledPhaseShift
 
 
 MultiControlledX
-^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""
 
 .. py:class:: pyvqnet.qnn.vqc.torch.MultiControlledX(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False,control_values=None)
     
@@ -3707,10 +4164,10 @@ MultiControlledX
 
 
 测量接口
---------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^
 
 Probability
-^^^^^^^^^^^^^^^^^^^^^^
+"""""""""""""""""""""
 
 
 .. py:class:: pyvqnet.qnn.vqc.torch.Probability(wires=None, name="")
@@ -3747,7 +4204,7 @@ Probability
 
 
 MeasureAll
-^^^^^^^^^^^^^^^^^^^^^^
+"""""""""""""""""""""
 
 .. py:class:: pyvqnet.qnn.vqc.torch.MeasureAll(obs=None, name="")
 
@@ -3802,7 +4259,7 @@ MeasureAll
 
 
 Samples
-^^^^^^^^^^^^^^^^^^^^^^
+"""""""""""""""""""""
 
 .. py:class:: pyvqnet.qnn.vqc.torch.Samples(wires=None, obs=None, shots = 1,name="")
 
@@ -3846,7 +4303,7 @@ Samples
 
 
 SparseHamiltonian
-^^^^^^^^^^^^^^^^^^^^^^
+"""""""""""""""""""""
 
 .. py:class:: pyvqnet.qnn.vqc.torch.SparseHamiltonian(obs=None, name="")
 
@@ -3935,7 +4392,7 @@ SparseHamiltonian
 
 
 HermitianExpval
-^^^^^^^^^^^^^^^^^^^^^^
+"""""""""""""""""""""
 
 .. py:class:: pyvqnet.qnn.vqc.torch.HermitianExpval(obs=None, name="")
 
@@ -4005,10 +4462,10 @@ HermitianExpval
         print(batch_y)
 
 量子线路常见模板
------------------------------- 
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 VQC_HardwareEfficientAnsatz
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""""""""""""""""""
 
 .. py:class:: pyvqnet.qnn.vqc.torch.VQC_HardwareEfficientAnsatz(n_qubits,single_rot_gate_list,entangle_gate="CNOT",entangle_rules='linear',depth=1,initial = None,dtype=None)
 
@@ -4070,7 +4527,7 @@ VQC_HardwareEfficientAnsatz
 
 
 VQC_BasicEntanglerTemplate
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""""""""""""""""""
 
 .. py:class:: pyvqnet.qnn.vqc.torch.VQC_BasicEntanglerTemplate(num_layer=1, num_qubits=1, rotation="RX", initial=None, dtype=None)
 
@@ -4127,7 +4584,7 @@ VQC_BasicEntanglerTemplate
 
 
 VQC_StronglyEntanglingTemplate
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""""""""""""""""""
 
 .. py:class:: pyvqnet.qnn.vqc.torch.VQC_StronglyEntanglingTemplate(num_layers=1, num_qubits=1, rotation = "RX", initial = None, dtype: = None)
 
@@ -4184,10 +4641,10 @@ VQC_StronglyEntanglingTemplate
 
 
 VQC_QuantumEmbedding
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""""""""""""""""""
 
 
-.. py:class:: pyvqnet.qnn.vqc.torch.VQC_QuantumEmbedding( num_repetitions_input, depth_input, num_unitary_layers, num_repetitions,initial=None,dtype=None,name="")
+.. py:class:: pyvqnet.qnn.vqc.torch.VQC_QuantumEmbedding(  num_repetitions_input, depth_input, num_unitary_layers, num_repetitions,initial = None,dtype = None,name= "")
 
     使用 RZ,RY,RZ 创建变分量子电路,将经典数据编码为量子态。
     参考 `Quantum embeddings for machine learning <https://arxiv.org/abs/2001.03622>`_。
@@ -4202,10 +4659,9 @@ VQC_QuantumEmbedding
     :paramdepth_input: 输入维数。
     :param num_unitary_layers: 变分量子门的重复次数。
     :param num_repetitions: 子模块的重复次数。
-    :param initial: 初始化所有参数, 该参数必须是只有一个元素的 QTensor, 默认值: None。
-    :param dtype: 参数的数据类型, 默认值: None, 使用 float32。
-    :param name: 该模块的名称。
-    :return: VQC_QuantumEmbedding 实例。
+    :param initial: 参数初始化值,默认为None
+    :param dtype: 参数的类型,默认 None,使用float32.
+    :param name: 类的名字
 
     Example::
 
@@ -4230,8 +4686,7 @@ VQC_QuantumEmbedding
 
                 self.ansatz = VQC_QuantumEmbedding(num_repetitions_input, depth_input,
                                                 num_unitary_layers,
-                                                num_repetitions, pyvqnet.kfloat64,
-                                                initial=tensor.full([1],12.0))
+                                                num_repetitions, initial=tensor.full([1],12.0),dtype=pyvqnet.kfloat64)
 
                 self.measure = MeasureAll(obs={f"Z{nq-1}":1})
                 self.device = QMachine(nq)
@@ -4249,7 +4704,7 @@ VQC_QuantumEmbedding
 
 
 ExpressiveEntanglingAnsatz
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""""""""""""""""""
 
 .. py:class:: pyvqnet.qnn.vqc.torch.ExpressiveEntanglingAnsatz(type: int, num_wires: int, depth: int, dtype=None, name: str = "")
 
@@ -4313,7 +4768,7 @@ ExpressiveEntanglingAnsatz
 
 
 vqc_basis_embedding
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""""""""""""""""""
 
 .. py:function:: pyvqnet.qnn.vqc.torch.vqc_basis_embedding(basis_state,q_machine)
 
@@ -4338,7 +4793,7 @@ vqc_basis_embedding
 
 
 vqc_angle_embedding
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""""""""""""""""""
 
 
 .. py:function:: pyvqnet.qnn.vqc.torch.vqc_angle_embedding(input_feat, wires, q_machine: pyvqnet.qnn.vqc.torch.QMachine, rotation: str = "X")
@@ -4379,7 +4834,7 @@ vqc_angle_embedding
 
 
 vqc_amplitude_embedding
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""""""""""""""""""
 
 .. py:function:: pyvqnet.qnn.vqc.torch.vqc_amplitude_embeddingVQC_AmplitudeEmbeddingCircuit(input_feature, q_machine)
 
@@ -4402,8 +4857,7 @@ vqc_amplitude_embedding
 
 
 vqc_iqp_embedding
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
+""""""""""""""""""""""""""""""""""""""""
 .. py:function:: pyvqnet.qnn.vqc.vqc_iqp_embedding(input_feat, q_machine: pyvqnet.qnn.vqc.torch.QMachine, rep: int = 1)
 
     使用IQP线路的对角门将 :math:`n` 特征编码为 :math:`n` 量子比特。该函数别名:  ``VQC_IQPEmbedding`` 。
@@ -4430,7 +4884,7 @@ vqc_iqp_embedding
 
 
 vqc_rotcircuit
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""""""""""""""""""
 
 .. py:function:: pyvqnet.qnn.vqc.torch.vqc_rotcircuit(q_machine, wire, params)
 
@@ -4461,7 +4915,7 @@ vqc_rotcircuit
 
 
 vqc_crot_circuit
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""""""""""""""""""
 
 
 .. py:function:: pyvqnet.qnn.vqc.torch.vqc_crot_circuit(para,control_qubits,rot_wire,q_machine)
@@ -4498,7 +4952,7 @@ vqc_crot_circuit
 
 
 vqc_controlled_hadamard
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""""""""""""""""""
 
 
 .. py:function:: pyvqnet.qnn.vqc.torch.vqc_controlled_hadamard(wires, q_machine)
@@ -4534,7 +4988,7 @@ vqc_controlled_hadamard
 
 
 vqc_ccz
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""""""""""""""""""
 
 .. py:function:: pyvqnet.qnn.vqc.torch.vqc_ccz(wires, q_machine)
 
@@ -4576,7 +5030,7 @@ vqc_ccz
 
 
 vqc_fermionic_single_excitation
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""""""""""""""""""
 
 .. py:function:: pyvqnet.qnn.vqc.torch.vqc_fermionic_single_excitation(weight, wires, q_machine)
 
@@ -4615,7 +5069,7 @@ vqc_fermionic_single_excitation
 
 
 vqc_fermionic_double_excitation
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""""""""""""""""""
 
 
 .. py:function:: pyvqnet.qnn.vqc.torch.vqc_fermionic_double_excitation(weight, wires1, wires2, q_machine)
@@ -4668,7 +5122,7 @@ vqc_fermionic_double_excitation
  
 
 vqc_uccsd
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""""""""""""""""""
 
 
 .. py:function:: pyvqnet.qnn.vqc.torch.vqc_uccsd(weights, wires, s_wires, d_wires, init_state, q_machine)
@@ -4729,7 +5183,7 @@ vqc_uccsd
 
 
 vqc_zfeaturemap
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""""""""""""""""""
 
 .. py:function:: pyvqnet.qnn.vqc.torch.vqc_zfeaturemap(input_feat, q_machine: pyvqnet.qnn.vqc.torch.QMachine, data_map_func=None, rep: int = 2)
 
@@ -4768,7 +5222,7 @@ vqc_zfeaturemap
  
 
 vqc_zzfeaturemap
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""""""""""""""""""
 
 .. py:function:: pyvqnet.qnn.vqc.torch.vqc_zzfeaturemap(input_feat, q_machine: pyvqnet.qnn.vqc.torch.QMachine, data_map_func=None, entanglement: Union[str, List[List[int]],Callable[[int], List[int]]] = "full",rep: int = 2)
 
@@ -4813,8 +5267,7 @@ vqc_zzfeaturemap
 
 
 vqc_allsinglesdoubles
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
+""""""""""""""""""""""""""""""""""""""""
 
 .. py:function:: pyvqnet.qnn.vqc.torch.vqc_allsinglesdoubles(weights, q_machine: pyvqnet.qnn.vqc.torch.QMachine, hf_state, wires, singles=None, doubles=None)
 
@@ -4852,7 +5305,7 @@ vqc_allsinglesdoubles
         print(qm.states)
 
 vqc_basisrotation
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""""""""""""""""""
 
 .. py:function:: pyvqnet.qnn.vqc.torch.vqc_basisrotation(q_machine: pyvqnet.qnn.vqc.torch.QMachine, wires, unitary_matrix: QTensor, check=False)
 
@@ -4898,7 +5351,7 @@ vqc_basisrotation
 
 
 vqc_quantumpooling_circuit
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""""""""""""""""""
 
 .. py:function:: pyvqnet.qnn.vqc.torch.vqc_quantumpooling_circuit(ignored_wires, sinks_wires, params, q_machine)
 
@@ -4930,22 +5383,17 @@ vqc_quantumpooling_circuit
         exp = m(q_machine=qm)
         print(exp)
 
-其他量子变分线路训练函数
-------------------------------------
-
-
-
 
 QuantumLayerAdjoint
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""""""""""""""""""
 
-.. py:class:: pyvqnet.qnn.vqc.torch.QuantumLayerAdjoint(general_module, q_machine,name="")
+.. py:class:: pyvqnet.qnn.vqc.torch.QuantumLayerAdjoint(general_module, use_qpanda=False,name="")
 
 
     使用伴随矩阵方式进行梯度计算的可自动微分的变分量子线路层,参考  `Efficient calculation of gradients in classical simulations of variational quantum algorithms <https://arxiv.org/abs/2009.02823>`_ 。
 
     :param general_module: 一个仅使用 ``pyvqnet.qnn.vqc.torch`` 下量子线路接口搭建的 ``pyvqnet.qnn.vqc.torch.QModule`` 实例。
-    :param q_machine: general_module 模块中申请的QMachine实例。
+    :param use_qpanda: 是否使用qpanda线路进行前传,默认:False。
     :param name: 该层名字,默认为""。
     :return: 返回一个 QuantumLayerAdjoint 类实例。
 
@@ -5016,258 +5464,24 @@ QuantumLayerAdjoint
         qunatum_model = QModel(num_wires=6,
                             dtype=pyvqnet.kcomplex64,
                             grad_mode="adjoint")
-        adjoint_model = QuantumLayerAdjoint(qunatum_model,q_machine=qunatum_model.qm)
+        adjoint_model = QuantumLayerAdjoint(qunatum_model)
         batch_y = adjoint_model(input_x)
         batch_y.backward()
 
 
-TorchQpandaQuantumLayer
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-如您更加熟悉pyQPanda语法,可以使用该接口TorchQpandaQuantumLayer,自定义量子比特 ``qubits`` ,经典比特 ``cbits`` ,后端模拟器 ``machine`` 加入TorchQpandaQuantumLayer的参数 ``qprog_with_measure`` 函数中。
-
-.. py:class:: pyvqnet.qnn.vqc.torch.TorchQpandaQuantumLayer(qprog_with_measure,para_num,diff_method:str = "parameter_shift",delta:float = 0.01,dtype=None,name="")
-
-	变分量子层的抽象计算模块。对一个参数化的量子线路使用pyQPanda进行仿真,得到测量结果。该变分量子层继承了VQNet框架的梯度计算模块,可以使用参数漂移法等计算线路参数的梯度,训练变分量子线路模型或将变分量子线路嵌入混合量子和经典模型。
-    
-    :param qprog_with_measure: 用pyQPand构建的量子线路运行和测量函数。
-    :param para_num: `int` - 参数个数。
-    :param diff_method: 求解量子线路参数梯度的方法,“参数位移”或“有限差分”,默认参数偏移。
-    :param delta: 有限差分计算梯度时的 \delta。
-    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
-    :param name: 这个模块的名字, 默认为""。
-
-    :return: 一个可以计算量子线路的模块。
-
-    .. warning::
-
-        该类继承于 ``pyvqnet.nn.torch.TorchModule`` 以及 ``pyvqnet.qnn.QuantumLayerV2`` ,可以作为 ``torch.nn.Module`` 的一个子模块加入torch的模型中。
 
 
-    .. note::
+TorchHybirdVQCQpanda3QVMLayer
+""""""""""""""""""""""""""""""""""""""""
 
-        qprog_with_measure是pyQPanda中定义的量子线路函数 :https://pyqpanda-toturial.readthedocs.io/zh/latest/QCircuit.html。
-        
-        此函数必须包含以下参数作为函数入参(即使某个参数未实际使用),否则无法在本函数中正常运行。
-
-        与QuantumLayer相比。该接口传入的变分线路运行函数中,用户应该手动创建量子比特和模拟器: https://pyqpanda-toturial.readthedocs.io/zh/latest/QuantumMachine.html,
-
-        如果qprog_with_measure需要quantum measure,用户还需要手动创建需要分配cbits: https://pyqpanda-toturial.readthedocs.io/zh/latest/Measure.html
-        
-        量子线路函数 qprog_with_measure (input,param,nqubits,ncubits)的使用可参考下面的例子。
-        
-        `input`: 输入一维经典数据。如果没有,输入 None。
-        
-        `param`: 输入一维的变分量子线路的待训练参数。
+.. py:class:: pyvqnet.qnn.vqc.torch.TorchHybirdVQCQpanda3QVMLayer(vqc_module: Module,qcloud_token: str,pauli_str_dict: Union[List[Dict], Dict, None] = None,shots: int = 1000,dtype: Union[int, None] = None,name: str = "",submit_kwargs: Dict = {},query_kwargs: Dict = {})
 
 
-    Example::
-
-        import pyqpanda as pq
-        from pyvqnet.qnn import ProbsMeasure
-        import numpy as np
-        from pyvqnet.tensor import QTensor
-        import pyvqnet
-        pyvqnet.backends.set_backend("torch")
-        from pyvqnet.qnn.vqc.torch import TorchQpandaQuantumLayer
-        def pqctest (input,param):
-            num_of_qubits = 4
-
-            m_machine = pq.CPUQVM()# outside
-            m_machine.init_qvm()# outside
-            qubits = m_machine.qAlloc_many(num_of_qubits)
-
-            circuit = pq.QCircuit()
-            circuit.insert(pq.H(qubits[0]))
-            circuit.insert(pq.H(qubits[1]))
-            circuit.insert(pq.H(qubits[2]))
-            circuit.insert(pq.H(qubits[3]))
-
-            circuit.insert(pq.RZ(qubits[0],input[0]))
-            circuit.insert(pq.RZ(qubits[1],input[1]))
-            circuit.insert(pq.RZ(qubits[2],input[2]))
-            circuit.insert(pq.RZ(qubits[3],input[3]))
-
-            circuit.insert(pq.CNOT(qubits[0],qubits[1]))
-            circuit.insert(pq.RZ(qubits[1],param[0]))
-            circuit.insert(pq.CNOT(qubits[0],qubits[1]))
-
-            circuit.insert(pq.CNOT(qubits[1],qubits[2]))
-            circuit.insert(pq.RZ(qubits[2],param[1]))
-            circuit.insert(pq.CNOT(qubits[1],qubits[2]))
-
-            circuit.insert(pq.CNOT(qubits[2],qubits[3]))
-            circuit.insert(pq.RZ(qubits[3],param[2]))
-            circuit.insert(pq.CNOT(qubits[2],qubits[3]))
-
-            prog = pq.QProg()
-            prog.insert(circuit)
-
-            rlt_prob = ProbsMeasure([0,2],prog,m_machine,qubits)
-            return rlt_prob
-
-        pqc = TorchQpandaQuantumLayer(pqctest,3)
-
-        #classic data as input
-        input = QTensor([[1.0,2,3,4],[4,2,2,3],[3,3,2,2]],requires_grad=True)
-
-        #forward circuits
-        rlt = pqc(input)
-
-        print(rlt)
-
-        grad =  QTensor(np.ones(rlt.data.shape)*1000)
-        #backward circuits
-        rlt.backward(grad)
-
-        print(pqc.m_para.grad)
-        print(input.grad)
-
-
-
-TorchQcloudQuantumLayer
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-当您安装最新版本pyqpanda,可以使用本接口定义一个变分线路,并提交到originqc的真实芯片上运行。
-
-.. py:class:: pyvqnet.qnn.vqc.torch.TorchQcloudQuantumLayer(origin_qprog_func, qcloud_token, para_num, num_qubits, num_cubits, pauli_str_dict=None, shots = 1000, initializer=None, dtype=None, name="", diff_method="parameter_shift", submit_kwargs={}, query_kwargs={})
-
-    使用 pyqpanda QCLOUD 从版本 3.8.2.2 开始的 originqc 真实芯片的抽象计算模块。 它提交参数化量子电路到真实芯片并获得测量结果。
-    如果 diff_method == "random_coordinate_descent" ,该层将随机选择单个参数来计算梯度,其他参数将保持为零。参考:https://arxiv.org/abs/2311.00088
-
-    .. warning::
-
-        该类继承于 ``pyvqnet.nn.torch.TorchModule`` 以及 ``pyvqnet.qnn.QuantumBatchAsyncQcloudLayer`` ,可以作为 ``torch.nn.Module`` 的一个子模块加入torch的模型中。
-
-
-    .. note::
-
-        qcloud_token 为您到 https://qcloud.originqc.com.cn/ 中申请的api token。
-        origin_qprog_func 需要返回pypqanda.QProg类型的数据,如果没有设置pauli_str_dict,需要保证该QProg中已经插入了measure。
-        origin_qprog_func 的形式必须按照如下:
-
-        origin_qprog_func(input,param,qubits,cbits,machine)
-        
-            `input`: 输入1~2维经典数据,二维的情况下,第一个维度为批处理大小。
-            
-            `param`: 输入一维的变分量子线路的待训练参数。
-
-            `machine`: 由QuantumBatchAsyncQcloudLayer创建的模拟器QCloud,无需用户额外在函数中定义。
-            
-            `qubits`: 由QuantumBatchAsyncQcloudLayer创建的模拟器QCloud创建的量子比特,数量为  `num_qubits`, 类型为pyQpanda.Qubits,无需用户额外在函数中定义。
-            
-            `cbits`: 由QuantumBatchAsyncQcloudLayer分配的经典比特, 数量为  `num_cubits`, 类型为 pyQpanda.ClassicalCondition,无需用户额外在函数中定义。。
-            
-
-
-    :param origin_qprog_func: QPanda 构建的变分量子电路函数,必须返回QProg。
-    :param qcloud_token: `str` - 量子机的类型或用于执行的云令牌。
-    :param para_num: `int` - 参数数量,参数是大小为[para_num]的QTensor。
-    :param num_qubits: `int` - 量子电路中的量子比特数量。
-    :param num_cubits: `int` - 量子电路中用于测量的经典比特数量。
-    :param pauli_str_dict: `dict|list` - 表示量子电路中泡利运算符的字典或字典列表。 默认为“无”,则进行测量操作,如果输入泡利算符的字典,则会计算单个期望或者多个期望。
-    :param shot: `int` - 测量次数。 默认值为 1000。
-    :param initializer: 参数值的初始化器。 默认为“无”,使用0~2*pi正态分布。
-    :param dtype: 参数的数据类型。 默认值为 None,即使用默认数据类型pyvqnet.kfloat32。
-    :param name: 模块的名称。 默认为空字符串。
-    :param diff_method: 梯度计算的微分方法。 默认为“parameter_shift”,"random_coordinate_descent"。
-    :param submit_kwargs: 用于提交量子电路的附加关键字参数,默认:{"chip_id":pyqpanda.real_chip_type.origin_72,"is_amend":True,"is_mapping":True,"is_optimization":True,"compile_level":3,"default_task_group_size":200,"test_qcloud_fake":False},当设置test_qcloud_fake为True则本地CPUQVM模拟。
-    :param query_kwargs: 用于查询量子结果的附加关键字参数,默认:{"timeout":2,"print_query_info":True,"sub_circuits_split_size":1}。
-    :return: 一个可以计算量子电路的模块。
-    
-    Example::
-
-        import pyqpanda as pq
-        import pyvqnet
-        from pyvqnet.qnn.vqc.torch import TorchQcloudQuantumLayer
-
-        pyvqnet.backends.set_backend("torch")
-        def qfun(input,param, m_machine, m_qlist,cubits):
-            measure_qubits = [0,2]
-            m_prog = pq.QProg()
-            cir = pq.QCircuit()
-            cir.insert(pq.RZ(m_qlist[0],input[0]))
-            cir.insert(pq.CNOT(m_qlist[0],m_qlist[1]))
-            cir.insert(pq.RY(m_qlist[1],param[0]))
-            cir.insert(pq.CNOT(m_qlist[0],m_qlist[2]))
-            cir.insert(pq.RZ(m_qlist[1],input[1]))
-            cir.insert(pq.RY(m_qlist[2],param[1]))
-            cir.insert(pq.H(m_qlist[2]))
-            m_prog.insert(cir)
-
-            for idx, ele in enumerate(measure_qubits):
-                m_prog << pq.Measure(m_qlist[ele], cubits[idx])
-            return m_prog
-
-        l = TorchQcloudQuantumLayer(qfun,
-                        "3047DE8A59764BEDAC9C3282093B16AF1",
-                        2,
-                        6,
-                        6,
-                        pauli_str_dict=None,
-                        shots = 1000,
-                        initializer=None,
-                        dtype=None,
-                        name="",
-                        diff_method="parameter_shift",
-                        submit_kwargs={"test_qcloud_fake":True},
-                        query_kwargs={})
-        x = pyvqnet.tensor.QTensor([[0.56,1.2],[0.56,1.2],[0.56,1.2],[0.56,1.2],[0.56,1.2]],requires_grad= True)
-        y = l(x)
-        print(y)
-        y.backward()
-        print(l.m_para.grad)
-        print(x.grad)
-
-        def qfun2(input,param, m_machine, m_qlist,cubits):
-            measure_qubits = [0,2]
-            m_prog = pq.QProg()
-            cir = pq.QCircuit()
-            cir.insert(pq.RZ(m_qlist[0],input[0]))
-            cir.insert(pq.CNOT(m_qlist[0],m_qlist[1]))
-            cir.insert(pq.RY(m_qlist[1],param[0]))
-            cir.insert(pq.CNOT(m_qlist[0],m_qlist[2]))
-            cir.insert(pq.RZ(m_qlist[1],input[1]))
-            cir.insert(pq.RY(m_qlist[2],param[1]))
-            cir.insert(pq.H(m_qlist[2]))
-            m_prog.insert(cir)
-
-            return m_prog
-        l = TorchQcloudQuantumLayer(qfun2,
-                "3047DE8A59764BEDAC9C3282093B16AF",
-                2,
-                6,
-                6,
-                pauli_str_dict={'Z0 X1':10,'':-0.5,'Y2':-0.543},
-                shots = 1000,
-                initializer=None,
-                dtype=None,
-                name="",
-                diff_method="parameter_shift",
-                submit_kwargs={"test_qcloud_fake":True},
-                query_kwargs={})
-        x = pyvqnet.tensor.QTensor([[0.56,1.2],[0.56,1.2],[0.56,1.2],[0.56,1.2]],requires_grad= True)
-        y = l(x)
-        print(y)
-        y.backward()
-        print(l.m_para.grad)
-        print(x.grad)
-
-
-
-HybirdVQCQpandaQVMLayer
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-.. py:class:: pyvqnet.qnn.vqc.torch.HybirdVQCQpandaQVMLayer(vqc_module: Module,qcloud_token: str,num_qubits: int,num_cubits: int,pauli_str_dict: Union[List[Dict], Dict, None] = None,shots: int = 1000,dtype: Union[int, None] = None,name: str = "",submit_kwargs: Dict = {},query_kwargs: Dict = {})
-
-
-    混合 vqc 和 qpanda QVM 层。该层将用户 `forward` 函数定义的VQNet编写的量子线路计算转化为QPanda OriginIR,可在QPanda 本地虚拟机或者云端服务上进行前向运行,并在本地CPU上模拟计算线路参数梯度,降低了使用参数漂移法计算的时间复杂度。
-    其中 ``vqc_module`` 为用户自定义的量子变分线路模型,其中的QMachine设置 ``save_ir=True`` 。
+    使用torch后端,混合 vqc 和 qpanda3 模拟计算。该层将用户 `forward` 函数定义的VQNet编写的量子线路计算转化为QPanda OriginIR,在QPanda3本地虚拟机或者云端服务上进行前向运行,并在基于自动微分计算线路参数梯度,降低了使用参数漂移法计算的时间复杂度。
+    其中 ``vqc_module`` 为用户自定义的量子变分线路模型,其中的QMachine设置 ``save_ir= True`` 。
 
     :param vqc_module: 带有 forward() 的 vqc_module。
     :param qcloud_token: `str` - 量子机器的类型或用于执行的云令牌。
-    :param num_qubits: `int` - 量子电路中的量子比特数。
-    :param num_cubits: `int` - 量子电路中用于测量的经典比特数。
     :param pauli_str_dict: `dict|list` - 表示量子电路中泡利算子的字典或字典列表。默认值为 None。
     :param shots: `int` - 量子线路测量次数。默认值为 1000。
     :param name: 模块名称。默认值为空字符串。
@@ -5284,13 +5498,13 @@ HybirdVQCQpandaQVMLayer
 
     .. warning::
 
-        该类继承于 ``pyvqnet.nn.torch.TorchModule`` 以及 ``pyvqnet.qnn.HybirdVQCQpandaQVMLayer`` ,可以作为 ``torch.nn.Module`` 的一个子模块加入torch的模型中。
+        该类继承于 ``pyvqnet.nn.torch.TorchModule`` 以及 ``pyvqnet.qnn.pq3.HybirdVQCQpandaQVMLayer`` ,可以作为 ``torch.nn.Module`` 的一个子模块加入torch的模型中。
 
 
     .. note::
 
-        ``pauli_str_dict`` 不能为 None,并且应与 ``vqc_module`` 测量函数中的 obs 相同。
-        ``vqc_module`` 应具有 ``pyvqnet.qnn.vqc.torch.QMachine`` 类型的属性, ``pyvqnet.qnn.vqc.torch.QMachine`` 应设置 save_ir=True
+        pauli_str_dict 不能为 None,并且应与 vqc_module 测量函数中的 obs 相同。
+        vqc_module 应具有 QMachine 类型的属性,QMachine 应设置 save_ir=True
 
     Example::
 
@@ -5298,10 +5512,10 @@ HybirdVQCQpandaQVMLayer
         import numpy as np
         from pyvqnet.qnn.vqc.torch import QMachine,QModule,RX,RY,\
         RZ,U1,U2,U3,I,S,X1,PauliX,PauliY,PauliZ,SWAP,CZ,\
-        RXX,RYY,RZX,RZZ,CR,Toffoli,Hadamard,T,CNOT,MeasureAll,\
-        TorchHybirdVQCQpandaQVMLayer
+        RXX,RYY,RZX,RZZ,CR,Toffoli,Hadamard,T,CNOT,MeasureAll
+        from pyvqnet.qnn.vqc.torch import HybirdVQCQpanda3QVMLayer
         import pyvqnet
-        
+
         from pyvqnet import tensor
 
         import pyvqnet.utils
@@ -5385,10 +5599,9 @@ HybirdVQCQpandaQVMLayer
 
         qunatum_model = QModel(num_wires=6, dtype=pyvqnet.kcomplex64)
 
-        l = TorchHybirdVQCQpandaQVMLayer(qunatum_model,
+        l = HybirdVQCQpanda3QVMLayer(qunatum_model,
                                 "3047DE8A59764BEDAC9C3282093B16AF1",
-                    6,
-                    6,
+
                     pauli_str_dict={'Z0':2,'Y3':3},
                     shots = 1000,
                     name="",
@@ -5398,12 +5611,8 @@ HybirdVQCQpandaQVMLayer
         y = l(input_x)
         print(y)
 
-
         y.backward()
         print(input_x.grad)
-
-
-
 
 
 分布式接口

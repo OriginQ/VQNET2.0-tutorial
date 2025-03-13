@@ -1545,7 +1545,7 @@ iswap
         import pyvqnet.qnn.vqc as vqc
         from pyvqnet.tensor import QTensor
         qm = QMachine(4)
-        vqc.iswap(q_machine=qm,wires=[0,1], params = QTensor([0.5]),)
+        vqc.iswap(q_machine=qm,wires=[0,1])
         print(qm.states)
 
         # [[[[[1.+0.j 0.+0.j]
@@ -2861,10 +2861,14 @@ MeasureAll
     例如:
 
     {\'wires\': [0,  1], \'observables\': [\'x\', \'i\'],\'coefficient\':[0.23,-3.5]}
-    或:
+     
     {\'X0\': 0.23}
-    或:
+     
     [{\'wires\': [0, 2, 3],\'observables\': [\'X\', \'Y\', \'Z\'],\'coefficient\': [1, 0.5, 0.4]}, {\'wires\': [0, 1, 2],\'observables\': [\'X\', \'Y\', \'Z\'],\'coefficient\': [1, 0.5, 0.4]}]
+    
+    [{\'X1 Z2 I0\':4,\'Z1 Z0\':3},\{'wires\': [0,  1], \'observables\': [\'x\', \'i\'],\'coefficient\':[0.23,-3.5]}]
+
+    {\'X1 Z2 I0\':4,\'Z1 Z0\':3}
 
     :param obs: 测量观测量,可以是单个观测量类包括,或者由观测量、作用比特、系数键值对构成的字典,或者键值对字典列表。
     :param name: 模块的名字,默认:""。
@@ -2930,7 +2934,7 @@ Samples
 
     获取特定线路 ``wires`` 上的带有 ``shots`` 的观测量 ``obs`` 结果。
 
-    :param wires: 样本量子比特索引。默认值:None,使用模拟器的所有比特。
+    :param wires: 样本量子比特索引。默认值:None,根据运行时使用模拟器的所有比特。
     :param obs: 该值只能设为None。
     :param shots: 样本重复次数,默认值:1。
     :param name: 此模块的名称,默认值:“”。
@@ -3320,7 +3324,7 @@ VQC_QuantumEmbedding
 ---------------------------------------------------------------
 
 
-.. py:class:: pyvqnet.qnn.vqc.VQC_QuantumEmbedding( num_repetitions_input, depth_input, num_unitary_layers, num_repetitions,initial=None,dtype=None,name="")
+.. py:class:: pyvqnet.qnn.vqc.VQC_QuantumEmbedding( num_repetitions_input, depth_input, num_unitary_layers, num_repetitions,initial = None,dtype = None,name= "")
 
     使用 RZ,RY,RZ 创建变分量子电路,将经典数据编码为量子态。
     参考 `Quantum embeddings for machine learning <https://arxiv.org/abs/2001.03622>`_。
@@ -3330,11 +3334,10 @@ VQC_QuantumEmbedding
     :paramdepth_input: 输入维数。
     :param num_unitary_layers: 变分量子门的重复次数。
     :param num_repetitions: 子模块的重复次数。
-    :param initial: 初始化所有参数, 该参数必须是只有一个元素的 QTensor, 默认值: None。
-    :param dtype: 参数的数据类型, 默认值: None, 使用 float32。
-    :param name: 该模块的名称。
-    :return: VQC_QuantumEmbedding 实例。
-    
+    :param initial: 参数初始化值,默认为None
+    :param dtype: 参数的类型,默认 None,使用float32.
+    :param name: 类的名字
+
     Example::
 
         from pyvqnet.nn import Module
@@ -3355,8 +3358,7 @@ VQC_QuantumEmbedding
 
                 self.ansatz = VQC_QuantumEmbedding(num_repetitions_input, depth_input,
                                                 num_unitary_layers,
-                                                num_repetitions, pyvqnet.kfloat64,
-                                                initial=tensor.full([1],12.0))
+                                                num_repetitions, initial=tensor.full([1],12.0),dtype=pyvqnet.kfloat64)
 
                 self.measure = MeasureAll(obs = {f"Z{nq-1}":1})
                 self.device = QMachine(nq,dtype=pyvqnet.kcomplex128)
@@ -3430,8 +3432,6 @@ ExpressiveEntanglingAnsatz
             
 
         input_x = tensor.QTensor([[0.1, 0.2, 0.3]])
-
-        #input_x = tensor.broadcast_to(input_x,[2,3])
 
         input_x.requires_grad = True
 
@@ -4150,9 +4150,6 @@ vqc_qft_add_two_register
 
         import numpy as np
         from pyvqnet.qnn.vqc import QMachine,Samples, vqc_qft_add_two_register
-        wires_m = [0, 1, 2]           # qubits needed to encode m
-        wires_k = [3, 4, 5]           # qubits needed to encode k
-        wires_solution = [6, 7, 8, 9, 10]  # qubits needed to encode the solution
 
         wires_m = [0, 1, 2]             # qubits needed to encode m
         wires_k = [3, 4, 5]             # qubits needed to encode k
@@ -4253,7 +4250,6 @@ VQC_LCU
 
     :param wires: 运算符作用的 qlist 索引,可能需要辅助量子位。
     :param check_hermitian: 检查输入是否为 Hermitian,默认值:True。
-    :return: 返回一个基于VQC的LCU类实例。
 
     Examples::
 
@@ -4329,6 +4325,321 @@ VQC_QSVT
             [ 0.       +0.j       , 0.       +0.j       ]]]]]
         """
 
+量子机器学习模型接口
+=====================
+
+
+Quanvolution
+---------------------------------------------------------------
+
+.. py:class:: pyvqnet.qnn.qcnn.Quanvolution(params_shape, strides=(1, 1), kernel_initializer=quantum_uniform, machine_type_or_cloud_token: str = "cpu")
+
+
+    基于《Quanvolutional Neural Networks: Powering Image Recognition with Quantum Circuits》（https://arxiv.org/abs/1904.04767）实现的量子卷积，用变分量子电路替换经典的卷积滤波器，从而得到具有量子卷积滤波器的量子卷积神经网络。
+
+    :param params_shape: 参数的形状，应为二维。
+    :param strides: 切片窗口的步长，默认为 (1,1)。
+    :param kernel_initializer: 参数的卷积核初始化器。
+    :param machine_type_or_cloud_token: 机器类型字符串或 Qcloud 令牌，默认为“cpu”。
+
+    Examples::
+
+        from pyvqnet.qnn.qcnn import Quanvolution
+        import pyvqnet.tensor as tensor
+        qlayer = Quanvolution([4,2],(3,3))
+
+        x = tensor.arange(1,25*25*3+1).reshape([3,1,25,25])
+
+        y = qlayer(x)
+
+        print(y.shape)
+
+        y.backward()
+
+        print(qlayer.m_para)
+        print(qlayer.m_para.grad)
+        #[3, 4, 8, 8]
+
+        #[4.0270405,4.3587413,2.4935627,2.8155506,0.3314773,0.8889271,3.7357519, 0.9196261]
+        #<Parameter [8] DEV_CPU kfloat32>
+
+        #[ -0.2364242, -0.6942478, -8.445061 , -0.0558891, -0.       ,-49.498577 ,40.339344 , 40.339344 ]
+        #<QTensor [8] DEV_CPU kfloat32>
+
+
+QDRL
+---------------------------------------------------------------
+
+.. py:class:: pyvqnet.qnn.qdrl_vqc.QDRL(nq)
+
+
+    基于《Data re-uploading for a universal quantum classifier》（https://arxiv.org/abs/1907.02085）实现的量子数据重上传(Quantum Data Re-upLoading,QDRL)算法是一种将量子电路与经典神经网络相结合的量子数据重上传模型。
+
+    :param nq: 量子电路中所使用的量子比特（qubits的数量）。这决定了模型将要处理的量子系统的规模。
+
+
+    Example::
+
+        import numpy as np
+        from pyvqnet.dtype import kfloat32
+        from pyvqnet.qnn.qdrl_vqc import QDRL
+        import pyvqnet.tensor as tensor
+
+        # Set the number of quantum bits (qubits)
+        nq = 1
+
+        # Initialize the model
+        model = QDRL(nq)
+
+        # Create an example input (assume the input is a (batch_size, 3) shaped data)
+        # Suppose we have a batch_size of 4 and each input has 3 features
+        x_input = tensor.QTensor(np.random.randn(4, 3), dtype=kfloat32)
+
+        # Pass the input through the model
+        output = model(x_input)
+
+        output.backward()
+
+        # Output the result
+        print("Model output:")
+        print(output)
+
+
+QGRU
+------------------------------------------------------------
+
+.. py:class:: pyvqnet.qnn.qgru.QGRU(para_num, num_of_qubits,input_size,hidden_size,batch_first=True)
+
+    基于量子量子变分线路实现的GRU（门控循环单元），通过利用量子电路来进行状态更新和记忆保持。
+
+    :param para_num: 量子电路中的参数数量。
+    :param num_of_qubits: 量子比特的数量。
+    :param input_size: 输入数据的特征维度。
+    :param hidden_size: 隐藏单元的维度。
+    :param batch_first:  输入的第一维是否为批次数量。
+
+    Example::
+
+        import numpy as np
+        from pyvqnet.tensor import tensor
+        from pyvqnet.qnn.qgru import QGRU
+        from pyvqnet.dtype import kfloat32
+        # Example usage
+ 
+        # Set parameters
+        para_num = 8
+        num_of_qubits = 8
+        input_size = 4
+        hidden_size = 4
+        batch_size = 1
+        seq_length = 1
+        # Create QGRU model
+        qgru = QGRU(para_num, num_of_qubits, input_size, hidden_size, batch_first=True)
+
+        # Create input data
+        x = tensor.QTensor(np.random.randn(batch_size, seq_length, input_size), dtype=kfloat32)
+
+        # Call the model
+        output, h_t = qgru(x)
+        output.backward()
+
+        print("Output shape:", output.shape)  # Output shape
+        print("h_t shape:", h_t.shape)  # Final hidden state shape
+
+
+
+
+QLSTM
+-------------------------------------------------------------
+
+.. py:class:: pyvqnet.qnn.qlstm.QLSTM(para_num, num_of_qubits,input_size, hidden_size,batch_first=True)
+
+
+    QLSTM (Quantum Long Short-Term Memory) 是一种结合了量子计算和经典LSTM的混合模型，旨在利用量子计算的并行性和经典LSTM的记忆能力来处理序列数据。
+
+    :param para_num: 量子电路中的参数数量。
+    :param num_of_qubits: 量子比特的数量。
+    :param input_size: 输入数据的特征维度。
+    :param hidden_size: 隐藏单元的维度。
+    :param batch_first: 输入的第一维是否为批次数量。
+
+
+    Example::
+
+        import numpy as np
+        from pyvqnet.tensor import tensor
+        from pyvqnet.qnn.qlstm import QLSTM
+        from pyvqnet.dtype import *
+ 
+        para_num = 4
+        num_of_qubits = 4
+        input_size = 4
+        hidden_size = 20
+        batch_size = 3
+        seq_length = 5
+        qlstm = QLSTM(para_num, num_of_qubits, input_size, hidden_size, batch_first=True)
+        x = tensor.QTensor(np.random.randn(batch_size, seq_length, input_size), dtype=kfloat32)
+
+        output, (h_t, c_t) = qlstm(x)
+
+        print("Output shape:", output.shape)
+        print("h_t shape:", h_t.shape)
+        print("c_t shape:", c_t.shape)
+
+QMLPModel
+--------------------------------------------------------------
+
+.. py:class:: pyvqnet.qnn.qmlp.qmlp.QMLPModel(input_channels: int,output_channels: int,num_qubits: int, kernel: _size_type,stride: _size_type,padding: _padding_type = "valid",weight_initializer: Union[Callable, None] = None,bias_initializer: Union[Callable, None] = None,use_bias: bool = True,dtype: Union[int, None] = None)
+
+
+    QMLPModel是基于《QMLP: An Error-Tolerant Nonlinear Quantum MLP Architecture using Parameterized Two-Qubit Gates》（https://arxiv.org/abs/2206.01345）实现的量子启发式神经网络，QMLPModel将量子电路与经典神经网络操作（如池化和全连接层）相结合。它旨在处理量子数据，并通过量子操作和经典层提取相关特征。
+
+    :param input_channels: 输入特征的数量。
+    :param output_channels: 输出特征的数量。
+    :param num_qubits: 量子比特的数量。
+    :param kernel: 平均池化窗口的大小。
+    :param stride: 下采样的步长因子。
+    :param padding: 填充方式，可选“valid”或“same”。
+    :param weight_initializer: 权重初始化器，默认为正态分布。
+    :param bias_initializer: 偏置初始化器，默认为零初始化。
+    :param use_bias: 是否使用偏置，默认为True。
+    :param dtype: 默认为None，使用默认数据类型。
+
+
+    Example::
+
+        import numpy as np
+        from pyvqnet.tensor import tensor
+        from pyvqnet.qnn.qmlp.qmlp import QMLPModel
+        from pyvqnet.dtype import *
+
+        input_channels = 16
+        output_channels = 10
+        num_qubits = 4
+        kernel = (2, 2)
+        stride = (2, 2)
+        padding = "valid"
+        batch_size = 8
+
+        model = QMLPModel(input_channels=num_qubits,
+                          output_channels=output_channels,
+                          num_qubits=num_qubits,
+                          kernel=kernel,
+                          stride=stride,
+                          padding=padding)
+
+        x = tensor.QTensor(np.random.randn(batch_size, input_channels, 32, 32),dtype=kfloat32)
+
+        output = model(x)
+
+        print("Output shape:", output.shape)
+
+
+QRLModel
+-------------------------------------------------------------
+
+.. py:class:: pyvqnet.qnn.qrl.QRLModel(num_qubits, n_layers)
+
+    使用变分量子电路的量子深度强化学习模型,参考 :ref:`QDRL_DEMO` 中的线路实现。
+
+    :param num_qubits: 量子电路中所使用的量子比特的数量。
+    :param n_layers: 变分量子电路中的层数。
+
+
+    Example::
+
+        from pyvqnet.tensor import tensor, QTensor
+        from pyvqnet.qnn.qrl import QRLModel
+
+        num_qubits = 4
+        model = QRLModel(num_qubits=num_qubits, n_layers=2)
+
+        batch_size = 3
+        x = QTensor([[1.1, 0.3, 1.2, 0.6], [0.2, 1.1, 0, 1.1], [1.3, 1.3, 0.3, 0.3]])
+        output = model(x)
+        output.backward()
+
+        print("Model output:", output)
+
+
+QRNN
+--------------------------------------------------------------
+
+.. py:class:: pyvqnet.qnn.qrnn.QRNN(para_num, num_of_qubits=4,input_size=100,hidden_size=100,batch_first=True)
+
+
+    QRNN（Quantum Recurrent Neural Network）是一种量子循环神经网络，旨在处理序列数据并捕捉序列中的长期依赖关系。
+
+
+    :param para_num: 量子电路中的参数数量。
+    :param num_of_qubits: 量子比特的数量。
+    :param input_size: 输入数据的特征维度。
+    :param hidden_size: 隐藏单元的维度。
+    :param batch_first: 输入的第一维是否为批次数量,默认为True。
+
+    Example::
+
+        from pyvqnet.dtype import kfloat32
+        from pyvqnet.qnn.qrnn import QRNN
+        from pyvqnet.tensor import tensor, QTensor
+        import numpy as np
+
+
+        para_num = 8
+        num_of_qubits = 8
+        input_size = 4
+        hidden_size = 4
+        batch_size = 1
+        seq_length = 1
+        qrnn = QRNN(para_num, num_of_qubits, input_size, hidden_size, batch_first=True)
+
+        x = tensor.QTensor(np.random.randn(batch_size, seq_length, input_size), dtype=kfloat32)
+
+        output, h_t = qrnn(x)
+
+        print("Output shape:", output.shape)
+        print("h_t shape:", h_t.shape)
+
+
+TTOLayer
+----------------------------------------------------------------
+
+.. py:class:: pyvqnet.qnn.ttolayer.TTOLayer(inp_modes,out_modes,mat_ranks,biases_initializer=tensor.zeros)
+
+
+    基于《Compressing deep neural networks by matrix product operators》（https://arxiv.org/abs/1904.06194）实现的TTOLayer对输入张量进行分解，从而实现对高维数据的高效表示。该层允许在秩约束条件下学习张量分解，相比于传统的全连接层，能够降低计算复杂度和内存使用。
+
+
+    :param inp_modes: 输入张量的维度。
+    :param out_modes: 输出张量的维度。
+    :param mat_ranks: 张量分解中张量核（分解秩）的秩。
+    :param biases_initializer: 偏置的初始化函数。
+
+    Example::
+
+        from pyvqnet.tensor import tensor
+        import numpy as np
+        from pyvqnet.qnn.ttolayer import TTOLayer
+        from pyvqnet.dtype import kfloat32
+
+        inp_modes = [4, 5]
+        out_modes = [4, 5]
+        mat_ranks = [1, 3, 1]
+        tto_layer = TTOLayer(inp_modes, out_modes, mat_ranks)
+
+        batch_size = 2
+        len = 4
+        embed_size = 5
+        inp = tensor.QTensor(np.random.randn(batch_size, len, embed_size), dtype=kfloat32)
+
+        output = tto_layer(inp)
+
+        print("Input shape:", inp.shape)
+        print("Output shape:", output.shape)
+
+
+
+
 
 其他函数
 =====================
@@ -4338,13 +4649,13 @@ VQC_QSVT
 QuantumLayerAdjoint
 ---------------------------------------------------------------
 
-.. py:class:: pyvqnet.qnn.vqc.QuantumLayerAdjoint(general_module: pyvqnet.nn.Module,q_machine, name="")
+.. py:class:: pyvqnet.qnn.vqc.QuantumLayerAdjoint(general_module: pyvqnet.nn.Module,use_qpanda=False, name="")
 
 
     使用伴随矩阵方式进行梯度计算的可自动微分的QuantumLayer层,参考  `Efficient calculation of gradients in classical simulations of variational quantum algorithms <https://arxiv.org/abs/2009.02823>`_ 。
 
-    :param general_module: 一个仅使用 ``pyvqnet.qnn.vqc`` 下量子线路接口搭建的 ``pyvqnet.nn.Module`` 实例。
-    :param q_machine: general_module 模块中申请的QMachine实例。
+    :param general_module: 一个仅使用 ``pyvqnet.qnn.vqc`` 下量子线路接口搭建的 `pyvqnet.nn.Module` 实例。
+    :param use_qpanda: 是否使用qpanda线路进行前传,默认:False。
     :param name: 该层名字,默认为""。
     :return: 返回一个 QuantumLayerAdjoint 类实例。
 
@@ -4411,7 +4722,7 @@ QuantumLayerAdjoint
                             dtype=pyvqnet.kcomplex64,
                             grad_mode="adjoint")
 
-        adjoint_model = QuantumLayerAdjoint(qunatum_model,q_machine=qunatum_model.qm)
+        adjoint_model = QuantumLayerAdjoint(qunatum_model)
 
         batch_y = adjoint_model(input_x)
         batch_y.backward()
@@ -4511,6 +4822,219 @@ QuantumLayerES
 
 
 
+DataParallelVQCAdjointLayer
+---------------------------------------------------------------
+
+.. py:class:: pyvqnet.distributed.DataParallelVQCAdjointLayer(Comm_OP, vqc_module, name="")
+
+
+    使用数据并行对数据批次大小创建 vqc 使用伴随梯度计算。其中 ``vqc_module`` 必须为 ``QuantumLayerAdjoint`` 类型的VQC模块.
+    如果我们使用 N 个节点来运行此模块,
+    在每个节点中, `batch_size/N` 数据向前运行变分量子线路 计算梯度。
+
+    :param Comm_OP: 设置分布式环境的通信控制器。
+    :param vqc_module: 带有 forward() 的 QuantumLayerAdjoint类型的VQC模块,确保qmachine 已正确设置。
+    :param name: 模块的名称。默认值为空字符串。
+    :return: 可以计算量子电路的模块。
+
+
+    Example::
+
+        #mpirun -n 2 python test.py
+
+        import sys
+        sys.path.insert(0,"../../")
+        from pyvqnet.distributed import CommController,DataParallelVQCAdjointLayer,\
+        get_local_rank
+
+        from pyvqnet.qnn import *
+        from pyvqnet.qnn.vqc import *
+        import pyvqnet
+        from pyvqnet.nn import Module, Linear
+        from pyvqnet.device import DEV_GPU_0
+
+        bsize = 100
+
+
+        class QModel(Module):
+            def __init__(self, num_wires, dtype, grad_mode="adjoint"):
+                super(QModel, self).__init__()
+
+                self._num_wires = num_wires
+                self._dtype = dtype
+                self.qm = QMachine(num_wires, dtype=dtype, grad_mode=grad_mode)
+                self.rx_layer = RX(has_params=True, trainable=False, wires=0)
+                self.ry_layer = RY(has_params=True, trainable=False, wires=1)
+                self.rz_layer = RZ(has_params=True, trainable=False, wires=1)
+                self.u1 = U1(has_params=True, trainable=True, wires=[2])
+                self.u2 = U2(has_params=True, trainable=True, wires=[3])
+                self.u3 = U3(has_params=True, trainable=True, wires=[1])
+                self.i = I(wires=[3])
+                self.s = S(wires=[3])
+                self.x1 = X1(wires=[3])
+                self.y1 = Y1(wires=[3])
+                self.z1 = Z1(wires=[3])
+                self.x = PauliX(wires=[3])
+                self.y = PauliY(wires=[3])
+                self.z = PauliZ(wires=[3])
+                self.swap = SWAP(wires=[2, 3])
+                self.cz = CZ(wires=[2, 3])
+                self.cr = CR(has_params=True, trainable=True, wires=[2, 3])
+                self.rxx = RXX(has_params=True, trainable=True, wires=[2, 3])
+                self.rzz = RYY(has_params=True, trainable=True, wires=[2, 3])
+                self.ryy = RZZ(has_params=True, trainable=True, wires=[2, 3])
+                self.rzx = RZX(has_params=True, trainable=False, wires=[2, 3])
+                self.toffoli = Toffoli(wires=[2, 3, 4], use_dagger=True)
+
+                self.h = Hadamard(wires=[1])
+
+                self.iSWAP = iSWAP(wires=[0, 2])
+                self.tlayer = T(wires=1)
+                self.cnot = CNOT(wires=[0, 1])
+                self.measure = MeasureAll(obs={'Z0': 2})
+
+            def forward(self, x, *args, **kwargs):
+                self.qm.reset_states(x.shape[0])
+                self.i(q_machine=self.qm)
+                self.s(q_machine=self.qm)
+                self.swap(q_machine=self.qm)
+                self.cz(q_machine=self.qm)
+                self.x(q_machine=self.qm)
+                self.x1(q_machine=self.qm)
+                self.y(q_machine=self.qm)
+                self.y1(q_machine=self.qm)
+                self.z(q_machine=self.qm)
+                self.z1(q_machine=self.qm)
+                self.ryy(q_machine=self.qm)
+                self.rxx(q_machine=self.qm)
+                self.rzz(q_machine=self.qm)
+                self.rzx(q_machine=self.qm, params=x[:, [1]])
+
+                self.u1(q_machine=self.qm)
+                self.u2(q_machine=self.qm)
+                self.u3(q_machine=self.qm)
+                self.rx_layer(params=x[:, [0]], q_machine=self.qm)
+                self.cnot(q_machine=self.qm)
+                self.h(q_machine=self.qm)
+                self.iSWAP(q_machine=self.qm)
+                self.ry_layer(params=x[:, [1]], q_machine=self.qm)
+                self.tlayer(q_machine=self.qm)
+                self.rz_layer(params=x[:, [2]], q_machine=self.qm)
+                self.toffoli(q_machine=self.qm)
+                rlt = self.measure(q_machine=self.qm)
+
+                return rlt
+
+
+        pyvqnet.utils.set_random_seed(42)
+
+        Comm_OP = CommController("mpi")
+
+        input_x = tensor.QTensor([[0.1, 0.2, 0.3]])
+        input_x = tensor.broadcast_to(input_x, [bsize, 3])
+        input_x.requires_grad = True
+
+        qunatum_model = QModel(num_wires=6, dtype=pyvqnet.kcomplex64)
+
+        l = DataParallelVQCAdjointLayer(
+            Comm_OP,
+            qunatum_model,
+        )
+
+        y = l(input_x)
+
+        y.backward()    
+
+
+
+DataParallelVQCLayer
+---------------------------------------------------------------
+
+.. py:class:: pyvqnet.distributed.DataParallelVQCLayer(Comm_OP, vqc_module, name="")
+
+
+    使用数据并行对数据批次大小创建 vqc 使用自动微分计算。 
+    如果我们使用 N 个节点来运行此模块,
+    在每个节点中, `batch_size/N` 数据向前运行变分量子线路 计算梯度。
+
+    :param Comm_OP: 设置分布式环境的通信控制器。
+    :param vqc_module: 带有 forward() 的 VQC模块,确保qmachine 已正确设置。
+    :param name: 模块的名称。默认值为空字符串。
+    :return: 可以计算量子电路的模块。
+
+
+    Example::
+
+        #mpirun -n 2 python xxx.py
+
+        import pyvqnet.backends
+
+        from pyvqnet.qnn.vqc import QMachine, cnot, rx, rz, ry, MeasureAll
+        from pyvqnet.tensor import tensor
+
+        from pyvqnet.distributed import CommController, DataParallelVQCLayer
+
+        from pyvqnet.qnn import *
+        from pyvqnet.qnn.vqc import *
+        import pyvqnet
+        from pyvqnet.nn import Module, Linear
+        from pyvqnet.device import DEV_GPU_0
+
+
+        class QModel(Module):
+
+            def __init__(self, num_wires, num_layer, dtype, grad_mode=""):
+                super(QModel, self).__init__()
+
+                self._num_wires = num_wires
+                self._dtype = dtype
+                self.qm = QMachine(num_wires, dtype=dtype, grad_mode=grad_mode)
+
+                self.measure = MeasureAll(obs=PauliX)
+                self.n = num_wires
+                self.l = num_layer
+
+            def forward(self, param, *args, **kwargs):
+                n = self.n
+                l = self.l
+                qm = self.qm
+                qm.reset_states(param.shape[0])
+                j = 0
+
+                for j in range(l):
+                    cnot(qm, wires=[j, (j + 1) % l])
+                    for i in range(n):
+                        rx(qm, i, param[:, 3 * n * j + i])
+                    for i in range(n):
+                        rz(qm, i, param[:, 3 * n * j + i + n], i)
+                    for i in range(n):
+                        rx(qm, i, param[:, 3 * n * j + i + 2 * n], i)
+
+                y = self.measure(qm)
+                return y
+
+
+        n = 4
+        b = 4
+        l = 2
+
+        input = tensor.ones([b, 3 * n * l])
+
+        Comm = CommController("mpi")
+        
+        input.requires_grad = True
+        qunatum_model = QModel(num_wires=n, num_layer=l, dtype=pyvqnet.kcomplex64)
+        
+        layer = qunatum_model
+
+        layer = DataParallelVQCLayer(
+            Comm,
+            qunatum_model,
+        )
+        y = layer(input)
+        y.backward()
+
+
 vqc_to_originir_list
 ---------------------------------------------------------------
 
@@ -4562,14 +5086,14 @@ vqc_to_originir_list
                 self.ryy = RZZ(has_params=True,trainable=True,wires=[2,3])
                 self.rzx = RZX(has_params=True,trainable=False, wires=[2,3])
                 self.toffoli = Toffoli(wires=[2,3,4],use_dagger=True)
-                #self.rz_layer2 = RZ(has_params=True, trainable=True, wires=1)
+
                 self.h =Hadamard(wires=[1])
                 self.rot = VQC_HardwareEfficientAnsatz(6, ["rx", "RY", "rz"],
                                                     entangle_gate="cnot",
                                                     entangle_rules="linear",
                                                     depth=5)
                 
-                self.iSWAP = iSWAP(True,True,wires=[0,2])
+                self.iSWAP = iSWAP(wires=[0,2])
                 self.tlayer = T(wires=1)
                 self.cnot = CNOT(wires=[0, 1])
                 self.measure = MeasureAll(obs = {
@@ -4645,16 +5169,16 @@ vqc_to_originir_list
         # Z1 q[3]
         # RZZ q[2],q[3],(4.484121322631836)
         # RXX q[2],q[3],(5.302337169647217)
-        # RYY q[2],q[3],(3.470323085784912)
+        # RYY q[2],q[3],(3.470322608947754)
         # RZX q[2],q[3],(0.20000000298023224)
-        # CR q[2],q[3],(5.467088222503662)
-        # U1 q[2],(6.254805088043213)
-        # U2 q[3],(1.261604905128479,0.9901542067527771)
-        # U3 q[1],(5.290454387664795,6.182775020599365,1.1797741651535034)
+        # CR q[2],q[3],(5.467087745666504)
+        # U1 q[2],(6.254804611206055)
+        # U2 q[3],(1.261604905128479,0.9901539087295532)
+        # U3 q[1],(5.290454387664795,6.182774543762207,1.1797739267349243)
         # RX q[0],(0.10000000149011612)
         # CNOT q[0],q[1]
         # H q[1]
-        # ISWAPTHETA q[0],q[2],(0.6857681274414062)
+        # ISWAP q[0],q[2]
         # RY q[1],(0.20000000298023224)
         # T q[1]
         # RZ q[1],(0.30000001192092896)
@@ -4662,7 +5186,8 @@ vqc_to_originir_list
         # TOFFOLI q[2],q[3],q[4]
         # ENDDAGGER
 
-        # {'000000': 0.006448949346548678, '000001': 0.004089870964118778, '000010': 0.1660891289303212, '000011': 0.08520414851665635, '000100': 0.0048503036661063, '000101': 8.679196482917438e-05, '000110': 0.14379026566368325, '000111': 0.0005079553597106437, '001000': 0.0023774056959510325, '001001': 0.008241263544544148, '001010': 0.06122877075562884, '001011': 0.1984226195587807, '001100': 0.0, '001101': 0.0, '001110': 0.0, '001111': 0.0, '010000': 0.0, '010001': 0.0, '010010': 0.0, '010011': 0.0, '010100': 0.0, '010101': 0.0, '010110': 0.0, '010111': 0.0, '011000': 0.0, '011001': 0.0, '011010': 0.0, '011011': 0.0, '011100': 0.011362100696548312, '011101': 0.00019143557058348747, '011110': 0.3059886012103368, '011111': 0.0011203885556518832, '100000': 0.0, '100001': 0.0, '100010': 0.0, '100011': 0.0, '100100': 0.0, '100101': 0.0, '100110': 0.0, '100111': 0.0, '101000': 0.0, '101001': 0.0, '101010': 0.0, '101011': 0.0, '101100': 0.0, '101101': 0.0, '101110': 0.0, '101111': 0.0, '110000': 0.0, '110001': 0.0, '110010': 0.0, '110011': 0.0, '110100': 0.0, '110101': 0.0, '110110': 0.0, '110111': 0.0, '111000': 0.0, '111001': 0.0, '111010': 0.0, '111011': 0.0, '111100': 0.0, '111101': 0.0, '111110': 0.0, '111111': 0.0}
+        # {'000000': 0.006448952789506197, '000001': 0.008877137190898976, '000010': 0.16608912704486037, '000011': 0.2286256412193044, '000100': 6.305162883375823e-05, '000101': 8.679206958650598e-05, '000110': 0.0003690135120983108, '000111': 0.0005079558928579155, '001000': 0.002377405289016277, '001001': 0.019580122608259993, '001010': 0.06122872689145276, '001011': 0.5042749695313318, '001100': 0.0, '001101': 0.0, '001110': 0.0, '001111': 0.0, '010000': 0.0, '010001': 0.0, '010010': 0.0, '010011': 0.0, '010100': 0.0, '010101': 0.0, '010110': 0.0, '010111': 0.0, '011000': 0.0, '011001': 0.0, '011010': 0.0, '011011': 0.0, '011100': 2.3243971659148392e-05, '011101': 0.00019143551883716285, '011110': 0.00013603676504013795, '011111': 0.0011203880764558683, '100000': 0.0, '100001': 0.0, '100010': 
+        # 0.0, '100011': 0.0, '100100': 0.0, '100101': 0.0, '100110': 0.0, '100111': 0.0, '101000': 0.0, '101001': 0.0, '101010': 0.0, '101011': 0.0, '101100': 0.0, '101101': 0.0, '101110': 0.0, '101111': 0.0, '110000': 0.0, '110001': 0.0, '110010': 0.0, '110011': 0.0, '110100': 0.0, '110101': 0.0, '110110': 0.0, '110111': 0.0, '111000': 0.0, '111001': 0.0, '111010': 0.0, '111011': 0.0, '111100': 0.0, '111101': 0.0, '111110': 0.0, '111111': 0.0}
         # QINIT 6
         # CREG 6
         # I q[3]
@@ -4677,16 +5202,16 @@ vqc_to_originir_list
         # Z1 q[3]
         # RZZ q[2],q[3],(4.484121322631836)
         # RXX q[2],q[3],(5.302337169647217)
-        # RYY q[2],q[3],(3.470323085784912)
+        # RYY q[2],q[3],(3.470322608947754)
         # RZX q[2],q[3],(0.20000000298023224)
-        # CR q[2],q[3],(5.467088222503662)
-        # U1 q[2],(6.254805088043213)
-        # U2 q[3],(1.261604905128479,0.9901542067527771)
-        # U3 q[1],(5.290454387664795,6.182775020599365,1.1797741651535034)
+        # CR q[2],q[3],(5.467087745666504)
+        # U1 q[2],(6.254804611206055)
+        # U2 q[3],(1.261604905128479,0.9901539087295532)
+        # U3 q[1],(5.290454387664795,6.182774543762207,1.1797739267349243)
         # RX q[0],(0.10000000149011612)
         # CNOT q[0],q[1]
         # H q[1]
-        # ISWAPTHETA q[0],q[2],(0.6857681274414062)
+        # ISWAP q[0],q[2]
         # RY q[1],(0.20000000298023224)
         # T q[1]
         # RZ q[1],(0.30000001192092896)
@@ -4694,7 +5219,10 @@ vqc_to_originir_list
         # TOFFOLI q[2],q[3],q[4]
         # ENDDAGGER
 
-        # {'000000': 0.006448949346548678, '000001': 0.004089870964118778, '000010': 0.1660891289303212, '000011': 0.08520414851665635, '000100': 0.0048503036661063, '000101': 8.679196482917438e-05, '000110': 0.14379026566368325, '000111': 0.0005079553597106437, '001000': 0.0023774056959510325, '001001': 0.008241263544544148, '001010': 0.06122877075562884, '001011': 0.1984226195587807, '001100': 0.0, '001101': 0.0, '001110': 0.0, '001111': 0.0, '010000': 0.0, '010001': 0.0, '010010': 0.0, '010011': 0.0, '010100': 0.0, '010101': 0.0, '010110': 0.0, '010111': 0.0, '011000': 0.0, '011001': 0.0, '011010': 0.0, '011011': 0.0, '011100': 0.011362100696548312, '011101': 0.00019143557058348747, '011110': 0.3059886012103368, '011111': 0.0011203885556518832, '100000': 0.0, '100001': 0.0, '100010': 0.0, '100011': 0.0, '100100': 0.0, '100101': 0.0, '100110': 0.0, '100111': 0.0, '101000': 0.0, '101001': 0.0, '101010': 0.0, '101011': 0.0, '101100': 0.0, '101101': 0.0, '101110': 0.0, '101111': 0.0, '110000': 0.0, '110001': 0.0, '110010': 0.0, '110011': 0.0, '110100': 0.0, '110101': 0.0, '110110': 0.0, '110111': 0.0, '111000': 0.0, '111001': 0.0, '111010': 0.0, '111011': 0.0, '111100': 0.0, '111101': 0.0, '111110': 0.0, '111111': 0.0}
+        # {'000000': 0.006448952789506197, '000001': 0.008877137190898976, '000010': 0.16608912704486037, '000011': 0.2286256412193044, '000100': 6.305162883375823e-05, '000101': 8.679206958650598e-05, '000110': 0.0003690135120983108, '000111': 0.0005079558928579155, '001000': 0.002377405289016277, '001001': 0.019580122608259993, '001010': 0.06122872689145276, '001011': 0.5042749695313318, '001100': 0.0, '001101': 0.0, '001110': 0.0, '001111': 0.0, '010000': 0.0, '010001': 0.0, '010010': 0.0, '010011': 0.0, '010100': 0.0, '010101': 0.0, '010110': 0.0, '010111': 0.0, '011000': 0.0, '011001': 0.0, '011010': 0.0, '011011': 0.0, '011100': 2.3243971659148392e-05, '011101': 0.00019143551883716285, '011110': 0.00013603676504013795, '011111': 0.0011203880764558683, '100000': 0.0, '100001': 0.0, '100010': 
+        # 0.0, '100011': 0.0, '100100': 0.0, '100101': 0.0, '100110': 0.0, '100111': 0.0, '101000': 0.0, '101001': 0.0, '101010': 0.0, '101011': 0.0, '101100': 0.0, '101101': 0.0, '101110': 0.0, '101111': 0.0, '110000': 0.0, '110001': 0.0, '110010': 0.0, '110011': 0.0, '110100': 0.0, '110101': 0.0, '110110': 0.0, '110111': 0.0, '111000': 0.0, '111001': 0.0, '111010': 0.0, '111011': 0.0, '111100': 0.0, '111101': 0.0, '111110': 0.0, '111111': 0.0}
+
+
 
 originir_to_vqc
 ---------------------------------------------------------------
@@ -4876,7 +5404,7 @@ QNG
 
                 self.l_train1(q_machine=self.qm)
                 self.l_train2(q_machine=self.qm)
-                #rx(q_machine=self.qm, wires=2, params=x[:, [3]])
+
                 rz(q_machine=self.qm, wires=1, params=x[:, [2]])
                 ry(q_machine=self.qm, wires=0, params=np.pi / 7)
                 rz(q_machine=self.qm, wires=1, params=x[:, [2]])
@@ -4914,7 +5442,6 @@ wrapper_single_qubit_op_fuse
     Example::
 
         from pyvqnet import tensor
-        from pyvqnet.qnn.vqc import QMachine, Operation, apply_unitary_bmm
         from pyvqnet import kcomplex128
         from pyvqnet.tensor import adjoint
         import numpy as np
