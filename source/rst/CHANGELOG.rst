@@ -37,6 +37,7 @@ Added
 
 - 增加 `pyvqnet.backends.set_backend()` 接口, 在用户安装 `torch` 时候, 可使用 `torch` 进行QTensor的矩阵计算, 变分量子线路计算, 具体见文档 :ref:`torch_api` 。
 - 增加 `pyvqnet.nn.torch` 下继承于 `torch.nn.Module` 的神经网络接口, 变分量子线路神经接口等, 具体见文档 :ref:`torch_api` 。
+- 增加量子大模型微调模块微调训练介绍，具体步骤可以见文档 :ref:`llm` 。
 
 Changed
 ===================
