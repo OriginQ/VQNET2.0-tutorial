@@ -7068,6 +7068,169 @@ ControlledPhaseShift
 常见测量接口
 --------------------------------------
 
+VQC_Purity
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:function:: pyvqnet.qnn.vqc.tn.VQC_Purity(state, qubits_idx, num_wires, use_tn=False)
+
+    从态矢中计算特定量子比特 ``qubits_idx`` 上的纯度。
+
+    .. math::
+        \gamma = \text{Tr}(\rho^2)
+
+    式中 :math:`\rho` 为密度矩阵。标准化量子态的纯度满足 :math:`\frac{1}{d} \leq \gamma \leq 1` ,
+    其中 :math:`d` 是希尔伯特空间的维数。
+    纯态的纯度是1。
+
+    :param state: TNQMachine.get_states() 获取的量子态
+    :param qubits_idx: 要计算纯度的量子比特位索引
+    :param num_wires: 量子比特数
+    :param use_tn: 张量网络后端时改成True, 默认False
+
+    :return: 对应比特位置上的纯度。
+
+    .. note::
+        
+        批量化需要搭配TNQModule使用 。
+
+    Example::
+
+        import pyvqnet
+        from pyvqnet.qnn.vqc.tn import TNQMachine, qcircuit, TNQModule,VQC_Purity
+        pyvqnet.backends.set_backend("torch")
+        from pyvqnet.tensor import QTensor
+
+        x = QTensor([[0.7, 0.4], [1.7, 2.4]], requires_grad=True).toGPU()
+
+        class QM(TNQModule):
+            def __init__(self, name=""):
+                super().__init__(name)
+                self.device = TNQMachine(3)
+                
+            def forward(self, x):
+                self.device.reset_states(2)
+                qcircuit.rx(q_machine=self.device, wires=0, params=x[0])
+                qcircuit.ry(q_machine=self.device, wires=1, params=x[1])
+                qcircuit.ry(q_machine=self.device, wires=2, params=x[1])
+                qcircuit.cnot(q_machine=self.device, wires=[0, 1])
+                qcircuit.cnot(q_machine=self.device, wires=[2, 1])
+                return VQC_Purity(self.device.get_states(), [0, 1], num_wires=3, use_tn=True)
+
+        model = QM().toGPU()
+        y_tn = model(x)
+        x.data.retain_grad()
+        y_tn.backward()
+        print(y_tn)
+
+VQC_VarMeasure
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+.. py:function:: pyvqnet.qnn.vqc.tn.VQC_VarMeasure(q_machine, obs)
+
+    提供的可观察量 ``obs`` 的方差。
+
+    :param q_machine: 从pyqpanda get_qstate()获取的量子态
+    :param obs: 测量观测量,当前支持Hadamard,I,PauliX,PauliY,PauliZ 几种Observable.
+
+    :return: 计算可观测量方差。
+
+    .. note::
+
+        测量结果一般为[b,1],其中b为 q_machine.reset_states(b)的批处理数量b。
+
+    Example::
+
+        import pyvqnet
+        from pyvqnet.qnn.vqc.tn import TNQMachine, qcircuit, VQC_VarMeasure, TNQModule,PauliY
+        from pyvqnet.tensor import QTensor
+        from pyvqnet import kfloat64
+        pyvqnet.backends.set_backend("torch")
+        x = QTensor([[0.7, 0.4], [0.6, 0.4]], requires_grad=True).toGPU()
+
+        class QM(TNQModule):
+            def __init__(self, name=""):
+                super().__init__(name)
+                self.device = TNQMachine(3)
+                
+            def forward(self, x):
+                self.device.reset_states(2)
+                qcircuit.rx(q_machine=self.device, wires=0, params=x[0])
+                qcircuit.ry(q_machine=self.device, wires=1, params=x[1])
+                qcircuit.ry(q_machine=self.device, wires=2, params=x[1])
+                qcircuit.cnot(q_machine=self.device, wires=[0, 1])
+                qcircuit.cnot(q_machine=self.device, wires=[2, 1])
+                return VQC_VarMeasure(q_machine= self.device, obs=PauliY(wires=0))
+            
+        model = QM().toGPU()
+        y = model(x)
+        x.data.retain_grad()
+        y.backward()
+        print(y)
+
+        # [[0.9370641],
+        # [0.9516521]]
+
+
+VQC_DensityMatrixFromQstate
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:function:: pyvqnet.qnn.vqc.tn.VQC_DensityMatrixFromQstate(state, indices, use_tn=False)
+
+    计算量子态在一组特定量子比特上的密度矩阵。
+
+    :param state: 一维列表状态向量。 这个列表的大小应该是 ``(2**N,)`` 对于量子比特个数 ``N`` ,qstate 应该从 000 ->111 开始。
+    :param indices: 所考虑子系统中的量子比特索引列表。
+    :param use_tn: 张量网络后端时改成True, 默认False.
+    :return: 大小为“(b, 2**len(indices), 2**len(indices))”的密度矩阵,其中b为 q_machine.reset_states(b)的批处理数量b。
+
+    Example::
+
+        import pyvqnet
+        from pyvqnet.tensor import QTensor
+        from pyvqnet.qnn.vqc.tn import TNQMachine, qcircuit, VQC_DensityMatrixFromQstate,TNQModule
+        pyvqnet.backends.set_backend("torch")
+        x = QTensor([[0.7,0.4],[1.7,2.4]], requires_grad=True).toGPU()
+        class QM(TNQModule):
+            def __init__(self, name=""):
+                super().__init__(name=name, use_jit=True)
+                self.device = TNQMachine(3)
+                
+            def forward(self, x):
+                self.device.reset_states(2)
+                qcircuit.rx(q_machine=self.device, wires=0, params=x[0])
+                qcircuit.ry(q_machine=self.device, wires=1, params=x[1])
+                qcircuit.ry(q_machine=self.device, wires=2, params=x[1])
+                qcircuit.cnot(q_machine=self.device, wires=[0, 1])
+                qcircuit.cnot(q_machine=self.device, wires=[2, 1])
+                return VQC_DensityMatrixFromQstate(self.device.get_states(),[0,1],use_tn=True)
+            
+        model = QM().toGPU()
+        y = model(x)
+        x.data.retain_grad()
+        y.backward()
+        print(y)
+
+        # [[[0.8155131+0.j        0.1718155+0.j        0.       +0.0627175j
+        #   0.       +0.2976855j]
+        #  [0.1718155+0.j        0.0669081+0.j        0.       +0.0244234j
+        #   0.       +0.0627175j]
+        #  [0.       -0.0627175j 0.       -0.0244234j 0.0089152+0.j
+        #   0.0228937+0.j       ]
+        #  [0.       -0.2976855j 0.       -0.0627175j 0.0228937+0.j
+        #   0.1086637+0.j       ]]
+        # 
+        # [[0.3362115+0.j        0.1471083+0.j        0.       +0.1674582j
+        #   0.       +0.3827205j]
+        #  [0.1471083+0.j        0.0993662+0.j        0.       +0.1131119j
+        #   0.       +0.1674582j]
+        #  [0.       -0.1674582j 0.       -0.1131119j 0.1287589+0.j
+        #   0.1906232+0.j       ]
+        #  [0.       -0.3827205j 0.       -0.1674582j 0.1906232+0.j
+        #   0.4356633+0.j       ]]]   
+
+
+
 Probability
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
