@@ -43,7 +43,7 @@ QuantumLayer是一个支持量子含参线路作为参数的自动求导模块�
 
     :param qprog_with_measure: 用pyqpanda2构建的量子线路运行和测量函数。
     :param para_num: `int` - 参数个数。
-    :param machine_type_or_cloud_token: qpanda量子虚拟机类型或pyqpanda2 量子云令牌 : https://pyqpanda-toturial.readthedocs.io/zh/latest/Realchip.html。
+    :param machine_type_or_cloud_token: qpanda量子虚拟机类型 "CPU"。
     :param num_of_qubits: 量子比特数。
     :param num_of_cbits: 经典比特数,默认为1。
     :param diff_method: 求解量子线路参数梯度的方法,“参数位移”或“有限差分”,默认参数偏移。
