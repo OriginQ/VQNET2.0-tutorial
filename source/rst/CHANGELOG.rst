@@ -10,6 +10,20 @@ Added
 
 - 增加了张量网络后端实现量子线路模块功能，增加基础逻辑门、测量、复杂量子线路支持。
 - 增加了张量网络后端对大比特量子线路构建功能实现。
+- 增加QTensor.swapaxes接口，为swapaxis的别名。
+
+Changed
+===================
+- 使用openblas进行矩阵运算。
+- 使用sleef进行CPU SIMD运算。
+- 删除qnn.MeasurePauliSum。
+- 当torch低于2.4版本时候，使用torch后端计算抛出警告。
+
+Fixed
+===================
+- 解决保存模型时候QMachine states的问题。
+- 解决layernorm，groupnorm当affine=False时候的问题。
+- 解决QuantumLayerAdjoint在eval模式下的问题。
 
 
 [v2.16.0] - 2025-1-15
