@@ -304,16 +304,7 @@
 
 
         def projected_xyz_embedding(X):
-            """
-            Create a Quantum Kernel given the template written in Pennylane framework
-
-            Args:
-                embedding: Pennylane template for the quantum feature map
-                X: feature data (matrix)
-
-            Returns:
-                projected quantum feature map X
-            """
+            
             N = X.shape[1]
 
             def proj_feature_map(x):
