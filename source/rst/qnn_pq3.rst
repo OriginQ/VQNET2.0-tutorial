@@ -1,4 +1,4 @@
-使用pyQPanda3量子机器学习模块
+使用pyqpanda3量子机器学习模块
 #################################
 
 .. warning::
@@ -12,11 +12,11 @@
 QuantumLayer
 ============================
 
-如您熟悉pyQPanda3语法,可以使用该接口QuantumLayer,自定义pyqpanda3模拟器进行计算。
+如您熟悉pyqpanda3语法,可以使用该接口QuantumLayer,自定义pyqpanda3模拟器进行计算。
 
 .. py:class:: pyvqnet.qnn.pq3.quantumlayer.QuantumLayer(qprog_with_measure,para_num,diff_method:str = "parameter_shift",delta:float = 0.01,dtype=None,name="")
 
-	变分量子层的抽象计算模块。对一个参数化的量子线路使用pyQPanda3进行仿真,得到测量结果。该变分量子层继承了VQNet框架的梯度计算模块,可以使用参数漂移法等计算线路参数的梯度,训练变分量子线路模型或将变分量子线路嵌入混合量子和经典模型。
+	变分量子层的抽象计算模块。对一个参数化的量子线路使用pyqpanda3进行仿真,得到测量结果。该变分量子层继承了VQNet框架的梯度计算模块,可以使用参数漂移法等计算线路参数的梯度,训练变分量子线路模型或将变分量子线路嵌入混合量子和经典模型。
     
     :param qprog_with_measure: 用pyQPand构建的量子线路运行和测量函数。
     :param para_num: `int` - 参数个数。
@@ -132,7 +132,7 @@ QpandaQProgVQCLayer
 
     .. note::
 
-        origin_qprog_func 是用户使用 pyQPanda3 定义的量子电路函数:
+        origin_qprog_func 是用户使用 pyqpanda3 定义的量子电路函数:
         https://qcloud.originqc.com.cn/document/qpanda-3/dc/d12/tutorial_quantum_program.html。。
 
         此函数必须包含输入和参数两个参数作为函数入参(即使某个参数未实际使用),输出为pyqpanda3.core.QProg类型数据,否则无法在QuantumLayerV3中正常运行。
@@ -622,7 +622,7 @@ Qconv是一种量子卷积算法接口。
 ============================
 
 在VQNet中,我们使用本源量子自研的 `pyqpanda3 <https://qcloud.originqc.com.cn/document/qpanda-3/index.html>`_ 的各个逻辑门搭建量子线路,进行量子模拟。
-当前pyQPanda支持的逻辑门可参考pyQPanda3 `量子逻辑门 <https://qcloud.originqc.com.cn/document/qpanda-3/da/dd5/tutorial_quantum_gate.html>`_ 部分的定义。
+当前pyQPanda支持的逻辑门可参考pyqpanda3 `量子逻辑门 <https://qcloud.originqc.com.cn/document/qpanda-3/da/dd5/tutorial_quantum_gate.html>`_ 部分的定义。
 此外VQNet还封装了部分在量子机器学习中常用的量子逻辑门组合:
 
 
@@ -1240,7 +1240,7 @@ expval
     如果观测值是 :math:`0.7Z\otimes X\otimes I+0.2I\otimes Z\otimes I`,
     那么 Hamiltonian dict 将是 ``{{'Z0, X1':0.7} ,{'Z1':0.2}}`` 。
 
-    expval api现在支持pyQPanda3 的模拟器 。 
+    expval api现在支持pyqpanda3 的模拟器 。 
     
     :param machine: 由pyQPanda创建的量子虚拟机。
     :param prog: pyQPanda创建的量子工程。
