@@ -5,7 +5,6 @@
 
     以下接口的量子计算部分使用pyqpanda3 https://qcloud.originqc.com.cn/document/qpanda-3/index.html。
 
-    如果您使用了本模块下的QCloud功能,在代码中导入pyqpanda2 或 使用pyvqnet的pyqpanda2相关封装接口会有错误。
 
 量子计算层
 ***********************************
@@ -43,6 +42,12 @@ QuantumLayer
     .. note::
 
         该类具有别名 `QuantumLayerV2`, `QpandaQCircuitVQCLayerLite`。
+
+
+    .. note::
+
+        该类计算梯度需要额外使用pyqpanda3进行线路计算个数与参数个数、数据个数、数据维度的乘积线性相关。
+
 
     Example::
 
@@ -104,10 +109,10 @@ QuantumLayer
 
 
 
-QuantumLayerV3
+QpandaQProgVQCLayer
 ============================
 
-.. py:class:: pyvqnet.qnn.pq3.quantumlayer.QuantumLayerV3(origin_qprog_func,para_num,qvm_type="cpu", pauli_str_dict=None, shots=1000, initializer=None,dtype=None,name="")
+.. py:class:: pyvqnet.qnn.pq3.quantumlayer.QpandaQProgVQCLayer(origin_qprog_func,para_num,qvm_type="cpu", pauli_str_dict=None, shots=1000, initializer=None,dtype=None,name="")
 
 
     它将参数化的量子电路提交给 本地QPanda3全振幅模拟器中计算,并训练线路中的参数。
@@ -143,13 +148,19 @@ QuantumLayerV3
 
     .. note::
 
-        该类具有别名 `QpandaQProgVQCLayer` 。
+        该类具有别名 `QuantumLayerV3` 。
+
+
+    .. note::
+
+        该类计算梯度需要额外使用pyqpanda3进行线路计算个数与参数个数、数据个数、数据维度的乘积线性相关。
+
 
     Example::
 
         import pyqpanda3.core as pq
         import pyvqnet
-        from pyvqnet.qnn.pq3.quantumlayer import  QuantumLayerV3
+        from pyvqnet.qnn.pq3.quantumlayer import  QpandaQProgVQCLayer
 
 
         def qfun(input, param ):
@@ -182,7 +193,7 @@ QuantumLayerV3
             return m_prog
 
         from pyvqnet.utils.initializer import ones
-        l = QuantumLayerV3(qfun,
+        l = QpandaQProgVQCLayer(qfun,
                         4,
                         "cpu",
                         pauli_str_dict=None,
@@ -206,7 +217,7 @@ QuantumBatchAsyncQcloudLayer
 
 .. py:class:: pyvqnet.qnn.pq3.quantumlayer.QuantumBatchAsyncQcloudLayer(origin_qprog_func, qcloud_token, para_num, pauli_str_dict=None, shots = 1000, initializer=None, dtype=None, name="", diff_method="parameter_shift", submit_kwargs={}, query_kwargs={})
 
-    使用 pyqpanda3 QCLOUD 的 originqc 真实芯片的抽象计算模块。 它提交参数化量子电路到真实芯片并获得测量结果。
+    使用 pyqpanda3 QCloud 的本源量子真实芯片的抽象计算模块。 它提交参数化量子电路到真实芯片并获得测量结果。
     如果 diff_method == "random_coordinate_descent" ,该层将随机选择单个参数来计算梯度,其他参数将保持为零。参考:https://arxiv.org/abs/2311.00088
 
     .. note::
@@ -221,6 +232,9 @@ QuantumBatchAsyncQcloudLayer
             
             `param`: 输入一维的变分量子线路的待训练参数。
 
+    .. note::
+
+        该类计算梯度需要额外使用芯片进行线路计算个数与参数个数、数据个数、数据维度的乘积线性相关。
 
 
     :param origin_qprog_func: QPanda 构建的变分量子电路函数,必须返回QProg。
@@ -516,7 +530,11 @@ QLinear 实现了一种量子全连接算法。首先将数据编码到量子态
 
 .. py:class:: pyvqnet.qnn.qlinear.QLinear(input_channels,output_channels,machine: str = "CPU"))
 
-    量子全连接模块。全连接模块的输入为形状（输入通道、输出通道）。请注意,该层不带变分量子参数。
+    量子全连接模块。全连接模块的输入为形状（输入通道、输出通道）。
+    
+    .. note::
+
+        请注意,该层不带变分量子参数。
 
     :param input_channels: `int` - 输入通道数。
     :param output_channels: `int` - 输出通道数。
@@ -1168,7 +1186,7 @@ Quantum_Embedding
 
     使用 RZ,RY,RZ 创建变分量子电路,将经典数据编码为量子态。
     参考 `Quantum embeddings for machine learning <https://arxiv.org/abs/2001.03622>`_。
-    在初始化该类后,其成员函数 ``compute_circuit`` 为运行函数,可作为参数输入 ``QuantumLayerV2`` 类构成量子机器学习模型的一层。
+    在初始化该类后,其成员函数 ``compute_circuit`` 为运行函数,可作为参数输入 ``QpandaQCircuitVQCLayerLite`` 类构成量子机器学习模型的一层。
 
     :param qubits: 使用pyqpanda 申请的量子比特。
     :param machine: 使用pyqpanda 申请的量子虚拟机。
@@ -1179,7 +1197,7 @@ Quantum_Embedding
 
     Example::
 
-        from pyvqnet.qnn.pq3 import QuantumLayerV2,Quantum_Embedding
+        from pyvqnet.qnn.pq3 import QpandaQCircuitVQCLayerLite,Quantum_Embedding
         from pyvqnet.tensor import tensor
         import pyqpanda3.core as pq
         depth_input = 2
@@ -1198,7 +1216,7 @@ Quantum_Embedding
 
         qe = Quantum_Embedding(nq, loacl_machine, num_repetitions_input,
                             depth_input, num_unitary_layers, num_repetitions)
-        qlayer = QuantumLayerV2(qe.compute_circuit,
+        qlayer = QpandaQCircuitVQCLayerLite(qe.compute_circuit,
                                 qe.param_num)
 
         data_in.requires_grad = True

@@ -11,6 +11,199 @@
 
 
 
+Circuit-centric quantum classifiers算法示例
+=========================================================
+
+这个例子使用 ``pyvqnet.qnn.vqc`` 实现了论文 `Circuit-centric quantum classifiers <https://arxiv.org/pdf/1804.00633.pdf>`_ 中可变量子线路进行二分类任务。
+该例子用来判断一个二进制数是奇数还是偶数。通过将二进制数编码到量子比特上,通过优化线路中的可变参数,使得该线路z方向测量值可以指示该输入为奇数还是偶数。
+变分量子线路通常定义一个子线路,这是一种基本的电路架构,可以通过重复层构建复杂变分电路。
+我们的电路层由多个旋转逻辑门以及将每个量子位与其相邻的量子位纠缠在一起的 ``CNOT`` 逻辑门组成。
+我们还需要一个线路将经典数据编码到量子态上,使得线路测量的输出与输入有关联。
+本例中,我们把二进制输入编码到对应顺序的量子比特上。例如输入数据1101被编码到4个量子比特。
+
+.. code-block::
+
+    import sys
+    sys.path.insert(0, "../")
+    import random
+    import numpy as np
+
+    from pyvqnet.optim import sgd
+    from pyvqnet.tensor.tensor import QTensor
+    from pyvqnet.dtype import kfloat32,kint64
+    from pyvqnet.qnn.vqc import QMachine, RX, RY, CNOT, PauliX, qmatrix, PauliZ,qmeasure,qcircuit,VQC_RotCircuit
+    from pyvqnet.tensor import QTensor, tensor
+    import pyvqnet
+    from pyvqnet.nn import Parameter
+
+    random.seed(1234)
+
+
+    class QModel(pyvqnet.nn.Module):
+        def __init__(self, num_wires, dtype):
+            super(QModel, self).__init__()
+
+            self._num_wires = num_wires
+            self._dtype = dtype
+            self.qm = QMachine(num_wires, dtype=dtype)
+
+            self.w = Parameter((2,4,3),initializer=pyvqnet.utils.initializer.quantum_uniform)
+            self.cnot = CNOT(wires=[0, 1])
+
+        def forward(self, x, *args, **kwargs):
+            self.qm.reset_states(x.shape[0])
+
+            def get_cnot(nqubits,qm):
+                for i in range(len(nqubits) - 1):
+                    CNOT(wires = [nqubits[i], nqubits[i + 1]])(q_machine = qm)
+                CNOT(wires = [nqubits[len(nqubits) - 1], nqubits[0]])(q_machine = qm)
+
+
+            def build_circult(weights, xx, nqubits,qm):
+                def Rot(weights_j, nqubits,qm):
+                    VQC_RotCircuit(qm,nqubits,weights_j)
+
+                def basisstate(qm,xx, nqubits):
+                    for i in nqubits:
+                        qcircuit.rz(q_machine=qm, wires=i, params=xx[:,[i]])
+                        qcircuit.ry(q_machine=qm, wires=i, params=xx[:,[i]])
+                        qcircuit.rz(q_machine=qm, wires=i, params=xx[:,[i]])
+
+                basisstate(qm,xx,nqubits)
+
+                for i in range(weights.shape[0]):
+
+                    weights_i = weights[i, :, :]
+                    for j in range(len(nqubits)):
+                        weights_j = weights_i[j]
+                        Rot(weights_j, nqubits[j],qm)
+                    get_cnot(nqubits,qm)
+
+            build_circult(self.w, x,range(4),self.qm)
+
+            return qmeasure.MeasureAll(obs={'Z0': 1})(self.qm)
+        
+
+数据载入,模型训练流程的代码:
+
+.. code-block::
+
+
+    qvc_train_data = [
+        0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1,
+        1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 0, 1, 1,
+        1, 1, 1, 0, 1, 1, 1, 1, 1, 0
+    ]
+    qvc_test_data = [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 1, 0, 0, 1, 1, 0]
+    batch_size = 5
+    
+    def dataloader(data, label, batch_size, shuffle=True) -> np:
+        if shuffle:
+            for _ in range(len(data) // batch_size):
+                random_index = np.random.randint(0, len(data), (batch_size, 1))
+                yield data[random_index].reshape(batch_size,
+                                                -1), label[random_index].reshape(
+                                                    batch_size, -1)
+        else:
+            for i in range(0, len(data) - batch_size + 1, batch_size):
+                yield data[i:i + batch_size], label[i:i + batch_size]
+
+
+    def get_accuary(result, label):
+        result, label = np.array(result.data), np.array(label.data)
+        score = np.sum(np.argmax(result, axis=1) == np.argmax(label, 1))
+        return score
+
+
+    def vqc_get_data(dataset_str):
+        """
+        Tranform data to valid form
+        """
+        if dataset_str == "train":
+            datasets = np.array(qvc_train_data)
+
+        else:
+            datasets = np.array(qvc_test_data)
+
+        datasets = datasets.reshape([-1, 5])
+        data = datasets[:, :-1]
+        label = datasets[:, -1].astype(int)
+        label = label.reshape(-1, 1)
+        return data, label
+
+
+    def vqc_square_loss(labels, predictions):
+        loss = 0
+        
+        loss = (labels - predictions) ** 2
+
+        loss = tensor.mean(loss,axis=0)
+        return loss
+    def run2():
+        """
+        Main run function
+        """
+        model = QModel(4,pyvqnet.kcomplex64)
+
+        optimizer = sgd.SGD(model.parameters(), lr=0.5)
+
+        epoch = 25
+
+        print("start training..............")
+        model.train()
+
+        datas, labels = vqc_get_data("train")
+
+        for i in range(epoch):
+            sum_loss = 0
+            count  =0
+            accuary = 0
+            for data, label in dataloader(datas, labels, batch_size, False):
+                optimizer.zero_grad()
+                data, label = QTensor(data,dtype=kfloat32), QTensor(label,dtype=kint64)
+
+                result = model(data)
+
+                loss_b = vqc_square_loss(label, result)
+                loss_b.backward()
+                optimizer._step()
+                sum_loss += loss_b.item()
+                count += batch_size
+                accuary += get_accuary(result, label)
+            print(
+                f"epoch:{i}, #### loss:{sum_loss/count} #####accuray:{accuary/count}"
+            )
+
+    run2()
+    """
+    epoch:0, #### loss:0.07805998176336289 #####accuray:1.0
+    epoch:1, #### loss:0.07268960326910019 #####accuray:1.0
+    epoch:2, #### loss:0.06934810429811478 #####accuray:1.0
+    epoch:3, #### loss:0.06652230024337769 #####accuray:1.0
+    epoch:4, #### loss:0.06363258957862854 #####accuray:1.0
+    epoch:5, #### loss:0.0604777917265892 #####accuray:1.0
+    epoch:6, #### loss:0.05711844265460968 #####accuray:1.0
+    epoch:7, #### loss:0.053814482688903806 #####accuray:1.0
+    epoch:8, #### loss:0.05088095813989639 #####accuray:1.0
+    epoch:9, #### loss:0.04851257503032684 #####accuray:1.0
+    epoch:10, #### loss:0.04672074168920517 #####accuray:1.0
+    epoch:11, #### loss:0.04540069997310638 #####accuray:1.0
+    epoch:12, #### loss:0.04442296177148819 #####accuray:1.0
+    epoch:13, #### loss:0.04368099868297577 #####accuray:1.0
+    epoch:14, #### loss:0.04310029000043869 #####accuray:1.0
+    epoch:15, #### loss:0.04263183027505875 #####accuray:1.0
+    epoch:16, #### loss:0.04224379360675812 #####accuray:1.0
+    epoch:17, #### loss:0.041915199160575865 #####accuray:1.0
+    epoch:18, #### loss:0.04163179695606232 #####accuray:1.0
+    epoch:19, #### loss:0.041383542120456696 #####accuray:1.0
+    epoch:20, #### loss:0.0411631852388382 #####accuray:1.0
+    epoch:21, #### loss:0.04096531867980957 #####accuray:1.0
+    epoch:22, #### loss:0.04078584611415863 #####accuray:1.0
+    epoch:23, #### loss:0.0406215637922287 #####accuray:1.0
+    epoch:24, #### loss:0.040470016002655027 #####accuray:1.0
+    """
+
+
 量子自然梯度接口示例
 ===================================
 量子机器学习模型一般使用梯度下降法对可变量子逻辑线路中参数进行优化。经典梯度下降法公式如下:
@@ -1286,198 +1479,6 @@
     test_accuracy:0.934
     """
 
-
-Circuit-centric quantum classifiers算法示例
-=========================================================
-
-这个例子使用 ``pyvqnet.qnn.vqc`` 实现了论文 `Circuit-centric quantum classifiers <https://arxiv.org/pdf/1804.00633.pdf>`_ 中可变量子线路进行二分类任务。
-该例子用来判断一个二进制数是奇数还是偶数。通过将二进制数编码到量子比特上,通过优化线路中的可变参数,使得该线路z方向测量值可以指示该输入为奇数还是偶数。
-变分量子线路通常定义一个子线路,这是一种基本的电路架构,可以通过重复层构建复杂变分电路。
-我们的电路层由多个旋转逻辑门以及将每个量子位与其相邻的量子位纠缠在一起的 ``CNOT`` 逻辑门组成。
-我们还需要一个线路将经典数据编码到量子态上,使得线路测量的输出与输入有关联。
-本例中,我们把二进制输入编码到对应顺序的量子比特上。例如输入数据1101被编码到4个量子比特。
-
-.. code-block::
-
-    import sys
-    sys.path.insert(0, "../")
-    import random
-    import numpy as np
-
-    from pyvqnet.optim import sgd
-    from pyvqnet.tensor.tensor import QTensor
-    from pyvqnet.dtype import kfloat32,kint64
-    from pyvqnet.qnn.vqc import QMachine, RX, RY, CNOT, PauliX, qmatrix, PauliZ,qmeasure,qcircuit,VQC_RotCircuit
-    from pyvqnet.tensor import QTensor, tensor
-    import pyvqnet
-    from pyvqnet.nn import Parameter
-
-    random.seed(1234)
-
-
-    class QModel(pyvqnet.nn.Module):
-        def __init__(self, num_wires, dtype):
-            super(QModel, self).__init__()
-
-            self._num_wires = num_wires
-            self._dtype = dtype
-            self.qm = QMachine(num_wires, dtype=dtype)
-
-            self.w = Parameter((2,4,3),initializer=pyvqnet.utils.initializer.quantum_uniform)
-            self.cnot = CNOT(wires=[0, 1])
-
-        def forward(self, x, *args, **kwargs):
-            self.qm.reset_states(x.shape[0])
-
-            def get_cnot(nqubits,qm):
-                for i in range(len(nqubits) - 1):
-                    CNOT(wires = [nqubits[i], nqubits[i + 1]])(q_machine = qm)
-                CNOT(wires = [nqubits[len(nqubits) - 1], nqubits[0]])(q_machine = qm)
-
-
-            def build_circult(weights, xx, nqubits,qm):
-                def Rot(weights_j, nqubits,qm):
-                    VQC_RotCircuit(qm,nqubits,weights_j)
-
-                def basisstate(qm,xx, nqubits):
-                    for i in nqubits:
-                        qcircuit.rz(q_machine=qm, wires=i, params=xx[:,[i]])
-                        qcircuit.ry(q_machine=qm, wires=i, params=xx[:,[i]])
-                        qcircuit.rz(q_machine=qm, wires=i, params=xx[:,[i]])
-
-                basisstate(qm,xx,nqubits)
-
-                for i in range(weights.shape[0]):
-
-                    weights_i = weights[i, :, :]
-                    for j in range(len(nqubits)):
-                        weights_j = weights_i[j]
-                        Rot(weights_j, nqubits[j],qm)
-                    get_cnot(nqubits,qm)
-
-            build_circult(self.w, x,range(4),self.qm)
-
-            return qmeasure.MeasureAll(obs={'Z0': 1})(self.qm)
-        
-
-数据载入,模型训练流程的代码:
-
-.. code-block::
-
-
-    qvc_train_data = [
-        0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1,
-        1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 0, 1, 1,
-        1, 1, 1, 0, 1, 1, 1, 1, 1, 0
-    ]
-    qvc_test_data = [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 1, 0, 0, 1, 1, 0]
-    batch_size = 5
-    
-    def dataloader(data, label, batch_size, shuffle=True) -> np:
-        if shuffle:
-            for _ in range(len(data) // batch_size):
-                random_index = np.random.randint(0, len(data), (batch_size, 1))
-                yield data[random_index].reshape(batch_size,
-                                                -1), label[random_index].reshape(
-                                                    batch_size, -1)
-        else:
-            for i in range(0, len(data) - batch_size + 1, batch_size):
-                yield data[i:i + batch_size], label[i:i + batch_size]
-
-
-    def get_accuary(result, label):
-        result, label = np.array(result.data), np.array(label.data)
-        score = np.sum(np.argmax(result, axis=1) == np.argmax(label, 1))
-        return score
-
-
-    def vqc_get_data(dataset_str):
-        """
-        Tranform data to valid form
-        """
-        if dataset_str == "train":
-            datasets = np.array(qvc_train_data)
-
-        else:
-            datasets = np.array(qvc_test_data)
-
-        datasets = datasets.reshape([-1, 5])
-        data = datasets[:, :-1]
-        label = datasets[:, -1].astype(int)
-        label = label.reshape(-1, 1)
-        return data, label
-
-
-    def vqc_square_loss(labels, predictions):
-        loss = 0
-        
-        loss = (labels - predictions) ** 2
-
-        loss = tensor.mean(loss,axis=0)
-        return loss
-    def run2():
-        """
-        Main run function
-        """
-        model = QModel(4,pyvqnet.kcomplex64)
-
-        optimizer = sgd.SGD(model.parameters(), lr=0.5)
-
-        epoch = 25
-
-        print("start training..............")
-        model.train()
-
-        datas, labels = vqc_get_data("train")
-
-        for i in range(epoch):
-            sum_loss = 0
-            count  =0
-            accuary = 0
-            for data, label in dataloader(datas, labels, batch_size, False):
-                optimizer.zero_grad()
-                data, label = QTensor(data,dtype=kfloat32), QTensor(label,dtype=kint64)
-
-                result = model(data)
-
-                loss_b = vqc_square_loss(label, result)
-                loss_b.backward()
-                optimizer._step()
-                sum_loss += loss_b.item()
-                count += batch_size
-                accuary += get_accuary(result, label)
-            print(
-                f"epoch:{i}, #### loss:{sum_loss/count} #####accuray:{accuary/count}"
-            )
-
-    run2()
-    """
-    epoch:0, #### loss:0.07805998176336289 #####accuray:1.0
-    epoch:1, #### loss:0.07268960326910019 #####accuray:1.0
-    epoch:2, #### loss:0.06934810429811478 #####accuray:1.0
-    epoch:3, #### loss:0.06652230024337769 #####accuray:1.0
-    epoch:4, #### loss:0.06363258957862854 #####accuray:1.0
-    epoch:5, #### loss:0.0604777917265892 #####accuray:1.0
-    epoch:6, #### loss:0.05711844265460968 #####accuray:1.0
-    epoch:7, #### loss:0.053814482688903806 #####accuray:1.0
-    epoch:8, #### loss:0.05088095813989639 #####accuray:1.0
-    epoch:9, #### loss:0.04851257503032684 #####accuray:1.0
-    epoch:10, #### loss:0.04672074168920517 #####accuray:1.0
-    epoch:11, #### loss:0.04540069997310638 #####accuray:1.0
-    epoch:12, #### loss:0.04442296177148819 #####accuray:1.0
-    epoch:13, #### loss:0.04368099868297577 #####accuray:1.0
-    epoch:14, #### loss:0.04310029000043869 #####accuray:1.0
-    epoch:15, #### loss:0.04263183027505875 #####accuray:1.0
-    epoch:16, #### loss:0.04224379360675812 #####accuray:1.0
-    epoch:17, #### loss:0.041915199160575865 #####accuray:1.0
-    epoch:18, #### loss:0.04163179695606232 #####accuray:1.0
-    epoch:19, #### loss:0.041383542120456696 #####accuray:1.0
-    epoch:20, #### loss:0.0411631852388382 #####accuray:1.0
-    epoch:21, #### loss:0.04096531867980957 #####accuray:1.0
-    epoch:22, #### loss:0.04078584611415863 #####accuray:1.0
-    epoch:23, #### loss:0.0406215637922287 #####accuray:1.0
-    epoch:24, #### loss:0.040470016002655027 #####accuray:1.0
-    """
 
 
 

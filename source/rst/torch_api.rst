@@ -7,10 +7,9 @@ VQNet使用torch进行底层计算
 
 .. danger::
 
-    **如需要使用以下功能, 请自行安装 torch , 本软件安装时候不自动安装 torch 。**
+    **如需要使用以下功能, 请自行安装 torch>=2.4.0 , 本软件安装时候不自动安装 torch 。**
 
-自2.15.0版本开始,本软件支持使用 ``torch`` 作为计算后端进行底层运算,方便接入主流大模型训练库进行大模型微调。
-
+自2.15.0版本开始,本软件支持使用 ``torch`` 作为计算后端进行底层运算,可接入第三方主流大模型训练库进行大模型微调。
 
 
     .. warning::
@@ -19,7 +18,7 @@ VQNet使用torch进行底层计算
         在 ``pyvqnet.backends.set_backend("torch")`` 后,可以输入 ``QTensor``,其成员 `data` 从pyvqnet的Tensor变为 ``torch.Tensor`` 计算。
 
         ``pyvqnet.backends.set_backend("torch")`` 以及 ``pyvqnet.backends.set_backend("pyvqnet")`` 会修改全局运行后端。
-        不同后端配置下申请的 ``QTensor`` 不能混在一起运算。
+        不同后端配置下申请的 ``QTensor`` 无法一起运算。
 
         使用 ``to_tensor`` 可将 ``torch.Tensor`` 封装为一个 ``QTensor`` 。
 
@@ -35,6 +34,7 @@ set_backend
     
     使用 ``pyvqnet.backends.set_backend("torch")`` 后,接口保持不变,但VQNet的 ``QTensor`` 的 ``data`` 成员变量均使用 ``torch.Tensor`` 储存数据,
     并使用torch计算。
+    
     使用 ``pyvqnet.backends.set_backend("pyvqnet")`` 后,VQNet ``QTensor`` 的 ``data`` 成员变量均使用 ``pyvqnet._core.Tensor`` 储存数据,并使用pyvqnet c++库计算。
 
     .. warning::
@@ -2437,7 +2437,7 @@ TorchQcloudQuantumLayer
 
 .. py:class:: pyvqnet.qnn.vqc.torch.TorchQcloudQuantumLayer(origin_qprog_func, qcloud_token, para_num, num_qubits, num_cubits, pauli_str_dict=None, shots = 1000, initializer=None, dtype=None, name="", diff_method="parameter_shift", submit_kwargs={}, query_kwargs={})
 
-    使用 pyqpanda QCloud 从版本 3.8.2.2 开始的 originqc 真实芯片的抽象计算模块。 它提交参数化量子电路到真实芯片并获得测量结果。
+    使用 pyqpanda QCloud 从版本 3.8.2.2 开始的本源量子真实芯片的抽象计算模块。 它提交参数化量子电路到真实芯片并获得测量结果。
     如果 diff_method == "random_coordinate_descent" ,该层将随机选择单个参数来计算梯度,其他参数将保持为零。参考:https://arxiv.org/abs/2311.00088
 
     .. note::
@@ -2568,7 +2568,7 @@ TorchQcloud3QuantumLayer
 
 .. py:class:: pyvqnet.qnn.vqc.torch.TorchQcloud3QuantumLayer(origin_qprog_func, qcloud_token, para_num, pauli_str_dict=None, shots = 1000, initializer=None, dtype=None, name="", diff_method="parameter_shift", submit_kwargs={}, query_kwargs={})
 
-    使用 pyqpanda3的 originqc 真实芯片的抽象计算模块。 它提交参数化量子电路到真实芯片并获得测量结果。
+    使用 pyqpanda3的本源量子真实芯片的抽象计算模块。 它提交参数化量子电路到真实芯片并获得测量结果。
     如果 diff_method == "random_coordinate_descent" ,该层将随机选择单个参数来计算梯度,其他参数将保持为零。参考:https://arxiv.org/abs/2311.00088
 
     .. note::

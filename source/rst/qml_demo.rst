@@ -5287,7 +5287,7 @@ VQNet实现了该算法的一个示例: 使用VQE 求解目标Hamiltonian的基�
     import pyqpanda as pq
     from pyvqnet.qnn.template import StronglyEntanglingTemplate
     from pyvqnet.qnn.measure import Hermitian_expval
-    from pyvqnet.qnn import QuantumLayerV2
+    from pyvqnet.qnn import QpandaQCircuitVQCLayerLite
     from pyvqnet.optim import SGD
     import pyvqnet._core as _core
     from pyvqnet.tensor import QTensor
@@ -5381,8 +5381,8 @@ vqe_func_analytic()函数是使用参数偏移计算理论梯度,vqe_func_shots(
 
     ##############################################################################
     # Optimizing the circuit using gradient descent via the parameter-shift rule:
-    qlayer_ana = QuantumLayerV2(vqe_func_analytic, 2*2*3 )
-    qlayer_shots = QuantumLayerV2(vqe_func_shots, 2*2*3 )
+    qlayer_ana = QpandaQCircuitVQCLayerLite(vqe_func_analytic, 2*2*3 )
+    qlayer_shots = QpandaQCircuitVQCLayerLite(vqe_func_shots, 2*2*3 )
     cost_sgd = []
     cost_dsgd = []
     temp = _core.Tensor(init_params)
