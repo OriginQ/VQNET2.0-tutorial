@@ -100,6 +100,7 @@ Module
     所有神经网络模块的基类,包括量子模块或经典模块。您的模型也应该是此类的子类,用于 autograd 计算。
     模块还可以包含其他Module类,允许将它们嵌套在树状结构。 您可以将子模块分配为常规属性::
 
+
         class Model(Module):
             def __init__(self):
                 super(Model, self).__init__()

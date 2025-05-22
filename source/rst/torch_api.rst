@@ -5406,6 +5406,8 @@ QuantumLayerAdjoint
 
         该类继承于 ``pyvqnet.nn.torch.TorchModule`` 以及 ``pyvqnet.qnn.vqc.QuantumLayerAdjoint`` ,可以作为 ``torch.nn.Module`` 的一个子模块加入torch的模型中。
 
+    .. warning::
+        Module 默认处于 `eval` 模式,如果需要训练参数，需要运行 `train()` 接口进入训练模式。
 
     .. note::
 
@@ -5469,6 +5471,7 @@ QuantumLayerAdjoint
                             dtype=pyvqnet.kcomplex64,
                             grad_mode="adjoint")
         adjoint_model = QuantumLayerAdjoint(qunatum_model)
+        adjoint_model.train()
         batch_y = adjoint_model(input_x)
         batch_y.backward()
 
