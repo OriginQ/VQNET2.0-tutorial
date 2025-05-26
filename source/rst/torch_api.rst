@@ -5646,6 +5646,10 @@ TNQModule
 
         该类以及其派生类仅适用于 ``pyvqnet.backends.set_backend("torch")`` , 不要与默认 ``pyvqnet.nn`` 下的 ``Module`` 混用。
 
+    .. note::
+        
+        批量化必须搭配TNQModule使用。
+
     Example::
 
         import pyvqnet
@@ -5726,6 +5730,10 @@ TNQMachine
     .. warning::
         
         在张量网络的量子线路中，默认会开启 ``vmap`` 功能，在线路上的逻辑门参数上均为舍弃了批次维度
+
+    .. note::
+        
+        批量化必须搭配TNQModule使用。
 
     :param num_wires: 量子比特数。
     :param dtype: 计算数据的数据类型。默认值是pyvqnet。kcomplex64,对应的参数精度为pyvqnet.kfloat32。
@@ -5836,15 +5844,32 @@ I
 
     Example::
         
-        from pyvqnet.qnn.vqc.tn import I,TNQMachine
+        from pyvqnet.qnn.vqc.tn import I,TNQMachine,TNQModule,MeasureAll, rx
         import pyvqnet
         pyvqnet.backends.set_backend("torch")
-        device = TNQMachine(4)
-        layer = I(wires=0)
-        batchsize = 1
-        device.reset_states(1)
-        layer(q_machine = device)
-        print(device.get_states())
+
+        class QModel(TNQModule):
+            
+            def __init__(self, num_wires, dtype,batch_size=2):
+                super(QModel, self).__init__()
+                self.device = TNQMachine(num_wires)
+                self.layer = I(wires=0)
+                self.batch_size = batch_size
+                self.num_wires = num_wires
+                
+            def forward(self, x, *args, **kwargs):
+                self.device.reset_states(batchsize=self.batch_size)
+                for i in range(self.num_wires):
+                    rx(self.device, wires=i, params=x[i])
+                self.layer(q_machine = self.device)
+                y = MeasureAll(obs={'Z0': 1})(self.device)
+                return y
+
+        x = pyvqnet.tensor.QTensor([[1,0,0,1],[1,1,0,1]],dtype=pyvqnet.kfloat32,requires_grad=True)
+        model = QModel(4,pyvqnet.kcomplex64,2)
+        y = model(x)
+        print(y)
+
 
 
 Hadamard
@@ -5869,15 +5894,32 @@ Hadamard
 
     Example::
         
-        from pyvqnet.qnn.vqc.tn import Hadamard,TNQMachine
+        from pyvqnet.qnn.vqc.tn import Hadamard,TNQMachine,TNQModule,MeasureAll, rx
         import pyvqnet
         pyvqnet.backends.set_backend("torch")
-        device = TNQMachine(4)
-        layer = Hadamard(wires=0)
-        batchsize = 1
-        device.reset_states(1)
-        layer(q_machine = device)
-        print(device.get_states())
+
+        class QModel(TNQModule):
+            
+            def __init__(self, num_wires, dtype,batch_size=2):
+                super(QModel, self).__init__()
+                self.device = TNQMachine(num_wires)
+                self.layer = Hadamard(wires=0)
+                self.batch_size = batch_size
+                self.num_wires = num_wires
+                
+            def forward(self, x, *args, **kwargs):
+                self.device.reset_states(batchsize=self.batch_size)
+                for i in range(self.num_wires):
+                    rx(self.device, wires=i, params=x[i])
+                self.layer(q_machine = self.device)
+                y = MeasureAll(obs={'Z0': 1})(self.device)
+                return y
+
+        x = pyvqnet.tensor.QTensor([[1,0,0,1],[1,1,0,1]],dtype=pyvqnet.kfloat32,requires_grad=True)
+        model = QModel(4,pyvqnet.kcomplex64,2)
+        y = model(x)
+        print(y)
+
 
 
 T
@@ -5902,15 +5944,31 @@ T
 
     Example::
         
-        from pyvqnet.qnn.vqc.tn import T,TNQMachine
+        from pyvqnet.qnn.vqc.tn import T,TNQMachine,TNQModule,MeasureAll, rx
         import pyvqnet
         pyvqnet.backends.set_backend("torch")
-        device = TNQMachine(4)
-        layer = T(wires=0)
-        batchsize = 1
-        device.reset_states(1)
-        layer(q_machine = device)
-        print(device.get_states())
+
+        class QModel(TNQModule):
+            
+            def __init__(self, num_wires, dtype,batch_size=2):
+                super(QModel, self).__init__()
+                self.device = TNQMachine(num_wires)
+                self.layer = T(wires=0)
+                self.batch_size = batch_size
+                self.num_wires = num_wires
+                
+            def forward(self, x, *args, **kwargs):
+                self.device.reset_states(batchsize=self.batch_size)
+                for i in range(self.num_wires):
+                    rx(self.device, wires=i, params=x[i])
+                self.layer(q_machine = self.device)
+                y = MeasureAll(obs={'Z0': 1})(self.device)
+                return y
+
+        x = pyvqnet.tensor.QTensor([[1,0,0,1],[1,1,0,1]],dtype=pyvqnet.kfloat32,requires_grad=True)
+        model = QModel(4,pyvqnet.kcomplex64,2)
+        y = model(x)
+        print(y)
 
 
 
@@ -5936,15 +5994,32 @@ S
 
     Example::
         
-        from pyvqnet.qnn.vqc.tn import S,TNQMachine
+        from pyvqnet.qnn.vqc.tn import S,TNQMachine,TNQModule,MeasureAll, rx
         import pyvqnet
         pyvqnet.backends.set_backend("torch")
-        device = TNQMachine(4)
-        layer = S(wires=0)
-        batchsize = 1
-        device.reset_states(1)
-        layer(q_machine = device)
-        print(device.get_states())
+
+        class QModel(TNQModule):
+            
+            def __init__(self, num_wires, dtype,batch_size=2):
+                super(QModel, self).__init__()
+                self.device = TNQMachine(num_wires)
+                self.layer = S(wires=0)
+                self.batch_size = batch_size
+                self.num_wires = num_wires
+                
+            def forward(self, x, *args, **kwargs):
+                self.device.reset_states(batchsize=self.batch_size)
+                for i in range(self.num_wires):
+                    rx(self.device, wires=i, params=x[i])
+                self.layer(q_machine = self.device)
+                y = MeasureAll(obs={'Z0': 1})(self.device)
+                return y
+
+        x = pyvqnet.tensor.QTensor([[1,0,0,1],[1,1,0,1]],dtype=pyvqnet.kfloat32,requires_grad=True)
+        model = QModel(4,pyvqnet.kcomplex64,2)
+        y = model(x)
+        print(y)
+
 
 
 PauliX
@@ -5970,15 +6045,31 @@ PauliX
 
     Example::
         
-        from pyvqnet.qnn.vqc.tn import PauliX,TNQMachine
+        from pyvqnet.qnn.vqc.tn import PauliX,TNQMachine,TNQModule,MeasureAll, rx
         import pyvqnet
         pyvqnet.backends.set_backend("torch")
-        device = TNQMachine(4)
-        layer = PauliX(wires=0)
-        batchsize = 1
-        device.reset_states(1)
-        layer(q_machine = device)
-        print(device.get_states())
+
+        class QModel(TNQModule):
+            
+            def __init__(self, num_wires, dtype,batch_size=2):
+                super(QModel, self).__init__()
+                self.device = TNQMachine(num_wires)
+                self.layer = PauliX(wires=0)
+                self.batch_size = batch_size
+                self.num_wires = num_wires
+                
+            def forward(self, x, *args, **kwargs):
+                self.device.reset_states(batchsize=self.batch_size)
+                for i in range(self.num_wires):
+                    rx(self.device, wires=i, params=x[i])
+                self.layer(q_machine = self.device)
+                y = MeasureAll(obs={'Z0': 1})(self.device)
+                return y
+
+        x = pyvqnet.tensor.QTensor([[1,0,0,1],[1,1,0,1]],dtype=pyvqnet.kfloat32,requires_grad=True)
+        model = QModel(4,pyvqnet.kcomplex64,2)
+        y = model(x)
+        print(y)
 
 
 PauliY
@@ -6004,15 +6095,31 @@ PauliY
 
     Example::
         
-        from pyvqnet.qnn.vqc.tn import PauliY,TNQMachine
+        from pyvqnet.qnn.vqc.tn import PauliY,TNQMachine,TNQModule,MeasureAll, rx
         import pyvqnet
         pyvqnet.backends.set_backend("torch")
-        device = TNQMachine(4)
-        layer = PauliY(wires=0)
-        batchsize = 1
-        device.reset_states(1)
-        layer(q_machine = device)
-        print(device.get_states())
+
+        class QModel(TNQModule):
+            
+            def __init__(self, num_wires, dtype,batch_size=2):
+                super(QModel, self).__init__()
+                self.device = TNQMachine(num_wires)
+                self.layer = PauliY(wires=0)
+                self.batch_size = batch_size
+                self.num_wires = num_wires
+                
+            def forward(self, x, *args, **kwargs):
+                self.device.reset_states(batchsize=self.batch_size)
+                for i in range(self.num_wires):
+                    rx(self.device, wires=i, params=x[i])
+                self.layer(q_machine = self.device)
+                y = MeasureAll(obs={'Z0': 1})(self.device)
+                return y
+
+        x = pyvqnet.tensor.QTensor([[1,0,0,1],[1,1,0,1]],dtype=pyvqnet.kfloat32,requires_grad=True)
+        model = QModel(4,pyvqnet.kcomplex64,2)
+        y = model(x)
+        print(y)
 
 
 
@@ -6039,15 +6146,31 @@ PauliZ
 
     Example::
         
-        from pyvqnet.qnn.vqc.tn import PauliZ,TNQMachine
+        from pyvqnet.qnn.vqc.tn import PauliZ,TNQMachine,TNQModule,MeasureAll, rx
         import pyvqnet
         pyvqnet.backends.set_backend("torch")
-        device = TNQMachine(4)
-        layer = PauliZ(wires=0)
-        batchsize = 1
-        device.reset_states(1)
-        layer(q_machine = device)
-        print(device.get_states())
+
+        class QModel(TNQModule):
+            
+            def __init__(self, num_wires, dtype,batch_size=2):
+                super(QModel, self).__init__()
+                self.device = TNQMachine(num_wires)
+                self.layer = PauliZ(wires=0)
+                self.batch_size = batch_size
+                self.num_wires = num_wires
+                
+            def forward(self, x, *args, **kwargs):
+                self.device.reset_states(batchsize=self.batch_size)
+                for i in range(self.num_wires):
+                    rx(self.device, wires=i, params=x[i])
+                self.layer(q_machine = self.device)
+                y = MeasureAll(obs={'Z0': 1})(self.device)
+                return y
+
+        x = pyvqnet.tensor.QTensor([[1,0,0,1],[1,1,0,1]],dtype=pyvqnet.kfloat32,requires_grad=True)
+        model = QModel(4,pyvqnet.kcomplex64,2)
+        y = model(x)
+        print(y)
 
 
 
@@ -6073,15 +6196,31 @@ X1
 
     Example::
         
-        from pyvqnet.qnn.vqc.tn import X1,TNQMachine
+        from pyvqnet.qnn.vqc.tn import X1,TNQMachine,TNQModule,MeasureAll, rx
         import pyvqnet
         pyvqnet.backends.set_backend("torch")
-        device = TNQMachine(4)
-        layer = X1(wires=0)
-        batchsize = 1
-        device.reset_states(1)
-        layer(q_machine = device)
-        print(device.get_states())
+
+        class QModel(TNQModule):
+            
+            def __init__(self, num_wires, dtype,batch_size=2):
+                super(QModel, self).__init__()
+                self.device = TNQMachine(num_wires)
+                self.layer = X1(wires=0)
+                self.batch_size = batch_size
+                self.num_wires = num_wires
+                
+            def forward(self, x, *args, **kwargs):
+                self.device.reset_states(batchsize=self.batch_size)
+                for i in range(self.num_wires):
+                    rx(self.device, wires=i, params=x[i])
+                self.layer(q_machine = self.device)
+                y = MeasureAll(obs={'Z0': 1})(self.device)
+                return y
+
+        x = pyvqnet.tensor.QTensor([[1,0,0,1],[1,1,0,1]],dtype=pyvqnet.kfloat32,requires_grad=True)
+        model = QModel(4,pyvqnet.kcomplex64,2)
+        y = model(x)
+        print(y)
 
 
 RX
@@ -6107,15 +6246,32 @@ RX
 
     Example::
 
-        from pyvqnet.qnn.vqc.tn import RX,TNQMachine
+        from pyvqnet.qnn.vqc.tn import RX,TNQMachine,TNQModule,MeasureAll, rx
         import pyvqnet
         pyvqnet.backends.set_backend("torch")
-        device = TNQMachine(4)
-        layer = RX(has_params= True, trainable= True, wires=0)
-        batchsize = 2
-        device.reset_states(batchsize)
-        layer(q_machine = device)
-        print(device.get_states())
+
+        class QModel(TNQModule):
+            
+            def __init__(self, num_wires, dtype,batch_size=2):
+                super(QModel, self).__init__()
+                self.device = TNQMachine(num_wires)
+                self.layer = RX(wires=0,has_params=True)
+                self.batch_size = batch_size
+                self.num_wires = num_wires
+                
+            def forward(self, x, *args, **kwargs):
+                self.device.reset_states(batchsize=self.batch_size)
+                for i in range(self.num_wires):
+                    rx(self.device, wires=i, params=x[i])
+                self.layer(q_machine = self.device)
+                y = MeasureAll(obs={'Z0': 1})(self.device)
+                return y
+
+        x = pyvqnet.tensor.QTensor([[1,0,0,1],[1,1,0,1]],dtype=pyvqnet.kfloat32,requires_grad=True)
+        model = QModel(4,pyvqnet.kcomplex64,2)
+        y = model(x)
+        print(y)
+
 
 
 
@@ -6141,15 +6297,31 @@ RY
 
     Example::
 
-        from pyvqnet.qnn.vqc.tn import RY,TNQMachine
+        from pyvqnet.qnn.vqc.tn import RY,TNQMachine,TNQModule,MeasureAll, rx
         import pyvqnet
         pyvqnet.backends.set_backend("torch")
-        device = TNQMachine(4)
-        layer = RY(has_params= True, trainable= True, wires=0)
-        batchsize = 2
-        device.reset_states(batchsize)
-        layer(q_machine = device)
-        print(device.get_states())
+
+        class QModel(TNQModule):
+            
+            def __init__(self, num_wires, dtype,batch_size=2):
+                super(QModel, self).__init__()
+                self.device = TNQMachine(num_wires)
+                self.layer = RY(wires=0,has_params=True)
+                self.batch_size = batch_size
+                self.num_wires = num_wires
+                
+            def forward(self, x, *args, **kwargs):
+                self.device.reset_states(batchsize=self.batch_size)
+                for i in range(self.num_wires):
+                    rx(self.device, wires=i, params=x[i])
+                self.layer(q_machine = self.device)
+                y = MeasureAll(obs={'Z0': 1})(self.device)
+                return y
+
+        x = pyvqnet.tensor.QTensor([[1,0,0,1],[1,1,0,1]],dtype=pyvqnet.kfloat32,requires_grad=True)
+        model = QModel(4,pyvqnet.kcomplex64,2)
+        y = model(x)
+        print(y)
 
 
 RZ
@@ -6174,15 +6346,31 @@ RZ
 
     Example::
 
-        from pyvqnet.qnn.vqc.tn import RZ,TNQMachine
+        from pyvqnet.qnn.vqc.tn import RZ,TNQMachine,TNQModule,MeasureAll, rx
         import pyvqnet
         pyvqnet.backends.set_backend("torch")
-        device = TNQMachine(4)
-        layer = RZ(has_params= True, trainable= True, wires=0)
-        batchsize = 2
-        device.reset_states(batchsize)
-        layer(q_machine = device)
-        print(device.get_states())
+
+        class QModel(TNQModule):
+            
+            def __init__(self, num_wires, dtype,batch_size=2):
+                super(QModel, self).__init__()
+                self.device = TNQMachine(num_wires)
+                self.layer = RZ(wires=0,has_params=True)
+                self.batch_size = batch_size
+                self.num_wires = num_wires
+                
+            def forward(self, x, *args, **kwargs):
+                self.device.reset_states(batchsize=self.batch_size)
+                for i in range(self.num_wires):
+                    rx(self.device, wires=i, params=x[i])
+                self.layer(q_machine = self.device)
+                y = MeasureAll(obs={'Z0': 1})(self.device)
+                return y
+
+        x = pyvqnet.tensor.QTensor([[1,0,0,1],[1,1,0,1]],dtype=pyvqnet.kfloat32,requires_grad=True)
+        model = QModel(4,pyvqnet.kcomplex64,2)
+        y = model(x)
+        print(y)
 
 
 CRX
@@ -6207,15 +6395,31 @@ CRX
 
     Example::
 
-        from pyvqnet.qnn.vqc.tn import CRX,TNQMachine
+        from pyvqnet.qnn.vqc.tn import CRX,TNQMachine,TNQModule,MeasureAll, rx
         import pyvqnet
         pyvqnet.backends.set_backend("torch")
-        device = TNQMachine(4)
-        layer = CRX(has_params= True, trainable= True, wires=[0,2])
-        batchsize = 2
-        device.reset_states(batchsize)
-        layer(q_machine = device)
-        print(device.get_states())
+
+        class QModel(TNQModule):
+            
+            def __init__(self, num_wires, dtype,batch_size=2):
+                super(QModel, self).__init__()
+                self.device = TNQMachine(num_wires)
+                self.layer = CRX(has_params= True, trainable= True, wires=[0,2])
+                self.batch_size = batch_size
+                self.num_wires = num_wires
+                
+            def forward(self, x, *args, **kwargs):
+                self.device.reset_states(batchsize=self.batch_size)
+                for i in range(self.num_wires):
+                    rx(self.device, wires=i, params=x[i])
+                self.layer(q_machine = self.device)
+                y = MeasureAll(obs={'Z0': 1})(self.device)
+                return y
+
+        x = pyvqnet.tensor.QTensor([[1,0,0,1],[1,1,0,1]],dtype=pyvqnet.kfloat32,requires_grad=True)
+        model = QModel(4,pyvqnet.kcomplex64,2)
+        y = model(x)
+        print(y)
 
 
 CRY
@@ -6240,15 +6444,31 @@ CRY
 
     Example::
 
-        from pyvqnet.qnn.vqc.tn import CRY,TNQMachine
+        from pyvqnet.qnn.vqc.tn import CRY,TNQMachine,TNQModule,MeasureAll, rx
         import pyvqnet
         pyvqnet.backends.set_backend("torch")
-        device = TNQMachine(4)
-        layer = CRY(has_params= True, trainable= True, wires=[0,2])
-        batchsize = 2
-        device.reset_states(batchsize)
-        layer(q_machine = device)
-        print(device.get_states())
+
+        class QModel(TNQModule):
+            
+            def __init__(self, num_wires, dtype,batch_size=2):
+                super(QModel, self).__init__()
+                self.device = TNQMachine(num_wires)
+                self.layer = CRY(has_params= True, trainable= True, wires=[0,2])
+                self.batch_size = batch_size
+                self.num_wires = num_wires
+                
+            def forward(self, x, *args, **kwargs):
+                self.device.reset_states(batchsize=self.batch_size)
+                for i in range(self.num_wires):
+                    rx(self.device, wires=i, params=x[i])
+                self.layer(q_machine = self.device)
+                y = MeasureAll(obs={'Z0': 1})(self.device)
+                return y
+
+        x = pyvqnet.tensor.QTensor([[1,0,0,1],[1,1,0,1]],dtype=pyvqnet.kfloat32,requires_grad=True)
+        model = QModel(4,pyvqnet.kcomplex64,2)
+        y = model(x)
+        print(y)
 
 
 CRZ
@@ -6274,15 +6494,32 @@ CRZ
 
     Example::
 
-        from pyvqnet.qnn.vqc.tn import CRZ,TNQMachine
+        from pyvqnet.qnn.vqc.tn import CRZ,TNQMachine,TNQModule,MeasureAll, rx
         import pyvqnet
         pyvqnet.backends.set_backend("torch")
-        device = TNQMachine(4)
-        layer = CRZ(has_params= True, trainable= True, wires=[0,2])
-        batchsize = 2
-        device.reset_states(batchsize)
-        layer(q_machine = device)
-        print(device.get_states())
+
+        class QModel(TNQModule):
+            
+            def __init__(self, num_wires, dtype,batch_size=2):
+                super(QModel, self).__init__()
+                self.device = TNQMachine(num_wires)
+                self.layer = CRZ(has_params= True, trainable= True, wires=[0,2])
+                self.batch_size = batch_size
+                self.num_wires = num_wires
+                
+            def forward(self, x, *args, **kwargs):
+                self.device.reset_states(batchsize=self.batch_size)
+                for i in range(self.num_wires):
+                    rx(self.device, wires=i, params=x[i])
+                self.layer(q_machine = self.device)
+                y = MeasureAll(obs={'Z0': 1})(self.device)
+                return y
+
+        x = pyvqnet.tensor.QTensor([[1,0,0,1],[1,1,0,1]],dtype=pyvqnet.kfloat32,requires_grad=True)
+        model = QModel(4,pyvqnet.kcomplex64,2)
+        y = model(x)
+        print(y)
+
 
 
 
@@ -6308,15 +6545,32 @@ U1
 
     Example::
 
-        from pyvqnet.qnn.vqc.tn import U1,TNQMachine
+        from pyvqnet.qnn.vqc.tn import U1,TNQMachine,TNQModule,MeasureAll, rx
         import pyvqnet
         pyvqnet.backends.set_backend("torch")
-        device = TNQMachine(4)
-        layer = U1(has_params= True, trainable= True, wires=0)
-        batchsize = 2
-        device.reset_states(batchsize)
-        layer(q_machine = device)
-        print(device.get_states())
+
+        class QModel(TNQModule):
+            
+            def __init__(self, num_wires, dtype,batch_size=2):
+                super(QModel, self).__init__()
+                self.device = TNQMachine(num_wires)
+                self.layer = U1(has_params= True, trainable= True, wires=0)
+                self.batch_size = batch_size
+                self.num_wires = num_wires
+                
+            def forward(self, x, *args, **kwargs):
+                self.device.reset_states(batchsize=self.batch_size)
+                for i in range(self.num_wires):
+                    rx(self.device, wires=i, params=x[i])
+                self.layer(q_machine = self.device)
+                y = MeasureAll(obs={'Z0': 1})(self.device)
+                return y
+
+        x = pyvqnet.tensor.QTensor([[1,0,0,1],[1,1,0,1]],dtype=pyvqnet.kfloat32,requires_grad=True)
+        model = QModel(4,pyvqnet.kcomplex64,2)
+        y = model(x)
+        print(y)
+
 
 U2
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -6341,15 +6595,32 @@ U2
 
     Example::
 
-        from pyvqnet.qnn.vqc.tn import U2,TNQMachine
+        from pyvqnet.qnn.vqc.tn import U2,TNQMachine,TNQModule,MeasureAll, rx
         import pyvqnet
         pyvqnet.backends.set_backend("torch")
-        device = TNQMachine(4)
-        layer = U2(has_params= True, trainable= True, wires=1)
-        batchsize = 2
-        device.reset_states(batchsize)
-        layer(q_machine = device)
-        print(device.get_states())
+
+        class QModel(TNQModule):
+            
+            def __init__(self, num_wires, dtype,batch_size=2):
+                super(QModel, self).__init__()
+                self.device = TNQMachine(num_wires)
+                self.layer = U2(has_params= True, trainable= True, wires=0)
+                self.batch_size = batch_size
+                self.num_wires = num_wires
+                
+            def forward(self, x, *args, **kwargs):
+                self.device.reset_states(batchsize=self.batch_size)
+                for i in range(self.num_wires):
+                    rx(self.device, wires=i, params=x[i])
+                self.layer(q_machine = self.device)
+                y = MeasureAll(obs={'Z0': 1})(self.device)
+                return y
+
+        x = pyvqnet.tensor.QTensor([[1,0,0,1],[1,1,0,1]],dtype=pyvqnet.kfloat32,requires_grad=True)
+        model = QModel(4,pyvqnet.kcomplex64,2)
+        y = model(x)
+        print(y)
+
 
 
 U3
@@ -6375,15 +6646,31 @@ U3
 
     Example::
 
-        from pyvqnet.qnn.vqc.tn import U3,TNQMachine
+        from pyvqnet.qnn.vqc.tn import U3,TNQMachine,TNQModule,MeasureAll, rx
         import pyvqnet
         pyvqnet.backends.set_backend("torch")
-        device = TNQMachine(4)
-        layer = U3(has_params= True, trainable= True, wires=1)
-        batchsize = 2
-        device.reset_states(batchsize)
-        layer(q_machine = device)
-        print(device.get_states())
+
+        class QModel(TNQModule):
+            
+            def __init__(self, num_wires, dtype,batch_size=2):
+                super(QModel, self).__init__()
+                self.device = TNQMachine(num_wires)
+                self.layer = U3(has_params= True, trainable= True, wires=0)
+                self.batch_size = batch_size
+                self.num_wires = num_wires
+                
+            def forward(self, x, *args, **kwargs):
+                self.device.reset_states(batchsize=self.batch_size)
+                for i in range(self.num_wires):
+                    rx(self.device, wires=i, params=x[i])
+                self.layer(q_machine = self.device)
+                y = MeasureAll(obs={'Z0': 1})(self.device)
+                return y
+
+        x = pyvqnet.tensor.QTensor([[1,0,0,1],[1,1,0,1]],dtype=pyvqnet.kfloat32,requires_grad=True)
+        model = QModel(4,pyvqnet.kcomplex64,2)
+        y = model(x)
+        print(y)
 
 
 
@@ -6409,15 +6696,32 @@ CNOT
 
     Example::
 
-        from pyvqnet.qnn.vqc.tn import CNOT,TNQMachine
+        from pyvqnet.qnn.vqc.tn import CNOT,TNQMachine,TNQModule,MeasureAll, rx
         import pyvqnet
         pyvqnet.backends.set_backend("torch")
-        device = TNQMachine(4)
-        layer = CNOT(wires=[0,1])
-        batchsize = 2
-        device.reset_states(batchsize)
-        layer(q_machine = device)
-        print(device.get_states())
+
+        class QModel(TNQModule):
+            
+            def __init__(self, num_wires, dtype,batch_size=2):
+                super(QModel, self).__init__()
+                self.device = TNQMachine(num_wires)
+                self.layer = CNOT(wires=[0,1])
+                self.batch_size = batch_size
+                self.num_wires = num_wires
+                
+            def forward(self, x, *args, **kwargs):
+                self.device.reset_states(batchsize=self.batch_size)
+                for i in range(self.num_wires):
+                    rx(self.device, wires=i, params=x[i])
+                self.layer(q_machine = self.device)
+                y = MeasureAll(obs={'Z0': 1})(self.device)
+                return y
+
+        x = pyvqnet.tensor.QTensor([[1,0,0,1],[1,1,0,1]],dtype=pyvqnet.kfloat32,requires_grad=True)
+        model = QModel(4,pyvqnet.kcomplex64,2)
+        y = model(x)
+        print(y)
+
 
 CY
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -6441,15 +6745,32 @@ CY
 
     Example::
 
-        from pyvqnet.qnn.vqc.tn import CY,TNQMachine
+        from pyvqnet.qnn.vqc.tn import CY,TNQMachine,TNQModule,MeasureAll, rx
         import pyvqnet
         pyvqnet.backends.set_backend("torch")
-        device = TNQMachine(4)
-        layer = CY(wires=[0,1])
-        batchsize = 2
-        device.reset_states(batchsize)
-        layer(q_machine = device)
-        print(device.get_states())
+
+        class QModel(TNQModule):
+            
+            def __init__(self, num_wires, dtype,batch_size=2):
+                super(QModel, self).__init__()
+                self.device = TNQMachine(num_wires)
+                self.layer = CY(wires=[0,1])
+                self.batch_size = batch_size
+                self.num_wires = num_wires
+                
+            def forward(self, x, *args, **kwargs):
+                self.device.reset_states(batchsize=self.batch_size)
+                for i in range(self.num_wires):
+                    rx(self.device, wires=i, params=x[i])
+                self.layer(q_machine = self.device)
+                y = MeasureAll(obs={'Z0': 1})(self.device)
+                return y
+
+        x = pyvqnet.tensor.QTensor([[1,0,0,1],[1,1,0,1]],dtype=pyvqnet.kfloat32,requires_grad=True)
+        model = QModel(4,pyvqnet.kcomplex64,2)
+        y = model(x)
+        print(y)
+
 
 
 CZ
@@ -6474,16 +6795,31 @@ CZ
 
     Example::
 
-        from pyvqnet.qnn.vqc.tn import CZ,TNQMachine
+        from pyvqnet.qnn.vqc.tn import CZ,TNQMachine,TNQModule,MeasureAll, rx
         import pyvqnet
         pyvqnet.backends.set_backend("torch")
-        device = TNQMachine(4)
-        layer = CZ(wires=[0,1])
-        batchsize = 2
-        device.reset_states(batchsize)
-        layer(q_machine = device)
-        print(device.get_states())
 
+        class QModel(TNQModule):
+            
+            def __init__(self, num_wires, dtype,batch_size=2):
+                super(QModel, self).__init__()
+                self.device = TNQMachine(num_wires)
+                self.layer = CZ(wires=[0,1])
+                self.batch_size = batch_size
+                self.num_wires = num_wires
+                
+            def forward(self, x, *args, **kwargs):
+                self.device.reset_states(batchsize=self.batch_size)
+                for i in range(self.num_wires):
+                    rx(self.device, wires=i, params=x[i])
+                self.layer(q_machine = self.device)
+                y = MeasureAll(obs={'Z0': 1})(self.device)
+                return y
+
+        x = pyvqnet.tensor.QTensor([[1,0,0,1],[1,1,0,1]],dtype=pyvqnet.kfloat32,requires_grad=True)
+        model = QModel(4,pyvqnet.kcomplex64,2)
+        y = model(x)
+        print(y)
 
 
 
@@ -6509,16 +6845,31 @@ CR
 
     Example::
 
-        from pyvqnet.qnn.vqc.tn import CR,TNQMachine
+        from pyvqnet.qnn.vqc.tn import CR,TNQMachine,TNQModule,MeasureAll, rx
         import pyvqnet
         pyvqnet.backends.set_backend("torch")
-        device = TNQMachine(4)
-        device = TNQMachine(4)
-        layer = CR(has_params= True, trainable= True, wires=[0,2])
-        batchsize = 2
-        device.reset_states(batchsize)
-        layer(q_machine = device)
-        print(device.get_states())
+
+        class QModel(TNQModule):
+            
+            def __init__(self, num_wires, dtype,batch_size=2):
+                super(QModel, self).__init__()
+                self.device = TNQMachine(num_wires)
+                self.layer = CR(has_params= True, trainable= True, wires=[0,2])
+                self.batch_size = batch_size
+                self.num_wires = num_wires
+                
+            def forward(self, x, *args, **kwargs):
+                self.device.reset_states(batchsize=self.batch_size)
+                for i in range(self.num_wires):
+                    rx(self.device, wires=i, params=x[i])
+                self.layer(q_machine = self.device)
+                y = MeasureAll(obs={'Z0': 1})(self.device)
+                return y
+
+        x = pyvqnet.tensor.QTensor([[1,0,0,1],[1,1,0,1]],dtype=pyvqnet.kfloat32,requires_grad=True)
+        model = QModel(4,pyvqnet.kcomplex64,2)
+        y = model(x)
+        print(y)
 
 
 
@@ -6545,15 +6896,31 @@ SWAP
 
     Example::
 
-        from pyvqnet.qnn.vqc.tn import SWAP,TNQMachine
+        from pyvqnet.qnn.vqc.tn import SWAP,TNQMachine,TNQModule,MeasureAll, rx
         import pyvqnet
         pyvqnet.backends.set_backend("torch")
-        device = TNQMachine(4)
-        layer = SWAP(wires=[0,1])
-        batchsize = 2
-        device.reset_states(batchsize)
-        layer(q_machine = device)
-        print(device.get_states())
+
+        class QModel(TNQModule):
+            
+            def __init__(self, num_wires, dtype,batch_size=2):
+                super(QModel, self).__init__()
+                self.device = TNQMachine(num_wires)
+                self.layer = SWAP(wires=[0,1])
+                self.batch_size = batch_size
+                self.num_wires = num_wires
+                
+            def forward(self, x, *args, **kwargs):
+                self.device.reset_states(batchsize=self.batch_size)
+                for i in range(self.num_wires):
+                    rx(self.device, wires=i, params=x[i])
+                self.layer(q_machine = self.device)
+                y = MeasureAll(obs={'Z0': 1})(self.device)
+                return y
+
+        x = pyvqnet.tensor.QTensor([[1,0,0,1],[1,1,0,1]],dtype=pyvqnet.kfloat32,requires_grad=True)
+        model = QModel(4,pyvqnet.kcomplex64,2)
+        y = model(x)
+        print(y)
 
 
 CSWAP
@@ -6589,15 +6956,32 @@ CSWAP
 
     Example::
 
-        from pyvqnet.qnn.vqc.tn import CSWAP,TNQMachine
+        from pyvqnet.qnn.vqc.tn import CSWAP,TNQMachine,TNQModule,MeasureAll, rx
         import pyvqnet
         pyvqnet.backends.set_backend("torch")
-        device = TNQMachine(4)
-        layer = CSWAP(wires=[0,1,2])
-        batchsize = 2
-        device.reset_states(batchsize)
-        layer(q_machine = device)
-        print(device.get_states())
+
+        class QModel(TNQModule):
+            
+            def __init__(self, num_wires, dtype,batch_size=2):
+                super(QModel, self).__init__()
+                self.device = TNQMachine(num_wires)
+                self.layer = CSWAP(wires=[0,1,2])
+                self.batch_size = batch_size
+                self.num_wires = num_wires
+                
+            def forward(self, x, *args, **kwargs):
+                self.device.reset_states(batchsize=self.batch_size)
+                for i in range(self.num_wires):
+                    rx(self.device, wires=i, params=x[i])
+                self.layer(q_machine = self.device)
+                y = MeasureAll(obs={'Z0': 1})(self.device)
+                return y
+
+        x = pyvqnet.tensor.QTensor([[1,0,0,1],[1,1,0,1]],dtype=pyvqnet.kfloat32,requires_grad=True)
+        model = QModel(4,pyvqnet.kcomplex64,2)
+        y = model(x)
+        print(y)
+
 
 RXX
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -6622,15 +7006,32 @@ RXX
 
     Example::
 
-        from pyvqnet.qnn.vqc.tn import RXX,TNQMachine
+        from pyvqnet.qnn.vqc.tn import RXX,TNQMachine,TNQModule,MeasureAll, rx
         import pyvqnet
         pyvqnet.backends.set_backend("torch")
-        device = TNQMachine(4)
-        layer = RXX(has_params= True, trainable= True, wires=[0,2])
-        batchsize = 2
-        device.reset_states(batchsize)
-        layer(q_machine = device)
-        print(device.get_states())
+
+        class QModel(TNQModule):
+            
+            def __init__(self, num_wires, dtype,batch_size=2):
+                super(QModel, self).__init__()
+                self.device = TNQMachine(num_wires)
+                self.layer = RXX(has_params= True, trainable= True, wires=[0,2])
+                self.batch_size = batch_size
+                self.num_wires = num_wires
+                
+            def forward(self, x, *args, **kwargs):
+                self.device.reset_states(batchsize=self.batch_size)
+                for i in range(self.num_wires):
+                    rx(self.device, wires=i, params=x[i])
+                self.layer(q_machine = self.device)
+                y = MeasureAll(obs={'Z0': 1})(self.device)
+                return y
+
+        x = pyvqnet.tensor.QTensor([[1,0,0,1],[1,1,0,1]],dtype=pyvqnet.kfloat32,requires_grad=True)
+        model = QModel(4,pyvqnet.kcomplex64,2)
+        y = model(x)
+        print(y)
+
 
 RYY
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -6654,15 +7055,31 @@ RYY
 
     Example::
 
-        from pyvqnet.qnn.vqc.tn import RYY,TNQMachine
+        from pyvqnet.qnn.vqc.tn import RYY,TNQMachine,TNQModule,MeasureAll, rx
         import pyvqnet
         pyvqnet.backends.set_backend("torch")
-        device = TNQMachine(4)
-        layer = RYY(has_params= True, trainable= True, wires=[0,2])
-        batchsize = 2
-        device.reset_states(batchsize)
-        layer(q_machine = device)
-        print(device.get_states())
+
+        class QModel(TNQModule):
+            
+            def __init__(self, num_wires, dtype,batch_size=2):
+                super(QModel, self).__init__()
+                self.device = TNQMachine(num_wires)
+                self.layer = RYY(has_params= True, trainable= True, wires=[0,2])
+                self.batch_size = batch_size
+                self.num_wires = num_wires
+                
+            def forward(self, x, *args, **kwargs):
+                self.device.reset_states(batchsize=self.batch_size)
+                for i in range(self.num_wires):
+                    rx(self.device, wires=i, params=x[i])
+                self.layer(q_machine = self.device)
+                y = MeasureAll(obs={'Z0': 1})(self.device)
+                return y
+
+        x = pyvqnet.tensor.QTensor([[1,0,0,1],[1,1,0,1]],dtype=pyvqnet.kfloat32,requires_grad=True)
+        model = QModel(4,pyvqnet.kcomplex64,2)
+        y = model(x)
+        print(y)
 
 
 RZZ
@@ -6687,15 +7104,31 @@ RZZ
 
     Example::
 
-        from pyvqnet.qnn.vqc.tn import RZZ,TNQMachine
+        from pyvqnet.qnn.vqc.tn import RZZ,TNQMachine,TNQModule,MeasureAll, rx
         import pyvqnet
         pyvqnet.backends.set_backend("torch")
-        device = TNQMachine(4)
-        layer = RZZ(has_params= True, trainable= True, wires=[0,2])
-        batchsize = 2
-        device.reset_states(batchsize)
-        layer(q_machine = device)
-        print(device.get_states())
+
+        class QModel(TNQModule):
+            
+            def __init__(self, num_wires, dtype,batch_size=2):
+                super(QModel, self).__init__()
+                self.device = TNQMachine(num_wires)
+                self.layer = RZZ(has_params= True, trainable= True, wires=[0,2])
+                self.batch_size = batch_size
+                self.num_wires = num_wires
+                
+            def forward(self, x, *args, **kwargs):
+                self.device.reset_states(batchsize=self.batch_size)
+                for i in range(self.num_wires):
+                    rx(self.device, wires=i, params=x[i])
+                self.layer(q_machine = self.device)
+                y = MeasureAll(obs={'Z0': 1})(self.device)
+                return y
+
+        x = pyvqnet.tensor.QTensor([[1,0,0,1],[1,1,0,1]],dtype=pyvqnet.kfloat32,requires_grad=True)
+        model = QModel(4,pyvqnet.kcomplex64,2)
+        y = model(x)
+        print(y)
 
 
 
@@ -6721,15 +7154,32 @@ RZX
 
     Example::
 
-        from pyvqnet.qnn.vqc.tn import RZX,TNQMachine
+        from pyvqnet.qnn.vqc.tn import RZX,TNQMachine,TNQModule,MeasureAll, rx
         import pyvqnet
         pyvqnet.backends.set_backend("torch")
-        device = TNQMachine(4)
-        layer = RZX(has_params= True, trainable= True, wires=[0,2])
-        batchsize = 2
-        device.reset_states(batchsize)
-        layer(q_machine = device)
-        print(device.get_states())
+
+        class QModel(TNQModule):
+            
+            def __init__(self, num_wires, dtype,batch_size=2):
+                super(QModel, self).__init__()
+                self.device = TNQMachine(num_wires)
+                self.layer = RZX(has_params= True, trainable= True, wires=[0,2])
+                self.batch_size = batch_size
+                self.num_wires = num_wires
+                
+            def forward(self, x, *args, **kwargs):
+                self.device.reset_states(batchsize=self.batch_size)
+                for i in range(self.num_wires):
+                    rx(self.device, wires=i, params=x[i])
+                self.layer(q_machine = self.device)
+                y = MeasureAll(obs={'Z0': 1})(self.device)
+                return y
+
+        x = pyvqnet.tensor.QTensor([[1,0,0,1],[1,1,0,1]],dtype=pyvqnet.kfloat32,requires_grad=True)
+        model = QModel(4,pyvqnet.kcomplex64,2)
+        y = model(x)
+        print(y)
+
 
 Toffoli
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -6754,15 +7204,32 @@ Toffoli
 
     Example::
 
-        from pyvqnet.qnn.vqc.tn import Toffoli,TNQMachine
+        from pyvqnet.qnn.vqc.tn import Toffoli,TNQMachine,TNQModule,MeasureAll, rx
         import pyvqnet
         pyvqnet.backends.set_backend("torch")
-        device = TNQMachine(4)
-        layer = Toffoli(wires=[0,2,1])
-        batchsize = 2
-        device.reset_states(batchsize)
-        layer(q_machine = device)
-        print(device.get_states())
+
+        class QModel(TNQModule):
+            
+            def __init__(self, num_wires, dtype,batch_size=2):
+                super(QModel, self).__init__()
+                self.device = TNQMachine(num_wires)
+                self.layer = Toffoli(wires=[0,2,1])
+                self.batch_size = batch_size
+                self.num_wires = num_wires
+                
+            def forward(self, x, *args, **kwargs):
+                self.device.reset_states(batchsize=self.batch_size)
+                for i in range(self.num_wires):
+                    rx(self.device, wires=i, params=x[i])
+                self.layer(q_machine = self.device)
+                y = MeasureAll(obs={'Z0': 1})(self.device)
+                return y
+
+        x = pyvqnet.tensor.QTensor([[1,0,0,1],[1,1,0,1]],dtype=pyvqnet.kfloat32,requires_grad=True)
+        model = QModel(4,pyvqnet.kcomplex64,2)
+        y = model(x)
+        print(y)
+
 
 IsingXX
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -6787,15 +7254,32 @@ IsingXX
 
     Example::
 
-        from pyvqnet.qnn.vqc.tn import IsingXX,TNQMachine
+        from pyvqnet.qnn.vqc.tn import IsingXX,TNQMachine,TNQModule,MeasureAll, rx
         import pyvqnet
         pyvqnet.backends.set_backend("torch")
-        device = TNQMachine(4)
-        layer = IsingXX(has_params= True, trainable= True, wires=[0,2])
-        batchsize = 2
-        device.reset_states(batchsize)
-        layer(q_machine = device)
-        print(device.get_states())
+
+        class QModel(TNQModule):
+            
+            def __init__(self, num_wires, dtype,batch_size=2):
+                super(QModel, self).__init__()
+                self.device = TNQMachine(num_wires)
+                self.layer = IsingXX(has_params= True, trainable= True, wires=[0,2])
+                self.batch_size = batch_size
+                self.num_wires = num_wires
+                
+            def forward(self, x, *args, **kwargs):
+                self.device.reset_states(batchsize=self.batch_size)
+                for i in range(self.num_wires):
+                    rx(self.device, wires=i, params=x[i])
+                self.layer(q_machine = self.device)
+                y = MeasureAll(obs={'Z0': 1})(self.device)
+                return y
+
+        x = pyvqnet.tensor.QTensor([[1,0,0,1],[1,1,0,1]],dtype=pyvqnet.kfloat32,requires_grad=True)
+        model = QModel(4,pyvqnet.kcomplex64,2)
+        y = model(x)
+        print(y)
+
 
 
 IsingYY
@@ -6821,15 +7305,31 @@ IsingYY
 
     Example::
 
-        from pyvqnet.qnn.vqc.tn import IsingYY,TNQMachine
+        from pyvqnet.qnn.vqc.tn import IsingYY,TNQMachine,TNQModule,MeasureAll, rx
         import pyvqnet
         pyvqnet.backends.set_backend("torch")
-        device = TNQMachine(4)
-        layer = IsingYY(has_params= True, trainable= True, wires=[0,2])
-        batchsize = 2
-        device.reset_states(batchsize)
-        layer(q_machine = device)
-        print(device.get_states())
+
+        class QModel(TNQModule):
+            
+            def __init__(self, num_wires, dtype,batch_size=2):
+                super(QModel, self).__init__()
+                self.device = TNQMachine(num_wires)
+                self.layer = IsingYY(has_params= True, trainable= True, wires=[0,2])
+                self.batch_size = batch_size
+                self.num_wires = num_wires
+                
+            def forward(self, x, *args, **kwargs):
+                self.device.reset_states(batchsize=self.batch_size)
+                for i in range(self.num_wires):
+                    rx(self.device, wires=i, params=x[i])
+                self.layer(q_machine = self.device)
+                y = MeasureAll(obs={'Z0': 1})(self.device)
+                return y
+
+        x = pyvqnet.tensor.QTensor([[1,0,0,1],[1,1,0,1]],dtype=pyvqnet.kfloat32,requires_grad=True)
+        model = QModel(4,pyvqnet.kcomplex64,2)
+        y = model(x)
+        print(y)
 
 
 IsingZZ
@@ -6855,15 +7355,31 @@ IsingZZ
 
     Example::
 
-        from pyvqnet.qnn.vqc.tn import IsingZZ,TNQMachine
+        from pyvqnet.qnn.vqc.tn import IsingZZ,TNQMachine,TNQModule,MeasureAll, rx
         import pyvqnet
         pyvqnet.backends.set_backend("torch")
-        device = TNQMachine(4)
-        layer = IsingZZ(has_params= True, trainable= True, wires=[0,2])
-        batchsize = 2
-        device.reset_states(batchsize)
-        layer(q_machine = device)
-        print(device.get_states())
+
+        class QModel(TNQModule):
+            
+            def __init__(self, num_wires, dtype,batch_size=2):
+                super(QModel, self).__init__()
+                self.device = TNQMachine(num_wires)
+                self.layer = IsingZZ(has_params= True, trainable= True, wires=[0,2])
+                self.batch_size = batch_size
+                self.num_wires = num_wires
+                
+            def forward(self, x, *args, **kwargs):
+                self.device.reset_states(batchsize=self.batch_size)
+                for i in range(self.num_wires):
+                    rx(self.device, wires=i, params=x[i])
+                self.layer(q_machine = self.device)
+                y = MeasureAll(obs={'Z0': 1})(self.device)
+                return y
+
+        x = pyvqnet.tensor.QTensor([[1,0,0,1],[1,1,0,1]],dtype=pyvqnet.kfloat32,requires_grad=True)
+        model = QModel(4,pyvqnet.kcomplex64,2)
+        y = model(x)
+        print(y)
 
 
 IsingXY
@@ -6889,15 +7405,31 @@ IsingXY
 
     Example::
 
-        from pyvqnet.qnn.vqc.tn import IsingXY,TNQMachine
+        from pyvqnet.qnn.vqc.tn import IsingXY,TNQMachine,TNQModule,MeasureAll, rx
         import pyvqnet
         pyvqnet.backends.set_backend("torch")
-        device = TNQMachine(4)
-        layer = IsingXY(has_params= True, trainable= True, wires=[0,2])
-        batchsize = 2
-        device.reset_states(batchsize)
-        layer(q_machine = device)
-        print(device.get_states())
+
+        class QModel(TNQModule):
+            
+            def __init__(self, num_wires, dtype,batch_size=2):
+                super(QModel, self).__init__()
+                self.device = TNQMachine(num_wires)
+                self.layer = IsingXY(has_params= True, trainable= True, wires=[0,2])
+                self.batch_size = batch_size
+                self.num_wires = num_wires
+                
+            def forward(self, x, *args, **kwargs):
+                self.device.reset_states(batchsize=self.batch_size)
+                for i in range(self.num_wires):
+                    rx(self.device, wires=i, params=x[i])
+                self.layer(q_machine = self.device)
+                y = MeasureAll(obs={'Z0': 1})(self.device)
+                return y
+
+        x = pyvqnet.tensor.QTensor([[1,0,0,1],[1,1,0,1]],dtype=pyvqnet.kfloat32,requires_grad=True)
+        model = QModel(4,pyvqnet.kcomplex64,2)
+        y = model(x)
+        print(y)
 
 
 PhaseShift
@@ -6923,15 +7455,31 @@ PhaseShift
 
     Example::
 
-        from pyvqnet.qnn.vqc.tn import PhaseShift,TNQMachine
+        from pyvqnet.qnn.vqc.tn import PhaseShift,TNQMachine,TNQModule,MeasureAll, rx
         import pyvqnet
         pyvqnet.backends.set_backend("torch")
-        device = TNQMachine(4)
-        layer = PhaseShift(has_params= True, trainable= True, wires=1)
-        batchsize = 2
-        device.reset_states(batchsize)
-        layer(q_machine = device)
-        print(device.get_states())
+
+        class QModel(TNQModule):
+            
+            def __init__(self, num_wires, dtype,batch_size=2):
+                super(QModel, self).__init__()
+                self.device = TNQMachine(num_wires)
+                self.layer = PhaseShift(has_params= True, trainable= True, wires=1)
+                self.batch_size = batch_size
+                self.num_wires = num_wires
+                
+            def forward(self, x, *args, **kwargs):
+                self.device.reset_states(batchsize=self.batch_size)
+                for i in range(self.num_wires):
+                    rx(self.device, wires=i, params=x[i])
+                self.layer(q_machine = self.device)
+                y = MeasureAll(obs={'Z0': 1})(self.device)
+                return y
+
+        x = pyvqnet.tensor.QTensor([[1,0,0,1],[1,1,0,1]],dtype=pyvqnet.kfloat32,requires_grad=True)
+        model = QModel(4,pyvqnet.kcomplex64,2)
+        y = model(x)
+        print(y)
 
 
 MultiRZ
@@ -6956,15 +7504,31 @@ MultiRZ
 
     Example::
 
-        from pyvqnet.qnn.vqc.tn import MultiRZ,TNQMachine
+        from pyvqnet.qnn.vqc.tn import MultiRZ,TNQMachine,TNQModule,MeasureAll, rx
         import pyvqnet
         pyvqnet.backends.set_backend("torch")
-        device = TNQMachine(4)
-        layer = MultiRZ(has_params= True, trainable= True, wires=[0,2])
-        batchsize = 2
-        device.reset_states(batchsize)
-        layer(q_machine = device)
-        print(device.get_states())
+
+        class QModel(TNQModule):
+            
+            def __init__(self, num_wires, dtype,batch_size=2):
+                super(QModel, self).__init__()
+                self.device = TNQMachine(num_wires)
+                self.layer = MultiRZ(has_params= True, trainable= True, wires=[0,2])
+                self.batch_size = batch_size
+                self.num_wires = num_wires
+                
+            def forward(self, x, *args, **kwargs):
+                self.device.reset_states(batchsize=self.batch_size)
+                for i in range(self.num_wires):
+                    rx(self.device, wires=i, params=x[i])
+                self.layer(q_machine = self.device)
+                y = MeasureAll(obs={'Z0': 1})(self.device)
+                return y
+
+        x = pyvqnet.tensor.QTensor([[1,0,0,1],[1,1,0,1]],dtype=pyvqnet.kfloat32,requires_grad=True)
+        model = QModel(4,pyvqnet.kcomplex64,2)
+        y = model(x)
+        print(y)
 
 
 
@@ -6991,15 +7555,31 @@ SDG
 
     Example::
         
-        from pyvqnet.qnn.vqc.tn import SDG,TNQMachine
+        from pyvqnet.qnn.vqc.tn import SDG,TNQMachine,TNQModule,MeasureAll, rx
         import pyvqnet
         pyvqnet.backends.set_backend("torch")
-        device = TNQMachine(4)
-        layer = SDG(wires=0)
-        batchsize = 1
-        device.reset_states(1)
-        layer(q_machine = device)
-        print(device.get_states())
+
+        class QModel(TNQModule):
+            
+            def __init__(self, num_wires, dtype,batch_size=2):
+                super(QModel, self).__init__()
+                self.device = TNQMachine(num_wires)
+                self.layer = SDG(wires=0)
+                self.batch_size = batch_size
+                self.num_wires = num_wires
+                
+            def forward(self, x, *args, **kwargs):
+                self.device.reset_states(batchsize=self.batch_size)
+                for i in range(self.num_wires):
+                    rx(self.device, wires=i, params=x[i])
+                self.layer(q_machine = self.device)
+                y = MeasureAll(obs={'Z0': 1})(self.device)
+                return y
+
+        x = pyvqnet.tensor.QTensor([[1,0,0,1],[1,1,0,1]],dtype=pyvqnet.kfloat32,requires_grad=True)
+        model = QModel(4,pyvqnet.kcomplex64,2)
+        y = model(x)
+        print(y)
 
 
 
@@ -7026,15 +7606,31 @@ TDG
 
     Example::
         
-        from pyvqnet.qnn.vqc.tn import TDG,TNQMachine
+        from pyvqnet.qnn.vqc.tn import TDG,TNQMachine,TNQModule,MeasureAll, rx
         import pyvqnet
         pyvqnet.backends.set_backend("torch")
-        device = TNQMachine(4)
-        layer = TDG(wires=0)
-        batchsize = 1
-        device.reset_states(1)
-        layer(q_machine = device)
-        print(device.get_states())
+
+        class QModel(TNQModule):
+            
+            def __init__(self, num_wires, dtype,batch_size=2):
+                super(QModel, self).__init__()
+                self.device = TNQMachine(num_wires)
+                self.layer = TDG(wires=0)
+                self.batch_size = batch_size
+                self.num_wires = num_wires
+                
+            def forward(self, x, *args, **kwargs):
+                self.device.reset_states(batchsize=self.batch_size)
+                for i in range(self.num_wires):
+                    rx(self.device, wires=i, params=x[i])
+                self.layer(q_machine = self.device)
+                y = MeasureAll(obs={'Z0': 1})(self.device)
+                return y
+
+        x = pyvqnet.tensor.QTensor([[1,0,0,1],[1,1,0,1]],dtype=pyvqnet.kfloat32,requires_grad=True)
+        model = QModel(4,pyvqnet.kcomplex64,2)
+        y = model(x)
+        print(y)
 
 
 
@@ -7061,15 +7657,31 @@ ControlledPhaseShift
 
     Example::
 
-        from pyvqnet.qnn.vqc.tn import ControlledPhaseShift,TNQMachine
+        from pyvqnet.qnn.vqc.tn import ControlledPhaseShift,TNQMachine,TNQModule,MeasureAll, rx
         import pyvqnet
         pyvqnet.backends.set_backend("torch")
-        device = TNQMachine(4)
-        layer = ControlledPhaseShift(has_params= True, trainable= True, wires=[0,2])
-        batchsize = 2
-        device.reset_states(batchsize)
-        layer(q_machine = device)
-        print(device.get_states())
+
+        class QModel(TNQModule):
+            
+            def __init__(self, num_wires, dtype,batch_size=2):
+                super(QModel, self).__init__()
+                self.device = TNQMachine(num_wires)
+                self.layer = ControlledPhaseShift(has_params= True, trainable= True, wires=[0,2])
+                self.batch_size = batch_size
+                self.num_wires = num_wires
+                
+            def forward(self, x, *args, **kwargs):
+                self.device.reset_states(batchsize=self.batch_size)
+                for i in range(self.num_wires):
+                    rx(self.device, wires=i, params=x[i])
+                self.layer(q_machine = self.device)
+                y = MeasureAll(obs={'Z0': 1})(self.device)
+                return y
+
+        x = pyvqnet.tensor.QTensor([[1,0,0,1],[1,1,0,1]],dtype=pyvqnet.kfloat32,requires_grad=True)
+        model = QModel(4,pyvqnet.kcomplex64,2)
+        y = model(x)
+        print(y)
 
 
 常见测量接口
@@ -7098,7 +7710,7 @@ VQC_Purity
 
     .. note::
         
-        批量化需要搭配TNQModule使用 。
+        批量化必须搭配TNQModule使用。
 
     Example::
 
