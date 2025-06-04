@@ -415,7 +415,7 @@ Circuit-centric quantum classifiers算法示例
     from pyvqnet.tensor.tensor import QTensor
     from pyvqnet.qnn.vqc.qcircuit import PauliZ, VQC_ZZFeatureMap,PauliX,PauliY,hadamard,crz,rz
     from pyvqnet.qnn.vqc import QMachine
-    from pyvqnet.qnn.vqc.qmeasure import expval
+    from pyvqnet.qnn.vqc.qmeasure import MeasureAll
     from pyvqnet import tensor
     import functools as ft
 
@@ -505,9 +505,9 @@ Circuit-centric quantum classifiers算法示例
                 VQC_ZZFeatureMap(x, qm, data_map_func=custom_data_map_func, entanglement="linear")
 
                 return (
-                    [expval(qm, i, PauliX()).to_numpy() for i in range(N)]
-                    + [expval(qm, i, PauliY()).to_numpy() for i in range(N)]
-                    + [expval(qm, i, PauliZ()).to_numpy() for i in range(N)]
+                    [MeasureAll(obs={f"X{i}":1})(qm) for i in range(N)]
+                    + [MeasureAll(obs={f"Y{i}":1})(qm) for i in range(N)]
+                    + [MeasureAll(obs={f"Z{i}":1})(qm) for i in range(N)]
                 )
 
             # build the gram matrix
@@ -528,7 +528,7 @@ Circuit-centric quantum classifiers算法示例
             for j in range(len(X_2_proj)):
                 result = [a - b for a,b in zip(X_1_proj[i], X_2_proj[j])]
                 result = [a**2 for a in result]
-                value = tensor.exp(-gamma * sum(result))
+                value = tensor.exp(-gamma * sum(result).squeeze(0))
                 gram[i,j] = value
         return gram
 
@@ -3905,7 +3905,6 @@ Dropout是经典深度神经网络(DNN)的一种常用技术,可防止计算单�
     from pyvqnet.qnn.vqc import *
     import numpy as np
     from pyvqnet import tensor
-    from pyvqnet.qnn.vqc.qmeasure import expval
     from sklearn.model_selection import train_test_split
     from matplotlib import ticker
     import matplotlib.pyplot as plt
@@ -3984,7 +3983,7 @@ Dropout是经典深度神经网络(DNN)的一种常用技术,可防止计算单�
                 keep_rotation=keep_rotation,
             )
         
-        return expval(qm, 0, PauliZ()) 
+        return qm
 
 生成dropout列表,根据dropout列表来对量子线路中的逻辑门随机dropout
 
@@ -4038,11 +4037,12 @@ Dropout是经典深度神经网络(DNN)的一种常用技术,可防止计算单�
             super(QNN, self).__init__()
             self.qm = QMachine(n_qubits, dtype=pyvqnet.kcomplex64)
             self.para = Parameter((params_per_layer * layers,))
-            
+            self.ma = MeasureAll(obs={"Z0":1})
+
         def forward(self, x:QTensor, keep_rot):
             self.qm.reset_states(x.shape[0])
-            x = qnn_circuit(x, self.para, keep_rot, n_qubits, layers, self.qm)
-            
+            qm = qnn_circuit(x, self.para, keep_rot, n_qubits, layers, self.qm)
+            x = self.ma(qm)
             return x
 
 制作sin数据集
