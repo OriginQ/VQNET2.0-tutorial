@@ -19,12 +19,13 @@ Changed
 - 删除qnn.MeasurePauliSum。
 - 当torch低于2.4版本时候，使用torch后端计算抛出警告。
 
+
 Fixed
 ===================
-- 解决保存模型时候QMachine states的问题。
+- 解决保存和载入模型时候QMachine states问题。
 - 解决layernorm，groupnorm当affine=False时候的问题。
 - 解决QuantumLayerAdjoint在eval模式下的问题。
-
+- 解决toCPU() 的bug。
 
 [v2.16.0] - 2025-1-15
 ***************************

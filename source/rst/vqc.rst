@@ -4669,6 +4669,9 @@ QuantumLayerAdjoint
     :param name: 该层名字,默认为""。
     :return: 返回一个 QuantumLayerAdjoint 类实例。
 
+    .. warning::
+        Module 默认处于 `eval` 模式,如果需要训练参数，需要运行 `train()` 接口进入训练模式。
+        
     .. note::
 
         general_module 的 QMachine 应设置 grad_method = "adjoint".
