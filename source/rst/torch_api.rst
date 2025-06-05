@@ -1638,6 +1638,8 @@ SDPA
     
         from pyvqnet.nn.torch import SDPA
         from pyvqnet import tensor
+        import pyvqnet
+        pyvqnet.backends.set_backend("torch")
         model = SDPA(tensor.QTensor([1.]))
 
     .. py:method:: forward(query,key,value)
@@ -5639,7 +5641,8 @@ TNQMachine
 
     .. warning::
         
-        在张量网络的量子线路中，默认会开启 ``vmap`` 功能，在线路上的逻辑门参数上均为舍弃了批次维度
+        在张量网络的量子线路中，默认会开启 ``vmap`` 功能，在线路上的逻辑门参数上均为舍弃了批次维度，
+        使用时，调用参数若维度为 [batch_size, *], 在使用时舍弃第一个batch_size维度, 直接使用后面维度, 如对输入数据x[:,1] -> x[1], 对可训练参数也一致，可参考下列样例中xx, weights用法.
 
     .. note::
         
@@ -8336,7 +8339,7 @@ vqc_angle_embedding
 vqc_amplitude_embedding
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:function:: pyvqnet.qnn.vqc.tn.vqc_amplitude_embeddingVQC_AmplitudeEmbeddingCircuit(input_feature, q_machine)
+.. py:function:: pyvqnet.qnn.vqc.tn.vqc_amplitude_embedding(input_feature, q_machine)
 
     将 :math:`2^n` 特征编码为 :math:`n` 量子比特的振幅向量。该函数别名 `VQC_AmplitudeEmbedding` 。
 

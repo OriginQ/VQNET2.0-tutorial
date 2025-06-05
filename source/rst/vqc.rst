@@ -4740,10 +4740,6 @@ QuantumLayerAdjoint
         batch_y = adjoint_model(input_x)
         batch_y.backward()
         print(batch_y)
-        # [[-0.0778451],
-        #  [-0.0778451],
-        #  [-0.0778451],
-        #  [-0.0778451]]
 
 
 QuantumLayerES
@@ -4953,7 +4949,7 @@ DataParallelVQCAdjointLayer
             Comm_OP,
             qunatum_model,
         )
-
+        l.train()
         y = l(input_x)
 
         y.backward()    
