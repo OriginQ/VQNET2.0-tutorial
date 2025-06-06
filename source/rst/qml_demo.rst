@@ -5311,7 +5311,7 @@ VQNet实现了该算法的一个示例: 使用VQE 求解目标Hamiltonian的基�
 
     init_params = np.random.uniform(low=0,
                                     high=2 * np.pi,
-                                    size=param_shape)
+                                    size=param_shape).astype(np.float32)
 
     def pq_circuit(params):
         params = params.reshape(param_shape)
