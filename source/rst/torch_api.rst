@@ -5642,7 +5642,7 @@ TNQMachine
     .. warning::
         
         在张量网络的量子线路中，默认会开启 ``vmap`` 功能，在线路上的逻辑门参数上均为舍弃了批次维度，
-        使用时，调用参数若维度为 [batch_size, *], 在使用时舍弃第一个batch_size维度, 直接使用后面维度, 如对输入数据x[:,1] -> x[1], 对可训练参数也一致，可参考下列样例中xx, weights用法.
+        使用时，调用参数若维度为 [batch_size, \*], 在使用时舍弃第一个batch_size维度, 直接使用后面维度, 如对输入数据x[:,1] -> x[1], 对可训练参数也一致，可参考下列样例中xx, weights用法.
 
     .. note::
         
@@ -8855,12 +8855,12 @@ vqc_basisrotation
 =================================================
 
 分布式相关功能,当使用 ``torch`` 计算后端时候,封装使用了torch的 ``torch.distributed`` 的接口,
-    
+
 
 
 .. note::
 
-    请参考 <https://pytorch.org/docs/stable/distributed.html7>`__ 中启动分布式的方法启动。
+    请参考 `torch分布式接口 <https://pytorch.org/docs/stable/distributed.html>`_  中启动分布式的方法启动。
     当使用CPU上进行分布式,请使用 ``gloo`` 而不是 ``mpi`` 。
     当使用GPU上进行分布式,请使用 ``nccl``。
 

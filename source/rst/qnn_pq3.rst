@@ -9,6 +9,8 @@
 量子计算层
 ***********************************
 
+.. _QuantumLayer_pq3:
+
 QuantumLayer
 ============================
 
@@ -1054,6 +1056,8 @@ HardwareEfficientAnsatz
 .. py:class:: pyvqnet.qnn.pq3.ansatz.HardwareEfficientAnsatz(qubits,single_rot_gate_list,entangle_gate="CNOT",entangle_rules='linear',depth=1)
 
     论文介绍的Hardware Efficient Ansatz的实现: `Hardware-efficient Variational Quantum Eigensolver for Small Molecules <https://arxiv.org/pdf/1704.05018.pdf>`__ 。
+    
+    通过其成员函数 ``create_ansatz`` 返回 `pyqpanda3` 的量子线路。
 
     :param qubits: 量子比特索引。
     :param single_rot_gate_list: 单个量子位旋转门列表由一个或多个作用于每个量子位的旋转门构成。目前支持 Rx、Ry、Rz。
@@ -1088,6 +1092,8 @@ BasicEntanglerTemplate
     CNOT 门环将每个量子位与其邻居连接起来,最后一个量子位被认为是第一个量子位的邻居。
 
     层数 :math:`L` 由参数 ``weights`` 的第一个维度决定。
+
+    通过其成员函数 ``create_circuit`` 返回 `pyqpanda3` 的量子线路。
 
     :param weights: 形状的权重张量 `(L, len(qubits))`。 每个权重都用作量子含参门中的参数。默认值为: ``None`` ,则使用 `(1,1)` 正态分布随机数作为权重。
     :param num_qubits: 量子比特数,默认为1。
@@ -1124,6 +1130,8 @@ StronglyEntanglingTemplate
 
     其包含2-qubit CNOT 门,作用于 :math:`M` 个量子比特上,:math:`i = 1,...,M`。 每个门的第二个量子位标号由公式 :math:`(i+r)\mod M` 给出,其中 :math:`r` 是一个称为 ``range``  的超参数,并且 :math:`0 < r < M`。
 
+    通过其成员函数 ``create_circuit`` 返回 `pyqpanda3` 的量子线路。
+
     :param weights: 形状为 ``(L, M, 3)`` 的权重张量,默认值:None,使用形状为 ``(1,1,3)`` 的随机张量。
     :param num_qubits: 量子比特数,默认值:1。
     :param ranges: 确定每个后续层的范围超参数的序列； 默认值:None,使用 :math:`r=l \ mod M` 作为ranges 的值。
@@ -1157,6 +1165,8 @@ ComplexEntangelingTemplate
 
     由 U3 门和 CNOT 门组成的强纠缠层。
     此线路模板来自以下论文:https://arxiv.org/abs/1804.00633。
+
+    通过其成员函数 ``create_circuit`` 返回 `pyqpanda3` 的量子线路。
 
     :param weights: 参数,[depth,num_qubits,3]的形状
     :param num_qubits: 量子比特数。
