@@ -1109,6 +1109,7 @@ BasicEntanglerTemplate
 
         circuit = BasicEntanglerTemplate(weights=weights, num_qubits=num_qubits, rotation=pq.RZ)
         result = circuit.compute_circuit()
+        cir = circuit.create_circuit(qubits)
         circuit.print_circuit(qubits)
 
 
@@ -1144,7 +1145,7 @@ StronglyEntanglingTemplate
 
         circuit = StronglyEntanglingTemplate(weights, num_qubits=num_qubits )
         result = circuit.compute_circuit()
-        print(result)
+        cir = circuit.create_circuit(qubits)
         circuit.print_circuit(qubits)
 
 
