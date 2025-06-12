@@ -1,23 +1,24 @@
-使用pyQPanda3量子机器学习模块
+使用pyqpanda3量子机器学习模块
 #################################
 
 .. warning::
 
     以下接口的量子计算部分使用pyqpanda3 https://qcloud.originqc.com.cn/document/qpanda-3/index.html。
 
-    如果您使用了本模块下的QCloud功能,在代码中导入pyqpanda2 或 使用pyvqnet的pyqpanda2相关封装接口会有错误。
 
 量子计算层
 ***********************************
 
+.. _QuantumLayer_pq3:
+
 QuantumLayer
 ============================
 
-如您熟悉pyQPanda3语法,可以使用该接口QuantumLayer,自定义pyqpanda3模拟器进行计算。
+如您熟悉pyqpanda3语法,可以使用该接口QuantumLayer,自定义pyqpanda3模拟器进行计算。
 
 .. py:class:: pyvqnet.qnn.pq3.quantumlayer.QuantumLayer(qprog_with_measure,para_num,diff_method:str = "parameter_shift",delta:float = 0.01,dtype=None,name="")
 
-	变分量子层的抽象计算模块。对一个参数化的量子线路使用pyQPanda3进行仿真,得到测量结果。该变分量子层继承了VQNet框架的梯度计算模块,可以使用参数漂移法等计算线路参数的梯度,训练变分量子线路模型或将变分量子线路嵌入混合量子和经典模型。
+	变分量子层的抽象计算模块。对一个参数化的量子线路使用pyqpanda3进行仿真,得到测量结果。该变分量子层继承了VQNet框架的梯度计算模块,可以使用参数漂移法等计算线路参数的梯度,训练变分量子线路模型或将变分量子线路嵌入混合量子和经典模型。
     
     :param qprog_with_measure: 用pyQPand构建的量子线路运行和测量函数。
     :param para_num: `int` - 参数个数。
@@ -43,6 +44,12 @@ QuantumLayer
     .. note::
 
         该类具有别名 `QuantumLayerV2`, `QpandaQCircuitVQCLayerLite`。
+
+
+    .. note::
+
+        该类计算梯度需要额外使用pyqpanda3进行线路计算个数与参数个数、数据个数、数据维度的乘积线性相关。
+
 
     Example::
 
@@ -104,10 +111,10 @@ QuantumLayer
 
 
 
-QuantumLayerV3
+QpandaQProgVQCLayer
 ============================
 
-.. py:class:: pyvqnet.qnn.pq3.quantumlayer.QuantumLayerV3(origin_qprog_func,para_num,qvm_type="cpu", pauli_str_dict=None, shots=1000, initializer=None,dtype=None,name="")
+.. py:class:: pyvqnet.qnn.pq3.quantumlayer.QpandaQProgVQCLayer(origin_qprog_func,para_num,qvm_type="cpu", pauli_str_dict=None, shots=1000, initializer=None,dtype=None,name="")
 
 
     它将参数化的量子电路提交给 本地QPanda3全振幅模拟器中计算,并训练线路中的参数。
@@ -127,7 +134,7 @@ QuantumLayerV3
 
     .. note::
 
-        origin_qprog_func 是用户使用 pyQPanda3 定义的量子电路函数:
+        origin_qprog_func 是用户使用 pyqpanda3 定义的量子电路函数:
         https://qcloud.originqc.com.cn/document/qpanda-3/dc/d12/tutorial_quantum_program.html。。
 
         此函数必须包含输入和参数两个参数作为函数入参(即使某个参数未实际使用),输出为pyqpanda3.core.QProg类型数据,否则无法在QuantumLayerV3中正常运行。
@@ -143,13 +150,19 @@ QuantumLayerV3
 
     .. note::
 
-        该类具有别名 `QpandaQProgVQCLayer` 。
+        该类具有别名 `QuantumLayerV3` 。
+
+
+    .. note::
+
+        该类计算梯度需要额外使用pyqpanda3进行线路计算个数与参数个数、数据个数、数据维度的乘积线性相关。
+
 
     Example::
 
         import pyqpanda3.core as pq
         import pyvqnet
-        from pyvqnet.qnn.pq3.quantumlayer import  QuantumLayerV3
+        from pyvqnet.qnn.pq3.quantumlayer import  QpandaQProgVQCLayer
 
 
         def qfun(input, param ):
@@ -182,7 +195,7 @@ QuantumLayerV3
             return m_prog
 
         from pyvqnet.utils.initializer import ones
-        l = QuantumLayerV3(qfun,
+        l = QpandaQProgVQCLayer(qfun,
                         4,
                         "cpu",
                         pauli_str_dict=None,
@@ -206,7 +219,7 @@ QuantumBatchAsyncQcloudLayer
 
 .. py:class:: pyvqnet.qnn.pq3.quantumlayer.QuantumBatchAsyncQcloudLayer(origin_qprog_func, qcloud_token, para_num, pauli_str_dict=None, shots = 1000, initializer=None, dtype=None, name="", diff_method="parameter_shift", submit_kwargs={}, query_kwargs={})
 
-    使用 pyqpanda3 QCLOUD 的 originqc 真实芯片的抽象计算模块。 它提交参数化量子电路到真实芯片并获得测量结果。
+    使用 pyqpanda3 QCloud 的本源量子真实芯片的抽象计算模块。 它提交参数化量子电路到真实芯片并获得测量结果。
     如果 diff_method == "random_coordinate_descent" ,该层将随机选择单个参数来计算梯度,其他参数将保持为零。参考:https://arxiv.org/abs/2311.00088
 
     .. note::
@@ -221,6 +234,9 @@ QuantumBatchAsyncQcloudLayer
             
             `param`: 输入一维的变分量子线路的待训练参数。
 
+    .. note::
+
+        该类计算梯度需要额外使用芯片进行线路计算个数与参数个数、数据个数、数据维度的乘积线性相关。
 
 
     :param origin_qprog_func: QPanda 构建的变分量子电路函数,必须返回QProg。
@@ -516,7 +532,11 @@ QLinear 实现了一种量子全连接算法。首先将数据编码到量子态
 
 .. py:class:: pyvqnet.qnn.qlinear.QLinear(input_channels,output_channels,machine: str = "CPU"))
 
-    量子全连接模块。全连接模块的输入为形状（输入通道、输出通道）。请注意,该层不带变分量子参数。
+    量子全连接模块。全连接模块的输入为形状（输入通道、输出通道）。
+    
+    .. note::
+
+        请注意,该层不带变分量子参数。
 
     :param input_channels: `int` - 输入通道数。
     :param output_channels: `int` - 输出通道数。
@@ -604,7 +624,7 @@ Qconv是一种量子卷积算法接口。
 ============================
 
 在VQNet中,我们使用本源量子自研的 `pyqpanda3 <https://qcloud.originqc.com.cn/document/qpanda-3/index.html>`_ 的各个逻辑门搭建量子线路,进行量子模拟。
-当前pyQPanda支持的逻辑门可参考pyQPanda3 `量子逻辑门 <https://qcloud.originqc.com.cn/document/qpanda-3/da/dd5/tutorial_quantum_gate.html>`_ 部分的定义。
+当前pyQPanda支持的逻辑门可参考pyqpanda3 `量子逻辑门 <https://qcloud.originqc.com.cn/document/qpanda-3/da/dd5/tutorial_quantum_gate.html>`_ 部分的定义。
 此外VQNet还封装了部分在量子机器学习中常用的量子逻辑门组合:
 
 
@@ -1036,6 +1056,8 @@ HardwareEfficientAnsatz
 .. py:class:: pyvqnet.qnn.pq3.ansatz.HardwareEfficientAnsatz(qubits,single_rot_gate_list,entangle_gate="CNOT",entangle_rules='linear',depth=1)
 
     论文介绍的Hardware Efficient Ansatz的实现: `Hardware-efficient Variational Quantum Eigensolver for Small Molecules <https://arxiv.org/pdf/1704.05018.pdf>`__ 。
+    
+    通过其成员函数 ``create_ansatz`` 返回 `pyqpanda3` 的量子线路。
 
     :param qubits: 量子比特索引。
     :param single_rot_gate_list: 单个量子位旋转门列表由一个或多个作用于每个量子位的旋转门构成。目前支持 Rx、Ry、Rz。
@@ -1071,6 +1093,8 @@ BasicEntanglerTemplate
 
     层数 :math:`L` 由参数 ``weights`` 的第一个维度决定。
 
+    通过其成员函数 ``create_circuit`` 返回 `pyqpanda3` 的量子线路。
+
     :param weights: 形状的权重张量 `(L, len(qubits))`。 每个权重都用作量子含参门中的参数。默认值为: ``None`` ,则使用 `(1,1)` 正态分布随机数作为权重。
     :param num_qubits: 量子比特数,默认为1。
     :param rotation: 使用单参数单量子比特门,``pyqpanda.RX`` 被用作默认值。
@@ -1091,6 +1115,7 @@ BasicEntanglerTemplate
 
         circuit = BasicEntanglerTemplate(weights=weights, num_qubits=num_qubits, rotation=pq.RZ)
         result = circuit.compute_circuit()
+        cir = circuit.create_circuit(qubits)
         circuit.print_circuit(qubits)
 
 
@@ -1104,6 +1129,8 @@ StronglyEntanglingTemplate
     参数 ``weights`` 包含每一层的权重。 因此得出层数 :math:`L` 等于 ``weights`` 的第一个维度。
 
     其包含2-qubit CNOT 门,作用于 :math:`M` 个量子比特上,:math:`i = 1,...,M`。 每个门的第二个量子位标号由公式 :math:`(i+r)\mod M` 给出,其中 :math:`r` 是一个称为 ``range``  的超参数,并且 :math:`0 < r < M`。
+
+    通过其成员函数 ``create_circuit`` 返回 `pyqpanda3` 的量子线路。
 
     :param weights: 形状为 ``(L, M, 3)`` 的权重张量,默认值:None,使用形状为 ``(1,1,3)`` 的随机张量。
     :param num_qubits: 量子比特数,默认值:1。
@@ -1126,7 +1153,7 @@ StronglyEntanglingTemplate
 
         circuit = StronglyEntanglingTemplate(weights, num_qubits=num_qubits )
         result = circuit.compute_circuit()
-        print(result)
+        cir = circuit.create_circuit(qubits)
         circuit.print_circuit(qubits)
 
 
@@ -1138,6 +1165,8 @@ ComplexEntangelingTemplate
 
     由 U3 门和 CNOT 门组成的强纠缠层。
     此线路模板来自以下论文:https://arxiv.org/abs/1804.00633。
+
+    通过其成员函数 ``create_circuit`` 返回 `pyqpanda3` 的量子线路。
 
     :param weights: 参数,[depth,num_qubits,3]的形状
     :param num_qubits: 量子比特数。
@@ -1168,7 +1197,7 @@ Quantum_Embedding
 
     使用 RZ,RY,RZ 创建变分量子电路,将经典数据编码为量子态。
     参考 `Quantum embeddings for machine learning <https://arxiv.org/abs/2001.03622>`_。
-    在初始化该类后,其成员函数 ``compute_circuit`` 为运行函数,可作为参数输入 ``QuantumLayerV2`` 类构成量子机器学习模型的一层。
+    在初始化该类后,其成员函数 ``compute_circuit`` 为运行函数,可作为参数输入 ``QpandaQCircuitVQCLayerLite`` 类构成量子机器学习模型的一层。
 
     :param qubits: 使用pyqpanda 申请的量子比特。
     :param machine: 使用pyqpanda 申请的量子虚拟机。
@@ -1179,7 +1208,7 @@ Quantum_Embedding
 
     Example::
 
-        from pyvqnet.qnn.pq3 import QuantumLayerV2,Quantum_Embedding
+        from pyvqnet.qnn.pq3 import QpandaQCircuitVQCLayerLite,Quantum_Embedding
         from pyvqnet.tensor import tensor
         import pyqpanda3.core as pq
         depth_input = 2
@@ -1198,7 +1227,7 @@ Quantum_Embedding
 
         qe = Quantum_Embedding(nq, loacl_machine, num_repetitions_input,
                             depth_input, num_unitary_layers, num_repetitions)
-        qlayer = QuantumLayerV2(qe.compute_circuit,
+        qlayer = QpandaQCircuitVQCLayerLite(qe.compute_circuit,
                                 qe.param_num)
 
         data_in.requires_grad = True
@@ -1222,7 +1251,7 @@ expval
     如果观测值是 :math:`0.7Z\otimes X\otimes I+0.2I\otimes Z\otimes I`,
     那么 Hamiltonian dict 将是 ``{{'Z0, X1':0.7} ,{'Z1':0.2}}`` 。
 
-    expval api现在支持pyQPanda3 的模拟器 。 
+    expval api现在支持pyqpanda3 的模拟器 。 
     
     :param machine: 由pyQPanda创建的量子虚拟机。
     :param prog: pyQPanda创建的量子工程。

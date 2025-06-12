@@ -1,0 +1,17 @@
+i,u3,phaseshift
+hadamard,cy,multirz
+t,cnot,sdg
+s,cr,tdg
+paulix,swap,controlledphaseshift
+pauliy,cswap,single_excitation
+pauliz,iswap,double_excitation
+x1,cz,
+rx,rxx,
+ry,ryy,
+rz,rzz,
+crx,rzx,
+cry,toffoli,
+crz,isingxx,
+p,isingyy,
+u1,isingzz,
+u2,isingxy,

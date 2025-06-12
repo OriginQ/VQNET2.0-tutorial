@@ -5,7 +5,7 @@
 
     以下接口的量子计算部分使用pyqpanda2 https://pyqpanda-toturial.readthedocs.io/zh/latest/。
 
-    由于pyqpanda2以及pyqpanda3兼容性问题,您需要自行安装pyqpnda2, `pip install pyqpanda` 
+    您需要自行安装pyqpanda2, `pip install pyqpanda` 
 
 量子计算层
 ***********************************
@@ -17,7 +17,7 @@ QuantumLayer
 
 QuantumLayer是一个支持量子含参线路作为参数的自动求导模块的封装类。用户定义一个函数作为参数 ``qprog_with_measure`` ,该函数需要包含pyqpanda2定义的量子线路:一般包含量子线路的编码线路,演化线路和测量操作。
 该类可以嵌入量子经典混合机器学习模型,通过经典的梯度下降法,使得量子经典混合模型的目标函数或损失函数最小。
-用户可通过参数 ``diff_method`` 指定 ``QuantumLayer`` 层中量子线路参数的梯度计算方式,``QuantumLayer`` 当前支持有限差分法 ``finite_diff`` 以及 ``parameter-shift`` 方法。
+用户可通过参数 ``diff_method`` 指定 ``QuantumLayer`` 层中量子线路参数的梯度计算方式, ``QuantumLayer`` 当前支持有限差分法 ``finite_diff`` 以及 ``parameter-shift`` 方法。
 
 有限差分法是估算函数梯度最传统和最常用的数值方法之一。主要思想是用差分代替偏导数:
 
@@ -43,7 +43,7 @@ QuantumLayer是一个支持量子含参线路作为参数的自动求导模块�
 
     :param qprog_with_measure: 用pyqpanda2构建的量子线路运行和测量函数。
     :param para_num: `int` - 参数个数。
-    :param machine_type_or_cloud_token: qpanda量子虚拟机类型或pyqpanda2 量子云令牌 : https://pyqpanda-toturial.readthedocs.io/zh/latest/Realchip.html。
+    :param machine_type_or_cloud_token: qpanda量子虚拟机类型 "CPU"。
     :param num_of_qubits: 量子比特数。
     :param num_of_cbits: 经典比特数,默认为1。
     :param diff_method: 求解量子线路参数梯度的方法,“参数位移”或“有限差分”,默认参数偏移。
@@ -75,6 +75,10 @@ QuantumLayer是一个支持量子含参线路作为参数的自动求导模块�
     .. note::
 
         该类具有别名 `QpandaQCircuitVQCLayer` 。
+
+    .. note::
+
+        该类计算梯度需要额外使用pyqpanda进行线路计算个数与参数个数、数据个数、数据维度的乘积线性相关。
 
     Example::
 
@@ -183,12 +187,12 @@ QuantumLayer是一个支持量子含参线路作为参数的自动求导模块�
         print(rlt)
 
 
-QuantumLayerV2
+QpandaQCircuitVQCLayerLite
 ============================
 
-如您更加熟悉pyqpanda2语法,可以使用该接口QuantumLayerV2,自定义量子比特 ``qubits`` ,经典比特 ``cbits`` ,后端模拟器 ``machine`` 加入QuantumLayerV2的参数 ``qprog_with_measure`` 函数中。
+如您更加熟悉pyqpanda2语法,可以使用该接口QpandaQCircuitVQCLayerLite,自定义量子比特 ``qubits`` ,经典比特 ``cbits`` ,后端模拟器 ``machine`` 加入QpandaQCircuitVQCLayerLite的参数 ``qprog_with_measure`` 函数中。
 
-.. py:class:: pyvqnet.qnn.quantumlayer.QuantumLayerV2(qprog_with_measure,para_num,diff_method:str = "parameter_shift",delta:float = 0.01,dtype=None,name="")
+.. py:class:: pyvqnet.qnn.quantumlayer.QpandaQCircuitVQCLayerLite(qprog_with_measure,para_num,diff_method:str = "parameter_shift",delta:float = 0.01,dtype=None,name="")
 
 	变分量子层的抽象计算模块。对一个参数化的量子线路使用pyqpanda2进行仿真,得到测量结果。该变分量子层继承了VQNet框架的梯度计算模块,可以使用参数漂移法等计算线路参数的梯度,训练变分量子线路模型或将变分量子线路嵌入混合量子和经典模型。
     
@@ -204,7 +208,7 @@ QuantumLayerV2
     .. note::
         qprog_with_measure是pyqpanda2中定义的量子线路函数 :https://pyqpanda-toturial.readthedocs.io/zh/latest/QCircuit.html。
         
-        此函数必须包含以下参数作为函数入参(即使某个参数未实际使用),否则无法在QuantumLayerV2中正常运行。
+        此函数必须包含以下参数作为函数入参(即使某个参数未实际使用),否则无法在QpandaQCircuitVQCLayerLite中正常运行。
 
         与QuantumLayer相比。该接口传入的变分线路运行函数中,用户应该手动创建量子比特和模拟器: https://pyqpanda-toturial.readthedocs.io/zh/latest/QuantumMachine.html,
 
@@ -218,13 +222,17 @@ QuantumLayerV2
 
     .. note::
 
-        该类具有别名 `QpandaQCircuitVQCLayerLite` 。
+        该类具有别名 `QuantumLayerV2` 。
+
+    .. note::
+
+        该类计算梯度需要额外使用pyqpanda进行线路计算个数与参数个数、数据个数、数据维度的乘积线性相关。
 
     Example::
 
         import pyqpanda as pq
         from pyvqnet.qnn.measure import ProbsMeasure
-        from pyvqnet.qnn.quantumlayer import QuantumLayerV2
+        from pyvqnet.qnn.quantumlayer import QpandaQCircuitVQCLayerLite
         import numpy as np
         from pyvqnet.tensor import QTensor
         def pqctest (input,param):
@@ -262,7 +270,7 @@ QuantumLayerV2
             rlt_prob = ProbsMeasure([0,2],prog,machine,qubits)
             return rlt_prob
 
-        pqc = QuantumLayerV2(pqctest,3)
+        pqc = QpandaQCircuitVQCLayerLite(pqctest,3)
 
         #classic data as input       
         input = QTensor([[1.0,2,3,4],[4,2,2,3],[3,3,2,2]] )
@@ -288,7 +296,7 @@ QuantumLayerV2
 
         import pyqpanda as pq
         from pyvqnet.qnn.measure import ProbsMeasure
-        from pyvqnet.qnn.quantumlayer import QuantumLayerV2
+        from pyvqnet.qnn.quantumlayer import QpandaQCircuitVQCLayerLite
         import numpy as np
         from pyvqnet.tensor import QTensor,DEV_GPU_0
         def pqctest (input,param):
@@ -326,7 +334,7 @@ QuantumLayerV2
             rlt_prob = ProbsMeasure([0,2],prog,machine,qubits)
             return rlt_prob
 
-        pqc = QuantumLayerV2(pqctest,3)
+        pqc = QpandaQCircuitVQCLayerLite(pqctest,3)
         #layer move to gpu
         pqc.toGPU()
         #classic data as input       
@@ -350,7 +358,7 @@ QuantumBatchAsyncQcloudLayer
 
 .. py:class:: pyvqnet.qnn.quantumlayer.QuantumBatchAsyncQcloudLayer(origin_qprog_func, qcloud_token, para_num, num_qubits, num_cubits, pauli_str_dict=None, shots = 1000, initializer=None, dtype=None, name="", diff_method="parameter_shift", submit_kwargs={}, query_kwargs={})
 
-    使用 pyqpanda QCLOUD 从版本 3.8.2.2 开始的 originqc 真实芯片的抽象计算模块。 它提交参数化量子电路到真实芯片并获得测量结果。
+    使用 pyqpanda QCloud 从版本 3.8.2.2 开始的本源量子真实芯片的抽象计算模块。 它提交参数化量子电路到真实芯片并获得测量结果。
     如果 diff_method == "random_coordinate_descent" ,该层将随机选择单个参数来计算梯度,其他参数将保持为零。参考:https://arxiv.org/abs/2311.00088
 
     .. note::
@@ -371,7 +379,9 @@ QuantumBatchAsyncQcloudLayer
             
             `cbits`: 由QuantumBatchAsyncQcloudLayer分配的经典比特, 数量为  `num_cubits`, 类型为 pyQpanda.ClassicalCondition,无需用户额外在函数中定义。。
             
+    .. note::
 
+        该类计算梯度需要额外使用真实芯片进行线路计算个数与参数个数、数据个数、数据维度的乘积线性相关。
 
     :param origin_qprog_func: QPanda 构建的变分量子电路函数,必须返回QProg。
     :param qcloud_token: `str` - 量子机的类型或用于执行的云令牌。
@@ -495,11 +505,11 @@ QuantumLayerMultiProcess
 
         此函数应包含以下参数,否则无法在QuantumLayerMultiProcess中正常运行。
 
-        与QuantumLayerV2类似,该接口传入的变分线路运行函数中,用户应该手动创建量子比特和模拟器: https://pyqpanda-toturial.readthedocs.io/zh/latest/QuantumMachine.html,
+        与QpandaQCircuitVQCLayerLite类似,该接口传入的变分线路运行函数中,用户应该手动创建量子比特和模拟器: https://pyqpanda-toturial.readthedocs.io/zh/latest/QuantumMachine.html,
 
         如果qprog_with_measure需要quantum measure,用户应该手动创建cbits: https://pyqpanda-toturial.readthedocs.io/zh/latest/Measure.html
 
-        量子线路函数 qprog_with_measure (input,param,nqubits,ncubits)的使用可参考下面的例子。对于线路深度较少的线路,该层的多线程加速效果并不明显。
+        量子线路函数 qprog_with_measure(input,param,nqubits,ncubits) 的使用可参考下面的例子。对于线路深度较少的线路,该层的多线程加速效果并不明显。
 
         `input`: 输入一维经典数据。
 
@@ -508,6 +518,11 @@ QuantumLayerMultiProcess
         `nqubits`: 预先设定的量子比特数量。如果没有,输入 0。
 
         `ncubits`: 预先设定的经典比特数量。如果没有,输入 0。
+
+
+    .. note::
+
+        该类计算梯度需要额外使用pyqpanda进行线路计算个数与参数个数、数据个数、数据维度的乘积线性相关。
 
     Example::
 
@@ -612,6 +627,10 @@ NoiseQuantumLayer
             `cbits`: cbits由NoiseQuantumLayer分配的经典比特,用来辅助测量函数,类型为 pyQpanda.ClassicalCondition。如果线路不使用cbits,也应保留此参数。
             
             `machine`: 由NoiseQuantumLayer创建的模拟器。
+
+    .. note::
+
+        该类计算梯度需要额外使用pyqpanda进行线路计算个数与参数个数、数据个数、数据维度的乘积线性相关。
 
 
     Example::
@@ -1188,7 +1207,7 @@ QGAN使用经典的GAN模型结构,分为Generator生成器与Discriminator鉴�
 
     Example::
 
-        from pyvqnet.qnn import AngleEmbeddingCircuit, expval, QuantumLayerV2, SPSA
+        from pyvqnet.qnn import AngleEmbeddingCircuit, expval, QpandaQCircuitVQCLayerLite, SPSA
         from pyvqnet.qnn.template import BasicEntanglerTemplate
         import pyqpanda as pq
         from pyvqnet.nn.module import Module
@@ -1196,7 +1215,7 @@ QGAN使用经典的GAN模型结构,分为Generator生成器与Discriminator鉴�
         class Model_spsa(Module):
             def __init__(self):
                 super(Model_spsa, self).__init__()
-                self.qvc = QuantumLayerV2(layer_fn_spsa_pq, 3)
+                self.qvc = QpandaQCircuitVQCLayerLite(layer_fn_spsa_pq, 3)
 
             def forward(self, x):
                 y = self.qvc(x)
@@ -1252,14 +1271,14 @@ QGAN使用经典的GAN模型结构,分为Generator生成器与Discriminator鉴�
         from pyvqnet.nn.module import Module
         from pyvqnet.qnn import SPSA
         from pyvqnet.tensor.tensor import QTensor
-        from pyvqnet.qnn import AngleEmbeddingCircuit, expval, QuantumLayerV2, expval
+        from pyvqnet.qnn import AngleEmbeddingCircuit, expval, QpandaQCircuitVQCLayerLite, expval
         from pyvqnet.qnn.template import BasicEntanglerTemplate
 
         #定义一个量子变分线路模型
         class Model_spsa(Module):
             def __init__(self):
                 super(Model_spsa, self).__init__()
-                self.qvc = QuantumLayerV2(layer_fn_spsa_pq, 3)
+                self.qvc = QpandaQCircuitVQCLayerLite(layer_fn_spsa_pq, 3)
 
             def forward(self, x):
                 y = self.qvc(x)
