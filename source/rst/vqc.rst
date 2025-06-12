@@ -4,7 +4,17 @@
 变分量子线路自动微分模拟
 ***********************************
 
-VQNet基于自动微分算子构建以及一些常用量子逻辑门、量子线路以及测量方法,可使用自动微分模拟代替量子线路parameter-shift方法计算梯度。我们可以像其他 `Module` 一样,使用VQC算子构成复杂神经网络。在 `Module` 中需要定义虚拟机 `QMachine`,并且需要对machine中 `states` 根据输入的batchsize进行reset_states。请具体看下例:
+以下接口使用pyVQNet的QTensor接口构建常用量子逻辑门、量子线路以及测量方法,可使用自动微分模拟代替量子线路parameter-shift方法计算量子变分线路中参数的梯度。
+
+我们可以像其他 `Module` 一样,使用 ``pyvqnet.qnn.vqc`` 模块下的接口构成量子与经典混合神经网络模型。在 `Module` 中需要定义虚拟机 `QMachine`,并且需要对machine的量子态矢数据 `states` 根据输入的batchsize进行reset_states。请具体看下例:
+
+.. warning::
+
+    为了在每次迭代运行量子线路前向函数保证量子态为初态，你需要在forward函数一开头运行 ``QMachine.reset_states(batchsize)``。
+    
+    为了支持批量数据运行量子线路，你将输入input编码到量子逻辑门上时候，input形状需要为[batchsize,*],其中*为要编码的逻辑门的参数个数。
+    
+    请参考如下例子：
 
 .. code-block::
 
@@ -34,9 +44,9 @@ VQNet基于自动微分算子构建以及一些常用量子逻辑门、量子线
             self.device.reset_states(x.shape[0])
             y = self.linearx(x)
             #将输入编码到RZ门上,注意输入必须是 [batchsize,1]的shape
-            self.encode1(params = y[:, [0]],q_machine = self.device,)
+            self.encode1(params = y[:, 0],q_machine = self.device,)
             #将输入编码到RZ门上,注意输入必须是 [batchsize,1]的shape
-            self.encode2(params = y[:, [1]],q_machine = self.device,)
+            self.encode2(params = y[:, 1],q_machine = self.device,)
             self.ansatz(q_machine =self.device)
             return self.measure(q_machine =self.device)
 
@@ -84,9 +94,9 @@ VQNet基于自动微分算子构建以及一些常用量子逻辑门、量子线
             self.device.reset_states(x.shape[0])
             y = self.linearx(x)
             #将输入编码到RZ门上,注意输入必须是 [batchsize,1]的shape
-            self.encode1(params = y[:, [0]],q_machine = self.device,)
+            self.encode1(params = y[:, 0],q_machine = self.device,)
             #将输入编码到RZ门上,注意输入必须是 [batchsize,1]的shape
-            self.encode2(params = y[:, [1]],q_machine = self.device,)
+            self.encode2(params = y[:, 1],q_machine = self.device,)
             #使用RZ门构成的含参变分线路,会加入训练。
             self.vqc(q_machine =self.device)
             self.ansatz(q_machine =self.device)
@@ -4659,6 +4669,9 @@ QuantumLayerAdjoint
     :param name: 该层名字,默认为""。
     :return: 返回一个 QuantumLayerAdjoint 类实例。
 
+    .. warning::
+        Module 默认处于 `eval` 模式,如果需要训练参数，需要运行 `train()` 接口进入训练模式。
+        
     .. note::
 
         general_module 的 QMachine 应设置 grad_method = "adjoint".
@@ -4723,14 +4736,10 @@ QuantumLayerAdjoint
                             grad_mode="adjoint")
 
         adjoint_model = QuantumLayerAdjoint(qunatum_model)
-
+        adjoint_model.train()
         batch_y = adjoint_model(input_x)
         batch_y.backward()
         print(batch_y)
-        # [[-0.0778451],
-        #  [-0.0778451],
-        #  [-0.0778451],
-        #  [-0.0778451]]
 
 
 QuantumLayerES
@@ -4940,7 +4949,7 @@ DataParallelVQCAdjointLayer
             Comm_OP,
             qunatum_model,
         )
-
+        l.train()
         y = l(input_x)
 
         y.backward()    
@@ -5542,7 +5551,7 @@ wrapper_commute_controlled
         import pyvqnet
         import numpy as np
         from pyvqnet.utils import set_random_seed
-        from pyvqnet.qnn import expval, QuantumLayerV2
+
         import time
         from functools import partial
         set_random_seed(42)
