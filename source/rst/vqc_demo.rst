@@ -326,7 +326,7 @@ Circuit-centric quantum classifiers算法示例
             return self.ma(q_machine=self.qm)
 
 
-使用SGD经典梯度下降法作为基线比较两者在相同迭代次数下的损失值变化情况,可见使用量子自然梯度,该损失函数下降更快。
+使用SGD经典梯度下降法作为基线比较量子自然梯度，带动量的量子自然梯度在相同迭代次数下的损失值变化情况,可见使用量子自然梯度,该损失函数下降更快。
 
 .. code-block::
 
@@ -343,6 +343,18 @@ Circuit-centric quantum classifiers算法示例
         yy = qng_model(None).to_numpy().reshape([1])
         qng_cost.append(yy)
 
+
+    x = QTensor([0.432, -0.123, 0.543, 0.233],
+                dtype=pyvqnet.kfloat64)
+    qng_model = Hmodel(3, pyvqnet.kcomplex128,x)
+    qng = pyvqnet.qnn.vqc.QNG(qng_model, 0.01,0.1)
+    qng_m_cost = []
+    for s in steps:
+        qng.zero_grad()
+        qng.step(None)
+        yy = qng_model(None).to_numpy().reshape([1])
+        qng_m_cost.append(yy)
+
     x = QTensor([0.432, -0.123, 0.543, 0.233],
                 requires_grad=True,
                 dtype=pyvqnet.kfloat64)
@@ -358,8 +370,7 @@ Circuit-centric quantum classifiers算法示例
 
         sgd_cost.append(y.to_numpy().reshape([1]))
 
-
-    plt.style.use("seaborn")
+    plt.plot(qng_m_cost, "r", label="Quantum natural gradient descent with Momentum")
     plt.plot(qng_cost, "b", label="Quantum natural gradient descent")
     plt.plot(sgd_cost, "g", label="Vanilla gradient descent")
 
@@ -367,6 +378,7 @@ Circuit-centric quantum classifiers算法示例
     plt.xlabel("Optimization steps")
     plt.legend()
     plt.savefig('qng_new_compare.png')
+
 
 
 
