@@ -1084,7 +1084,7 @@ Linear
 .. py:class:: pyvqnet.nn.Linear(input_channels, output_channels, weight_initializer=None, bias_initializer=None,use_bias=True, dtype=None, name: str = "")
 
     线性模块(全连接层)。
-    :math:`y = Ax + b`
+    :math:`y = x@A.T + b`
 
     :param input_channels: `int` - 输入数据通道数。
     :param output_channels: `int` - 输出数据通道数。
