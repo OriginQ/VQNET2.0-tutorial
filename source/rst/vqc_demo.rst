@@ -4481,7 +4481,7 @@ Dropout是经典深度神经网络(DNN)的一种常用技术,可防止计算单�
 ===================================
 `论文 <https://ieeexplore.ieee.org/abstract/document/10806779>`__ 实现了一种新型的 QRNN 模型，它可以作为 QRNN 的典型模型。
 其中，量子循环块 (QRB) 以硬件高效的方式构建，并通过交错堆叠 QRB 来构建 QRNN，这可以大大降低算法对量子器件相干时间的要求。
-以下示例基于torch后端（需要安装torch）搭建了一个QGRU模型进行时序数据预测。此外需要下载示例数据 `ba.csv <./images/ba.csv>`_ 到本地。
+以下示例基于torch后端（需要安装torch）搭建了一个QGRU模型进行时序数据预测。此外需要下载示例数据 :download:`ba.csv <images/ba.csv>` 到本地。
 
 .. code-block::
 
