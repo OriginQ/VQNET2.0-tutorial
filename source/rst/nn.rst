@@ -1084,7 +1084,7 @@ Linear
 .. py:class:: pyvqnet.nn.Linear(input_channels, output_channels, weight_initializer=None, bias_initializer=None,use_bias=True, dtype=None, name: str = "")
 
     线性模块(全连接层)。
-    :math:`y = Ax + b`
+    :math:`y = x@A.T + b`
 
     :param input_channels: `int` - 输入数据通道数。
     :param output_channels: `int` - 输出数据通道数。
@@ -3446,7 +3446,10 @@ auc_calculate
 VQNet的分布式计算模块
 *********************************************************
 
-该模块使用mpi启动多进程并行计算, 使用nccl进行GPU之间通信。仅在linux操作系统下能够使用。
+分布式计算​​是指通过多台设备（如GPU/CPU节点）协同完成神经网络的训练或推理任务，利用并行处理加速计算并扩展模型规模。
+其核心是通过​​分布式接口​​（如MPI、NCCL、gRP）协调设备间的通信与同步
+
+VQNet的分布式计算模块模块使用mpi启动多进程并行计算, 使用nccl进行GPU之间通信。该功能仅在linux操作系统下能够使用。
 
 
 

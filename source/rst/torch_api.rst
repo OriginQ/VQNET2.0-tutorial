@@ -15,6 +15,7 @@ VQNet使用torch进行底层计算
     .. warning::
 
         :ref:`vqc_api` 中的变分量子计算函数(小写命名,例如 `rx`, `ry`, `rz` 等), :ref:`qtensor_api` 中的QTensor基本计算函数,
+
         在 ``pyvqnet.backends.set_backend("torch")`` 后,可以输入 ``QTensor``,其成员 `data` 从pyvqnet的Tensor变为 ``torch.Tensor`` 计算。
 
         ``pyvqnet.backends.set_backend("torch")`` 以及 ``pyvqnet.backends.set_backend("pyvqnet")`` 会修改全局运行后端。
@@ -32,8 +33,11 @@ set_backend
 
     设置当前计算和储存数据所使用的后端,默认为 "pyvqnet",可设置为 "torch"。
     
-    使用 ``pyvqnet.backends.set_backend("torch")`` 后,接口保持不变,但VQNet的 ``QTensor`` 的 ``data`` 成员变量均使用 ``torch.Tensor`` 储存数据,
-    并使用torch计算。
+    使用 ``pyvqnet.backends.set_backend("torch")`` 后,接口保持不变,VQNet的 ``QTensor`` 的 ``data`` 成员变量均使用 ``torch.Tensor`` 储存数据。
+    :ref:`qtensor_api`， :ref:`vqc_api` 以及 `pyvqnet.nn.torch` 下的接口输入接受 ``QTensor`` 类型，输出为 ``QTensor`` 类型。
+
+    使用 ``pyvqnet.backends.set_backend("torch-native")`` 后,接口保持不变, :ref:`qtensor_api`， :ref:`vqc_api` 以及 `pyvqnet.nn.torch` 下的接口
+    输入可直接接受 ``torch.Tensor`` 类型或 ``QTensor`` 类型，输出为 ``torch.Tensor`` ，不再转换为 ``QTensor`` ，减少了数据转换。
     
     使用 ``pyvqnet.backends.set_backend("pyvqnet")`` 后,VQNet ``QTensor`` 的 ``data`` 成员变量均使用 ``pyvqnet._core.Tensor`` 储存数据,并使用pyvqnet c++库计算。
 
@@ -371,7 +375,7 @@ Linear
 .. py:class:: pyvqnet.nn.torch.Linear(input_channels, output_channels, weight_initializer=None, bias_initializer=None,use_bias=True, dtype=None, name: str = "")
 
     线性模块(全连接层)。
-    :math:`y = Ax + b`
+    :math:`y = x@A.T + b`
     
     .. warning::
 
@@ -2781,6 +2785,7 @@ TorchQpanda3QuantumLayer
 
         print(pqc.m_para.grad)
         print(input.grad)
+
 
 
 基于自动微分的变分量子线路模块和接口
@@ -5654,7 +5659,7 @@ TNQMachine
     .. warning::
         
         在张量网络的量子线路中，默认会开启 ``vmap`` 功能，在线路上的逻辑门参数上均为舍弃了批次维度，
-        使用时，调用参数若维度为 [batch_size, *], 在使用时舍弃第一个batch_size维度, 直接使用后面维度, 如对输入数据x[:,1] -> x[1], 对可训练参数也一致，可参考下列样例中xx, weights用法.
+        使用时，调用参数若维度为 [batch_size, \*], 在使用时舍弃第一个batch_size维度, 直接使用后面维度, 如对输入数据x[:,1] -> x[1], 对可训练参数也一致，可参考下列样例中xx, weights用法.
 
 
     :param num_wires: 量子比特数。
@@ -8864,12 +8869,12 @@ vqc_basisrotation
 =================================================
 
 分布式相关功能,当使用 ``torch`` 计算后端时候,封装使用了torch的 ``torch.distributed`` 的接口,
-    
+
 
 
 .. note::
 
-    请参考 <https://pytorch.org/docs/stable/distributed.html7>`__ 中启动分布式的方法启动。
+    请参考 `torch分布式接口 <https://pytorch.org/docs/stable/distributed.html>`_  中启动分布式的方法启动。
     当使用CPU上进行分布式,请使用 ``gloo`` 而不是 ``mpi`` 。
     当使用GPU上进行分布式,请使用 ``nccl``。
 

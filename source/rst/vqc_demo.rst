@@ -326,7 +326,7 @@ Circuit-centric quantum classifiers算法示例
             return self.ma(q_machine=self.qm)
 
 
-使用SGD经典梯度下降法作为基线比较两者在相同迭代次数下的损失值变化情况,可见使用量子自然梯度,该损失函数下降更快。
+使用SGD经典梯度下降法作为基线比较量子自然梯度，带动量的量子自然梯度在相同迭代次数下的损失值变化情况,可见使用量子自然梯度,该损失函数下降更快。
 
 .. code-block::
 
@@ -343,6 +343,18 @@ Circuit-centric quantum classifiers算法示例
         yy = qng_model(None).to_numpy().reshape([1])
         qng_cost.append(yy)
 
+
+    x = QTensor([0.432, -0.123, 0.543, 0.233],
+                dtype=pyvqnet.kfloat64)
+    qng_model = Hmodel(3, pyvqnet.kcomplex128,x)
+    qng = pyvqnet.qnn.vqc.QNG(qng_model, 0.01,0.1)
+    qng_m_cost = []
+    for s in steps:
+        qng.zero_grad()
+        qng.step(None)
+        yy = qng_model(None).to_numpy().reshape([1])
+        qng_m_cost.append(yy)
+
     x = QTensor([0.432, -0.123, 0.543, 0.233],
                 requires_grad=True,
                 dtype=pyvqnet.kfloat64)
@@ -358,8 +370,7 @@ Circuit-centric quantum classifiers算法示例
 
         sgd_cost.append(y.to_numpy().reshape([1]))
 
-
-    plt.style.use("seaborn")
+    plt.plot(qng_m_cost, "r", label="Quantum natural gradient descent with Momentum")
     plt.plot(qng_cost, "b", label="Quantum natural gradient descent")
     plt.plot(sgd_cost, "g", label="Vanilla gradient descent")
 
@@ -367,6 +378,7 @@ Circuit-centric quantum classifiers算法示例
     plt.xlabel("Optimization steps")
     plt.legend()
     plt.savefig('qng_new_compare.png')
+
 
 
 
@@ -4186,3 +4198,489 @@ Dropout是经典深度神经网络(DNN)的一种常用技术,可防止计算单�
     ## 0.7-0.7  run 0 - epoch 695/700 --- Train cost:0.3922218 --- Test cost:0.2057379
 
 通过在训练时对模型的参数们进行随机dropout方式,能够预防模型的过拟合问题,不过需要对dropout的概率进行合适的设计,不然也会导致模型训练结果不佳。
+
+量子线路玻尔兹曼机
+===================================
+
+
+量子线路玻尔兹曼机（Quantum Circuit Born Machines, QCBMs） 在无监督生成建模中展现出前景，旨在通过纯量子态学习和表示经典数据集的概率分布。由于其高表达能力，它们备受欢迎。玻尔兹曼机利用量子波函数的概率解释，用纯量子态而非热分布（如玻尔兹曼机）来表示概率分布。这使得玻尔兹曼机能够通过对量子比特进行投影测量直接生成样本，提供了比吉布斯采样方法更快的替代方案。
+
+对于一个数据集 :math:`\mathcal{D} = \{x\}` , 包含来自未知目标分布 :math:`\pi(x)` 的独立同分布样本，QCBM 用于生成与目标分布高度相似的样本。QCBM 将输入乘积态 :math:`|\textbf{0} \rangle` 转换为一个参数化量子态 :math:`|\psi_\boldsymbol{\theta}\rangle`。在计算基下测量这个输出态会产生比特样本 :math:`x \sim p_\theta(x)`.
+
+.. math::
+
+   p_\boldsymbol{\theta}(x) = |\langle x | \psi_\boldsymbol{\theta} \rangle|^2.
+
+目标是使模型概率分布 :math:`p_\boldsymbol{\theta}` 与目标分布 :math:`\pi` 对齐。
+
+在本例，我们将使用 VQNet 实现一个基于梯度的 QCBM 算法。我们将描述模型和学习算法，然后将其应用于 :math:`3 \times 3` 条纹和格子数据集以及双高斯峰。
+
+为了训练 QCBM，我们使用平方最大平均差异（MMD）作为损失函数:
+
+.. math::
+
+    \mathcal{L}(\boldsymbol{\theta}) = \left|\sum_{x} p_\boldsymbol{\theta}(x) \phi(x)- \sum_{x} \pi(x) \phi(x)  \right|^2,
+
+其中 :math:`\phi(x)` 将 :math:`x` 映射到一个更大的特征空间。使用核函数 :math:`K(x,y) = \phi(x)^T\phi(y)` 允许我们在一个低维空间中工作。
+我们为此目的使用了径向基函数（RBF）核，其定义为：
+
+.. math::
+
+    K(x,y) = \frac{1}{c}\sum_{i=1}^c \exp \left( \frac{|x-y|^2}{2\sigma_i^2} \right).
+
+这里，:math:`\sigma_i` 是控制高斯核宽度的带宽参数。当且仅当 :math:`p_\boldsymbol{\theta}` 逼近 :math:`\pi` 时，:math:`\mathcal{L}` 逼近于零。
+
+ :math:`K(x,y)` 形式的损失函数如下：
+
+.. math::
+
+    \mathcal{L} = \underset{x, y \sim p_\boldsymbol{\theta}}{\mathbb{E}}[{K(x,y)}]-2\underset{x\sim p_\boldsymbol{\theta},y\sim \pi}{\mathbb{E}}[K(x,y)]+\underset{x, y \sim \pi}{\mathbb{E}}[K(x, y)]
+ 
+
+.. code-block::
+
+    import matplotlib.pyplot as plt
+
+    import numpy as np
+    import pyvqnet
+    from pyvqnet import tensor
+    from pyvqnet.qnn.vqc import VQC_StronglyEntanglingTemplate,QMachine,Probability,QModule
+    from pyvqnet.optim import Adam
+
+    # this definition of MMD, QCBM and QC
+    class MMD:
+        def __init__(self, scales, space):
+            gammas = 1 / (2 * (scales**2))
+            sq_dists = tensor.abs(space.reshape([-1,1]) - space.reshape([1,-1])) ** 2
+            tl = [tensor.exp(-gamma * sq_dists) for gamma in gammas]
+            self.K = sum(tl) / len(scales)
+            self.scales = scales
+
+        def k_expval(self, px, py):
+            # Kernel expectation value
+            d1 = px @ self.K
+    
+            d1 = d1.reshape([d1.shape[0],1,-1])
+            py = py.reshape([py.shape[0],-1,1])
+            d2  = d1 @ py
+            #(b,1,1)
+            return d2.reshape((d2.shape[0],1))
+
+        def __call__(self, px, py):
+            pxy = px - py
+            #(b,2**n)
+            return self.k_expval(pxy, pxy)
+
+
+    
+    class QCBM(QModule):
+
+        def __init__(self, circ, mmd, py):
+            super().__init__()
+            self.circ = circ
+            self.mmd = mmd
+            self.py = py  # target distribution π(x)
+
+
+        def forward(self):
+            px = self.circ()
+            return self.mmd(px, self.py), px
+
+    class QC(QModule):
+        def __init__(self,n_qubits,cir):
+            super().__init__()
+            self.n_qubits = n_qubits
+            self.cir =cir
+            self.qm = QMachine(n_qubits)
+        def forward(self):
+            self.qm.reset_states(1)
+            self.cir(self.qm)
+            p = Probability(range(n_qubits))
+            px = p(self.qm)
+            return px
+
+
+    def get_bars_and_stripes(n):
+        bitstrings = [list(np.binary_repr(i, n))[::-1] for i in range(2**n)]
+        bitstrings = np.array(bitstrings, dtype=int)
+
+        stripes = bitstrings.copy()
+        stripes = np.repeat(stripes, n, 0)
+        stripes = stripes.reshape(2**n, n * n)
+
+        bars = bitstrings.copy()
+        bars = bars.reshape(2**n * n, 1)
+        bars = np.repeat(bars, n, 1)
+        bars = bars.reshape(2**n, n * n)
+        return np.vstack((stripes[0 : stripes.shape[0] - 1], bars[1 : bars.shape[0]]))
+
+
+    n = 3
+    size = n**2
+    data = get_bars_and_stripes(n)
+
+    sample = data[1].reshape(n, n)
+
+
+    #我们计算了有效配置所表示的整数。我们稍后将使用它们来评估 QCBM 的性能。
+    #我们可以计算目标概率分布 :math:\pi(x)，它在下方进行了可视化。
+
+
+    bitstrings = []
+    nums = []
+    for d in data:
+        bitstrings += ["".join(str(int(i)) for i in d)]
+        nums += [int(bitstrings[-1], 2)]
+    print(nums)
+
+    
+    bitstrings = []
+    nums = []
+    for d in data:
+        bitstrings += ["".join(str(int(i)) for i in d)]
+        nums += [int(bitstrings[-1], 2)]
+
+    probs = np.zeros([2**size])
+    probs[nums] = 1 / len(data)
+
+
+    n_qubits = size
+    
+    n_layers = 6
+
+    ser_cir = VQC_StronglyEntanglingTemplate(n_layers,n_qubits)
+
+
+    bandwidth = tensor.QTensor([0.25, 0.5, 1])
+
+    space = tensor.arange(0,2**n_qubits,dtype=pyvqnet.kfloat32)
+
+    mmd = MMD(bandwidth, space)
+    #模型定义
+    qc =QC(n_qubits,ser_cir)
+
+    qcbm = QCBM(qc, mmd, tensor.QTensor(probs,dtype=pyvqnet.kfloat32))
+    #优化器定义
+    opt = Adam(qcbm.parameters(),lr=0.1)
+
+
+    #优化函数
+    def update_step(qmodel):
+        opt.zero_grad()
+        loss_val, qcbm_probs = qmodel()
+        loss_val.backward()
+        opt.step()
+
+        qcbm_probs = qcbm_probs.numpy()
+        py =  qmodel.py.numpy()
+        kl_div = -np.sum(py * np.nan_to_num(np.log(qcbm_probs /py)))
+        return   loss_val, kl_div
+
+
+    history = []
+    divs = []
+
+    #start train with optim and qcbm
+    n_iterations = 100
+
+    for i in range(n_iterations):
+        loss_val, kl_div = update_step(qcbm)
+
+        if i % 10 == 0:
+            print(f"Step: {i} Loss: {loss_val} KL-div: {kl_div}")
+
+        history.append(loss_val.numpy().flatten())
+        divs.append(kl_div)
+
+    
+    # 可视化损失函数以及KL散度
+
+
+    fig, ax = plt.subplots(1, 2, figsize=(12, 5))
+
+    ax[0].plot(history)
+    ax[0].set_xlabel("Iteration")
+    ax[0].set_ylabel("MMD Loss")
+
+    ax[1].plot(divs, color="green")
+    ax[1].set_xlabel("Iteration")
+    ax[1].set_ylabel("KL Divergence")
+    plt.show()
+
+
+    qcbm_probs = qcbm.circ().numpy()
+
+    plt.figure(figsize=(12, 5))
+
+    plt.bar(
+        np.arange(2**size),
+        probs,
+        width=2.0,
+        label=r"$\pi(x)$",
+        alpha=0.4,
+        color="tab:blue",
+    )
+    plt.bar(
+        np.arange(2**size),
+        qcbm_probs.reshape(qcbm_probs.shape[1]),
+        width=2.0,
+        label=r"$p_\theta(x)$",
+        alpha=0.9,
+        color="tab:green",
+    )
+
+    plt.xlabel("Samples")
+    plt.ylabel("Prob. Distribution")
+
+    plt.xticks(nums, bitstrings, rotation=80)
+    plt.legend(loc="upper right")
+    plt.subplots_adjust(bottom=0.3)
+    plt.show()
+
+    Step: 0 Loss: 
+    [[0.0692388]]
+    <QTensor [1, 1] DEV_CPU kfloat32> KL-div: 4.307866096496582
+    Step: 10 Loss: 
+    [[0.0442727]]
+    <QTensor [1, 1] DEV_CPU kfloat32> KL-div: 2.081686496734619
+    Step: 20 Loss: 
+    [[0.0350034]]
+    <QTensor [1, 1] DEV_CPU kfloat32> KL-div: 1.391021490097046
+    Step: 30 Loss: 
+    [[0.0269803]]
+    <QTensor [1, 1] DEV_CPU kfloat32> KL-div: 1.0231478214263916
+    Step: 40 Loss: 
+    [[0.0193367]]
+    <QTensor [1, 1] DEV_CPU kfloat32> KL-div: 0.7527393102645874
+    Step: 50 Loss: 
+    [[0.0114549]]
+    <QTensor [1, 1] DEV_CPU kfloat32> KL-div: 0.5251109600067139
+    Step: 60 Loss: 
+    [[0.0079325]]
+    <QTensor [1, 1] DEV_CPU kfloat32> KL-div: 0.38522785902023315
+    Step: 70 Loss: 
+    [[0.0051147]]
+    <QTensor [1, 1] DEV_CPU kfloat32> KL-div: 0.2812555432319641
+    Step: 80 Loss: 
+    [[0.0036854]]
+    <QTensor [1, 1] DEV_CPU kfloat32> KL-div: 0.22650760412216187
+    Step: 90 Loss: 
+    [[0.0026104]]
+    <QTensor [1, 1] DEV_CPU kfloat32> KL-div: 0.21417859196662903
+
+将目标概率分布与 QCBM 预测结果进行比较，如下图：
+
+.. image:: ./images/qcbm.png
+   :width: 600 px
+   :align: center
+
+|
+
+
+基于QGRU 进行时序数据预测
+===================================
+`论文 <https://ieeexplore.ieee.org/abstract/document/10806779>`__ 实现了一种新型的 QRNN 模型，它可以作为 QRNN 的典型模型。
+其中，量子循环块 (QRB) 以硬件高效的方式构建，并通过交错堆叠 QRB 来构建 QRNN，这可以大大降低算法对量子器件相干时间的要求。
+以下示例基于torch后端（需要安装torch）搭建了一个QGRU模型进行时序数据预测。此外需要下载示例数据 :download:`ba.csv <images/ba.csv>` 到本地。
+
+.. code-block::
+
+    
+    import pyvqnet.qnn.vqc as vqc
+    from pyvqnet.nn import ParameterList,Parameter, ParameterDict
+    import numpy as np
+    from typing import Tuple, List, Iterator
+
+    # 首先使用pyvqnet.vqc的接口构建含参量子逻辑线路的计算部分。
+    def pqc_circuit(q_machine, n_qubits, params, wires):
+        
+        for wire in wires:
+            vqc.hadamard(q_machine, wires=wire)
+
+        for i in range(n_qubits-1):
+            vqc.cnot(q_machine, wires=[wires[i], wires[i+1]])
+        vqc.cnot(q_machine,  wires=[wires[-1], wires[0]])
+
+        if n_qubits == 2:
+            vqc.cnot(q_machine, wires=[1, 0])
+            vqc.cnot(q_machine, wires=[0, 1])
+        else:
+            for i in range(n_qubits):
+                vqc.cnot(q_machine, wires=[wires[(i+2)%n_qubits], wires[i]])
+
+        param_idx = 0
+        for wire in wires:
+            vqc.rx(q_machine,  wires=wire, params = params[param_idx])
+            param_idx += 1
+            vqc.rz(q_machine,  wires=wire, params = params[param_idx])
+            param_idx += 1
+            vqc.rx(q_machine, wires=wire, params = params[param_idx])
+            param_idx += 1
+
+    #接着构建量子qgru线路部分
+    def gru_circuit(q_machine, qubits, encoder_params, pqc_params):
+
+        vqc.ry(q_machine, wires=qubits[1], params = encoder_params)
+        vqc.ry(q_machine, wires=qubits[3] , params = encoder_params)
+        vqc.ry(q_machine,  wires=qubits[6], params = encoder_params)
+
+        pqc_circuit(q_machine, 2, pqc_params['a'], [qubits[1], qubits[2]])
+        pqc_circuit(q_machine,2, pqc_params['b'], [qubits[3], qubits[4]])
+        pqc_circuit(q_machine,2,  pqc_params['c'], [qubits[0], qubits[1]])
+        pqc_circuit(q_machine,2, pqc_params['d'], [qubits[4], qubits[5]])
+        pqc_circuit(q_machine,2, pqc_params['e'], [qubits[5], qubits[6]])
+        pqc_circuit(q_machine, 2, pqc_params['f'], [qubits[2], qubits[5]])
+
+        pqc_circuit(q_machine, 4, pqc_params['g'], [qubits[0], qubits[1], qubits[2], qubits[5]])
+
+    #由于到相邻时刻之间，QGRU 的比特之间有交叉，我们构造一个函数来生成不同时刻 QGRU 所作用的量子比特。注意到对于长度为 x_length 的序列，共需要 4 + 3 * x_length 个量子比特，
+    # 我们先将起始时刻编码隐藏状态的 4 个比特定义为 q_0\sim q_3, 而将其余比特作为 “辅助比特” 不断添加进来。
+
+    def get_apply_qubits(x_length):
+        
+        qubits = []
+        aux_qubits = list(range(4, 4 + 3 * x_length))
+        j = 3  # aux 计数
+        qubits = [[0, 4, 1, 5, 2, 3, 6]]
+
+        for i in range(x_length - 1):
+            tem = [qubits[-1][0], aux_qubits[j], qubits[-1][1], aux_qubits[j+1], 
+                qubits[-1][2], qubits[-1][5], aux_qubits[j+2]]
+            qubits.append(tem)
+            j += 3
+        return qubits
+
+    """完整的 QGRNN 电路"""
+    def qgrnn_circuit(qm, x, pqc_params):
+        
+        x_length = x.shape[1]
+        qubit_sets = get_apply_qubits(x_length)
+        
+        for i in range(x_length):
+            # 每个时间步使用对应的编码参数
+            gru_circuit(qm,qubit_sets[i], 
+                    encoder_params=x[:,i],
+                    pqc_params=pqc_params)
+
+
+    #数据集构建
+    class NumpyDataset:
+        def __init__(self, data: Tuple[np.ndarray, np.ndarray], batch_size: int = 1, shuffle: bool = False):
+            
+            self.x, self.y = data
+            self.batch_size = batch_size
+            self.shuffle = shuffle
+            self.num_samples = len(self.x)
+            self.indices = np.arange(self.num_samples)
+            
+            if self.shuffle:
+                np.random.shuffle(self.indices)
+        
+        def __iter__(self) -> Iterator[Tuple[np.ndarray, np.ndarray]]:
+            self.current = 0
+            return self
+        
+        def __next__(self) -> Tuple[np.ndarray, np.ndarray]:
+            if self.current >= self.num_samples:
+                raise StopIteration
+            
+            end = min(self.current + self.batch_size, self.num_samples)
+            batch_indices = self.indices[self.current:end]
+            
+            batch_x = self.x[batch_indices]
+            batch_y = self.y[batch_indices]
+            
+            self.current = end
+            return batch_x, batch_y
+        
+        def __len__(self) -> int:
+            return (self.num_samples + self.batch_size - 1) // self.batch_size
+
+    def get_dataset_numpy(file_name: str = 'ba', x_length: int = 5, rate: float = 0.8, batch_size: int = 4) -> Tuple[NumpyDataset, NumpyDataset, NumpyDataset]:
+        
+    
+        data = np.loadtxt(f'{file_name}.csv', delimiter=',', skiprows=1, usecols=[4])
+        
+        # 数据标准化到 [-1, 1]
+        min_val, max_val = data.min(), data.max()
+        scaled_data = 2 * ((data - min_val) / (max_val - min_val)) - 1
+        
+        # 创建时间序列样本
+        x, y = [], []
+        size = len(data)
+        for i in range(size - x_length):
+            x.append(scaled_data[i:i + x_length])
+            y.append(scaled_data[i + x_length])
+        
+        x = np.array(x)
+        y = np.array(y).reshape([-1,1])
+        
+        # 划分数据集
+    
+        point1 = int(rate * size)
+        
+        train_data = (x[:point1], y[:point1])
+        
+        test_data = (x[point1:], y[point1:])
+        
+        # 创建数据集对象
+        train_dataset = NumpyDataset(train_data, batch_size=batch_size, shuffle=True)
+        
+        test_dataset = NumpyDataset(test_data, batch_size=8)
+        
+        return train_dataset,   test_dataset
+
+
+    ##################################################
+
+    file_name = 'ba'
+    x_length = 4
+    rate = 0.8
+    batch_size = 16
+    epoch = 1
+    nq = 16
+    train_dataset, test_dataset = get_dataset_numpy(file_name, x_length, rate, batch_size)
+    pqc_params = ParameterDict({
+            'a': Parameter([6]),  # 2-qubit PQC
+            'b': Parameter([6]),
+            'c': Parameter([6]),
+            'd': Parameter([6]),
+            'e': Parameter([6]),
+            'f': Parameter([6]),
+            'g': Parameter([12])  # 4-qubit PQC
+        })
+
+    """
+    接下来，我们装配并训练模型，包括线路、模拟器、哈密顿量、网络层、优化器、损失函数。本文使用 $q_3$ 的期望值作为预测依据，故而将哈密顿量设为了 $Z_3$。
+    """
+    class QM(vqc.QModule):
+        def __init__(self, nq = 4, name=""):
+            super().__init__(name)
+            self.qm = vqc.QMachine(nq)
+            
+            self.pqc_params = pqc_params
+            self.w = Parameter([1])
+            self.ma = vqc.MeasureAll({"Z3":1})
+        def forward(self,x):
+            self.qm.reset_states(x.shape[0]
+            )
+            qgrnn_circuit(self.qm, x, pqc_params)
+            y =self.ma(self.qm)
+            return y*self.w
+    #定义模型
+    model =QM(nq)
+    #模型训练过程
+    from pyvqnet.optim import Adam
+    from pyvqnet.nn import MeanSquaredError
+    from pyvqnet import QTensor,kfloat32
+    mse = MeanSquaredError()
+    optim = Adam(model.parameters())
+    for e in range(epoch):
+        for i, (batch_x, batch_y) in enumerate(train_dataset):
+            optim.zero_grad()
+            pred = model(QTensor(batch_x,dtype=kfloat32))
+            loss = mse(QTensor(batch_y,dtype=kfloat32),pred)
+            loss.backward()
+            optim.step()
+            print("i")
+            print(loss)

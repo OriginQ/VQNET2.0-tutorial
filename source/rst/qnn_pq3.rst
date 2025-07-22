@@ -9,6 +9,8 @@
 量子计算层
 ***********************************
 
+.. _QuantumLayer_pq3:
+
 QuantumLayer
 ============================
 
@@ -329,12 +331,166 @@ QuantumBatchAsyncQcloudLayer
         print(x.grad)
 
 
+QpandaQProgVQCLayer
+============================
+
+.. py:class:: pyvqnet.qnn.pq3.quantumlayer.QuantumLayerAdjoint(pq3_vqc_circuit,param_num,pauli_dicts,dtype = None，name="")
+
+    本类使用 pyqpanda3 的 VQCircuit 接口 https://qcloud.originqc.com.cn/document/qpanda-3/d8/d94/tutorial_variational_quantum_circuit.html，通过伴随法计算量子电路中参数相对于哈密顿量的梯度。
+    
+    本类支持批量输入和多哈密顿量输出。
+
+    .. note::
+
+        使用此接口时，必须使用 VQCircuit 下的逻辑门来构建电路。
+
+        目前支持的逻辑门有限，不支持则会抛出异常。
+
+        输入参数 ``pq3_vqc_circuit`` 只能包含两个参数 `x` 和 `param`，且必须是一维数组或列表。
+
+        在 ``pq3_vqc_circuit`` 函数中，用户必须使用 ``pyqpanda3.vqcircuit.VQCircuit().set_Param`` 自定义如何处理输入和参数。
+
+        此外，用户需要预先在 ``param_num`` 中输入参数的数量。此接口将初始化一个长度为 ``param_num`` 的参数 ``m_para``。
+
+        请参考以下示例。
+
+    :param pq3_vqc_circuit: 自定义 pyqpanda3 VQCircuit 电路。
+    :param param_num: 参数数量。
+    :param pauli_dicts: 预期观测值，可以是列表。
+    :param dtype: 参数类型，kfloat32 或 kfloat64，默认值：None，使用 kfloat32。
+    :param name: 此接口的名称。
+    :return: 返回一个QuantumLayerAdjoint实例
+
+    Example::
+
+        from pyvqnet.qnn.pq3 import QuantumLayerAdjoint
+        from pyvqnet import tensor
+
+        from pyqpanda3.vqcircuit import VQCircuit
+        import pyqpanda3 as pq3
+
+        l = 3
+        n = 7
+        def pqctest(x,param):
+            vqc = VQCircuit()
+            vqc.set_Param([len(param) +len(x)])
+            w_offset = len(x)
+            for j in range(len(x)):
+                vqc << pq3.core.RX(j, vqc.Param([j  ]))
+            for j in range(l):
+                for i in range(n - 1):
+                    vqc << pq3.core.CNOT(i, i + 1)
+                for i in range(n):
+                    vqc << pq3.core.RX(i, vqc.Param([w_offset + 3 * n * j + i]))
+                        
+                    vqc << pq3.core.RZ(i, vqc.Param([w_offset + 3 * n * j + i + n]))
+                    vqc << pq3.core.RY(i, vqc.Param([w_offset + 3 * n * j + i + 2 * n]))
+            
+            return vqc
+
+        Xn_string = ' '.join([f'X{i}' for i in range(n)])
+        pauli_dict  = {Xn_string:1.}
+
+        layer = QuantumLayerAdjoint(pqctest,3*l*n,pauli_dict)
+
+        x = tensor.randn([2,5])
+        x.requires_grad = True
+        y = layer(x)
+        y.backward()
+        print(layer.m_para.grad)
+        print(x.grad)
+
+        Xn_string = ' '.join([f'X{i}' for i in range(n)])
+        Zn_string = ' '.join([f'Z{i}' for i in range(n)])
+        pauli_dict  = {Xn_string:1.,Zn_string:0.5}
+
+        layer = QuantumLayerAdjoint(pqctest,3*l*n,pauli_dict)
+
+        x = tensor.randn([2,5])
+        x.requires_grad = True
+        y = layer(x)
+        y.backward()
+        print(layer.m_para.grad)
+        print(x.grad)
+
+        Xn_string = ' '.join([f'X{i}' for i in range(n)])
+        Zn_string = ' '.join([f'Z{i}' for i in range(n)])
+        pauli_dict  = {Xn_string:1.,Zn_string:0.5}
+
+        layer = QuantumLayerAdjoint(pqctest,3*l*n,pauli_dict)
+
+        x = tensor.randn([1,5])
+        x.requires_grad = True
+        y = layer(x)
+        y.backward()
+        print(layer.m_para.grad)
+        print(x.grad)
+
+        Xn_string = ' '.join([f'X{i}' for i in range(n)])
+        Zn_string = ' '.join([f'Z{i}' for i in range(n)])
+        pauli_dict  = [{Xn_string:1.,Zn_string:0.5},{Xn_string:1.,Zn_string:0.5}]
+
+        layer = QuantumLayerAdjoint(pqctest,3*l*n,pauli_dict)
+
+        x = tensor.randn([1,5])
+        x.requires_grad = True
+        y = layer(x)
+        y.backward()
+        print(layer.m_para.grad)
+        print(x.grad)
+
+        Xn_string = ' '.join([f'X{i}' for i in range(n)])
+        Zn_string = ' '.join([f'Z{i}' for i in range(n)])
+        pauli_dict  = [{Xn_string:1.,Zn_string:0.5},{Xn_string:1.,Zn_string:0.5}]
+
+        layer = QuantumLayerAdjoint(pqctest,3*l*n,pauli_dict)
+
+        x = tensor.randn([2,5])
+        x.requires_grad = True
+        y = layer(x)
+        y.backward()
+        print(layer.m_para.grad)
+        print(x.grad)
+        """
+        [-0.1086438, 0.1805159, 0.2619071,..., 0.1508062, 0.0329617,-0.0043367]
+        <QTensor [63] DEV_CPU kfloat32>
+
+        [[-0.0425088, 0.0187212,-0.0326243, 0.1314874,-0.0729216],
+        [-0.0972663,-0.0371378,-0.0455299,-0.0170686,-0.0328533]]
+        <QTensor [2, 5] DEV_CPU kfloat32>
+
+        [ 0.0706403,-0.1070583, 0.0547093,...,-0.0183769,-0.0742296, 0.0026942]
+        <QTensor [63] DEV_CPU kfloat32>
+
+        [[-0.07577  ,-0.1364278, 0.0220043, 0.0690343, 0.0281384],
+        [ 0.0075356,-0.1627405,-0.0381604, 0.1185545, 0.1409108]]
+        <QTensor [2, 5] DEV_CPU kfloat32>
+
+        [-0.0634308,-0.0128268, 0.0396237,...,-0.0350691,-0.116307 , 0.0164972]
+        <QTensor [63] DEV_CPU kfloat32>
+
+        [[-0.0823639,-0.0418629, 0.0105356, 0.0699336, 0.041226 ]]
+        <QTensor [1, 5] DEV_CPU kfloat32>
+
+        [-0.1281752, 0.0852512, 0.0678721,...,-0.080481 , 0.0202518,-0.0348869]
+        <QTensor [63] DEV_CPU kfloat32>
+
+        [[-0.0339751,-0.0330053,-0.0651799, 0.2171837,-0.1267595]]
+        <QTensor [1, 5] DEV_CPU kfloat32>
+
+        [ 0.305574 , 0.2730191, 0.0605986,...,-0.2138517,-0.2475468, 0.174026 ]
+        <QTensor [63] DEV_CPU kfloat32>
+
+        [[ 0.1867954,-0.0704528,-0.0603823,-0.0123921,-0.0938597],
+        [-0.041001 ,-0.2520995, 0.0683114,-0.0986969, 0.1000023]]
+        <QTensor [2, 5] DEV_CPU kfloat32>
+        """
 
 grad
 ==============
 .. py:function:: pyvqnet.qnn.pq3.quantumlayer.grad(quantum_prog_func, input_params, *args)
 
-    grad 函数提供了一种对用户设计的含参量子线路参数的梯度进行计算的接口。
+    grad 函数提供了一种对用户设计的含参量子线路参数的梯度使用参数漂移法计算的接口。
     用户可按照如下例子,使用pyqpanda设计线路运行函数 ``quantum_prog_func`` ,并作为参数送入grad函数。
     grad函数的第二个参数则是想要计算量子逻辑门参数梯度的坐标。
     返回值的形状为  [num of parameters,num of output]。
@@ -1054,6 +1210,8 @@ HardwareEfficientAnsatz
 .. py:class:: pyvqnet.qnn.pq3.ansatz.HardwareEfficientAnsatz(qubits,single_rot_gate_list,entangle_gate="CNOT",entangle_rules='linear',depth=1)
 
     论文介绍的Hardware Efficient Ansatz的实现: `Hardware-efficient Variational Quantum Eigensolver for Small Molecules <https://arxiv.org/pdf/1704.05018.pdf>`__ 。
+    
+    通过其成员函数 ``create_ansatz`` 返回 `pyqpanda3` 的量子线路。
 
     :param qubits: 量子比特索引。
     :param single_rot_gate_list: 单个量子位旋转门列表由一个或多个作用于每个量子位的旋转门构成。目前支持 Rx、Ry、Rz。
@@ -1088,6 +1246,8 @@ BasicEntanglerTemplate
     CNOT 门环将每个量子位与其邻居连接起来,最后一个量子位被认为是第一个量子位的邻居。
 
     层数 :math:`L` 由参数 ``weights`` 的第一个维度决定。
+
+    通过其成员函数 ``create_circuit`` 返回 `pyqpanda3` 的量子线路。
 
     :param weights: 形状的权重张量 `(L, len(qubits))`。 每个权重都用作量子含参门中的参数。默认值为: ``None`` ,则使用 `(1,1)` 正态分布随机数作为权重。
     :param num_qubits: 量子比特数,默认为1。
@@ -1124,6 +1284,8 @@ StronglyEntanglingTemplate
 
     其包含2-qubit CNOT 门,作用于 :math:`M` 个量子比特上,:math:`i = 1,...,M`。 每个门的第二个量子位标号由公式 :math:`(i+r)\mod M` 给出,其中 :math:`r` 是一个称为 ``range``  的超参数,并且 :math:`0 < r < M`。
 
+    通过其成员函数 ``create_circuit`` 返回 `pyqpanda3` 的量子线路。
+
     :param weights: 形状为 ``(L, M, 3)`` 的权重张量,默认值:None,使用形状为 ``(1,1,3)`` 的随机张量。
     :param num_qubits: 量子比特数,默认值:1。
     :param ranges: 确定每个后续层的范围超参数的序列； 默认值:None,使用 :math:`r=l \ mod M` 作为ranges 的值。
@@ -1157,6 +1319,8 @@ ComplexEntangelingTemplate
 
     由 U3 门和 CNOT 门组成的强纠缠层。
     此线路模板来自以下论文:https://arxiv.org/abs/1804.00633。
+
+    通过其成员函数 ``create_circuit`` 返回 `pyqpanda3` 的量子线路。
 
     :param weights: 参数,[depth,num_qubits,3]的形状
     :param num_qubits: 量子比特数。

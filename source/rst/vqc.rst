@@ -5341,7 +5341,7 @@ model_summary
 QNG
 ---------------------------------------------------------------
 
-.. py:class:: pyvqnet.qnn.vqc.qng.QNG(qmodel, stepsize=0.01)
+.. py:class:: pyvqnet.qnn.vqc.qng.QNG(qmodel, stepsize=0.01，momentum=0)
 
     `量子自然梯度法(Quantum Nature Gradient) <https://arxiv.org/abs/1909.02108>`_ 借鉴经典自然梯度法的概念 `Amari (1998) <https://www.mitpressjournals.org/doi/abs/10.1162/089976698300017746>`__ ,
     我们改为将优化问题视为给定输入的可能输出值的概率分布(即,最大似然估计),则更好的方法是在分布
@@ -5350,7 +5350,7 @@ QNG
     该张量将量子线路参数空间中的最速下降转换为分布空间中的最速下降。
     量子自然梯度的公式如下:
 
-    .. math:: \theta_{t+1} = \theta_t - \eta g^{+}(\theta_t)\nabla \mathcal{L}(\theta),
+    .. math:: \theta_{t+1} = \theta_t + momentum(x^{(t)} - x^{(t-1)}) - \eta g^{+}(\theta_t)\nabla \mathcal{L}(\theta),
 
     其中 :math:`g^{+}` 是伪逆。
 
@@ -5358,6 +5358,7 @@ QNG
 
     :param qmodel: 量子变分线路模型,需要使用 `wrapper_calculate_qng` 作为forward函数的装饰器。
     :param stepsize: 梯度下降法的步长,默认0.01。
+    :param momentum: 动量，默认0.
 
     .. note::
 
@@ -5922,3 +5923,96 @@ wrapper_compile
         # total parameter gates: 11
         # total parameters: 27
         # #################################################
+
+
+QNSPSAOptimizer
+---------------------------------------------------------------
+
+.. py:class:: pyvqnet.qnn.vqc.qng.QNSPSAOptimizer(stepsize=1e-3,regularization=1e-3,finite_diff_step=1e-2,resamplings=1,blocking=True,history_length=5,seed=None)
+
+
+    ​​量子自然 SPSA (QNSPSA) 优化器
+
+    一个用于量子电路的二阶随机优化器，结合了梯度下降和 Fubini-Study 度量张量信息。
+
+    使用对称扰动进行梯度估计​​（类似 SPSA）：
+
+    .. math::
+
+        \begin{equation}
+        \widehat{\nabla f}(\mathbf{x}) \approx \frac{f(\mathbf{x}+\epsilon \mathbf{h})-f(\mathbf{x}-\epsilon \mathbf{h})}{2\epsilon}
+        \end{equation}
+
+    通过状态重叠测量计算 Fubini-Study 度量：
+
+    .. math::
+
+        \begin{equation}
+        \widehat{\mathbf{g}}(\mathbf{x}) \approx \frac{\delta F}{8\epsilon^2}(\mathbf{h}_1\mathbf{h}_2^\intercal + \mathbf{h}_2\mathbf{h}_1^\intercal)
+        \end{equation}
+
+    .. math::
+
+        \begin{equation}
+        \delta F = F(\mathbf{x}+\epsilon\mathbf{h}_1+\epsilon\mathbf{h}_2) - F(\mathbf{x}+\epsilon\mathbf{h}_1) - F(\mathbf{x}-\epsilon\mathbf{h}_1+\epsilon\mathbf{h}_2) + F(\mathbf{x}-\epsilon\mathbf{h}_1)
+        \end{equation}
+
+    其中 δF 测量四个电路的重叠差异评价。
+
+    ​​更新规则​​：
+
+    .. math::
+
+        \begin{equation}
+        \mathbf{x}^{(t+1)} = \mathbf{x}^{(t)} - \eta \widehat{\mathbf{g}}^{-1}(\mathbf{x}^{(t)})\widehat{\nabla f}(\mathbf{x}^{(t)})
+        \end{equation}
+
+    :param stepsize: 用户自定义学习率超参数 :math:`\eta` （默认值：1e-3）
+    :param regularization: 用于 Fubini-Study 度量张量的正则化项 :math:`\beta` ，用于数值稳定性（默认值：1e-3）
+    :param finite_diff_step: 用于计算有限差分梯度和 Fubini-Study 度量张量的步长 :math:`\epsilon` （默认值：1e-2）
+    :param resamplings: 每次参数更新的平均样本数（默认值：1）
+    :param blocking: 当为 True 时，仅接受导致损失值不大于前次损失值之和的更新容差（有助于收敛）（默认值：True）
+    :param history_length: 当 ``blocking`` 为 True 时，容差设置为前几个 ``history_length`` 成本值的平均值（默认值：5）
+    :param seed: 随机采样的种子（默认值：None）
+
+    .. py:method:: step(qmodel, *args, **kwargs)
+
+        使用优化器的更新可训练参数一次。
+
+        :param qmodel: 可训练的量子模型
+        :param args: 用于 qmodel 的可变长度可训练 qtensor。
+        :param kwargs: 用于 qmodel 的可变长度关键字参数。
+
+        :return: 更新后的参数。
+
+
+        Examples::
+
+                from pyvqnet.tensor import QTensor,ones,randu
+                from pyvqnet.qnn.vqc import rx,cry,QMachine,MeasureAll,QModule
+
+                num_qubits = 2
+                class QModuleDemo(QModule):
+                    def __init__(self, name=""):
+                        super().__init__(name)
+                        self.qm = QMachine(num_qubits)
+                        self.ma = MeasureAll({"Z1 Z0":1})
+                    def forward(self,params):
+                        qm = self.qm
+                        qm.reset_states(1)
+                        rx(qm, 0, params[0])
+                        cry(qm, [0, 1], params[1])
+                        return self.ma(qm)
+
+                qmd = QModuleDemo()
+
+                from pyvqnet.qnn.vqc.qnspsa import QNSPSAOptimizer
+                params = QTensor([0.37454012, 0.95071431])
+
+                params.requires_grad = True
+                opt =  QNSPSAOptimizer(stepsize=5e-2,seed=1)
+                for i in range(51):
+                    params = opt.step(qmd, params)
+                    loss =qmd(params)
+                    if i % 10 == 0:
+                        print(f"Step {i}: cost = {loss}")
