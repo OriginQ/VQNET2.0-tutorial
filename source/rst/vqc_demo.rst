@@ -4437,8 +4437,44 @@ Dropout是经典深度神经网络(DNN)的一种常用技术,可防止计算单�
     plt.subplots_adjust(bottom=0.3)
     plt.show()
 
+    Step: 0 Loss: 
+    [[0.0692388]]
+    <QTensor [1, 1] DEV_CPU kfloat32> KL-div: 4.307866096496582
+    Step: 10 Loss: 
+    [[0.0442727]]
+    <QTensor [1, 1] DEV_CPU kfloat32> KL-div: 2.081686496734619
+    Step: 20 Loss: 
+    [[0.0350034]]
+    <QTensor [1, 1] DEV_CPU kfloat32> KL-div: 1.391021490097046
+    Step: 30 Loss: 
+    [[0.0269803]]
+    <QTensor [1, 1] DEV_CPU kfloat32> KL-div: 1.0231478214263916
+    Step: 40 Loss: 
+    [[0.0193367]]
+    <QTensor [1, 1] DEV_CPU kfloat32> KL-div: 0.7527393102645874
+    Step: 50 Loss: 
+    [[0.0114549]]
+    <QTensor [1, 1] DEV_CPU kfloat32> KL-div: 0.5251109600067139
+    Step: 60 Loss: 
+    [[0.0079325]]
+    <QTensor [1, 1] DEV_CPU kfloat32> KL-div: 0.38522785902023315
+    Step: 70 Loss: 
+    [[0.0051147]]
+    <QTensor [1, 1] DEV_CPU kfloat32> KL-div: 0.2812555432319641
+    Step: 80 Loss: 
+    [[0.0036854]]
+    <QTensor [1, 1] DEV_CPU kfloat32> KL-div: 0.22650760412216187
+    Step: 90 Loss: 
+    [[0.0026104]]
+    <QTensor [1, 1] DEV_CPU kfloat32> KL-div: 0.21417859196662903
 
-将目标概率分布与 QCBM 预测结果进行比较，我们可以看到预测结果具有良好的近似性。
+将目标概率分布与 QCBM 预测结果进行比较，如下图：
+
+.. image:: ./images/qcbm.png
+   :width: 600 px
+   :align: center
+
+|
 
 
 基于QGRU 进行时序数据预测
