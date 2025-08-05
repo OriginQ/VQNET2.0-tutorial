@@ -4255,13 +4255,9 @@ MeasureAll
         cnot(q_machine=qm,wires=[0,2])
         rz(q_machine=qm,wires=3,params=x[:,[1]])
         obs_list = [{
-            'wires': [0, 2, 3],
-            'observables': ['X', 'Y', 'Z'],
-            'coefficient': [1, 0.5, 0.4]
+            "Z0 Z1" :2
         }, {
-            'wires': [0, 1, 2],
-            'observables': ['X', 'Y', 'Z'],
-            'coefficient': [1, 0.5, 0.4]
+            "X1 X0" :2
         }]
         ma = MeasureAll(obs = obs_list)
         y = ma(q_machine=qm)
@@ -4665,10 +4661,7 @@ ExpressiveEntanglingAnsatz
                 self._dtype = dtype
                 self.qm = QMachine(num_wires, dtype=dtype,grad_mode=grad_mode)
                 self.c1 = ExpressiveEntanglingAnsatz(1,3,2)
-                self.measure = MeasureAll(obs={
-                    'wires': [1],
-                    'observables': ['z'],
-                    'coefficient': [1]
+                self.measure = MeasureAll(obs={"Z1":1
                 })
 
             def forward(self, x, *args, **kwargs):
@@ -5361,9 +5354,7 @@ QuantumLayerAdjoint
                 self.tlayer = T(wires=1)
                 self.cnot = CNOT(wires=[0, 1])
                 self.measure = MeasureAll(obs={
-                    'wires': [1],
-                    'observables': ['x'],
-                    'coefficient': [1]
+                    "X1":1
                 })
 
             def forward(self, x, *args, **kwargs):
@@ -7855,13 +7846,9 @@ MeasureAll
         cnot(q_machine=qm,wires=[0,2])
         rz(q_machine=qm,wires=3,params=x[:,[1]])
         obs_list = [{
-            'wires': [0, 2, 3],
-            'observables': ['X', 'Y', 'Z'],
-            'coefficient': [1, 0.5, 0.4]
+            "Z0 Z1" :2
         }, {
-            'wires': [0, 1, 2],
-            'observables': ['X', 'Y', 'Z'],
-            'coefficient': [1, 0.5, 0.4]
+            "X1 X0" :2
         }]
         ma = MeasureAll(obs = obs_list)
         y = ma(q_machine=qm)
@@ -8262,9 +8249,7 @@ ExpressiveEntanglingAnsatz
                 self.qm = TNQMachine(num_wires, dtype=dtype)
                 self.c1 = ExpressiveEntanglingAnsatz(1,3,2)
                 self.measure = MeasureAll(obs={
-                    'wires': [1],
-                    'observables': ['z'],
-                    'coefficient': [1]
+                    "Z1":1
                 })
 
             def forward(self, x, *args, **kwargs):

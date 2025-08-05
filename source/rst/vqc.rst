@@ -3429,9 +3429,7 @@ ExpressiveEntanglingAnsatz
                 self.qm = QMachine(num_wires, dtype=dtype,grad_mode=grad_mode,save_ir=True)
                 self.c1 = ExpressiveEntanglingAnsatz(13,3,2)
                 self.measure = MeasureAll(obs = {
-                    'wires': [1],
-                    'observables': ['z'],
-                    'coefficient': [1]
+                    "Z1":1
                 })
 
             def forward(self, x, *args, **kwargs):
@@ -4705,9 +4703,7 @@ QuantumLayerAdjoint
                 self.tlayer = T(wires=1)
                 self.cnot = CNOT(wires=[0, 1])
                 self.measure = MeasureAll(obs = {
-                    'wires': [1],
-                    'observables': ['x'],
-                    'coefficient': [1]
+                    "Z1":1
                 })
 
             def forward(self, x, *args, **kwargs):
@@ -4789,9 +4785,7 @@ QuantumLayerES
                 self.tlayer = T(wires=1)
                 self.cnot = CNOT(wires=[0, 1])
                 self.measure = MeasureAll(obs = {
-                    'wires': [1],
-                    'observables': ['x'],
-                    'coefficient': [1]
+                    "X1":1
                 })
 
             def forward(self, x, *args, **kwargs):
@@ -5106,9 +5100,7 @@ vqc_to_originir_list
                 self.tlayer = T(wires=1)
                 self.cnot = CNOT(wires=[0, 1])
                 self.measure = MeasureAll(obs = {
-                    'wires': [1],
-                    'observables': ['x'],
-                    'coefficient': [1]
+                    "X1":1
                 })
 
             def forward(self, x, *args, **kwargs):
@@ -5479,9 +5471,7 @@ wrapper_single_qubit_op_fuse
                 self.tlayer = T(wires=1)
                 self.cnot = CNOT(wires=[0, 1])
                 self.measure = MeasureAll(obs={
-                    'wires': [1],
-                    'observables': ['x'],
-                    'coefficient': [1]
+                    "X1":1
                 })
 
             @wrapper_single_qubit_op_fuse
@@ -5572,9 +5562,7 @@ wrapper_commute_controlled
                 self.t = T(wires=0)
                 self.rz = RZ(has_params=True, wires=1, dtype=dtype)
                 self.measure = MeasureAll(obs={
-                    'wires': [0],
-                    'observables': ['z'],
-                    'coefficient': [1]
+                    "X1":1
                 })
 
             @partial(wrapper_commute_controlled, direction="left")
@@ -5671,9 +5659,7 @@ wrapper_merge_rotations
                 self.qm = QMachine(num_wires, dtype=dtype)
 
                 self.measure = MeasureAll(obs={
-                    'wires': [0],
-                    'observables': ['z'],
-                    'coefficient': [1]
+                    "X1":1
                 })
 
             @wrapper_merge_rotations
@@ -5772,9 +5758,7 @@ wrapper_compile
                 self.rz = RZ(has_params=True, wires=1, dtype=dtype)
 
                 self.measure = MeasureAll(obs={
-                    'wires': [0],
-                    'observables': ['z'],
-                    'coefficient': [1]
+                    "X1":1
                 })
 
             def forward(self, x, *args, **kwargs):
@@ -5836,9 +5820,7 @@ wrapper_compile
                 self.rz = RZ(has_params=True, wires=1, dtype=dtype)
 
                 self.measure = MeasureAll(obs={
-                    'wires': [0],
-                    'observables': ['z'],
-                    'coefficient': [1]
+                    "X1":1
                 })
 
             @partial(wrapper_compile)

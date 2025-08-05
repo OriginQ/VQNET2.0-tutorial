@@ -3743,9 +3743,7 @@ VQNet当前提供4种方式对用户自定义的变分量子线路中的量子�
             self.rz = RZ(has_params=True, wires=1, dtype=dtype)
 
             self.measure = MeasureAll(obs={
-                'wires': [0],
-                'observables': ['z'],
-                'coefficient': [1]
+                    "Z1":1
             })
 
         def forward(self, x, *args, **kwargs):
