@@ -2867,20 +2867,17 @@ MeasureAll
 
 .. py:class:: pyvqnet.qnn.vqc.MeasureAll(obs, name="")
 
-    计算量子线路的测量结果,支持输入观测量 ``obs`` 为由观测量 `observables`、作用比特 `wires` 、系数 `coefficient` 键值对构成的字典,或者键值对字典列表。
+    计算量子线路的测量结果,支持输入观测量 ``obs``。其格式可以为字典格式，用于表示一个由多个Pauli算符组合而成的可观测量；列表形式,表示多个期望值的可观测量列表。
+ 
     例如:
 
-    {\'wires\': [0,  1], \'observables\': [\'x\', \'i\'],\'coefficient\':[0.23,-3.5]}
-     
-    {\'X0\': 0.23}
-     
-    [{\'wires\': [0, 2, 3],\'observables\': [\'X\', \'Y\', \'Z\'],\'coefficient\': [1, 0.5, 0.4]}, {\'wires\': [0, 1, 2],\'observables\': [\'X\', \'Y\', \'Z\'],\'coefficient\': [1, 0.5, 0.4]}]
-    
-    [{\'X1 Z2 I0\':4,\'Z1 Z0\':3},\{'wires\': [0,  1], \'observables\': [\'x\', \'i\'],\'coefficient\':[0.23,-3.5]}]
+    {\'X0\': 0.23} 表示在量子比特0上作用PauliX,系数为0.23
 
-    {\'X1 Z2 I0\':4,\'Z1 Z0\':3}
+    {\'X1 Z2\':2.4,\'Y2\':-0.5} 对应于观测量 2.4 * X1 @ Z2 - 0.5 * Y2
 
-    :param obs: 测量观测量,可以是单个观测量类包括,或者由观测量、作用比特、系数键值对构成的字典,或者键值对字典列表。
+    [{\'X1 Z2\':4,\'Z1 Z0\':3},{\'X1 Y2 Z0\':3.5}] 对应于两个观测量 4 * X1 @ Z2 + 3 * Z1 @ Z0 以及 3.5 * X1 @ Y2 @ Z0 。
+
+    :param obs: 测量观测量。
     :param name: 模块的名字,默认:""。
 
     .. py:method:: forward(q_machine)
@@ -2917,13 +2914,9 @@ MeasureAll
         
         # list of 2 observables
         obs_list = [{
-            'wires': [0, 2, 3],
-            'observables': ['X', 'Y', 'Z'],
-            'coefficient': [1, 0.5, 0.4]
+           "Z0 X1":2
         }, {
-            'wires': [0, 1, 2],
-            'observables': ['X', 'Y', 'Z'],
-            'coefficient': [1, 0.5, 0.4]
+           "Z2 Y1":2
         }]
 
         ma = MeasureAll(obs = obs_list)
@@ -2932,9 +2925,7 @@ MeasureAll
         
         #return QTensor of [batch_size,len(obs)]
         print(y)
-
-        # [[0.4000001 0.3980018]
-        #  [0.4000001 0.3980018]]
+ 
 
 
 Samples

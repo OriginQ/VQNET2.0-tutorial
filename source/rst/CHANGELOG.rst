@@ -16,7 +16,7 @@ Added
 Changed
 ===================
 - Linear层实现从 :math:`y = Ax + b` 变为 :math:`y = x@A.T + b`
-- CPU下的MeasureAll接口优化；
+- MeasureAll接口参数 `obs` 修改；
 
 
 Fixed
