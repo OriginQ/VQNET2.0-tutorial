@@ -4906,12 +4906,13 @@ RowParallelLinear
 =================================
 
 量子比特重排序技术是比特并行中的技术，其核心是通过改变比特并行过程中量子逻辑门的排列顺序，减少比特并行中需要执行比特变换的次数，以下是基于比特并行构建大比特量子线路时需要的模块。参照论文 `Lazy Qubit Reordering for Accelerating Parallel State-Vector-based Quantum Circuit Simulation <https://export.arxiv.org/abs/2410.04252>`__ 。
+以下接口需要通过 `mpi` 启动多个进程进行计算。
 
 DistributeQMachine
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 .. py:class:: pyvqnet.distributed.qubits_reorder.DistributeQMachine(num_wires,dtype,grad_mode)
 
-    用于比特并行中的变分量子计算的模拟类， 包含的states是比特并行中的量子线路的初态。
+    用于比特并行中的变分量子计算的模拟类，包含每个节点包含的部分比特上的量子态。通过MPI,每个节点都申请一个该类，进行分布式的量子变分线路模拟，N的值必须等于2的分布式并行的比特个数 `global_qubit` 的幂次方，可通过 `set_qr_config` 进行配置。
 
     :param num_wires: 完整量子线路的比特的数量。
     :param dtype: 计算数据的数据类型。默认是 pyvqnet.kcomplex64，对应的参数精度是 pyvqnet.kfloat32。
@@ -4924,7 +4925,13 @@ DistributeQMachine
 
     .. warning::
 
-        必须对 ``DistributeQMachine`` 中比特并行中参数进行配置， 如样例中所示。
+        必须对 ``DistributeQMachine`` 中比特并行中参数进行配置， 如样例中所示，包括：
+        
+        .. code-block::
+
+            qm.set_just_defined(True)
+            qm.set_save_op_history_flag(True) # open save op
+            qm.set_qr_config({'qubit': 总比特个数, 'global_qubit': 分布式比特个数})
 
     Examples::
 
@@ -4949,7 +4956,7 @@ DistributeQMachine
                 
                 self.qm.set_just_defined(True)
                 self.qm.set_save_op_history_flag(True) # open save op
-                self.qm.set_qubit_reordered({"qubit": num_wires, # open qubit reordered, set config
+                self.qm.set_qr_config({"qubit": num_wires, # open qubit reordered, set config
                                         "global_qubit": 1}) # global_qubit == log2(nproc)
                 
                 self.params = pyvqnet.nn.Parameter([qubit])
@@ -5001,7 +5008,7 @@ DistQuantumLayerAdjoint
 
     .. note::
 
-        输入的vqc_module模块必须包含 ``DistributeQMachine``， 基于 ``DistributeQMachine`` 进行比特并行下的adjoint反传梯度计算，样例如下。
+        输入的vqc_module模块必须包含 ``DistributeQMachine``， 基于 ``DistributeQMachine`` 进行比特并行下的adjoint反传梯度计算。
 
     Examples::
 
@@ -5026,7 +5033,7 @@ DistQuantumLayerAdjoint
                 
                 self.qm.set_just_defined(True)
                 self.qm.set_save_op_history_flag(True) # open save op
-                self.qm.set_qubit_reordered({"qubit": num_wires, # open qubit reordered, set config
+                self.qm.set_qr_config({"qubit": num_wires, # open qubit reordered, set config
                                             "global_qubit": 1}) # global_qubit == log2(nproc)
                 
                 self.params = pyvqnet.nn.Parameter([qubit])
