@@ -3833,19 +3833,7 @@ CommController
             # vqnetrun -n 2 python test.py 
 
  
-    .. py:method:: ncclSplitGroup(rankL)
-        
-        用于划分gpu上的通信组。
 
-        :param rankL: 进程组列表。
-
-        Examples::
-
-            from pyvqnet.distributed import CommController
-            Comm_OP = CommController("nccl")
-            
-            Comm_OP.ncclSplitGroup([[0, 1]])
-            # vqnetrun -n 2 python test.py 
 
  
     .. py:method:: barrier()
@@ -3862,18 +3850,19 @@ CommController
             Comm_OP.barrier()
 
 
-    .. py:method:: GetDeviceNum()
+    .. py:method:: get_device_num()
         
         用于获得当前节点上的显卡数量, (仅支持gpu下使用)。
 
         :return: 返回当前节点上显卡数量。
-
+        
         Examples::
+
 
             from pyvqnet.distributed import CommController
             Comm_OP = CommController("nccl")
             
-            Comm_OP.GetDeviceNum()
+            Comm_OP.get_device_num()
             # python test.py
 
 
@@ -4018,14 +4007,34 @@ CommController
             
             # vqnetrun -n 2 python test.py
 
+    .. py:method:: split_group(rankL)
+        
+        根据入参设置的进程号列表用于划分多个通信组。
 
+        :param rankL: 进程组序号列表。
+
+        :return: 当后端为 `nccl` 返回的是进程组序号元组，当后端为 `mpi` 返回分组的MPI通信组。
+
+        Examples::
+            
+            from pyvqnet.distributed import CommController,get_rank,get_local_rank
+            from pyvqnet.tensor import tensor
+            import numpy as np
+            Comm_OP = CommController("mpi")
+
+            groups = Comm_OP.split_group([[0, 1],[2,3]])
+            print(groups)
+            #[[<mpi4py.MPI.Intracomm object at 0x7f53691f3230>, [0, 3]], [<mpi4py.MPI.Intracomm object at 0x7f53691f3010>, [2, 1]]]
+
+            # mpirun -n 4 python test.py
+        
     .. py:method:: allreduce_group(tensor, c_op = "avg", GroupComm = None)
         
         组内allreduce通信接口。
 
         :param tensor: 输入数据.
         :param c_op: 计算方法.
-        :param GroupComm: 通信组, 仅mpi进行组内通信时需要.
+        :param GroupComm: 通信组.
 
         Examples::
 
@@ -4034,13 +4043,13 @@ CommController
             import numpy as np
             Comm_OP = CommController("nccl")
 
-            Comm_OP.ncclSplitGroup([[0, 1]])
+            groups = Comm_OP.split_group([[0, 1]])
 
             complex_data = tensor.QTensor([3+1j, 2, 1 + get_rank()],dtype=8).reshape((3,1)).toGPU(1000+ get_local_rank())
 
             print(f"allreduce_group before rank {get_rank()}: {complex_data}")
 
-            Comm_OP.allreduce_group(complex_data, c_op="sum")
+            Comm_OP.allreduce_group(complex_data, c_op="sum",group = groups[0])
             print(f"allreduce_group after rank {get_rank()}: {complex_data}")
             # vqnetrun -n 2 python test.py
 
@@ -4051,7 +4060,7 @@ CommController
         :param tensor: 输入数据.
         :param root: 指定进程号.
         :param c_op: 计算方法.
-        :param GroupComm: 通信组, 仅mpi进行组内通信时需要.
+        :param GroupComm: 通信组.
 
         Examples::
             
@@ -4060,13 +4069,13 @@ CommController
             import numpy as np
             Comm_OP = CommController("nccl")
 
-            Comm_OP.ncclSplitGroup([[0, 1]])
+            groups = Comm_OP.split_group([[0, 1]])
 
             complex_data = tensor.QTensor([3+1j, 2, 1 + get_rank()],dtype=8).reshape((3,1)).toGPU(1000+ get_local_rank())
 
             print(f"reduce_group before rank {get_rank()}: {complex_data}")
 
-            Comm_OP.reduce_group(complex_data, c_op="sum")
+            Comm_OP.reduce_group(complex_data, c_op="sum",group = groups[0])
             print(f"reduce_group after rank {get_rank()}: {complex_data}")
             # vqnetrun -n 2 python test.py
 
@@ -4076,8 +4085,8 @@ CommController
         组内broadcast通信接口。
 
         :param tensor: 输入数据.
-        :param root: 指定进程号.
-        :param GroupComm: 通信组, 仅mpi进行组内通信时需要.
+        :param root: 指定从哪个进程号广播， 默认为0.
+        :param GroupComm: 通信组.
 
         Examples::
             
@@ -4086,13 +4095,13 @@ CommController
             import numpy as np
             Comm_OP = CommController("nccl")
 
-            Comm_OP.ncclSplitGroup([[0, 1]])
+            groups = Comm_OP.split_group([[0, 1]])
 
             complex_data = tensor.QTensor([3+1j, 2, 1 + get_rank()],dtype=8).reshape((3,1)).toGPU(1000+ get_local_rank())
 
             print(f"broadcast_group before rank {get_rank()}: {complex_data}")
 
-            Comm_OP.broadcast_group(complex_data)
+            Comm_OP.broadcast_group(complex_data,group = groups[0])
             Comm_OP.barrier()
             print(f"broadcast_group after rank {get_rank()}: {complex_data}")
             # vqnetrun -n 2 python test.py
@@ -4103,7 +4112,7 @@ CommController
         组内allgather通信接口。
 
         :param tensor: 输入数据.
-        :param GroupComm: 通信组, 仅mpi进行组内通信时需要.
+        :param GroupComm: 通信组.
 
         Examples::
             
@@ -4125,10 +4134,10 @@ CommController
             from pyvqnet.distributed import CommController,get_rank,get_local_rank
             from pyvqnet.tensor import tensor
             Comm_OP = CommController("nccl")
-            Comm_OP.ncclSplitGroup([[0, 1]])
+            groups = Comm_OP.split_group([[0, 1]])
             complex_data = tensor.QTensor([3+1j, 2, 1 + get_rank()],dtype=8).reshape((3,1)).toGPU(1000+ get_local_rank())
             print(f" before rank {get_rank()}: {complex_data}")
-            complex_data = Comm_OP.all_gather_group(complex_data)
+            complex_data = Comm_OP.all_gather_group(complex_data, group = groups[0])
             print(f"after rank {get_rank()}: {complex_data}")
             # mpirun -n 2 python test.py
 
