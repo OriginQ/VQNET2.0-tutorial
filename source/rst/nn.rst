@@ -1823,7 +1823,7 @@ Interpolate
     Example::
 
         from pyvqnet.nn import Interpolate
-        from pyvqnet.tensor import tensor 
+        from pyvqnet.tensor import tensor
         import pyvqnet
         pyvqnet.utils.set_random_seed(1)
 
@@ -1834,24 +1834,25 @@ Interpolate
         mode_ = "bilinear"
         size_ = 3
 
-        class model_vqnet(pyvqnet.nn.Module):
+        class Model(pyvqnet.nn.Module):
 
             def __init__(self):
                 super().__init__()
                 self.inter = Interpolate(size = size_, mode=mode_)
                 self.ln = pyvqnet.nn.Linear(9, 1)
-                
+
             def forward(self, x):
                 x = self.inter(x).reshape((1,-1))
                 x = self.ln(x)
-                return 2 * x 
+                return 2 * x
 
         input_vqnet = tensor.QTensor(np_,  dtype=pyvqnet.kfloat32, requires_grad=True)
         loss_pyvqnet = pyvqnet.nn.MeanSquaredError()
+        model_vqnet = Model()
         output_vqnet = model_vqnet(input_vqnet)
         l = loss_pyvqnet(tensor.QTensor([[1.0]]), output_vqnet)
         l.backward()
-        print(model.parameters()[0].grad)
+        print(model_vqnet.parameters()[0].grad)
 
 
 fuse_module
@@ -2300,7 +2301,8 @@ CrossEntropyLoss
 
     Example::
 
-        from pyvqnet.tensor import QTensor, kint64
+        from pyvqnet.tensor import QTensor
+        from pyvqnet import kint64
         from pyvqnet.nn import CrossEntropyLoss
         x = QTensor([
             0.9476322568516703, 0.226547421131723, 0.5944201443911326,
@@ -3766,7 +3768,7 @@ h
 CommController
 =================================
 
-.. py:class:: pyvqnet.distributed.ControllComm.CommController(backend,rank=None,world_size=None)
+.. py:class:: pyvqnet.distributed.ControlComm.CommController(backend,rank=None,world_size=None)
 
     CommController用于控制在cpu、gpu下数据通信的控制器, 通过设置参数 `backend` 来生成cpu(mpi)、gpu(nccl)的控制器。(目前分布式计算的功能仅支持linux操作系系统下使用)
 
@@ -4028,13 +4030,14 @@ CommController
 
             # mpirun -n 4 python test.py
         
-    .. py:method:: allreduce_group(tensor, c_op = "avg", GroupComm = None)
+    .. py:method:: allreduce_group(tensor, c_op = "avg", group = None)
         
         组内allreduce通信接口。
 
         :param tensor: 输入数据.
         :param c_op: 计算方法.
-        :param GroupComm: 通信组.
+        :param group: 当使用mpi后端时候，输入由 `init_group` 或 `split_group` 生成的组对应通信组，当使用nccl后端时候输入`split_group` 生成的组序号。
+
 
         Examples::
 
@@ -4053,14 +4056,15 @@ CommController
             print(f"allreduce_group after rank {get_rank()}: {complex_data}")
             # vqnetrun -n 2 python test.py
 
-    .. py:method:: reduce_group(tensor, root = 0, c_op = "avg", GroupComm = None)
+    .. py:method:: reduce_group(tensor, root = 0, c_op = "avg", group = None)
         
         组内reduce通信接口。
 
         :param tensor: 输入数据.
         :param root: 指定进程号.
         :param c_op: 计算方法.
-        :param GroupComm: 通信组.
+        :param group: 当使用mpi后端时候，输入由 `init_group` 或 `split_group` 生成的组对应通信组，当使用nccl后端时候输入`split_group` 生成的组序号。
+
 
         Examples::
             
@@ -4080,13 +4084,14 @@ CommController
             # vqnetrun -n 2 python test.py
 
  
-    .. py:method:: broadcast_group(tensor, root = 0, GroupComm = None)
+    .. py:method:: broadcast_group(tensor, root = 0, group = None)
         
         组内broadcast通信接口。
 
         :param tensor: 输入数据.
         :param root: 指定从哪个进程号广播， 默认为0.
-        :param GroupComm: 通信组.
+        :param group: 当使用mpi后端时候，输入由 `init_group` 或 `split_group` 生成的组对应通信组，当使用nccl后端时候输入`split_group` 生成的组序号。
+
 
         Examples::
             
@@ -4107,12 +4112,13 @@ CommController
             # vqnetrun -n 2 python test.py
 
  
-    .. py:method:: allgather_group(tensor, GroupComm = None)
+    .. py:method:: allgather_group(tensor, group = None)
         
         组内allgather通信接口。
 
         :param tensor: 输入数据.
-        :param GroupComm: 通信组.
+        :param group: 当使用mpi后端时候，输入由 `init_group` 或 `split_group` 生成的组对应通信组，当使用nccl后端时候输入`split_group` 生成的组序号。
+
 
         Examples::
             
@@ -4173,7 +4179,7 @@ get_local_rank
 =================================
 
 
-.. py:function:: pyvqnet.distributed.ControllComm.get_local_rank()
+.. py:function:: pyvqnet.distributed.ControlComm.get_local_rank()
 
     得到当前节点上进程号。例如你在第2个节点的第3个进程,每个节点5个进程,则返回2。
 
@@ -4181,7 +4187,7 @@ get_local_rank
 
     Example::
 
-        from pyvqnet.distributed.ControllComm import get_local_rank
+        from pyvqnet.distributed.ControlComm import get_local_rank
 
         print(get_local_rank())
         # vqnetrun -n 2 python test.py
@@ -4189,7 +4195,7 @@ get_local_rank
 get_rank
 =================================
 
-.. py:function:: pyvqnet.distributed.ControllComm.get_rank()
+.. py:function:: pyvqnet.distributed.ControlComm.get_rank()
 
     用于获得当前进程的全局进程号。例如你在第2个节点的第3个进程,每个节点5个进程,则返回7。
 
@@ -4197,7 +4203,7 @@ get_rank
 
     Example::
 
-        from pyvqnet.distributed.ControllComm import get_rank
+        from pyvqnet.distributed.ControlComm import get_rank
 
         print(get_rank())
         # vqnetrun -n 2 python test.py
@@ -4206,9 +4212,9 @@ init_group
 =================================
 
 
-.. py:function:: pyvqnet.distributed.ControllComm.init_group(rank_lists)
+.. py:function:: pyvqnet.distributed.ControlComm.init_group(rank_lists)
 
-    根据给出的进程数列表来对基于cpu下的进程组进行初始化。
+    根据给出的进程数列表来对基于 `mpi`后端的进程组进行初始化。
 
     :param rank_lists: 通信进程组列表.
     :return: 初始化后的进程组列表。
@@ -4225,7 +4231,7 @@ init_group
 
         for comm_ in group_l:
             if Comm_OP.getRank() in comm_[1]:
-                Comm_OP.allreduce_group(num, "sum", GroupComm = comm_[0])
+                Comm_OP.allreduce_group(num, "sum", group = comm_[0])
                 print(f"rank {Comm_OP.getRank()}  {num} after")
         
         # vqnetrun -n 3 python test.py
@@ -4925,6 +4931,8 @@ DistributeQMachine
 
     .. warning::
 
+        该接口只支持在Linux下运行；
+
         必须对 ``DistributeQMachine`` 中比特并行中参数进行配置， 如样例中所示，包括：
         
         .. code-block::
@@ -5010,6 +5018,10 @@ DistQuantumLayerAdjoint
 
         输入的vqc_module模块必须包含 ``DistributeQMachine``， 基于 ``DistributeQMachine`` 进行比特并行下的adjoint反传梯度计算。
 
+    .. warning::
+
+        该接口只支持在Linux下运行；
+        
     Examples::
 
         from pyvqnet.distributed import get_rank

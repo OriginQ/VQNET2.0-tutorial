@@ -448,7 +448,7 @@ Circuit-centric quantum classifiers算法示例
         custom data map function
         """
         coeff = x[0] if x.shape[0] == 1 else ft.reduce(lambda m, n: m * n, x)
-        return coeff
+        return coeff.reshape([1])
 
     def vqnet_quantum_kernel(X_1, X_2=None):
 

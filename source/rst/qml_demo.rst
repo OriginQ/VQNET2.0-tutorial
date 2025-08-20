@@ -1677,6 +1677,7 @@ Quantum circuit structure learning任务的核心目标就是找到最优的带�
 
 .. code-block::
 
+    from pyvqnet.native.backprop_utils import AutoGradNode
     #量子计算层的前传和梯度计算函数的定义,其需要继承于抽象类Module
     class Hybrid(Module):
         """ Hybrid quantum - Quantum layer definition """
@@ -1706,7 +1707,7 @@ Quantum circuit structure learning任务的核心目标就是找到最优的带�
 
             nodes = []
             if input.requires_grad:
-                nodes.append(QTensor.GraphNode(tensor=input, df=lambda g: _backward(g, input)))
+                nodes.append(QTensor.AutoGradNode(tensor=input, df=lambda g: _backward(g, input)))
             return QTensor(data=result, requires_grad=requires_grad, nodes=nodes)
 
     #模型定义

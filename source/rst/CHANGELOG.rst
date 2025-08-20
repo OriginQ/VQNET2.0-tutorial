@@ -18,7 +18,7 @@ Changed
 ===================
 - Linear层实现从 :math:`y = Ax + b` 变为 :math:`y = x@A.T + b`
 - MeasureAll接口参数 `obs` 修改；
-
+- 删除 `QuantumLayerES` 接口。
 
 Fixed
 ===================

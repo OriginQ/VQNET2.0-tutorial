@@ -8869,7 +8869,7 @@ vqc_basisrotation
 CommController
 -------------------------
 
-.. py:class:: pyvqnet.distributed.ControllComm.CommController(backend,rank=None,world_size=None)
+.. py:class:: pyvqnet.distributed.ControlComm.CommController(backend,rank=None,world_size=None)
 
     CommController用于控制在cpu、gpu下数据通信的控制器, 通过设置参数 `backend` 来生成cpu(gloo)、gpu(nccl)的控制器。
     这个类会调用 backend,rank,world_size 初始化 ``torch.distributed.init_process_group(backend,rank,world_size)``
@@ -8964,7 +8964,7 @@ CommController
 
         Examples::
 
-                        from pyvqnet.distributed import CommController
+            from pyvqnet.distributed import CommController
             import pyvqnet
             pyvqnet.backends.set_backend("torch")
             import os
@@ -9045,8 +9045,10 @@ CommController
 
         Examples::
 
-            from pyvqnet.distributed import CommController
+            from pyvqnet.distributed import get_local_rank,CommController,init_group
             import pyvqnet
+            import numpy as np
+            from pyvqnet.tensor import tensor
             pyvqnet.backends.set_backend("torch")
             import os
             import multiprocessing as mp
@@ -9057,11 +9059,16 @@ CommController
                 os.environ['MASTER_ADDR'] = '127.0.0.1'
                 os.environ['MASTER_PORT'] = '29500'
                 os.environ['LOCAL_RANK'] = f"{rank}"
-                pp = CommController("gloo", rank=rank, world_size=size)
-                
-                local_rank = pp.split_group([[0,1],[2,3]])
-                print(local_rank )
+                Comm_OP = CommController("gloo", rank=rank, world_size=size)
 
+                group = Comm_OP.split_group([[1,3]])
+
+                num = tensor.to_tensor(np.random.rand(1, 5)+get_local_rank()*10)
+                print(f"before rank {Comm_OP.getRank()}  {num}\n")
+                
+                Comm_OP.reduce_group(num, 1,"sum",group[0])
+                print(f"after rank {Comm_OP.getRank()}  {num}\n")
+                
 
             if __name__ == "__main__":
                 world_size = 4
@@ -9398,13 +9405,13 @@ CommController
                     p.join()
             
 
-    .. py:method:: allreduce_group(tensor, c_op = "avg", GroupComm = None)
+    .. py:method:: allreduce_group(tensor, c_op = "avg", group = None)
         
         组内allreduce通信接口。
 
         :param tensor: 输入数据.
         :param c_op: 计算方法.
-        :param GroupComm: 通信组, 仅mpi进行组内通信时需要.
+        :param group: 通信组.
 
         Examples::
 
@@ -9424,22 +9431,19 @@ CommController
                 os.environ['LOCAL_RANK'] = f"{rank}"
                 Comm_OP = CommController("gloo", rank=rank, world_size=size)
 
-            
-                groups = Comm_OP.split_group([[0,2],[1,3]])
+
+                groups = Comm_OP.split_group([[0,1]])
                 num = tensor.to_tensor(np.random.rand(1, 5)+get_local_rank()*1000)
+                num = num.to(pyvqnet.DEV_GPU_0+get_local_rank())
                 print(f"rank {Comm_OP.getRank()}  {num}")
 
-                Comm_OP.all_reduce_group(num, "sum",groups[0])
+                Comm_OP.all_reduce_group(num, "sum", groups[0])
 
                 print(f"rank {Comm_OP.getRank()}  {num}")
-                num = tensor.to_tensor(np.random.rand(1, 5)-get_local_rank()*100)
-                print(f"rank {Comm_OP.getRank()}  {num}")
 
-                Comm_OP.all_reduce_group(num, "sum",groups[0])
-                print(f"rank {Comm_OP.getRank()}  {num}")
 
             if __name__ == "__main__":
-                world_size = 4
+                world_size = 2
                 mp.set_start_method("spawn")
                 processes = []
                 for rank in range(world_size):
@@ -9451,14 +9455,14 @@ CommController
                     p.join()
  
 
-    .. py:method:: reduce_group(tensor, root = 0, c_op = "avg", GroupComm = None)
+    .. py:method:: reduce_group(tensor, root = 0, c_op = "avg", group = None)
         
         组内reduce通信接口。
 
         :param tensor: 输入数据.
         :param root: 指定进程号.
         :param c_op: 计算方法.
-        :param GroupComm: 通信组, 仅mpi进行组内通信时需要.
+        :param group: 通信组.
 
         Examples::
             
@@ -9478,12 +9482,12 @@ CommController
                 os.environ['LOCAL_RANK'] = f"{rank}"
                 Comm_OP = CommController("gloo", rank=rank, world_size=size)
 
-                group = Comm_OP.split_group([1,3])
+                group = Comm_OP.split_group([[1,3]])
 
                 num = tensor.to_tensor(np.random.rand(1, 5)+get_local_rank()*10)
                 print(f"before rank {Comm_OP.getRank()}  {num}\n")
                 
-                Comm_OP.reduce_group(num, 1,"sum",group)
+                Comm_OP.reduce_group(num, 1,"sum",group[0])
                 print(f"after rank {Comm_OP.getRank()}  {num}\n")
                 
 
@@ -9501,13 +9505,13 @@ CommController
             
 
  
-    .. py:method:: broadcast_group(tensor, root = 0, GroupComm = None)
+    .. py:method:: broadcast_group(tensor, root = 0, group = None)
         
         组内broadcast通信接口。
 
         :param tensor: 输入数据.
         :param root: 指定进程号.
-        :param GroupComm: 通信组, 仅mpi进行组内通信时需要.
+        :param group: 通信组.
 
         Examples::
             
@@ -9527,12 +9531,12 @@ CommController
                 os.environ['LOCAL_RANK'] = f"{rank}"
                 Comm_OP = CommController("gloo", rank=rank, world_size=size)
 
-                group = Comm_OP.split_group([2,3])
+                group = Comm_OP.split_group([[2,3]])
 
                 num = tensor.to_tensor(np.random.rand(1, 5))+ rank*1000
                 print(f"before rank {Comm_OP.getRank()}  {num}")
                 
-                Comm_OP.broadcast_group(num, 2,group)
+                Comm_OP.broadcast_group(num, 2,group[0])
                 print(f"after rank {Comm_OP.getRank()}  {num}")
                 
 
@@ -9550,12 +9554,12 @@ CommController
             
 
  
-    .. py:method:: allgather_group(tensor, GroupComm = None)
+    .. py:method:: allgather_group(tensor, group = None)
         
         组内allgather通信接口。
 
         :param tensor: 输入数据.
-        :param GroupComm: 通信组, 仅mpi进行组内通信时需要.
+        :param group: 通信组.
 
         Examples::
             
@@ -9573,33 +9577,20 @@ CommController
                 os.environ['MASTER_ADDR'] = '127.0.0.1'
                 os.environ['MASTER_PORT'] = '29500'
                 os.environ['LOCAL_RANK'] = f"{rank}"
-                Comm_OP = CommController("gloo", rank=rank, world_size=size)
+                Comm_OP = CommController("nccl", rank=rank, world_size=size)
 
-                group = Comm_OP.split_group([0,2])
+                group = Comm_OP.split_group([[0,1]])
                 print(f"get_world_size {get_world_size()}")
 
-                num = tensor.QTensor(np.random.rand(5,4)+get_local_rank()*100)
+                num = tensor.QTensor(np.random.rand(5,4)+get_local_rank()*100,device=pyvqnet.DEV_GPU_0+get_local_rank())
                 print(f"before rank {Comm_OP.getRank()}  {num}\n")
 
-                num = Comm_OP.all_gather_group(num,group)
-                print(f"after rank {Comm_OP.getRank()}  {num}\n")
-
-
-                num = tensor.QTensor(np.random.rand(5)+get_local_rank()*100)
-                print(f"before rank {Comm_OP.getRank()}  {num}\n")
-
-                num = Comm_OP.all_gather_group(num,group)
-                print(f"after rank {Comm_OP.getRank()}  {num}\n")
-
-                num = tensor.QTensor(np.random.rand(3,5,4)+get_local_rank()*100)
-                print(f"before rank {Comm_OP.getRank()}  {num}\n")
-
-                num = Comm_OP.all_gather_group(num,group)
+                num = Comm_OP.all_gather_group(num,group[0])
                 print(f"after rank {Comm_OP.getRank()}  {num}\n")
 
 
             if __name__ == "__main__":
-                world_size = 3
+                world_size = 2
                 processes = []
                 mp.set_start_method("spawn")
                 for rank in range(world_size):
@@ -9609,5 +9600,4 @@ CommController
 
                 for p in processes:
                     p.join()
-            
 
