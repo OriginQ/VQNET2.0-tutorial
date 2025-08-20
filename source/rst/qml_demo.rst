@@ -1707,7 +1707,7 @@ Quantum circuit structure learning任务的核心目标就是找到最优的带�
 
             nodes = []
             if input.requires_grad:
-                nodes.append(QTensor.AutoGradNode(tensor=input, df=lambda g: _backward(g, input)))
+                nodes.append(AutoGradNode(tensor=input, df=lambda g: _backward(g, input)))
             return QTensor(data=result, requires_grad=requires_grad, nodes=nodes)
 
     #模型定义
