@@ -331,7 +331,7 @@ QuantumBatchAsyncQcloudLayer
         print(x.grad)
 
 
-QpandaQProgVQCLayer
+QuantumLayerAdjoint
 ============================
 
 .. py:class:: pyvqnet.qnn.pq3.quantumlayer.QuantumLayerAdjoint(pq3_vqc_circuit,param_num,pauli_dicts,dtype = None，name="")
