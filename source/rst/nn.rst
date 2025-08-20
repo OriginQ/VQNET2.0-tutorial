@@ -4015,7 +4015,7 @@ CommController
 
         :param rankL: 进程组序号列表。
 
-        :return: 当后端为 `nccl` 返回的是进程组序号元组，当后端为 `mpi` 返回分组的MPI通信组。
+        :return: 当后端为 `nccl` 返回的是进程组序号元组，当后端为 `mpi` 返回一个列表，其长度等于分组个数；每个元素是二元组 (comm, rank)，其中 comm 为该分组的 MPI 通信器，rank 为组内序号。
 
         Examples::
             
@@ -4214,10 +4214,14 @@ init_group
 
 .. py:function:: pyvqnet.distributed.ControlComm.init_group(rank_lists)
 
-    根据给出的进程数列表来对基于 `mpi`后端的进程组进行初始化。
+    根据给出的进程数列表来对基于 `mpi` 后端的进程组进行初始化。
+
+    .. warning::
+
+        该接口只支持分布式后端为 `mpi` 。
 
     :param rank_lists: 通信进程组列表.
-    :return: 初始化后的进程组列表。
+    :return: 返回一个列表，其长度等于分组个数；每个元素是二元组 (comm, rank)，其中 comm 为该分组的 MPI 通信器，rank 为组内序号。
 
     Example::
 
