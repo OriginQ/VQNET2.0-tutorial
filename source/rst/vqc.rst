@@ -4640,7 +4640,7 @@ TTOLayer
 
 
 
-其他函数
+其他函数与类
 =====================
 
 
@@ -4736,9 +4736,9 @@ DataParallelVQCAdjointLayer
 .. py:class:: pyvqnet.distributed.DataParallelVQCAdjointLayer(Comm_OP, vqc_module, name="")
 
 
-    使用数据并行对数据批次大小创建 vqc 使用伴随梯度计算。其中 ``vqc_module`` 必须为 ``QuantumLayerAdjoint`` 类型的VQC模块.
+    使用分布式数据并行对数据批次大小创建变分量子线路使用伴随梯度计算。其中 ``vqc_module`` 必须为 ``QuantumLayerAdjoint`` 类型的VQC模块.
     如果我们使用 N 个节点来运行此模块,
-    在每个节点中, `batch_size/N` 数据向前运行变分量子线路 计算梯度。
+    在每个节点中, `batch_size/N` 数据向前运行变分量子线路计算梯度。
 
     :param Comm_OP: 设置分布式环境的通信控制器。
     :param vqc_module: 带有 forward() 的 QuantumLayerAdjoint类型的VQC模块,确保qmachine 已正确设置。
@@ -4861,7 +4861,7 @@ DataParallelVQCLayer
 .. py:class:: pyvqnet.distributed.DataParallelVQCLayer(Comm_OP, vqc_module, name="")
 
 
-    使用数据并行对数据批次大小创建 vqc 使用自动微分计算。 
+    使用分布式数据并行对数据批次大小创建变分量子线路使用自动微分计算。 
     如果我们使用 N 个节点来运行此模块,
     在每个节点中, `batch_size/N` 数据向前运行变分量子线路 计算梯度。
 
@@ -4887,7 +4887,6 @@ DataParallelVQCLayer
         import pyvqnet
         from pyvqnet.nn import Module, Linear
         from pyvqnet.device import DEV_GPU_0
-
 
         class QModel(Module):
 

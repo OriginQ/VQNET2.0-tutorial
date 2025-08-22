@@ -539,8 +539,8 @@ HybirdVQCQpanda3QVMLayer
 .. py:class:: pyvqnet.qnn.pq3.hybird_vqc_qpanda.HybirdVQCQpanda3QVMLayer(vqc_module: Module,qcloud_token: str,pauli_str_dict: Union[List[Dict], Dict, None] = None,shots: int = 1000,dtype: Union[int, None] = None,name: str = "",submit_kwargs: Dict = {},query_kwargs: Dict = {})
 
 
-    混合 vqc 和 qpanda3 模拟计算。该层将用户 `forward` 函数定义的VQNet编写的量子线路计算转化为QPanda OriginIR,在QPanda3本地虚拟机或者云端服务上进行前向运行,并在基于自动微分计算线路参数梯度,降低了使用参数漂移法计算的时间复杂度。
-    其中 ``vqc_module`` 为用户自定义的量子变分线路模型,其中的QMachine设置 ``save_ir=True`` 。
+    混合 vqc 和 qpanda3 模拟计算。该层将用户 `forward` 函数定义的VQNet编写的量子线路计算转化为QPanda OriginIR,在QPanda3本地虚拟机或者云端服务上进行前向运行,基于自动微分计算线路参数梯度,降低了使用参数漂移法计算的时间复杂度。
+
     有别名 ``HybirdVQCQpandaQVMLayer``。
 
     :param vqc_module: 带有 forward() 的 vqc_module。

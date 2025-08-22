@@ -13,7 +13,7 @@ Added
 - 增加量子自然梯度SPSA算法qnspsa接口，quantum circuit born machine，带动量的量子自然梯度接口，纯量子的qgru示例。
 - 增加了 ``torch_native`` 后端。
 - 增加比特并行接口支持量子线路比特并行，添加比特重排序功能减少比特交换次数.
-- 增加 `split_group`方法。
+- 增加 `split_group` 方法。
 
 
 Changed
@@ -22,13 +22,13 @@ Changed
 - MeasureAll接口参数 `obs` 修改；
 - 删除 `QuantumLayerES` 接口。
 - 修改了ControllComm为ControlComm, `allgather_group` , `allreduce_group`, `reduce_group` , `broadcast_group` 等接口的参数名字修改。
-- 删除 `ncclsplitGroup`接口。
+- 删除 `ncclsplitGroup` 接口。
 
 Fixed
 ===================
 - 解决分布式通信接口同步延迟问题。
 - 修改了分布式通信接口定义。
-- 解决adjoint梯度计算不支持 `PauliX`, `PauliY`, `PauliZ`的问题。
+- 解决adjoint梯度计算不支持 `PauliX` , `PauliY` , `PauliZ` 的问题。
 
 
 [v2.17.0] - 2025-4-22
