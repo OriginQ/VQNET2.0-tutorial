@@ -4074,6 +4074,51 @@ pack_pad_sequence
         print(data.batch_sizes)
         # [3, 2, 1, 1]
 
+functional_conv2d
+==============================
+.. py:function:: pyvqnet.nn.functional.functional_conv2d(x, weight, bias, stride=(1,1), padding=(0,0), dilation=(1,1), groups=1)
+
+    对由多个输入平面组成的输入图像进行二维卷积。
+
+    :param x: 4维输入张量。
+    :param weight: 4维核张量。
+    :param weight: 4维核张量。
+
+    :param stride: `tuple` - 步长，默认为 (1, 1)
+    :param padding: 填充，控制输入的填充量。它可以是字符串 {‘valid’, ‘same’} 或一个整数元组，用于指定应用于输入的隐式填充量，默认为(0,0)
+    :param dilation_rate: `tuple` - 核元素之间的间距。默认值：(0,0)
+    :param group: `int` - 组数。默认值：1
+
+    :return: qtensor
+
+
+    Examples::
+
+        from pyvqnet.nn.functional import functional_conv2d
+        from pyvqnet.tensor import arange,ones
+        from pyvqnet import kfloat32
+        from pyvqnet.nn import Module,Parameter
+
+
+        class TM(Module):
+            def __init__(self, *args, **kwargs):
+                super().__init__(*args, **kwargs)
+                self.w = ones([5,4,2,2])
+                self.w.requires_grad = True
+                self.b = ones([5,])
+                self.b.requires_grad = True
+
+            def forward(self,x):
+                weight, bias,   = self.w, self.b 
+                return functional_conv2d(x, weight, bias )
+
+
+        x = arange(0,7*4*12*12,dtype=kfloat32).reshape([7,4,12,12])
+        l = TM()
+        y = l(x)
+
+        y.backward( )
+
 no_grad
 ==============================
     
