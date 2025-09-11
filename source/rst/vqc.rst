@@ -2867,20 +2867,17 @@ MeasureAll
 
 .. py:class:: pyvqnet.qnn.vqc.MeasureAll(obs, name="")
 
-    计算量子线路的测量结果,支持输入观测量 ``obs`` 为由观测量 `observables`、作用比特 `wires` 、系数 `coefficient` 键值对构成的字典,或者键值对字典列表。
+    计算量子线路的测量结果,支持输入观测量 ``obs``。其格式可以为字典格式，用于表示一个由多个Pauli算符组合而成的可观测量；列表形式,表示多个期望值的可观测量列表。
+ 
     例如:
 
-    {\'wires\': [0,  1], \'observables\': [\'x\', \'i\'],\'coefficient\':[0.23,-3.5]}
-     
-    {\'X0\': 0.23}
-     
-    [{\'wires\': [0, 2, 3],\'observables\': [\'X\', \'Y\', \'Z\'],\'coefficient\': [1, 0.5, 0.4]}, {\'wires\': [0, 1, 2],\'observables\': [\'X\', \'Y\', \'Z\'],\'coefficient\': [1, 0.5, 0.4]}]
-    
-    [{\'X1 Z2 I0\':4,\'Z1 Z0\':3},\{'wires\': [0,  1], \'observables\': [\'x\', \'i\'],\'coefficient\':[0.23,-3.5]}]
+    {\'X0\': 0.23} 表示在量子比特0上作用PauliX,系数为0.23
 
-    {\'X1 Z2 I0\':4,\'Z1 Z0\':3}
+    {\'X1 Z2\':2.4,\'Y2\':-0.5} 对应于观测量 2.4 * X1 @ Z2 - 0.5 * Y2
 
-    :param obs: 测量观测量,可以是单个观测量类包括,或者由观测量、作用比特、系数键值对构成的字典,或者键值对字典列表。
+    [{\'X1 Z2\':4,\'Z1 Z0\':3},{\'X1 Y2 Z0\':3.5}] 对应于两个观测量 4 * X1 @ Z2 + 3 * Z1 @ Z0 以及 3.5 * X1 @ Y2 @ Z0 。
+
+    :param obs: 测量观测量。
     :param name: 模块的名字,默认:""。
 
     .. py:method:: forward(q_machine)
@@ -2917,13 +2914,9 @@ MeasureAll
         
         # list of 2 observables
         obs_list = [{
-            'wires': [0, 2, 3],
-            'observables': ['X', 'Y', 'Z'],
-            'coefficient': [1, 0.5, 0.4]
+           "Z0 X1":2
         }, {
-            'wires': [0, 1, 2],
-            'observables': ['X', 'Y', 'Z'],
-            'coefficient': [1, 0.5, 0.4]
+           "Z2 Y1":2
         }]
 
         ma = MeasureAll(obs = obs_list)
@@ -2932,9 +2925,7 @@ MeasureAll
         
         #return QTensor of [batch_size,len(obs)]
         print(y)
-
-        # [[0.4000001 0.3980018]
-        #  [0.4000001 0.3980018]]
+ 
 
 
 Samples
@@ -3429,9 +3420,7 @@ ExpressiveEntanglingAnsatz
                 self.qm = QMachine(num_wires, dtype=dtype,grad_mode=grad_mode,save_ir=True)
                 self.c1 = ExpressiveEntanglingAnsatz(13,3,2)
                 self.measure = MeasureAll(obs = {
-                    'wires': [1],
-                    'observables': ['z'],
-                    'coefficient': [1]
+                    "Z1":1
                 })
 
             def forward(self, x, *args, **kwargs):
@@ -4651,7 +4640,7 @@ TTOLayer
 
 
 
-其他函数
+其他函数与类
 =====================
 
 
@@ -4705,9 +4694,7 @@ QuantumLayerAdjoint
                 self.tlayer = T(wires=1)
                 self.cnot = CNOT(wires=[0, 1])
                 self.measure = MeasureAll(obs = {
-                    'wires': [1],
-                    'observables': ['x'],
-                    'coefficient': [1]
+                    "Z1":1
                 })
 
             def forward(self, x, *args, **kwargs):
@@ -4742,94 +4729,6 @@ QuantumLayerAdjoint
         print(batch_y)
 
 
-QuantumLayerES
----------------------------------------------------------------
-
-.. py:class:: pyvqnet.qnn.vqc.QuantumLayerES(general_module: nn.Module, q_machine: pyvqnet.qnn.vqc.QMachine, name="", sigma = np.pi / 24)
-
-
-    根据进化策略进行梯度计算的可自动微分的QuantumLayer层,参考  `Learning to learn with an evolutionary strategy Learning to learn with an evolutionary strategy <https://arxiv.org/abs/2310.17402>`_ 。
-
-    :param general_module: 一个仅使用 ``pyvqnet.qnn.vqc`` 下量子线路接口搭建的 `pyvqnet.nn.QModule` 实例。
-    :param q_machine: 来自general_module中定义的QMachine。
-    :param name: 该层名字,默认为""。
-    :param sigma: 多元正态分布的采样方差.
-
-    .. note::
-
-        general_module 的 QMachine 应设置 grad_method = "ES".
-
-        当前支持由如下含参逻辑门 `RX`, `RY`, `RZ`, `PhaseShift`, `RXX`, `RYY`, `RZZ`, `RZX`, `U1`, `U2`, `U3` 以及其他不含参逻辑门构成的变分线路。
-
-    Example::
-
-        from pyvqnet import tensor
-        from pyvqnet.qnn.vqc import QuantumLayerES, QMachine, RX, RY, CNOT, T, MeasureAll, RZ, VQC_HardwareEfficientAnsatz
-        import pyvqnet
-        from pyvqnet.utils import set_random_seed
-
-        set_random_seed(42)
-
-        class QModel(pyvqnet.nn.Module):
-            def __init__(self, num_wires, dtype, grad_mode=""):
-                super(QModel, self).__init__()
-
-                self._num_wires = num_wires
-                self._dtype = dtype
-                self.qm = QMachine(num_wires, dtype=dtype, grad_mode=grad_mode)
-                self.rx_layer = RX(has_params=True, trainable=False, wires=0)
-                self.ry_layer = RY(has_params=True, trainable=False, wires=1)
-                self.rz_layer = RZ(has_params=True, trainable=False, wires=1)
-                self.rz_layer2 = RZ(has_params=True, trainable=True, wires=1)
-
-                self.rot = VQC_HardwareEfficientAnsatz(6, ["rx", "RY", "rz"],
-                                                    entangle_gate="cnot",
-                                                    entangle_rules="linear",
-                                                    depth=5)
-                self.tlayer = T(wires=1)
-                self.cnot = CNOT(wires=[0, 1])
-                self.measure = MeasureAll(obs = {
-                    'wires': [1],
-                    'observables': ['x'],
-                    'coefficient': [1]
-                })
-
-            def forward(self, x, *args, **kwargs):
-                self.qm.reset_states(x.shape[0])
-
-                self.rx_layer(params=x[:, [0]], q_machine=self.qm)
-                self.cnot(q_machine=self.qm)
-                self.ry_layer(params=x[:, [1]], q_machine=self.qm)
-                self.tlayer(q_machine=self.qm)
-                self.rz_layer(params=x[:, [2]], q_machine=self.qm)
-                self.rz_layer2(q_machine=self.qm)
-                self.rot(q_machine=self.qm)
-                rlt = self.measure(q_machine=self.qm)
-
-                return rlt
-
-
-        input_x = tensor.QTensor([[0.1, 0.2, 0.3]])
-
-        input_x = tensor.broadcast_to(input_x, [4, 3])
-
-        input_x.requires_grad = True
-
-        qunatum_model = QModel(num_wires=6,
-                            dtype=pyvqnet.kcomplex64,
-                            grad_mode="ES")
-
-        ES_model = QuantumLayerES(qunatum_model, qunatum_model.qm)
-
-        batch_y = ES_model(input_x)
-        batch_y.backward()
-        print(batch_y)
-        # [[-0.0778451],
-        #  [-0.0778451],
-        #  [-0.0778451],
-        #  [-0.0778451]]
-
-
 
 DataParallelVQCAdjointLayer
 ---------------------------------------------------------------
@@ -4837,9 +4736,9 @@ DataParallelVQCAdjointLayer
 .. py:class:: pyvqnet.distributed.DataParallelVQCAdjointLayer(Comm_OP, vqc_module, name="")
 
 
-    使用数据并行对数据批次大小创建 vqc 使用伴随梯度计算。其中 ``vqc_module`` 必须为 ``QuantumLayerAdjoint`` 类型的VQC模块.
+    使用分布式数据并行对数据批次大小创建变分量子线路使用伴随梯度计算。其中 ``vqc_module`` 必须为 ``QuantumLayerAdjoint`` 类型的VQC模块.
     如果我们使用 N 个节点来运行此模块,
-    在每个节点中, `batch_size/N` 数据向前运行变分量子线路 计算梯度。
+    在每个节点中, `batch_size/N` 数据向前运行变分量子线路计算梯度。
 
     :param Comm_OP: 设置分布式环境的通信控制器。
     :param vqc_module: 带有 forward() 的 QuantumLayerAdjoint类型的VQC模块,确保qmachine 已正确设置。
@@ -4962,7 +4861,7 @@ DataParallelVQCLayer
 .. py:class:: pyvqnet.distributed.DataParallelVQCLayer(Comm_OP, vqc_module, name="")
 
 
-    使用数据并行对数据批次大小创建 vqc 使用自动微分计算。 
+    使用分布式数据并行对数据批次大小创建变分量子线路使用自动微分计算。 
     如果我们使用 N 个节点来运行此模块,
     在每个节点中, `batch_size/N` 数据向前运行变分量子线路 计算梯度。
 
@@ -4988,7 +4887,6 @@ DataParallelVQCLayer
         import pyvqnet
         from pyvqnet.nn import Module, Linear
         from pyvqnet.device import DEV_GPU_0
-
 
         class QModel(Module):
 
@@ -5106,9 +5004,7 @@ vqc_to_originir_list
                 self.tlayer = T(wires=1)
                 self.cnot = CNOT(wires=[0, 1])
                 self.measure = MeasureAll(obs = {
-                    'wires': [1],
-                    'observables': ['x'],
-                    'coefficient': [1]
+                    "X1":1
                 })
 
             def forward(self, x, *args, **kwargs):
@@ -5341,7 +5237,7 @@ model_summary
 QNG
 ---------------------------------------------------------------
 
-.. py:class:: pyvqnet.qnn.vqc.qng.QNG(qmodel, stepsize=0.01)
+.. py:class:: pyvqnet.qnn.vqc.qng.QNG(qmodel, stepsize=0.01，momentum=0)
 
     `量子自然梯度法(Quantum Nature Gradient) <https://arxiv.org/abs/1909.02108>`_ 借鉴经典自然梯度法的概念 `Amari (1998) <https://www.mitpressjournals.org/doi/abs/10.1162/089976698300017746>`__ ,
     我们改为将优化问题视为给定输入的可能输出值的概率分布(即,最大似然估计),则更好的方法是在分布
@@ -5350,7 +5246,7 @@ QNG
     该张量将量子线路参数空间中的最速下降转换为分布空间中的最速下降。
     量子自然梯度的公式如下:
 
-    .. math:: \theta_{t+1} = \theta_t - \eta g^{+}(\theta_t)\nabla \mathcal{L}(\theta),
+    .. math:: \theta_{t+1} = \theta_t + momentum(x^{(t)} - x^{(t-1)}) - \eta g^{+}(\theta_t)\nabla \mathcal{L}(\theta),
 
     其中 :math:`g^{+}` 是伪逆。
 
@@ -5358,6 +5254,7 @@ QNG
 
     :param qmodel: 量子变分线路模型,需要使用 `wrapper_calculate_qng` 作为forward函数的装饰器。
     :param stepsize: 梯度下降法的步长,默认0.01。
+    :param momentum: 动量，默认0.
 
     .. note::
 
@@ -5478,9 +5375,7 @@ wrapper_single_qubit_op_fuse
                 self.tlayer = T(wires=1)
                 self.cnot = CNOT(wires=[0, 1])
                 self.measure = MeasureAll(obs={
-                    'wires': [1],
-                    'observables': ['x'],
-                    'coefficient': [1]
+                    "X1":1
                 })
 
             @wrapper_single_qubit_op_fuse
@@ -5571,9 +5466,7 @@ wrapper_commute_controlled
                 self.t = T(wires=0)
                 self.rz = RZ(has_params=True, wires=1, dtype=dtype)
                 self.measure = MeasureAll(obs={
-                    'wires': [0],
-                    'observables': ['z'],
-                    'coefficient': [1]
+                    "X1":1
                 })
 
             @partial(wrapper_commute_controlled, direction="left")
@@ -5670,9 +5563,7 @@ wrapper_merge_rotations
                 self.qm = QMachine(num_wires, dtype=dtype)
 
                 self.measure = MeasureAll(obs={
-                    'wires': [0],
-                    'observables': ['z'],
-                    'coefficient': [1]
+                    "X1":1
                 })
 
             @wrapper_merge_rotations
@@ -5771,9 +5662,7 @@ wrapper_compile
                 self.rz = RZ(has_params=True, wires=1, dtype=dtype)
 
                 self.measure = MeasureAll(obs={
-                    'wires': [0],
-                    'observables': ['z'],
-                    'coefficient': [1]
+                    "X1":1
                 })
 
             def forward(self, x, *args, **kwargs):
@@ -5835,9 +5724,7 @@ wrapper_compile
                 self.rz = RZ(has_params=True, wires=1, dtype=dtype)
 
                 self.measure = MeasureAll(obs={
-                    'wires': [0],
-                    'observables': ['z'],
-                    'coefficient': [1]
+                    "X1":1
                 })
 
             @partial(wrapper_compile)
@@ -5922,3 +5809,96 @@ wrapper_compile
         # total parameter gates: 11
         # total parameters: 27
         # #################################################
+
+
+QNSPSAOptimizer
+---------------------------------------------------------------
+
+.. py:class:: pyvqnet.qnn.vqc.qng.QNSPSAOptimizer(stepsize=1e-3,regularization=1e-3,finite_diff_step=1e-2,resamplings=1,blocking=True,history_length=5,seed=None)
+
+
+    ​​量子自然 SPSA (QNSPSA) 优化器
+
+    一个用于量子电路的二阶随机优化器，结合了梯度下降和 Fubini-Study 度量张量信息。
+
+    使用对称扰动进行梯度估计​​（类似 SPSA）：
+
+    .. math::
+
+        \begin{equation}
+        \widehat{\nabla f}(\mathbf{x}) \approx \frac{f(\mathbf{x}+\epsilon \mathbf{h})-f(\mathbf{x}-\epsilon \mathbf{h})}{2\epsilon}
+        \end{equation}
+
+    通过状态重叠测量计算 Fubini-Study 度量：
+
+    .. math::
+
+        \begin{equation}
+        \widehat{\mathbf{g}}(\mathbf{x}) \approx \frac{\delta F}{8\epsilon^2}(\mathbf{h}_1\mathbf{h}_2^\intercal + \mathbf{h}_2\mathbf{h}_1^\intercal)
+        \end{equation}
+
+    .. math::
+
+        \begin{equation}
+        \delta F = F(\mathbf{x}+\epsilon\mathbf{h}_1+\epsilon\mathbf{h}_2) - F(\mathbf{x}+\epsilon\mathbf{h}_1) - F(\mathbf{x}-\epsilon\mathbf{h}_1+\epsilon\mathbf{h}_2) + F(\mathbf{x}-\epsilon\mathbf{h}_1)
+        \end{equation}
+
+    其中 δF 测量四个电路的重叠差异评价。
+
+    ​​更新规则​​：
+
+    .. math::
+
+        \begin{equation}
+        \mathbf{x}^{(t+1)} = \mathbf{x}^{(t)} - \eta \widehat{\mathbf{g}}^{-1}(\mathbf{x}^{(t)})\widehat{\nabla f}(\mathbf{x}^{(t)})
+        \end{equation}
+
+    :param stepsize: 用户自定义学习率超参数 :math:`\eta` （默认值：1e-3）
+    :param regularization: 用于 Fubini-Study 度量张量的正则化项 :math:`\beta` ，用于数值稳定性（默认值：1e-3）
+    :param finite_diff_step: 用于计算有限差分梯度和 Fubini-Study 度量张量的步长 :math:`\epsilon` （默认值：1e-2）
+    :param resamplings: 每次参数更新的平均样本数（默认值：1）
+    :param blocking: 当为 True 时，仅接受导致损失值不大于前次损失值之和的更新容差（有助于收敛）（默认值：True）
+    :param history_length: 当 ``blocking`` 为 True 时，容差设置为前几个 ``history_length`` 成本值的平均值（默认值：5）
+    :param seed: 随机采样的种子（默认值：None）
+
+    .. py:method:: step(qmodel, *args, **kwargs)
+
+        使用优化器的更新可训练参数一次。
+
+        :param qmodel: 可训练的量子模型
+        :param args: 用于 qmodel 的可变长度可训练 qtensor。
+        :param kwargs: 用于 qmodel 的可变长度关键字参数。
+
+        :return: 更新后的参数。
+
+
+        Examples::
+
+                from pyvqnet.tensor import QTensor,ones,randu
+                from pyvqnet.qnn.vqc import rx,cry,QMachine,MeasureAll,QModule
+
+                num_qubits = 2
+                class QModuleDemo(QModule):
+                    def __init__(self, name=""):
+                        super().__init__(name)
+                        self.qm = QMachine(num_qubits)
+                        self.ma = MeasureAll({"Z1 Z0":1})
+                    def forward(self,params):
+                        qm = self.qm
+                        qm.reset_states(1)
+                        rx(qm, 0, params[0])
+                        cry(qm, [0, 1], params[1])
+                        return self.ma(qm)
+
+                qmd = QModuleDemo()
+
+                from pyvqnet.qnn.vqc.qnspsa import QNSPSAOptimizer
+                params = QTensor([0.37454012, 0.95071431])
+
+                params.requires_grad = True
+                opt =  QNSPSAOptimizer(stepsize=5e-2,seed=1)
+                for i in range(51):
+                    params = opt.step(qmd, params)
+                    loss =qmd(params)
+                    if i % 10 == 0:
+                        print(f"Step {i}: cost = {loss}")
