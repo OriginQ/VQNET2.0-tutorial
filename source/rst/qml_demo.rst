@@ -3155,7 +3155,7 @@ QUnet主要是用于解决图像分割的技术。
     from pyvqnet.optim.adam import Adam
     from pyvqnet.tensor.tensor import QTensor
     from pyvqnet.qnn.measure import expval
-    from pyvqnet.qnn.quantumlayer import QuantumLayer, QuantumLayerMultiProcess
+    from pyvqnet.qnn.quantumlayer import QuantumLayer
     from pyvqnet.nn.pooling import AvgPool2D
     from pyvqnet.nn.linear import Linear
     from pyvqnet.data.data import data_generator
@@ -3397,43 +3397,12 @@ QUnet主要是用于解决图像分割的技术。
 
         return exp_vals
 
-    def build_multiprocess_qmlp_circuit(x, weights, num_qubits, num_clist):
-        machine = pq.CPUQVM()
-        machine.init_qvm()
-        qubits = machine.qAlloc_many(num_qubits)
-        cir = pq.QCircuit()
-        for i in range(num_qubits):
-            cir.insert(pq.RX(qubits[i], x[i]))
-
-        cir.insert(build_RotCircuit(qubits, weights[0:48]))
-        cir.insert(build_CRotCircuit(qubits, weights[48:64]))
-
-        for i in range(num_qubits):
-            cir.insert(pq.RX(qubits[i], x[i]))
-
-        cir.insert(build_RotCircuit(qubits, weights[64:112]))
-        cir.insert(build_CRotCircuit(qubits, weights[112:128]))
-
-        prog = pq.QProg()
-        prog.insert(cir)
-        # print(prog)
-        # exit()
-
-        exp_vals = []
-        for position in range(num_qubits):
-            pauli_str = {"Z" + str(position): 1.0}
-            exp2 = expval(machine, prog, pauli_str, qubits)
-            exp_vals.append(exp2)
-
-        return exp_vals
-
     class QMLPModel(Module):
         def __init__(self):
             super(QMLPModel, self).__init__()
             self.ave_pool2d = AvgPool2D([7, 7], [7, 7], "valid")
-            # self.quantum_circuit = QuantumLayer(build_qmlp_circuit, 128, "CPU", 16, diff_method="finite_diff")
-            self.quantum_circuit = QuantumLayerMultiProcess(build_multiprocess_qmlp_circuit, 128, 
-                                                            16, 1, diff_method="finite_diff")
+            self.quantum_circuit = QuantumLayer(build_qmlp_circuit, 128, "CPU", 16, diff_method="finite_diff")
+
             self.linear = Linear(16, 10)
 
         def forward(self, x):
@@ -3636,9 +3605,8 @@ QUnet主要是用于解决图像分割的技术。
     def encoder(encodings):
         encodings = int(encodings[0])
         return [i for i, b in enumerate(f'{encodings:0{CIRCUIT_SIZE}b}') if b == '1']
-    def build_qc(x, weights, num_qubits, num_clist):
-        machine = pq.CPUQVM()
-        machine.init_qvm()
+    def build_qc(x, weights, num_qubits, num_clist,machine):
+
         qubits = machine.qAlloc_many(num_qubits)
         cir = pq.QCircuit()
         if x:
@@ -3662,8 +3630,9 @@ QUnet主要是用于解决图像分割的技术。
     class DRLModel(Module):
         def __init__(self):
             super(DRLModel, self).__init__()
-            self.quantum_circuit = QuantumLayerMultiProcess(build_qc, 24,  
-                                                            4, 1, diff_method="finite_diff")
+
+            self.quantum_circuit = QuantumLayer(build_qc, 24, "CPU", 4, diff_method="finite_diff")
+            
         def forward(self, x):
             quanutum_result = self.quantum_circuit(x)
             return quanutum_result
@@ -3743,18 +3712,6 @@ QUnet主要是用于解决图像分割的技术。
                     exit()
                 break
         end = time.time()
-
-数据结果
----------------------------------
-
-训练结果如下图所示,可以看出经过一定步骤之后达到最终位置。
-
-.. image:: ./images/result_QDRL.gif
-   :width: 600 px
-   :align: center
-
-|
-
 
 
 无监督学习
@@ -4476,7 +4433,7 @@ QUnet主要是用于解决图像分割的技术。
     from pyvqnet.tensor.tensor import QTensor
     import pyqpanda as pq
     from pyvqnet.qnn.measure import expval
-    from pyvqnet.qnn.quantumlayer import QuantumLayer, QuantumLayerMultiProcess
+    from pyvqnet.qnn.quantumlayer import QuantumLayer
     import matplotlib.pyplot as plt
     import matplotlib
     try:
