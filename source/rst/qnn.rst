@@ -622,7 +622,518 @@ NoiseQuantumLayer
 
 		return qvm
 
+QiskitLayer
+=================================
 
+.. py:class:: pyvqnet.qnn.QiskitLayer(qiskit_circuits,para_num)
+
+    一个用于在 vqnet 中实现前向和反向传播的 qiskit 电路封装层。QISKIT_VQC 是一个定义 qiskit 量子电路及其 `run` 函数的类。
+    以下示例展示了它的工作原理。此层仅支持电路的输入和权重作为参数。
+    
+    :param cirq_vqc: 定义 qiskit 电路的定义、后端和运行函数的类。
+    :param para_num: `int` - para_num 的数量。
+    :return: 一个可以运行 qiskit 量子电路模型的类。
+
+    Example::
+
+
+        """
+        调用qiskit训练
+
+        qiskit                        2.1.1
+        qiskit-aer                    0.17.2
+        opencv-python
+        """
+        import sys
+        sys.path.insert(0,"../")
+        import os
+        import os.path
+        import urllib
+        import gzip
+        import numpy as np
+        import random
+        import sys
+        sys.path.insert(0,"../../")
+        random.seed(42)
+        np.random.seed(42)
+        from pyvqnet.nn.module import Module
+        from pyvqnet.optim import Adam
+        import pyvqnet
+        pyvqnet.utils.set_random_seed(42)
+        from pyvqnet.nn.loss import MeanSquaredError
+        from pyvqnet.qnn.utils import QiskitLayer
+
+        import qiskit
+        from qiskit.quantum_info import Statevector
+        from qiskit import  QuantumRegister, ClassicalRegister
+
+        from qiskit.quantum_info.operators import  Pauli
+        max_parallel_threads = 24
+        gpu = False
+        method = "statevector"
+        backend_options = {
+            "method": method,
+            "precision": "double",
+            "max_parallel_threads": max_parallel_threads,
+            "fusion_enable": True,
+            "fusion_threshold": 14,
+            "fusion_max_qubit": 5,
+        }
+        from qiskit_aer import StatevectorSimulator
+        simulator = StatevectorSimulator()
+
+        simulator.set_options(**backend_options)
+
+
+        url_base = 'https://ossci-datasets.s3.amazonaws.com/mnist/'
+        key_file = {
+            'train_img':'train-images-idx3-ubyte.gz',
+            'train_label':'train-labels-idx1-ubyte.gz',
+            'test_img':'t10k-images-idx3-ubyte.gz',
+            'test_label':'t10k-labels-idx1-ubyte.gz'
+        }
+
+        def _download(dataset_dir,file_name):
+            file_path = dataset_dir + "/" + file_name
+
+            if os.path.exists(file_path):
+                with gzip.GzipFile(file_path) as f:
+                    file_path_ungz = file_path[:-3].replace('\\', '/')
+                    if not os.path.exists(file_path_ungz):
+                        open(file_path_ungz,"wb").write(f.read())
+                return
+
+            print("Downloading " + file_name + " ... ")
+            urllib.request.urlretrieve(url_base + file_name, file_path)
+            if os.path.exists(file_path):
+                    with gzip.GzipFile(file_path) as f:
+                        file_path_ungz = file_path[:-3].replace('\\', '/')
+                        file_path_ungz = file_path_ungz.replace('-idx', '.idx')
+                        if not os.path.exists(file_path_ungz):
+                            open(file_path_ungz,"wb").write(f.read())
+            print("Done")
+
+        def download_mnist(dataset_dir):
+            for v in key_file.values():
+                _download(dataset_dir,v)
+
+        def dataloader(data,label,batch_size, shuffle = True)->np:
+            if shuffle:
+                for _ in range(len(data)//batch_size):
+                    random_index = np.random.randint(0, len(data), (batch_size, 1))
+                    yield data[random_index].reshape(batch_size,-1),label[random_index].reshape(batch_size,-1)
+            else:
+                for i in range(0,len(data)-batch_size+1,batch_size):
+                    yield data[i:i+batch_size], label[i:i+batch_size]
+
+        def get_accuary(result,label):
+            result,label = np.array(result.data), np.array(label.data)
+
+            is_correct = (np.abs(result - label) < 0.5)
+            is_correct = np.count_nonzero(is_correct)
+            acc = is_correct
+
+            return acc
+
+        def load_mnist_4_4(dataset="training_data", digits=np.arange(10),
+                        path="."):
+            import os, struct
+            from array import array as pyarray
+            download_mnist(path)
+            if dataset == "training_data":
+                fname_image = os.path.join(path, 'train-images.idx3-ubyte').replace('\\', '/')
+                fname_label = os.path.join(path, 'train-labels.idx1-ubyte').replace('\\', '/')
+            elif dataset == "testing_data":
+                fname_image = os.path.join(path, 't10k-images.idx3-ubyte').replace('\\', '/')
+                fname_label = os.path.join(path, 't10k-labels.idx1-ubyte').replace('\\', '/')
+            else:
+                raise ValueError("dataset must be 'training_data' or 'testing_data'")
+
+            flbl = open(fname_label, 'rb')
+            magic_nr, size = struct.unpack(">II", flbl.read(8))
+
+            lbl = pyarray("b", flbl.read())
+            flbl.close()
+
+            fimg = open(fname_image, 'rb')
+            magic_nr, size, rows, cols = struct.unpack(">IIII", fimg.read(16))
+            img = pyarray("B", fimg.read())
+            fimg.close()
+
+            ind = [k for k in range(size) if lbl[k] in digits]
+            N = len(ind)
+            images = np.zeros((N, rows, cols))
+            images_new = []# = np.zeros((N, 4, 4))
+            labels = np.zeros((N, 1), dtype=int)
+            import cv2
+            for i in range(len(ind)):
+                tmp1 = np.array(img[ind[i] * rows * cols: (ind[i] + 1) * rows * cols]).reshape((rows, cols))
+                tmp1 = tmp1[4:24,4:24]
+                tmp = cv2.resize(tmp1,(4,4))
+
+                if np.max(tmp) ==0:
+                    continue
+                images_new.append(tmp)
+                if lbl[ind[i]] ==digits[1]:
+                    labels[i] = 1
+                else:
+                    labels[i] = 0
+
+            return np.array(images_new), labels
+
+
+        class QISKIT_VQC:
+
+            def __init__(self, n_qubits, backend, shots):
+                # --- Circuit definition ---
+
+                qc = ClassicalRegister(1)
+                self.qc = qc
+                self.n_qubits = n_qubits
+
+                all_qubits = [i for i in range(n_qubits)]
+                self.all_qubits= all_qubits
+
+                self.backend = backend
+                self.shots = shots
+
+            def run(self,**kwargs):
+
+                x  = kwargs['x']
+                weights  = kwargs['w']
+
+                weights = weights.astype(np.float64)
+                x = x.astype(np.float64)
+
+                sum_feature = np.power(np.sum([t**2 for t in x]),0.5)
+                normalize_feat = x/sum_feature
+
+                self._circuit = qiskit.QuantumCircuit(QuantumRegister(4))
+
+                self.theta = weights.reshape([4,6])
+                self._circuit.initialize(normalize_feat, [0,1,2,3])
+
+                # 先搭建广义的旋转层
+                for i in range(self.n_qubits):
+                    self._circuit.rz(self.theta[i,0], i)
+                    self._circuit.ry(self.theta[i,1], i)
+                    self._circuit.rz(self.theta[i,2], i)
+
+                for d in range(3, 6):
+                    # 搭建纠缠层
+                    for i in range(self.n_qubits-1):
+                        self._circuit.cx(i, i + 1)
+                    self._circuit.cx(self.n_qubits-1, 0)
+                    # 对每一个量子比特搭建Ry
+                    for i in range(self.n_qubits):
+                        self._circuit.ry(self.theta[i,d], i)
+
+                statevec = Statevector(self._circuit)
+                Expectation = np.real(statevec.expectation_value(Pauli('ZIII')))
+                return Expectation
+
+        #define qiskit circuits class
+        circuit = QISKIT_VQC(4, simulator, 1000)
+
+        class Model_qiskit(Module):
+            def __init__(self):
+                super(Model_qiskit, self).__init__()
+                self.qvc = QiskitLayer(circuit,24)
+
+            def forward(self, x):
+
+                return self.qvc(x)*0.5 + 0.5
+
+        def Run_qiskit():
+
+            x_train, y_train = load_mnist_4_4("training_data",digits=[3,6])
+
+            y_train = y_train.reshape(-1, 1)
+
+            x_test, y_test = load_mnist_4_4("testing_data",digits=[3,6])
+
+            x_train = x_train.astype(np.float32)
+            x_test = x_test.astype(np.float32)
+            y_train = y_train.astype(np.float32)
+            y_test = y_test.astype(np.float32)
+            x_train = x_train *np.pi / 255
+            x_test = x_test *np.pi / 255
+            x_train = x_train[:100]
+            y_train = y_train[:100]
+
+            x_test = x_test[:50]
+            y_test = y_test[:50]
+
+            model = Model_qiskit()
+
+            optimizer = Adam(model.parameters(),lr =0.01)
+            batch_size = 10
+            epoch = 2
+
+            loss = MeanSquaredError()
+            print("start training..............")
+            model.train()
+
+            TL=[]
+
+            TA=[]
+
+            for i in range(epoch):
+                count=0
+                sum_loss = 0
+                accuary = 0
+                t = 0
+                model.train()
+                for data,label in dataloader(x_train,y_train,batch_size,True):
+
+                    optimizer.zero_grad()
+
+                    result = model(data)
+
+                    loss_b = loss(label,result)
+
+                    loss_b.backward()
+                    optimizer._step()
+                    sum_loss += loss_b.item()
+                    count+=batch_size
+                    accuary += get_accuary(result,label)
+                    t = t + 1
+
+                    print(f"epoch:{i}, iter{t} #### loss:{sum_loss*batch_size/count} #####accuray:{accuary/count}")
+                TL.append(sum_loss*batch_size/count)
+                TA.append(accuary/count)
+            print(f"qiskit epoch {epoch}，最终准确率 {TA[-1]}")
+
+if __name__=="__main__":
+
+    Run_qiskit()
+
+
+CirqLayer
+=================================
+
+.. py:class:: pyvqnet.qnn.CirqLayer(cirq_vqc,para_num)
+
+    一个用于在 vqnet 中实现前向和反向传播的 cirq 电路封装层。CIRQ_VQC是需要用户定义 cirq 量子电路及其 `run` 函数的类。以下示例展示了它的工作原理。
+    此层仅支持电路的输入和权重作为参数。
+    
+    :param cirq_vqc: 定义 cirq 电路的定义、后端和运行函数的类。
+    :param para_num: `int` - para_num 的数量。
+    :return: 一个可以运行 cirq 量子电路模型的类。
+
+    Example::
+
+        import numpy as np
+        import random
+        random.seed(42)
+        np.random.seed(42)
+        from pyvqnet.nn.module import Module
+        import pyvqnet
+        pyvqnet.utils.set_random_seed(42)
+        from pyvqnet.optim import Adam
+
+        from pyvqnet.nn.loss import MeanSquaredError
+        from pyvqnet.qnn.utils import CirqLayer
+
+
+        import cirq
+        import sympy
+        from pyvqnet.utils.utils import get_circuit_symbols
+
+
+        def dataloader(data,label,batch_size, shuffle = True)->np:
+            if shuffle:
+                for _ in range(len(data)//batch_size):
+                    random_index = np.random.randint(0, len(data), (batch_size, 1))
+                    yield data[random_index].reshape(batch_size,-1),label[random_index].reshape(batch_size,-1)
+            else:
+                for i in range(0,len(data)-batch_size+1,batch_size):
+                    yield data[i:i+batch_size].reshape(batch_size,-1), label[i:i+batch_size].reshape(batch_size,-1)
+
+        def get_accuary(result,label):
+            result,label = np.array(result.data), np.array(label.data)
+
+            is_correct = (np.abs(result - label) < 0.5)
+            is_correct = np.count_nonzero(is_correct)
+            acc = is_correct
+
+            return acc
+
+        def load_mnist_4_4(dataset="training_data", digits=np.arange(10), 
+                        path=".",encoding = "raw" ):
+            import os, struct
+            from array import array as pyarray
+            if dataset == "training_data":
+                fname_image = os.path.join(path, 'train-images.idx3-ubyte').replace('\\', '/')
+                fname_label = os.path.join(path, 'train-labels.idx1-ubyte').replace('\\', '/')
+            elif dataset == "testing_data":
+                fname_image = os.path.join(path, 't10k-images.idx3-ubyte').replace('\\', '/')
+                fname_label = os.path.join(path, 't10k-labels.idx1-ubyte').replace('\\', '/')
+            else:
+                raise ValueError("dataset must be 'training_data' or 'testing_data'")
+
+            flbl = open(fname_label, 'rb')
+            magic_nr, size = struct.unpack(">II", flbl.read(8))
+
+            lbl = pyarray("b", flbl.read())
+            flbl.close()
+
+            fimg = open(fname_image, 'rb')
+            magic_nr, size, rows, cols = struct.unpack(">IIII", fimg.read(16))
+            img = pyarray("B", fimg.read())
+            fimg.close()
+
+            ind = [k for k in range(size) if lbl[k] in digits]
+            N = len(ind)
+
+            images_new = []# = np.zeros((N, 4, 4))
+            labels = np.zeros((N, 1), dtype=int)
+            import cv2
+            for i in range(len(ind)):
+                tmp1 = np.array(img[ind[i] * rows * cols: (ind[i] + 1) * rows * cols]).reshape((rows, cols))
+                tmp1 = tmp1[4:24,4:24]
+                tmp = cv2.resize(tmp1,(4,4))
+
+                if np.max(tmp) ==0:
+                    continue
+                if encoding == "normalized":
+                    sum_feature = np.power(np.sum([t**2 for t in tmp.flatten()]),0.5)
+                        
+                    normalize_feat = tmp/sum_feature
+                images_new.append(normalize_feat)
+                if lbl[ind[i]] ==digits[1]:
+                    labels[i] = 1
+                else:
+                    labels[i] = 0 
+
+            return np.array(images_new), labels
+
+
+
+        class CIRQ_VQC:
+
+            def __init__(self,simulator = cirq.Simulator ()):
+
+                self._circuit = cirq.Circuit()
+                n_qubits =4
+                ###define qubits
+                q0 = cirq.NamedQubit ('q0')
+                q1 = cirq.NamedQubit ('q1')
+                q2 = cirq.NamedQubit ('q2')
+                q3 = cirq.NamedQubit ('q3')
+                qubits = [q0,q1,q2,q3]
+                self.qubits = [q0,q1,q2,q3]
+                ###define varational parameters
+                param = sympy.symbols(f'theta(0:24)')
+                self.theta = np.asarray(param).reshape((4,6))
+
+                ###define circuits
+                circuit = cirq.Circuit()
+
+                for i ,q in enumerate(qubits):
+                    circuit.append(cirq.rz(self.theta[i][0])(q))
+                    circuit.append(cirq.ry(self.theta[i][1])(q))
+                    circuit.append(cirq.rz(self.theta[i][2])(q))
+                
+                for d in range(3, 6):
+                    for i in range(n_qubits-1):
+                        circuit.append(cirq.CNOT(qubits[i], qubits[i + 1]))
+                    circuit.append(cirq.CNOT(qubits[n_qubits-1], qubits[0]))
+
+                    for i ,q in enumerate(qubits):
+                        circuit.append(cirq.ry(self.theta[i][d])(q))
+
+                self._circuit = circuit
+                
+                ###define backend
+                self._backend = simulator
+
+                self._param_symbols_list,self._input_symbols_list = get_circuit_symbols(self._circuit)
+
+
+            def run(self,resolver,init_state):
+
+                rlt = self._backend.simulate(self._circuit,resolver,initial_state=init_state).final_state_vector
+                z0 = cirq.Z(self.qubits[0])
+
+                qubit_map={self.qubits[0]: 0}
+                
+                expectation = z0.expectation_from_state_vector(rlt, qubit_map).real
+
+                return expectation
+
+        #define cirq circuits class
+        circuit = CIRQ_VQC()
+
+        class Model_cirq(Module):
+            def __init__(self):
+                super(Model_cirq, self).__init__()
+                self.qvc = CirqLayer(circuit,24)
+
+            def forward(self, x):
+
+                y = self.qvc(x)*0.5 + 0.5
+                return y.astype(x.dtype)
+
+
+        def run_cirq():
+
+            x_train, y_train = load_mnist_4_4("training_data",digits=[3,6],encoding="normalized")
+            y_train = y_train.reshape(-1, 1) 
+
+            x_test, y_test = load_mnist_4_4("testing_data",digits=[3,6],encoding="normalized")
+
+            x_train = x_train.astype(np.float32)
+            x_test = x_test.astype(np.float32)
+            y_test = y_test.astype(np.float32)
+            y_train = y_train.astype(np.float32)
+            x_train = x_train[:100] 
+
+            y_train = y_train[:100] 
+
+            x_test = x_test[:50]
+
+            y_test = y_test[:50]  
+
+            model = Model_cirq()
+
+            optimizer = Adam(model.parameters(),lr =0.01)
+            batch_size = 10
+            epoch = 5
+
+            loss = MeanSquaredError()
+            print("start training..............")
+            model.train()
+
+            TL=[]
+            TA=[]
+
+            for i in range(epoch):
+                count=0
+                sum_loss = 0
+                accuary = 0
+                t = 0
+                for data,label in dataloader(x_train,y_train,batch_size,False):
+
+                    optimizer.zero_grad()
+                    result = model(data)
+                    loss_b = loss(label,result)
+
+                    loss_b.backward()
+                    optimizer._step()
+                    sum_loss += loss_b.item()
+                    count+=batch_size
+                    accuary += get_accuary(result,label)
+                    t = t + 1
+
+                    print(f"epoch:{i},  #### loss:{sum_loss*batch_size/count} #####accuray:{accuary/count}")
+                TL.append(sum_loss*batch_size/count)
+                TA.append(accuary/count)
+            print(f"cirq epoch {epoch}，最终准确率 {TA[-1]}")
+
+        if __name__=="__main__":
+        
+            run_cirq()
 
 
 

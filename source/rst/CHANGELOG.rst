@@ -3,6 +3,30 @@ VQNet Changelog
 ######################
 
 
+[v2.17.2] - 2025-11-18
+***************************
+
+Added
+===================
+
+- 增加量子自然梯度QNG接口 对torch后端的支持；
+- 增加 ``pyvqnet-ad`` 后端，该后端使用类似 torch 的C++自动微分后端，数据结构依旧采用原始的_core.Tensor,支持绝大部分当前现有接口。
+
+
+Changed
+===================
+
+- 删除 `HybirdVQCQpanda3QVMLayer`, `QuantumLayerMultiProcess`, `TorchHybirdVQCQpanda3QVMLayer`;
+- 删除 `is_csr`, `csr_members`, `SparseHamiltonian`, `csr_to_dense`, `dense_to_csr`;
+- 增加 `QiskitLayer`, `CirqLayer`;
+- 增加 为 `QuantumBatchAsyncQcloudLayer` 层 增加 `if_print_qcloud_log` 支持打印qcloud 日志;
+
+Fixed
+===================
+- 支持最新版本pyqpanda2 qcloud的返回值;
+- 增加点乘前的设备检查;
+- 解决 `TorchModule` 的一个bug;
+
 
 [v2.17.1] - 2025-8-22
 ***************************
