@@ -9,7 +9,7 @@ VQNet使用torch进行底层计算
 
     **如需要使用以下功能, 请自行安装 torch>=2.4.0 , 本软件安装时候不自动安装 torch 。**
 
-自2.15.0版本开始,本软件支持使用 ``torch`` 作为计算后端进行底层运算,可接入第三方主流大模型训练库进行大模型微调。
+自2.15.0版本开始,本软件支持使用 ``torch`` 作为计算后端进行底层运算,可接入基于 ``torch`` 的模型、代码、第三方库进行二次开发。
 
 
     .. warning::
@@ -31,15 +31,20 @@ set_backend
 
 .. py:function:: pyvqnet.backends.set_backend(backend_name)
 
-    设置当前计算和储存数据所使用的后端,默认为 "pyvqnet",可设置为 "torch"。
+    该用于切换计算和数据存储后端，可选择使用 pyvqnet 原生计算、C++自动微分、或基于 PyTorch 的后端，从而在不同性能和兼容性需求间灵活切换。默认为 "pyvqnet",可设置为 "torch"。
     
+    使用 ``pyvqnet.backends.set_backend("pyvqnet")`` 后,VQNet ``QTensor`` 的 ``data`` 成员变量均使用 ``pyvqnet._core.Tensor`` 储存数据,并使用pyvqnet c++库计算,
+    自动微分在python完成。
+
+    使用 ``pyvqnet.backends.set_backend("pyvqnet-ad")`` 后,VQNet ``QTensor`` 的 ``data`` 成员变量均使用 ``pyvqnet._core.Tensor`` 储存数据,并使用pyvqnet c++库计算,
+    自动微分在C++完成。
+
     使用 ``pyvqnet.backends.set_backend("torch")`` 后,接口保持不变,VQNet的 ``QTensor`` 的 ``data`` 成员变量均使用 ``torch.Tensor`` 储存数据。
     :ref:`qtensor_api`， :ref:`vqc_api` 以及 `pyvqnet.nn.torch` 下的接口输入接受 ``QTensor`` 类型，输出为 ``QTensor`` 类型。
 
     使用 ``pyvqnet.backends.set_backend("torch-native")`` 后,接口保持不变, :ref:`qtensor_api`， :ref:`vqc_api` 以及 `pyvqnet.nn.torch` 下的接口
     输入可直接接受 ``torch.Tensor`` 类型或 ``QTensor`` 类型，输出为 ``torch.Tensor`` ，不再转换为 ``QTensor`` ，减少了数据转换。
     
-    使用 ``pyvqnet.backends.set_backend("pyvqnet")`` 后,VQNet ``QTensor`` 的 ``data`` 成员变量均使用 ``pyvqnet._core.Tensor`` 储存数据,并使用pyvqnet c++库计算。
 
     .. warning::
 
@@ -8727,6 +8732,7 @@ CommController
 -------------------------
 
 .. py:class:: pyvqnet.distributed.ControlComm.CommController(backend,rank=None,world_size=None)
+    :no-index:
 
     CommController用于控制在cpu、gpu下数据通信的控制器, 通过设置参数 `backend` 来生成cpu(gloo)、gpu(nccl)的控制器。
     这个类会调用 backend,rank,world_size 初始化 ``torch.distributed.init_process_group(backend,rank,world_size)``
@@ -8772,9 +8778,9 @@ CommController
  
 
     .. py:method:: getRank()
-        
-        用于获得当前进程的进程号。
+        :no-index:
 
+        用于获得当前进程的进程号。
 
         :return: 返回当前进程的进程号。
 
@@ -8813,7 +8819,8 @@ CommController
 
 
     .. py:method:: getSize()
-    
+        :no-index:
+
         用于获得总共启动的进程数。
 
 
@@ -8854,7 +8861,8 @@ CommController
 
 
     .. py:method:: getLocalRank()
-        
+        :no-index:
+
         在每个进程中通过 ``os.environ['LOCAL_RANK'] = rank`` 获取每个机器的局部进程号。
         需要事先对环境变量 `LOCAL_RANK` 进行设置。
 
@@ -8894,7 +8902,8 @@ CommController
 
  
     .. py:method:: split_group(rankL)
-        
+        :no-index:
+
         根据入参设置的进程号列表用于划分多个通信组。
 
         :param rankL: 进程组列表。
@@ -8943,7 +8952,8 @@ CommController
 
  
     .. py:method:: barrier()
-        
+        :no-index:
+
         不同进程的同步。
 
         :return: 同步操作。
@@ -8981,7 +8991,8 @@ CommController
                     p.join()
 
     .. py:method:: allreduce(tensor, c_op = "avg")
-        
+        :no-index:
+
         支持对数据作allreduce通信。
 
         :param tensor: 输入数据.
@@ -9029,7 +9040,8 @@ CommController
 
  
     .. py:method:: reduce(tensor, root = 0, c_op = "avg")
-        
+        :no-index:
+
         支持对数据作reduce通信。
 
         :param tensor: 输入数据。
@@ -9077,7 +9089,8 @@ CommController
  
  
     .. py:method:: broadcast(tensor, root = 0)
-        
+        :no-index:
+
         将指定进程root上的数据广播到所有进程上。
 
         :param tensor: 输入数据。
@@ -9125,7 +9138,8 @@ CommController
 
  
     .. py:method:: allgather(tensor)
-        
+        :no-index:
+
         将所有进程上数据allgather到一起。本接口只支持nccl后端。
 
         :param tensor: 输入数据。
@@ -9169,7 +9183,8 @@ CommController
 
 
     .. py:method:: send(tensor, dest)
-        
+        :no-index:
+
         p2p通信接口。
 
         :param tensor: 输入数据.
@@ -9216,7 +9231,8 @@ CommController
  
  
     .. py:method:: recv(tensor, source)
-        
+        :no-index:
+
         p2p通信接口。
 
         :param tensor: 输入数据.
@@ -9263,7 +9279,8 @@ CommController
             
 
     .. py:method:: allreduce_group(tensor, c_op = "avg", group = None)
-        
+        :no-index:
+
         组内allreduce通信接口。
 
         :param tensor: 输入数据.
@@ -9317,7 +9334,8 @@ CommController
 
 
     .. py:method:: reduce_group(tensor, root = 0, c_op = "avg", group = None)
-        
+        :no-index:
+
         组内reduce通信接口。
 
         :param tensor: 输入数据.
@@ -9369,7 +9387,8 @@ CommController
 
  
     .. py:method:: broadcast_group(tensor, root = 0, group = None)
-        
+        :no-index:
+
         组内broadcast通信接口。
 
         :param tensor: 输入数据.
@@ -9422,7 +9441,8 @@ CommController
 
 
     .. py:method:: allgather_group(tensor, group = None)
-        
+        :no-index:
+
         组内allgather通信接口,仅支持 `nccl` 后端。
 
         :param tensor: 输入数据.
