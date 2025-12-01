@@ -3528,7 +3528,7 @@ QUnet主要是用于解决图像分割的技术。
     from pyvqnet.optim.adam import Adam
     from pyvqnet.tensor.tensor import QTensor
     from pyvqnet import kfloat32
-    from pyvqnet.qnn.quantumlayer import QuantumLayerMultiProcess
+    from pyvqnet.qnn.quantumlayer import QuantumLayer
     from pyvqnet.tensor import tensor
     from pyvqnet.qnn.measure import expval
     from pyvqnet._core import Tensor as CoreTensor
@@ -3536,7 +3536,7 @@ QUnet主要是用于解决图像分割的技术。
     from matplotlib import pyplot as plt
     try:
         matplotlib.use("TkAgg")
-    except:  
+    except:  # pylint:disable=bare-except
         print("Can not use matplot TkAgg")
     def display_frames_as_gif(frames, c_index):
         patch = plt.imshow(frames[0])
@@ -3558,27 +3558,7 @@ QUnet主要是用于解决图像分割的技术。
     STATE_NT = 3
     DONE = 4
     def RotCircuit(para, qlist):
-        r"""
-        Arbitrary single qubit rotation.Number of qlist should be 1,and number of parameters should
-        be 3
-        .. math::
-            R(\phi,\theta,\omega) = RZ(\omega)RY(\theta)RZ(\phi)= \begin{bmatrix}
-            e^{-i(\phi+\omega)/2}\cos(\theta/2) & -e^{i(\phi-\omega)/2}\sin(\theta/2) \\
-            e^{-i(\phi-\omega)/2}\sin(\theta/2) & e^{i(\phi+\omega)/2}\cos(\theta/2)
-            \end{bmatrix}.
-        :param para: numpy array which represents paramters [\phi, \theta, \omega]
-        :param qlist: qubits allocated by pyQpanda.qAlloc_many()
-        :return: quantum circuits
-        Example::
-            m_machine = pq.init_quantum_machine(pq.QMachineType.CPU)
-            m_clist = m_machine.cAlloc_many(2)
-            m_prog = pq.QProg()
-            m_qlist = m_machine.qAlloc_many(1)
-            param = np.array([3,4,5])
-            c = RotCircuit(param,m_qlist)
-            print(c)
-            pq.destroy_quantum_machine(m_machine)
-        """
+        
         if isinstance(para, QTensor):
             para = QTensor._to_numpy(para)
         if para.ndim > 1:
@@ -3605,9 +3585,10 @@ QUnet主要是用于解决图像分割的技术。
     def encoder(encodings):
         encodings = int(encodings[0])
         return [i for i, b in enumerate(f'{encodings:0{CIRCUIT_SIZE}b}') if b == '1']
-    def build_qc(x, weights, num_qubits, num_clist,machine):
 
-        qubits = machine.qAlloc_many(num_qubits)
+    def build_qc(x, weights, qubits, cubits ,machine):
+
+
         cir = pq.QCircuit()
         if x:
             wires = encoder(x)
@@ -3622,7 +3603,7 @@ QUnet主要是用于解决图像分割的技术。
         prog = pq.QProg()
         prog.insert(cir)
         exp_vals = []
-        for position in range(num_qubits):
+        for position in range(n_qubits):
             pauli_str = {"Z" + str(position): 1.0}
             exp2 = expval(machine, prog, pauli_str, qubits)
             exp_vals.append(exp2)
@@ -3630,9 +3611,8 @@ QUnet主要是用于解决图像分割的技术。
     class DRLModel(Module):
         def __init__(self):
             super(DRLModel, self).__init__()
-
             self.quantum_circuit = QuantumLayer(build_qc, 24, "CPU", 4, diff_method="finite_diff")
-            
+
         def forward(self, x):
             quanutum_result = self.quantum_circuit(x)
             return quanutum_result
@@ -3662,9 +3642,9 @@ QUnet主要是用于解决图像分割的技术。
             time.sleep(0.1)
             input_x = QTensor([[state_t]],dtype=kfloat32)
             acts = model(input_x) + bias
-            # print(f'type of acts: {type(acts)}')
+
             act_t = tensor.QTensor.argmax(acts)
-            # print(f'act_t: {act_t} type of act_t: {type(act_t)}')
+
             act_t_np = int(act_t.pdata[0])
             print(f'Episode: {i}, Steps: {t}, act: {act_t_np}')
             state_nt, reward, done, info = env.step(action=act_t_np)
@@ -3712,6 +3692,7 @@ QUnet主要是用于解决图像分割的技术。
                     exit()
                 break
         end = time.time()
+
 
 
 无监督学习
