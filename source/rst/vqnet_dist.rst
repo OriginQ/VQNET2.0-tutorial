@@ -293,7 +293,7 @@ h
 
 
 CommController
-=================================
+~~~~~~~~~~~~~~~~~~~~~~~
 
 .. py:class:: pyvqnet.distributed.ControlComm.CommController(backend,rank=None,world_size=None)
 
@@ -678,7 +678,7 @@ CommController
  
 
 split_data
-=================================
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 在多进程中,使用 ``split_data`` 根据进程数对数据进行切分,返回相应进程上数据。
 
@@ -703,7 +703,7 @@ split_data
         x_train, y_train= split_data(x_train, y_train)
 
 get_local_rank
-=================================
+~~~~~~~~~~~~~~~~~~~~~~~
 
 
 .. py:function:: pyvqnet.distributed.ControlComm.get_local_rank()
@@ -720,7 +720,7 @@ get_local_rank
         # vqnetrun -n 2 python test.py
 
 get_rank
-=================================
+~~~~~~~~~~~~~~~~~
 
 .. py:function:: pyvqnet.distributed.ControlComm.get_rank()
 
@@ -736,7 +736,7 @@ get_rank
         # vqnetrun -n 2 python test.py
 
 init_group
-=================================
+~~~~~~~~~~~~~~~~~~~
 
 
 .. py:function:: pyvqnet.distributed.ControlComm.init_group(rank_lists)
@@ -769,7 +769,7 @@ init_group
 
 
 PipelineParallelTrainingWrapper
-=================================
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 .. py:class:: pyvqnet.distributed.pp.PipelineParallelTrainingWrapper(args,join_layers,trainset)
     
     Pipeline Parallel Training Wrapper 实现了 1F1B训练。仅在 Linux 平台上,且具有 GPU 的情况下可用。
@@ -906,7 +906,7 @@ PipelineParallelTrainingWrapper
 
 
 ZeroModelInitial
-=================================
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 .. py:class:: pyvqnet.distributed.ZeroModelInitial(args,model,optimizer)
     
     Zero1 api接口, 目前仅用于linux平台下基于GPU并行计算。
@@ -1092,7 +1092,7 @@ ZeroModelInitial
         print(f'Accuracy of the model on the 10000 Train images: {train_acc}% time cost {time2 - time1}')
 
 ColumnParallelLinear
-=================================
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 .. py:class:: pyvqnet.distributed.ColumnParallelLinear(input_size,output_size,weight_initializer,bias_initializer,use_bias,dtype,name,tp_comm)
     
     张量并行计算,列并行线性层
@@ -1268,7 +1268,7 @@ ColumnParallelLinear
 
 
 RowParallelLinear
-=================================
+~~~~~~~~~~~~~~~~~~~~~~~~~
 .. py:class:: pyvqnet.distributed.RowParallelLinear(input_size,output_size,weight_initializer,bias_initializer,use_bias,dtype,name,tp_comm)
     
     张量并行计算,行并行线性层。
