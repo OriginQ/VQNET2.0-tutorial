@@ -5,7 +5,7 @@
 批量数据量子梯度基准测试
 ***********************************
 
-在量子机器学习中，梯度计算是影响变分量子线路效率的关键环节。为评估不同框架的量子梯度计算性能，本文在 Linux 系统下使用 GPU，对 VQNet、Deepquantum 与 Pennylane 进行了基准测试。测试在不同批量数据规模、线路深度与量子比特数目下分别进行，统计了各框架运行 10 次的平均耗时。其中，Deepquantum 和 Pennylane 基于 Torch 的 GPU 后端实现，VQNet 则使用自研的 GPU 加速方案。
+在量子机器学习中，梯度计算是影响变分量子线路效率的关键环节。为评估不同框架的量子梯度计算性能，本文在 Linux 系统下使用 GPU，对 VQNet、Deepquantum 与 Pennylane 进行了基准测试。测试在不同批量数据规模、线路深度与量子比特数目下分别进行，统计了各框架运行 10 次的平均耗时。其中，Deepquantum 和 Pennylane 基于 Torch 的 GPU 后端实现，VQNet 则使用自研代码实现GPU运算。
 
 .. image:: ./images/grad-benchmarks.png
    :width: 600 px
