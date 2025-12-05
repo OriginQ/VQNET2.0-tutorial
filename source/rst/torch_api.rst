@@ -7,19 +7,16 @@ VQNet使用torch进行底层计算
 
     .. important::
 
-        **如需要使用以下功能, 请自行安装 torch>=2.4.0 , 本软件安装时候不自动安装 torch 。**
+        **如需要使用以下功能, 请自行安装 torch >= 2.4.0 , 本软件安装时候不自动安装 torch 。**
 
 自2.15.0版本开始,本软件支持使用 `pytorch` 作为计算后端进行底层运算,可接入基于pytorch的模型、代码、第三方库进行二次开发。
 
 
     .. important::
 
-        在 ``pyvqnet.backends.set_backend("torch")`` 后,可以输入 ``QTensor``,其成员 `data` 从pyvqnet的QTensor变为 ``torch.Tensor`` 计算。
+        :ref:`vqc_api` 中的变分量子计算函数(小写命名,例如 `rx`, `ry`, `rz` 等), :ref:`qtensor_api` 中的QTensor基本计算函数,以及经典和量子神经网络模块, 在 ``pyvqnet.backends.set_backend("torch")`` 后,可以输入 ``QTensor``,其成员 `data` 从pyvqnet的 ``_core.Tensor`` 变为 ``torch.Tensor`` 计算。
 
-        ``pyvqnet.backends.set_backend("torch")`` 以及 ``pyvqnet.backends.set_backend("pyvqnet")`` 会修改全局运行后端。
-        不同后端配置下申请的 ``QTensor`` 无法一起运算。
-
-        使用 ``to_tensor`` 可将 ``torch.Tensor`` 封装为一个 ``QTensor`` 。
+        可使用 ``to_tensor`` 可将 ``torch.Tensor`` 封装为一个 ``QTensor`` 。
 
         使用 ``pytorch`` 等后端时，所使用的神经网络模块、pyqpanda量子神经网络模块必须继承于 ``pyvqnet.nn.torch.TorchModule``,
         自动微分变分量子模块必须必须继承于 ``pyvqnet.qnn.vqc.torch.QModule``， 否则其中参数无法进行自动微分训练和保存。
@@ -27,7 +24,11 @@ VQNet使用torch进行底层计算
         ``pyvqnet.nn.torch.TorchModule`` 和 ``pyvqnet.qnn.vqc.torch.QModule`` 的 ``_buffers`` 中的数据为 ``torch.Tensor`` 类型, 
         , ``_parmeters`` 中的数据为 ``torch.nn.Parameter`` 类型,无法使用QTensor接口。
 
-        :ref:`vqc_api` 中的变分量子计算函数(小写命名,例如 `rx`, `ry`, `rz` 等), :ref:`qtensor_api` 中的QTensor基本计算函数,
+
+        请注意：``pyvqnet.backends.set_backend("torch")`` 以及 ``pyvqnet.backends.set_backend("pyvqnet")`` 会修改全局运行后端。
+        不同后端配置下创建的 ``QTensor`` ，其底层数据结构不同，无法一起运算。
+
+
 
 
 
