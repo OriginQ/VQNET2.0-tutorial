@@ -904,9 +904,10 @@ QiskitLayer
                 TA.append(accuary/count)
             print(f"qiskit epoch {epoch}，最终准确率 {TA[-1]}")
 
-if __name__=="__main__":
+        
+        if __name__=="__main__":
 
-    Run_qiskit()
+            Run_qiskit()
 
 
 CirqLayer
