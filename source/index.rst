@@ -58,7 +58,6 @@ VQNet 不仅是一个强大的开发工具，还在公司内部多个项目中�
 
     rst/QTensor.rst
     rst/nn.rst
-    rst/vqnet_dist.rst
     rst/utils.rst
 
 .. toctree::
@@ -84,7 +83,8 @@ VQNet 不仅是一个强大的开发工具，还在公司内部多个项目中�
 .. toctree::
     :caption: 其他
     :maxdepth: 2
-
+    
+    rst/vqnet_dist.rst
     rst/torch_api.rst
     rst/FAQ.rst
     rst/CHANGELOG.rst
