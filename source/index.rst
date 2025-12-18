@@ -72,7 +72,7 @@ VQNet 不仅是一个强大的开发工具，还在公司内部多个项目中�
     :maxdepth: 2
 
     rst/vqc.rst
-    .. rst/benchmarks.rst
+
 
 .. toctree::
     :caption: 量子大模型微调
