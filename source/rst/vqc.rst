@@ -5812,6 +5812,8 @@ QNSPSAOptimizer
                         print(f"Step {i}: cost = {loss}")
 
 
+.. _benchmarks:
+
 批量数据量子梯度基准测试
 =========================
 

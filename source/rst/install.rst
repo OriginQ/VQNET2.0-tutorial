@@ -12,16 +12,27 @@ VQNet python包安装
 
     pip install pyvqnet --upgrade
 
+如在Linux遇到如下GLBCXX问题:
+
+.. code-block::
+    
+    ImportError: /lib/x86_64-linux-gnu/libstdc++.so.6: version `GLIBCXX_3.4.30' not found (required by /home/whc/miniforge3/envs/py310/lib/python3.10/site-packages/pyvqnet/libs/libvqnet.so)
+
+可更新libstdcxx库，例如：
+
+.. code-block::
+    
+    conda install -c conda-forge "libstdcxx-ng>=12"
 
 对于Windows, Linux系统, pyvqnet软件包自带基于Nvidia CUDA对经典神经网络计算加速功能。软件包编译时针对以下 CUDA 架构进行了优化：**sm_80** (NVIDIA A100, A30 系列数据中心 GPU) 和 **sm_86** (NVIDIA GeForce RTX 30 系列消费级 GPU)。请确保使用支持上述架构的 GPU，否则程序可能无法正常运行。
 
 
 
-
-
-
 VQNet 测试安装成功
 ----------------------------------
+
+
+
 
 .. code-block::
 

@@ -106,3 +106,16 @@ VQNet提供的 :ref:`QuantumLayer_pq3` 下的接口已经封装了量子变分�
 使用以下功能需要自行安装torch>=2.4.0。自v2.15.0版本,我们支持使用 `torch >=2.4.0 <https://docs.pytorch.org/docs/stable/index.html>`_ 作为计算后端，进行经典神经网络、量子变分线路、分布式等计算。
 使用 ``pyvqnet.backends.set_backend("torch")`` 后,接口保持不变,但VQNet的 ``QTensor`` 的 ``data`` 成员变量均使用 ``torch.Tensor`` 储存数据,
 并使用torch计算。 ``pyvqnet.nn.torch`` 以及 ``pyvqnet.qnn.vqc.torch`` 下的类继承于 ``torch.nn.Module`` ,可以构成 ``torch`` 模型。
+
+
+**问: 在Linux遇到如下GLBCXX问题:**
+
+    .. code-block::
+        
+        ImportError: /lib/x86_64-linux-gnu/libstdc++.so.6: version `GLIBCXX_3.4.30' not found (required by /home/whc/miniforge3/envs/py310/lib/python3.10/site-packages/pyvqnet/libs/libvqnet.so)
+
+答: 可更新libstdcxx库，例如：
+
+    .. code-block::
+        
+        conda install -c conda-forge "libstdcxx-ng>=12"
