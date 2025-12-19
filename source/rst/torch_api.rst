@@ -5,23 +5,33 @@
 VQNet使用torch进行底层计算
 ====================================
 
-.. danger::
+    .. important::
 
-    **如需要使用以下功能, 请自行安装 torch>=2.4.0 , 本软件安装时候不自动安装 torch 。**
+        **如需要使用以下功能, 请自行安装 torch >= 2.4.0 , 本软件安装时候不自动安装 torch 。**
 
-自2.15.0版本开始,本软件支持使用 ``torch`` 作为计算后端进行底层运算,可接入第三方主流大模型训练库进行大模型微调。
+自2.15.0版本开始,本软件支持使用 `pytorch` 作为计算后端进行底层运算,可接入基于pytorch的模型、代码、第三方库进行二次开发。
 
 
-    .. warning::
+    .. important::
 
-        :ref:`vqc_api` 中的变分量子计算函数(小写命名,例如 `rx`, `ry`, `rz` 等), :ref:`qtensor_api` 中的QTensor基本计算函数,
+        :ref:`vqc_api` 中的变分量子计算函数(小写命名,例如 `rx`, `ry`, `rz` 等), :ref:`qtensor_api` 中的QTensor基本计算函数,以及经典和量子神经网络模块, 在 ``pyvqnet.backends.set_backend("torch")`` 后,可以输入 ``QTensor``,其成员 `data` 从pyvqnet的 ``_core.Tensor`` 变为 ``torch.Tensor`` 计算。
 
-        在 ``pyvqnet.backends.set_backend("torch")`` 后,可以输入 ``QTensor``,其成员 `data` 从pyvqnet的Tensor变为 ``torch.Tensor`` 计算。
+        可使用 ``to_tensor`` 可将 ``torch.Tensor`` 封装为一个 ``QTensor`` 。
 
-        ``pyvqnet.backends.set_backend("torch")`` 以及 ``pyvqnet.backends.set_backend("pyvqnet")`` 会修改全局运行后端。
-        不同后端配置下申请的 ``QTensor`` 无法一起运算。
+        使用 ``pytorch`` 等后端时，所使用的神经网络模块、pyqpanda量子神经网络模块必须继承于 ``pyvqnet.nn.torch.TorchModule``,
+        自动微分变分量子模块必须必须继承于 ``pyvqnet.qnn.vqc.torch.QModule``， 否则其中参数无法进行自动微分训练和保存。
 
-        使用 ``to_tensor`` 可将 ``torch.Tensor`` 封装为一个 ``QTensor`` 。
+        ``pyvqnet.nn.torch.TorchModule`` 和 ``pyvqnet.qnn.vqc.torch.QModule`` 的 ``_buffers`` 中的数据为 ``torch.Tensor`` 类型, 
+        , ``_parmeters`` 中的数据为 ``torch.nn.Parameter`` 类型,无法使用QTensor接口。
+
+
+        请注意：``pyvqnet.backends.set_backend("torch")`` 以及 ``pyvqnet.backends.set_backend("pyvqnet")`` 会修改全局运行后端。
+        不同后端配置下创建的 ``QTensor`` ，其底层数据结构不同，无法一起运算。
+
+
+
+
+
 
 计算后端基本设置
 ====================
@@ -31,15 +41,20 @@ set_backend
 
 .. py:function:: pyvqnet.backends.set_backend(backend_name)
 
-    设置当前计算和储存数据所使用的后端,默认为 "pyvqnet",可设置为 "torch"。
+    该用于切换计算和数据存储后端，可选择使用 pyvqnet 原生计算、C++自动微分、或基于 PyTorch 的后端，从而在不同性能和兼容性需求间灵活切换。默认为 "pyvqnet",可设置为 "torch"。
     
+    使用 ``pyvqnet.backends.set_backend("pyvqnet")`` 后,VQNet ``QTensor`` 的 ``data`` 成员变量均使用 ``pyvqnet._core.Tensor`` 储存数据,并使用pyvqnet c++库计算,
+    自动微分在python完成。
+
+    使用 ``pyvqnet.backends.set_backend("pyvqnet-ad")`` 后,VQNet ``QTensor`` 的 ``data`` 成员变量均使用 ``pyvqnet._core.Tensor`` 储存数据,并使用pyvqnet c++库计算,
+    自动微分在C++完成。
+
     使用 ``pyvqnet.backends.set_backend("torch")`` 后,接口保持不变,VQNet的 ``QTensor`` 的 ``data`` 成员变量均使用 ``torch.Tensor`` 储存数据。
     :ref:`qtensor_api`， :ref:`vqc_api` 以及 `pyvqnet.nn.torch` 下的接口输入接受 ``QTensor`` 类型，输出为 ``QTensor`` 类型。
 
     使用 ``pyvqnet.backends.set_backend("torch-native")`` 后,接口保持不变, :ref:`qtensor_api`， :ref:`vqc_api` 以及 `pyvqnet.nn.torch` 下的接口
     输入可直接接受 ``torch.Tensor`` 类型或 ``QTensor`` 类型，输出为 ``torch.Tensor`` ，不再转换为 ``QTensor`` ，减少了数据转换。
     
-    使用 ``pyvqnet.backends.set_backend("pyvqnet")`` 后,VQNet ``QTensor`` 的 ``data`` 成员变量均使用 ``pyvqnet._core.Tensor`` 储存数据,并使用pyvqnet c++库计算。
 
     .. warning::
 
@@ -5387,149 +5402,6 @@ QuantumLayerAdjoint
 
 
 
-TorchHybirdVQCQpanda3QVMLayer
-""""""""""""""""""""""""""""""""""""""""
-
-.. py:class:: pyvqnet.qnn.vqc.torch.TorchHybirdVQCQpanda3QVMLayer(vqc_module: Module,qcloud_token: str,pauli_str_dict: Union[List[Dict], Dict, None] = None,shots: int = 1000,dtype: Union[int, None] = None,name: str = "",submit_kwargs: Dict = {},query_kwargs: Dict = {})
-
-
-    使用torch后端,混合 vqc 和 qpanda3 模拟计算。该层将用户 `forward` 函数定义的VQNet编写的量子线路计算转化为QPanda OriginIR,在QPanda3本地虚拟机或者云端服务上进行前向运行,并在基于自动微分计算线路参数梯度,降低了使用参数漂移法计算的时间复杂度。
-    其中 ``vqc_module`` 为用户自定义的量子变分线路模型,其中的QMachine设置 ``save_ir= True`` 。
-
-    :param vqc_module: 带有 forward() 的 vqc_module。
-    :param qcloud_token: `str` - 量子机器的类型或用于执行的云令牌。
-    :param pauli_str_dict: `dict|list` - 表示量子电路中泡利算子的字典或字典列表。默认值为 None。
-    :param shots: `int` - 量子线路测量次数。默认值为 1000。
-    :param name: 模块名称。默认值为空字符串。
-    :param submit_kwargs: 提交量子电路的附加关键字参数,默认值:
-        {"chip_id":pyqpanda.real_chip_type.origin_72,
-        "is_amend":True,"is_mapping":True,
-        "is_optimization":True,
-        "default_task_group_size":200,
-        "test_qcloud_fake":True}。
-    :param query_kwargs: 查询量子结果的附加关键字参数,默认值:{"timeout":2,"print_query_info":True,"sub_circuits_split_size":1}。
-    
-    :return: 可以计算量子电路的模块。
-
-
-    .. warning::
-
-        该类继承于 ``pyvqnet.nn.torch.TorchModule`` 以及 ``pyvqnet.qnn.pq3.HybirdVQCQpandaQVMLayer`` ,可以作为 ``torch.nn.Module`` 的一个子模块加入torch的模型中。
-
-
-    .. note::
-
-        pauli_str_dict 不能为 None,并且应与 vqc_module 测量函数中的 obs 相同。
-        vqc_module 应具有 QMachine 类型的属性,QMachine 应设置 save_ir=True
-
-    Example::
-
-        import pyvqnet.backends
-        import numpy as np
-        from pyvqnet.qnn.vqc.torch import QMachine,QModule,RX,RY,\
-        RZ,U1,U2,U3,I,S,X1,PauliX,PauliY,PauliZ,SWAP,CZ,\
-        RXX,RYY,RZX,RZZ,CR,Toffoli,Hadamard,T,CNOT,MeasureAll
-        from pyvqnet.qnn.vqc.torch import HybirdVQCQpanda3QVMLayer
-        import pyvqnet
-
-        from pyvqnet import tensor
-
-        import pyvqnet.utils
-        pyvqnet.backends.set_backend("torch")
-        pyvqnet.utils.set_random_seed(42)
-
-        class QModel(QModule):
-            def __init__(self, num_wires, dtype,grad_mode=""):
-                super(QModel, self).__init__()
-
-                self._num_wires = num_wires
-                self._dtype = dtype
-                self.qm = QMachine(num_wires, dtype=dtype,grad_mode=grad_mode,save_ir=True)
-                self.rx_layer = RX(has_params=True, trainable=False, wires=0)
-                self.ry_layer = RY(has_params=True, trainable=False, wires=1)
-                self.rz_layer = RZ(has_params=True, trainable=False, wires=1)
-                self.u1 = U1(has_params=True,trainable=True,wires=[2])
-                self.u2 = U2(has_params=True,trainable=True,wires=[3])
-                self.u3 = U3(has_params=True,trainable=True,wires=[1])
-                self.i = I(wires=[3])
-                self.s = S(wires=[3])
-                self.x1 = X1(wires=[3])
-                
-                self.x = PauliX(wires=[3])
-                self.y = PauliY(wires=[3])
-                self.z = PauliZ(wires=[3])
-                self.swap = SWAP(wires=[2,3])
-                self.cz = CZ(wires=[2,3])
-                self.cr = CR(has_params=True,trainable=True,wires=[2,3])
-                self.rxx = RXX(has_params=True,trainable=True,wires=[2,3])
-                self.rzz = RYY(has_params=True,trainable=True,wires=[2,3])
-                self.ryy = RZZ(has_params=True,trainable=True,wires=[2,3])
-                self.rzx = RZX(has_params=True,trainable=False, wires=[2,3])
-                self.toffoli = Toffoli(wires=[2,3,4],use_dagger=True)
-                self.h =Hadamard(wires=[1])
-
-
-                self.tlayer = T(wires=1)
-                self.cnot = CNOT(wires=[0, 1])
-                self.measure = MeasureAll(obs={'Z0':2,'Y3':3} 
-            )
-
-            def forward(self, x, *args, **kwargs):
-                self.qm.reset_states(x.shape[0])
-                self.i(q_machine=self.qm)
-                self.s(q_machine=self.qm)
-                self.swap(q_machine=self.qm)
-                self.cz(q_machine=self.qm)
-                self.x(q_machine=self.qm)
-                self.x1(q_machine=self.qm)
-                self.y(q_machine=self.qm)
-
-                self.z(q_machine=self.qm)
-
-                self.ryy(q_machine=self.qm)
-                self.rxx(q_machine=self.qm)
-                self.rzz(q_machine=self.qm)
-                self.rzx(q_machine=self.qm,params = x[:,[1]])
-                self.cr(q_machine=self.qm)
-                self.u1(q_machine=self.qm)
-                self.u2(q_machine=self.qm)
-                self.u3(q_machine=self.qm)
-                self.rx_layer(params = x[:,[0]], q_machine=self.qm)
-                self.cnot(q_machine=self.qm)
-                self.h(q_machine=self.qm)
-
-                self.ry_layer(params = x[:,[1]], q_machine=self.qm)
-                self.tlayer(q_machine=self.qm)
-                self.rz_layer(params = x[:,[2]], q_machine=self.qm)
-                self.toffoli(q_machine=self.qm)
-                rlt = self.measure(q_machine=self.qm)
-
-                return rlt
-            
-
-        input_x = tensor.QTensor([[0.1, 0.2, 0.3]])
-
-        input_x = tensor.broadcast_to(input_x,[2,3])
-
-        input_x.requires_grad = True
-
-        qunatum_model = QModel(num_wires=6, dtype=pyvqnet.kcomplex64)
-
-        l = HybirdVQCQpanda3QVMLayer(qunatum_model,
-                                "3047DE8A59764BEDAC9C3282093B16AF1",
-
-                    pauli_str_dict={'Z0':2,'Y3':3},
-                    shots = 1000,
-                    name="",
-            submit_kwargs={"test_qcloud_fake":True},
-                    query_kwargs={})
-
-        y = l(input_x)
-        print(y)
-
-        y.backward()
-        print(input_x.grad)
-
 
 张量网络后端变分量子线路模块
 ============================================
@@ -8870,6 +8742,7 @@ CommController
 -------------------------
 
 .. py:class:: pyvqnet.distributed.ControlComm.CommController(backend,rank=None,world_size=None)
+    :no-index:
 
     CommController用于控制在cpu、gpu下数据通信的控制器, 通过设置参数 `backend` 来生成cpu(gloo)、gpu(nccl)的控制器。
     这个类会调用 backend,rank,world_size 初始化 ``torch.distributed.init_process_group(backend,rank,world_size)``
@@ -8915,9 +8788,9 @@ CommController
  
 
     .. py:method:: getRank()
-        
-        用于获得当前进程的进程号。
+        :no-index:
 
+        用于获得当前进程的进程号。
 
         :return: 返回当前进程的进程号。
 
@@ -8956,7 +8829,8 @@ CommController
 
 
     .. py:method:: getSize()
-    
+        :no-index:
+
         用于获得总共启动的进程数。
 
 
@@ -8997,7 +8871,8 @@ CommController
 
 
     .. py:method:: getLocalRank()
-        
+        :no-index:
+
         在每个进程中通过 ``os.environ['LOCAL_RANK'] = rank`` 获取每个机器的局部进程号。
         需要事先对环境变量 `LOCAL_RANK` 进行设置。
 
@@ -9037,7 +8912,8 @@ CommController
 
  
     .. py:method:: split_group(rankL)
-        
+        :no-index:
+
         根据入参设置的进程号列表用于划分多个通信组。
 
         :param rankL: 进程组列表。
@@ -9086,7 +8962,8 @@ CommController
 
  
     .. py:method:: barrier()
-        
+        :no-index:
+
         不同进程的同步。
 
         :return: 同步操作。
@@ -9124,7 +9001,8 @@ CommController
                     p.join()
 
     .. py:method:: allreduce(tensor, c_op = "avg")
-        
+        :no-index:
+
         支持对数据作allreduce通信。
 
         :param tensor: 输入数据.
@@ -9172,7 +9050,8 @@ CommController
 
  
     .. py:method:: reduce(tensor, root = 0, c_op = "avg")
-        
+        :no-index:
+
         支持对数据作reduce通信。
 
         :param tensor: 输入数据。
@@ -9220,7 +9099,8 @@ CommController
  
  
     .. py:method:: broadcast(tensor, root = 0)
-        
+        :no-index:
+
         将指定进程root上的数据广播到所有进程上。
 
         :param tensor: 输入数据。
@@ -9268,7 +9148,8 @@ CommController
 
  
     .. py:method:: allgather(tensor)
-        
+        :no-index:
+
         将所有进程上数据allgather到一起。本接口只支持nccl后端。
 
         :param tensor: 输入数据。
@@ -9312,7 +9193,8 @@ CommController
 
 
     .. py:method:: send(tensor, dest)
-        
+        :no-index:
+
         p2p通信接口。
 
         :param tensor: 输入数据.
@@ -9359,7 +9241,8 @@ CommController
  
  
     .. py:method:: recv(tensor, source)
-        
+        :no-index:
+
         p2p通信接口。
 
         :param tensor: 输入数据.
@@ -9406,7 +9289,8 @@ CommController
             
 
     .. py:method:: allreduce_group(tensor, c_op = "avg", group = None)
-        
+        :no-index:
+
         组内allreduce通信接口。
 
         :param tensor: 输入数据.
@@ -9460,7 +9344,8 @@ CommController
 
 
     .. py:method:: reduce_group(tensor, root = 0, c_op = "avg", group = None)
-        
+        :no-index:
+
         组内reduce通信接口。
 
         :param tensor: 输入数据.
@@ -9512,7 +9397,8 @@ CommController
 
  
     .. py:method:: broadcast_group(tensor, root = 0, group = None)
-        
+        :no-index:
+
         组内broadcast通信接口。
 
         :param tensor: 输入数据.
@@ -9565,7 +9451,8 @@ CommController
 
 
     .. py:method:: allgather_group(tensor, group = None)
-        
+        :no-index:
+
         组内allgather通信接口,仅支持 `nccl` 后端。
 
         :param tensor: 输入数据.

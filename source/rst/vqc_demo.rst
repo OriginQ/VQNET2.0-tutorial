@@ -1,9 +1,9 @@
 使用自动微分模拟的量子机器学习示例
 ##################################################
 
-下面的例子使用 ``pyvqnet.qnn.vqc`` 下的变分量子线路接口实现一些量子机器学习算法和示例。 ``pyvqnet.qnn.vqc`` 下的变分量子线路接口使用态矢来表示量子态在量子逻辑门下的演化,通过自动微分计算变分量子线路中的梯度。
+下面的例子使用 ``pyvqnet.qnn.vqc`` 下的变分量子线路接口实现了一些量子机器学习算法和示例。 ``pyvqnet.qnn.vqc`` 下的变分量子线路接口使用态矢(statevectors) 来表示量子态在量子逻辑门下的演化,基于自动微分计算变分量子线路中的梯度。
 
-请注意下例子中 ``pyvqnet.qnn.vqc.QMachine`` 的使用,该类存放了量子态矢的数据,当计算批量数据时候或者每次进行测量之后,必须进行 ``pyvqnet.qnn.vqc.QMachine.reset_states`` 重新初始化态矢数据到输入数据的batch_size大小。
+请注意以下例子中 ``pyvqnet.qnn.vqc.QMachine`` 的使用,该类存放了量子态矢的数据,当计算批量数据时候或者每次进行测量之后,必须进行 ``pyvqnet.qnn.vqc.QMachine.reset_states`` 重新初始化态矢数据到输入数据的batch_size大小。
 ``pyvqnet.qnn.vqc`` 还提供了 MeasureAll,Probability,Samples 等测量接口。
 
 此外, ``pyvqnet.qnn.vqc.QModule`` 为用户定义的计算自动微分量子线路模型需要继承的类,需要像经典神经网络模型一样,定义 `__init__` 以及 `forward` 函数。

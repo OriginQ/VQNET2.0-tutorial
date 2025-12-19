@@ -4,28 +4,35 @@ VQNet 安装步骤
 VQNet python包安装
 ----------------------------------
 
-我们提供了Linux, Windows, x86_64 OSX >=10.12, arm64 OSX>=13.0 上的python预编译包供安装,需要 **python3.9, 3.10, 3.11** 。
+我们提供了Linux, Windows, x86_64 OSX >=10.12, arm64 OSX>=13.0 上的python预编译包供安装,需要 **python3.10, python3.11, python3.12** 。
 
-对于Windows, Linux系统,pyvqnet提供了基于Nvidia GPU对经典神经网络计算加速功能,当您的电脑的GPU是GTX10系列及其以后的型号,可使用pyvqnet的GPU功能运行模型。
-
-.. code-block::
-
-    pip install pyvqnet
-
-或者：
+安装命令如下：
 
 .. code-block::
 
-    pip install pyvqnet --index-url https://pypi.originqc.com.cn
+    pip install pyvqnet --upgrade
 
-如果您遇到网络问题导致无法下载,可尝试增加timeout。
+如在Linux遇到如下GLBCXX问题:
 
 .. code-block::
+    
+    ImportError: /lib/x86_64-linux-gnu/libstdc++.so.6: version `GLIBCXX_3.4.30' not found (required by /home/whc/miniforge3/envs/py310/lib/python3.10/site-packages/pyvqnet/libs/libvqnet.so)
 
-    pip install pyvqnet --index-url https://pypi.originqc.com.cn --default-timeout=100
+可更新libstdcxx库，例如：
+
+.. code-block::
+    
+    conda install -c conda-forge "libstdcxx-ng>=12"
+
+对于Windows, Linux系统, pyvqnet软件包自带基于Nvidia CUDA对经典神经网络计算加速功能。软件包编译时针对以下 CUDA 架构进行了优化：**sm_80** (NVIDIA A100, A30 系列数据中心 GPU) 和 **sm_86** (NVIDIA GeForce RTX 30 系列消费级 GPU)。请确保使用支持上述架构的 GPU，否则程序可能无法正常运行。
+
+
 
 VQNet 测试安装成功
 ----------------------------------
+
+
+
 
 .. code-block::
 
