@@ -416,7 +416,7 @@ CommController
             print(f"rank {Comm_OP.getRank()}  {num}")
             # vqnetrun -n 2 python test.py
 
- 
+
     .. py:method:: reduce(tensor, root = 0, c_op = "avg")
         
         支持对数据作reduce通信。
@@ -439,7 +439,9 @@ CommController
             print(f"rank {Comm_OP.getRank()}  {num}")
             # vqnetrun -n 2 python test.py
 
- 
+
+    
+
     .. py:method:: broadcast(tensor, root = 0)
         
         将指定进程root上的数据广播到所有进程上。
@@ -675,7 +677,152 @@ CommController
             # mpirun -n 2 python test.py
 
 
- 
+    .. py:method:: nccl_async_all_gather( output, input, group=None, async_op=False):
+        
+        对GPU上数据使用NCCL进行异步或同步all_gather。
+
+        :param output: QTensor all_gather的目标数据。
+        :param input: QTensor 待gather的数据。
+        :param group: 通信进程组，group 是一个包含组索引的元组。默认值：None，不使用任何组。
+        :param async_op: 此操作是否为异步操作，默认值：False。
+        :return: Work，一个异步通信句柄。使用 wait() 等待此操作完成。
+        
+        Examples::
+
+            from pyvqnet import tensor
+            import pyvqnet
+            from pyvqnet.distributed import CommController,get_rank,get_local_rank
+            Comm_OP = CommController("nccl")
+
+            complex_data = tensor.QTensor([3+1j, 2, 1 + get_rank()],dtype=8).reshape((3,1)).toGPU(1000+ get_local_rank())
+
+            out_data = tensor.empty([2,3,1],dtype=pyvqnet.kcomplex64).toGPU(pyvqnet.DEV_GPU_0+ get_local_rank())
+            work = Comm_OP.nccl_async_all_gather(out_data, complex_data, group = None,async_op=True)
+            work.wait()
+
+    .. py:method:: nccl_async_all_reduce(tensor, c_op="avg",group=None, async_op=False):
+        
+        对GPU上数据使用NCCL进行异步或同步allreduce。
+
+        :param tensor: 需要归约的 QTensor。
+        :param dest: 要归约的 QTensor 的目标排名。
+        :param c_op: 计算方法，可以是 "sum" 或 "avg"，默认值为 "avg"。
+        :param group: 通信进程组，group 是一个包含组索引的元组。默认值：None，不使用任何组。
+        :param async_op: 此操作是否为异步操作，默认值：False。
+        :return: Work，一个异步通信句柄。使用 wait() 等待此操作完成。
+
+        Examples::
+            
+            import pyvqnet
+            from pyvqnet.tensor import tensor
+            from pyvqnet.distributed.ControlComm import CommController,get_local_rank
+
+            Comm_OP = CommController("nccl")
+            complex_data = tensor.ones([500,500],dtype=pyvqnet.kcomplex64).toGPU(pyvqnet.DEV_GPU_0 + get_local_rank())
+            work = Comm_OP.nccl_async_all_reduce(complex_data, "sum",group = None,async_op = True)
+            work.wait()
+            
+    .. py:method:: nccl_async_reduce( tensor_, dest, c_op="avg", group=None, async_op=False ):
+        
+        对GPU上数据使用NCCL进行异步或同步reduce。
+
+        :param tensor_: 需要归约的 QTensor。
+        :param dest: 要归约的 QTensor 的目标排名。
+        :param c_op: 计算方法，可以是 "sum" 或 "avg"，默认值为 "avg"。
+        :param group: 通信进程组，group 是一个包含组索引的元组。默认值：None，不使用任何组。
+        :param async_op: 此操作是否为异步操作，默认值：False。
+        :return: Work，一个异步通信句柄。使用 wait() 等待此操作完成。
+        
+        Examples::
+
+            from pyvqnet import tensor
+            import pyvqnet
+            from pyvqnet.distributed import CommController,get_rank,get_local_rank
+            Comm_OP = CommController("nccl")
+
+            complex_data = tensor.ones([500,500],dtype=pyvqnet.kcomplex64).toGPU(pyvqnet.DEV_GPU_0 + get_local_rank())
+            work = Comm_OP.nccl_async_reduce(complex_data, 0,"sum",group = None,async_op = True)
+            work.wait()
+
+    .. py:method:: nccl_async_broadcast(tensor, src, group=None, async_op=False )
+        
+        对GPU上数据使用NCCL进行异步或同步广播。
+
+        :param tensor: 需要广播的 QTensor。
+        :param src: 要广播的 QTensor 的源排名。
+        :param group: 通信进程组，group 是一个包含组索引的元组。默认值：None，不使用任何组。
+        :param async_op: 此操作是否为异步操作，默认值：False。
+        :return: Work，一个异步通信句柄。使用 wait() 等待此操作完成。
+
+        Examples::
+
+            import pyvqnet
+            from pyvqnet.tensor import tensor
+            from pyvqnet.distributed.ControlComm import CommController,get_local_rank
+            Comm_OP = CommController("nccl")
+            if get_local_rank() == 1:
+                complex_data = tensor.ones([5,5],dtype=pyvqnet.kcomplex64).toGPU(pyvqnet.DEV_GPU_0+ get_local_rank())
+            else:
+                complex_data = tensor.zeros([5,5],dtype=pyvqnet.kcomplex64).toGPU(pyvqnet.DEV_GPU_0+ get_local_rank())
+            work = Comm_OP.nccl_async_broadcast(complex_data, 1, group = None,async_op=True)
+
+            work.wait()
+
+
+
+    .. py:method:: nccl_async_send( t, dest, async_op=False ):
+
+        对GPU上数据使用NCCL进行异步或同步P2Psend。
+
+        :param t: 需要发送的 QTensor。
+        :param dest: 要发送 QTensor 的目标排名。
+        :param async_op: 此操作是否为异步操作，默认值：False。
+        :return: Work，一个异步通信句柄。使用 wait() 等待此操作完成。
+
+        Examples::
+
+            import pyvqnet
+            from pyvqnet.tensor import tensor
+            from pyvqnet.distributed.ControlComm import CommController,get_local_rank
+            Comm_OP = CommController("nccl")
+                
+            if get_local_rank() == 0:
+                complex_data = tensor.ones([5000,5000],dtype=pyvqnet.kcomplex64).toGPU(pyvqnet.DEV_GPU_0+ get_local_rank())*10
+            else:
+                complex_data = tensor.ones([5000,5000],dtype=pyvqnet.kcomplex64).toGPU(pyvqnet.DEV_GPU_0+ get_local_rank())
+
+            if get_local_rank() == 0:
+                work = Comm_OP.nccl_async_send(complex_data, 1 ,True)
+            else:
+                work = Comm_OP.nccl_async_recv(complex_data, 0 ,True)
+            work.wait()
+
+    .. py:method:: nccl_async_recv( t, src, async_op=False ):
+
+        对GPU上数据使用NCCL进行异步或同步P2Precv。
+        
+        :param t: 需要接受的 QTensor。
+        :param src: 要接受 QTensor 的目标排名。
+        :param async_op: 此操作是否为异步操作，默认值：False。
+        :return: Work，一个异步通信句柄。使用 wait() 等待此操作完成。
+
+        Examples::
+
+            import pyvqnet
+            from pyvqnet.tensor import tensor
+            from pyvqnet.distributed.ControlComm import CommController,get_local_rank
+            Comm_OP = CommController("nccl")
+                
+            if get_local_rank() == 0:
+                complex_data = tensor.ones([5000,5000],dtype=pyvqnet.kcomplex64).toGPU(pyvqnet.DEV_GPU_0+ get_local_rank())*10
+            else:
+                complex_data = tensor.ones([5000,5000],dtype=pyvqnet.kcomplex64).toGPU(pyvqnet.DEV_GPU_0+ get_local_rank())
+
+            if get_local_rank() == 0:
+                work = Comm_OP.nccl_async_send(complex_data, 1 ,True)
+            else:
+                work = Comm_OP.nccl_async_recv(complex_data, 0 ,True)
+            work.wait()
 
 split_data
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
