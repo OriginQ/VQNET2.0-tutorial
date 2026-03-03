@@ -22,11 +22,6 @@ QTensor's 函数与属性
     :param name: QTensor的名字,default:""。
     :return: 输出 QTensor。
 
-    .. note::
-
-            QTensor 内部数据类型dtype支持kbool,kuint8,kint8,kint16,kint32,kint64,kfloat32,kfloat64,kcomplex64,kcomplex128.
-            分别对应C++的 bool,uint8_t,int8_t,int16_t,int32_t,int64_t,float,double,complex<float>,complex<double>.
-
     Example::
 
         from pyvqnet.tensor import QTensor
@@ -113,14 +108,29 @@ QTensor's 函数与属性
             # 4
 
 
- 
 
     .. py:attribute:: dtype
 
         返回张量的数据类型。
 
-        QTensor 内部数据类型dtype支持kbool = 0, kuint8 = 1, kint8 = 2,kint16 = 3,kint32 = 4,kint64 = 5, 
-        kfloat32 = 6, kfloat64 = 7, kcomplex64 = 8, kcomplex128 = 9 .
+        支持数据类型如下：
+
+            =========================================  ===============================
+            dtype                                      description
+            =========================================  ===============================
+            ``pyvqnet.kbool``                          布尔变量
+            ``pyvqnet.kuint8``                         8比特整数 (无符号)
+            ``pyvqnet.kint8``                          8比特整数 (有符号)
+            ``pyvqnet.kint16``                         16比特整数 (signed)
+            ``pyvqnet.kint32``                         32比特整数 (signed)
+            ``pyvqnet.kint64``                         64比特整数 (signed)
+            ``pyvqnet.kfloat32``                       32比特浮点数, 见 https://en.wikipedia.org/wiki/IEEE_754
+            ``pyvqnet.kfloat64``                       64比特浮点数, 见 https://en.wikipedia.org/wiki/IEEE_754
+            ``pyvqnet.kcomplex64``                     64比特复数，由两个 `float32` 构成
+            ``pyvqnet.kcomplex128``                    128比特复数，由两个 `float64` 构成
+            ``pyvqnet.kbfloat16``                      16比特浮点数, 有时被称为脑浮点格式（Brain floating point），其位分配为 1 位符号位、8 位指数位、7 位尾数位
+            =========================================  ===============================
+
 
         :return: 张量的数据类型。
 
