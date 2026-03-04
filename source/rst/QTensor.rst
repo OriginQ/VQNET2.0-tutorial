@@ -220,6 +220,10 @@ QTensor's 函数与属性
 
         :return: 一个新的 numpy.ndarray 包含 QTensor 数据
 
+        .. note:: 
+            
+            numpy不支持bfloat16类型，需要先转成其他numpy支持的数据类型例如float32，再调用该接口。
+
         Example::
 
             from pyvqnet.tensor import tensor
