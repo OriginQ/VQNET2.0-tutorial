@@ -349,8 +349,7 @@ Model中使用 :ref:`QuantumLayer` 类这个可进行自动微分的量子计算
                 accuracy += get_score(output, label)
 
                 loss += losss.item()
-                # print(f"epoch:{i}, train_accuracy:{accuracy}")
-                # print(f"epoch:{i}, train_loss:{losss}")
+
                 count += batch_size
 
             print(f"epoch:{i}, train_accuracy_for_each_batch:{accuracy/count}")
@@ -3643,7 +3642,7 @@ QUnet主要是用于解决图像分割的技术。
             act_nt_np = int(act_nt.pdata[0])
             memory[i, t] = (state_t, act_t, reward, state_nt, done)
             if len(memory) >= BATCHSIZE:
-                # print('Optimizing...')
+
                 sampled_vs = [memory[k] for k in random.sample(list(memory), BATCHSIZE)]
                 target_temp = []
                 for s in sampled_vs:
@@ -4368,7 +4367,7 @@ QUnet主要是用于解决图像分割的技术。
 
     trainable_block_layers = 3
     weights = 2 * np.pi * np.random.random(size=(2, trainable_block_layers, r, 3))
-    # print(weights)
+
     x = np.linspace(-6, 6, 70)
     random_quantum_model_y = [parallel_quantum_model(weights, xx, r) for xx in x]
 

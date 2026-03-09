@@ -529,8 +529,7 @@ Circuit-centric quantum classifiers算法示例
         X_1_proj = projected_xyz_embedding(QTensor(X_1))
         X_2_proj = projected_xyz_embedding(QTensor(X_2))
 
-        # print(X_1_proj)
-        # print(X_2_proj)
+
         # build the gram matrix
 
         gamma = params[0]
@@ -815,7 +814,6 @@ Circuit-centric quantum classifiers算法示例
             result = model(QTensor(x_train))
 
             train_cost = 1.0 - tensor.sums(result[tensor.arange(0, len(y_train)), y_train]) / len(y_train)
-            # print(f"step {step}, train_cost {train_cost}")
 
             train_cost.backward()
             opti.step()
@@ -823,10 +821,8 @@ Circuit-centric quantum classifiers算法示例
             train_cost_epochs.append(train_cost.to_numpy()[0])
             # compute accuracy on training data
 
-            # print(tensor.sums(result[tensor.arange(0, len(y_train)), y_train] > 0.5))
             train_acc = tensor.sums(result[tensor.arange(0, len(y_train)), y_train] > 0.5) / result.shape[0]
-            # print(train_acc)
-            # print(f"step {step}, train_acc {train_acc}")
+
             train_acc_epochs.append(train_acc.to_numpy())
 
             # compute accuracy and cost on testing data
@@ -836,8 +832,7 @@ Circuit-centric quantum classifiers算法示例
             test_cost = 1.0 - tensor.sums(test_out[tensor.arange(0, len(y_test)), y_test]) / len(y_test)
             test_cost_epochs.append(test_cost.to_numpy()[0])
 
-            # print(f"step {step}, test_cost {test_cost}")
-            # print(f"step {step}, test_acc {test_acc}")
+
 
         return dict(
             n_train=[n_train] * n_epochs,
@@ -2814,7 +2809,7 @@ QMLP模型示例
             loss_list.append(np.sum(total_loss) / len(total_loss))
             # train_acc_list.append(correct / n_train)
             print("epoch: ", epoch)
-            # print(100. * (epoch + 1) / epochs)
+
             print("{:.0f} loss is : {:.10f}".format(epoch, loss_list[-1]))
 
     if __name__ == "__main__":
@@ -3002,9 +2997,8 @@ QMLP模型示例
             time.sleep(0.1)
             input_x = QTensor([[state_t]],dtype=kfloat32)
             acts = model(input_x) + bias
-            # print(f'type of acts: {type(acts)}')
             act_t = tensor.QTensor.argmax(acts)
-            # print(f'act_t: {act_t} type of act_t: {type(act_t)}')
+
             act_t_np = int(act_t.to_numpy())
             print(f'Episode: {i}, Steps: {t}, act: {act_t_np}')
             state_nt, reward, done, info = env.step(action=act_t_np)
@@ -3014,7 +3008,7 @@ QMLP模型示例
             act_nt_np = int(act_nt.to_numpy())
             memory[i, t] = (state_t, act_t, reward, state_nt, done)
             if len(memory) >= BATCHSIZE:
-                # print('Optimizing...')
+
                 sampled_vs = [memory[k] for k in random.sample(list(memory), BATCHSIZE)]
                 target_temp = []
                 for s in sampled_vs:
@@ -3539,7 +3533,6 @@ QMLP模型示例
     # m_copy is generated to error analysis
     m_copy = np.copy(M)
 
-    # Print M
     print('Random matrix M is: ')
     print(M)
 

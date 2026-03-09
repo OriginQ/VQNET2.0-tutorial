@@ -1154,44 +1154,6 @@ CirqLayer
 
 在VQNet中,我们使用本源量子自研的 `pyqpanda2 <https://pyqpanda-toturial.readthedocs.io/zh/latest/>`_ 的各个逻辑门搭建量子线路,进行量子模拟。
 当前pyqpanda2支持的逻辑门可参考pyqpanda2 `量子逻辑门 <https://pyqpanda-toturial.readthedocs.io/zh/latest/>`_ 部分的定义。
-此外VQNet还封装了部分在量子机器学习中常用的量子逻辑门组合,这里仅留下了pyqpanda2版本的振幅编码,更多接口可使用参考 :ref: `pq3_gate` 中集成pyqpanda3的接口。
-
- 
- 
-
-AmplitudeEmbeddingCircuit
-============================
-
-.. py:function:: pyvqnet.qnn.template.AmplitudeEmbeddingCircuit(input_feat,qubits)
-
-    将 :math:`2^n` 特征编码为 :math:`n` 量子比特的振幅向量。为了表示一个有效的量子态向量, ``features`` 的L2范数必须是1。
-
-    :param input_feat: 表示参数的numpy数组。
-    :param qubits: pyqpanda2分配的量子比特列表。
-    :return: 量子线路。
-
-    Example::
-
-        import numpy as np
-        import pyqpanda as pq
-        from pyvqnet.qnn.template import AmplitudeEmbeddingCircuit
-        input_feat = np.array([2.2, 1, 4.5, 3.7])
-        machine = pq.init_quantum_machine(pq.QMachineType.CPU)
-        m_qlist = machine.qAlloc_many(2)
-        m_clist = machine.cAlloc_many(2)
-        m_prog = pq.QProg()
-        cir = AmplitudeEmbeddingCircuit(input_feat,m_qlist)
-        print(cir)
-        pq.destroy_quantum_machine(machine)
-
-        #                              ┌────────────┐     ┌────────────┐
-        # q_0:  |0>─────────────── ─── ┤RY(0.853255)├ ─── ┤RY(1.376290)├
-        #           ┌────────────┐ ┌─┐ └──────┬─────┘ ┌─┐ └──────┬─────┘
-        # q_1:  |0>─┤RY(2.355174)├ ┤X├ ───────■────── ┤X├ ───────■──────
-        #           └────────────┘ └─┘                └─┘
-
-
-
 
 
 
