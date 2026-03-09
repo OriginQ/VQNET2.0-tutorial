@@ -1,12 +1,12 @@
-使用pyqpanda2的量子机器学习示例
+使用pyqpanda的量子机器学习示例
 #################################
 
-我们这里使用VQNet以及pyqpanda2实现了多个量子机器学习示例。
+我们这里使用VQNet以及pyqpanda2或pyqpanda3实现了多个量子机器学习示例。
 
 
 .. warning::
 
-    以下接口的量子计算部分使用pyqpanda2 https://pyqpanda-toturial.readthedocs.io/zh/latest/。
+    以下接口的量子计算部分可能使用pyqpanda2 https://pyqpanda-toturial.readthedocs.io/zh/latest/。
 
     您需要额外安装pyqpanda2, `pip install pyqpanda` 
 
@@ -275,14 +275,8 @@ Model中使用 :ref:`QuantumLayer` 类这个可进行自动微分的量子计算
     from pyvqnet.nn.loss import CategoricalCrossEntropy
     from pyvqnet.tensor.tensor import QTensor
     from pyvqnet.nn.module import Module
-    import matplotlib.pyplot as plt
-    import matplotlib
+
     from pyvqnet.data import data_generator as get_minibatch_data
-    try:
-        matplotlib.use("TkAgg")
-    except:  
-        print("Can not use matplot TkAgg")
-        pass
 
     np.random.seed(42)
 
@@ -312,18 +306,6 @@ Model中使用 :ref:`QuantumLayer` 类这个可进行自动微分的量子计算
             data_x.append(x)
             data_y.append(y)
         return np.array(data_x), np.array(data_y)
-
-
-    def plot_data(x, y, fig=None, ax=None):
-
-        if fig is None:
-            fig, ax = plt.subplots(1, 1, figsize=(5, 5))
-        reds = y == 0
-        blues = y == 1
-        ax.scatter(x[reds, 0], x[reds, 1], c="red", s=20, edgecolor="k")
-        ax.scatter(x[blues, 0], x[blues, 1], c="blue", s=20, edgecolor="k")
-        ax.set_xlabel("$x_1$")
-        ax.set_ylabel("$x_2$")
 
 
     def get_score(pred, label):
@@ -3136,7 +3118,7 @@ QUnet主要是用于解决图像分割的技术。
 ==================================
 
 我们介绍并分析了提出了一种量子多层感知器 (QMLP) 架构,其特点是具有容错输入嵌入、丰富的非线性和带有参数化双量子比特纠缠门的增强变分电路模拟。`QMLP: An Error-Tolerant Nonlinear Quantum MLP Architecture using Parameterized Two-Qubit Gates <https://arxiv.org/pdf/2206.01345.pdf>`_ 。
-我们将编写一个将 `pyqpanda <https://pyqpanda-toturial.readthedocs.io/zh/latest/>`_ 与 `VQNet` 集成的简单示例。
+我们将编写一个将 `pyqpanda3` 与 `VQNet` 集成的简单示例。
 
 
 
@@ -3149,23 +3131,18 @@ QUnet主要是用于解决图像分割的技术。
     import gzip
     import struct
     import numpy as np
-    import pyqpanda as pq
+    import matplotlib.pyplot as plt 
+    import pyqpanda3.core as pq
+    import pyvqnet
     from pyvqnet.nn.module import Module
-    from pyvqnet.nn.loss import MeanSquaredError, CrossEntropyLoss
+    from pyvqnet.nn.loss import CrossEntropyLoss
     from pyvqnet.optim.adam import Adam
-    from pyvqnet.tensor.tensor import QTensor
-    from pyvqnet.qnn.measure import expval
-    from pyvqnet.qnn.quantumlayer import QuantumLayer
+
+    from pyvqnet.qnn.pq3.measure import expval
+    from pyvqnet.qnn.pq3.quantumlayer import QuantumLayer
     from pyvqnet.nn.pooling import AvgPool2D
     from pyvqnet.nn.linear import Linear
     from pyvqnet.data.data import data_generator
-    from pyvqnet.tensor import tensor
-    import matplotlib
-    from matplotlib import pyplot as plt
-    try:
-        matplotlib.use("TkAgg")
-    except:  
-        print("Can not use matplot TkAgg")
 
     try:
         import urllib.request
@@ -3208,7 +3185,7 @@ QUnet主要是用于解决图像分割的技术。
         for v in key_file.values():
             _download(dataset_dir, v)
 
-    def load_mnist(dataset="training_data", digits=np.arange(2), path="./"):
+    def load_mnist(dataset="training_data", digits=np.arange(2), path="../data/MNIST_data"):
         """
         load mnist data
         """
@@ -3243,7 +3220,7 @@ QUnet主要是用于解决图像分割的技术。
         labels = np.zeros((num, 1), dtype=int)
         for i in range(len(ind)):
             images[i] = np.array(img[ind[i] * rows * cols:(ind[i] + 1) * rows *
-                                     cols]).reshape((rows, cols))
+                                    cols]).reshape((rows, cols))
             labels[i] = lbl[ind[i]]
 
         return images, labels
@@ -3252,8 +3229,8 @@ QUnet主要是用于解决图像分割的技术。
         """
         Select data from mnist dataset.
         """
-        x_train, y_train = load_mnist("training_data")  
-        x_test, y_test = load_mnist("testing_data")  
+        x_train, y_train = load_mnist("training_data")
+        x_test, y_test = load_mnist("testing_data")
         idx_train = np.append(
             np.where(y_train == 0)[0][:train_num],
             np.where(y_train == 1)[0][:train_num])
@@ -3277,122 +3254,87 @@ QUnet主要是用于解决图像分割的技术。
         return x_train, y_train, x_test, y_test
 
     def RotCircuit(para, qlist):
-        r"""
-
-        Arbitrary single qubit rotation.Number of qlist should be 1,and number of parameters should
-        be 3
-
-        .. math::
-
-            R(\phi,\theta,\omega) = RZ(\omega)RY(\theta)RZ(\phi)= \begin{bmatrix}
-            e^{-i(\phi+\omega)/2}\cos(\theta/2) & -e^{i(\phi-\omega)/2}\sin(\theta/2) \\
-            e^{-i(\phi-\omega)/2}\sin(\theta/2) & e^{i(\phi+\omega)/2}\cos(\theta/2)
-            \end{bmatrix}.
-
-
-        :param para: numpy array which represents paramters [\phi, \theta, \omega]
-        :param qlist: qubits allocated by pyQpanda.qAlloc_many()
-        :return: quantum circuits
-
-        Example::
-
-            m_machine = pq.init_quantum_machine(pq.QMachineType.CPU)
-            m_clist = m_machine.cAlloc_many(2)
-            m_prog = pq.QProg()
-            m_qlist = m_machine.qAlloc_many(1)
-            param = np.array([3,4,5])
-            c = RotCircuit(param,m_qlist)
-            print(c)
-            pq.destroy_quantum_machine(m_machine)
-
-        """
-        if isinstance(para, QTensor):
-            para = QTensor._to_numpy(para)
-        if para.ndim > 1:
-            raise ValueError(" dim of paramters in Rot should be 1")
-        if para.shape[0] != 3:
-            raise ValueError(" numbers of paramters in Rot should be 3")
 
         cir = pq.QCircuit()
-        cir.insert(pq.RZ(qlist, para[2]))
-        cir.insert(pq.RY(qlist, para[1]))
-        cir.insert(pq.RZ(qlist, para[0]))
+        cir << pq.RZ(qlist, para[2])
+        cir << pq.RY(qlist, para[1])
+        cir << pq.RZ(qlist, para[0])
 
         return cir
 
     def build_RotCircuit(qubits, weights):
         cir = pq.QCircuit()
-        cir.insert(RotCircuit(weights[0:3], qubits[0]))
-        cir.insert(RotCircuit(weights[3:6], qubits[1]))
-        cir.insert(RotCircuit(weights[6:9], qubits[2]))
-        cir.insert(RotCircuit(weights[9:12], qubits[3]))
-        cir.insert(RotCircuit(weights[12:15], qubits[4]))
-        cir.insert(RotCircuit(weights[15:18], qubits[5]))
-        cir.insert(RotCircuit(weights[18:21], qubits[6]))
-        cir.insert(RotCircuit(weights[21:24], qubits[7]))
-        cir.insert(RotCircuit(weights[24:27], qubits[8]))
-        cir.insert(RotCircuit(weights[27:30], qubits[9]))
-        cir.insert(RotCircuit(weights[30:33], qubits[10]))
-        cir.insert(RotCircuit(weights[33:36], qubits[11]))
-        cir.insert(RotCircuit(weights[36:39], qubits[12]))
-        cir.insert(RotCircuit(weights[39:42], qubits[13]))
-        cir.insert(RotCircuit(weights[42:45], qubits[14]))
-        cir.insert(RotCircuit(weights[45:48], qubits[15]))
+        cir << RotCircuit(weights[0:3], qubits[0])
+        cir << RotCircuit(weights[3:6], qubits[1])
+        cir << RotCircuit(weights[6:9], qubits[2])
+        cir << RotCircuit(weights[9:12], qubits[3])
+        cir << RotCircuit(weights[12:15], qubits[4])
+        cir << RotCircuit(weights[15:18], qubits[5])
+        cir << RotCircuit(weights[18:21], qubits[6])
+        cir << RotCircuit(weights[21:24], qubits[7])
+        cir << RotCircuit(weights[24:27], qubits[8])
+        cir << RotCircuit(weights[27:30], qubits[9])
+        cir << RotCircuit(weights[30:33], qubits[10])
+        cir << RotCircuit(weights[33:36], qubits[11])
+        cir << RotCircuit(weights[36:39], qubits[12])
+        cir << RotCircuit(weights[39:42], qubits[13])
+        cir << RotCircuit(weights[42:45], qubits[14])
+        cir << RotCircuit(weights[45:48], qubits[15])
 
         return cir
 
     def CRXCircuit(para, control_qlists, rot_qlists):
         cir = pq.QCircuit()
-        cir.insert(pq.RX(rot_qlists, para))
-        cir.set_control(control_qlists)
+        cir << pq.CRX(control_qlists,rot_qlists, para)
         return cir
 
     def build_CRotCircuit(qubits, weights):
         cir = pq.QCircuit()
-        cir.insert(CRXCircuit(weights[0], qubits[0], qubits[1]))
-        cir.insert(CRXCircuit(weights[1], qubits[1], qubits[2]))
-        cir.insert(CRXCircuit(weights[2], qubits[2], qubits[3]))
-        cir.insert(CRXCircuit(weights[3], qubits[3], qubits[4]))
-        cir.insert(CRXCircuit(weights[4], qubits[4], qubits[5]))
-        cir.insert(CRXCircuit(weights[5], qubits[5], qubits[6]))
-        cir.insert(CRXCircuit(weights[6], qubits[6], qubits[7]))
-        cir.insert(CRXCircuit(weights[7], qubits[7], qubits[8]))
-        cir.insert(CRXCircuit(weights[8], qubits[8], qubits[9]))
-        cir.insert(CRXCircuit(weights[9], qubits[9], qubits[10]))
-        cir.insert(CRXCircuit(weights[10], qubits[10], qubits[11]))
-        cir.insert(CRXCircuit(weights[11], qubits[11], qubits[12]))
-        cir.insert(CRXCircuit(weights[12], qubits[12], qubits[13]))
-        cir.insert(CRXCircuit(weights[13], qubits[13], qubits[14]))
-        cir.insert(CRXCircuit(weights[14], qubits[14], qubits[15]))
-        cir.insert(CRXCircuit(weights[15], qubits[15], qubits[0]))
+        cir << CRXCircuit(weights[0], qubits[0], qubits[1])
+        cir << CRXCircuit(weights[1], qubits[1], qubits[2])
+        cir << CRXCircuit(weights[2], qubits[2], qubits[3])
+        cir << CRXCircuit(weights[3], qubits[3], qubits[4])
+        cir << CRXCircuit(weights[4], qubits[4], qubits[5])
+        cir << CRXCircuit(weights[5], qubits[5], qubits[6])
+        cir << CRXCircuit(weights[6], qubits[6], qubits[7])
+        cir << CRXCircuit(weights[7], qubits[7], qubits[8])
+        cir << CRXCircuit(weights[8], qubits[8], qubits[9])
+        cir << CRXCircuit(weights[9], qubits[9], qubits[10])
+        cir << CRXCircuit(weights[10], qubits[10], qubits[11])
+        cir << CRXCircuit(weights[11], qubits[11], qubits[12])
+        cir << CRXCircuit(weights[12], qubits[12], qubits[13])
+        cir << CRXCircuit(weights[13], qubits[13], qubits[14])
+        cir << CRXCircuit(weights[14], qubits[14], qubits[15])
+        cir << CRXCircuit(weights[15], qubits[15], qubits[0])
 
         return cir
 
 
-    def build_qmlp_circuit(x, weights, qubits, clist, machine):
+    def build_qmlp_circuit(x, weights, ):
+        qubits = range(16)
+        machine = pq.CPUQVM()
         cir = pq.QCircuit()
         num_qubits = len(qubits)
         for i in range(num_qubits):
-            cir.insert(pq.RX(qubits[i], x[i]))
+            cir << pq.RX(qubits[i], x[i])
 
-        cir.insert(build_RotCircuit(qubits, weights[0:48]))
-        cir.insert(build_CRotCircuit(qubits, weights[48:64]))
+        cir << build_RotCircuit(qubits, weights[0:48])
+        cir << build_CRotCircuit(qubits, weights[48:64])
 
         for i in range(num_qubits):
-            cir.insert(pq.RX(qubits[i], x[i]))
+            cir << pq.RX(qubits[i], x[i])
 
-        cir.insert(build_RotCircuit(qubits, weights[64:112]))
-        cir.insert(build_CRotCircuit(qubits, weights[112:128]))
+        cir << build_RotCircuit(qubits, weights[64:112])
+        cir << build_CRotCircuit(qubits, weights[112:128])
 
         prog = pq.QProg()
-        prog.insert(cir)
-        # print(prog)
-        # exit()
+        prog << cir
+
 
         exp_vals = []
         for position in range(num_qubits):
             pauli_str = {"Z" + str(position): 1.0}
-            exp2 = expval(machine, prog, pauli_str, qubits)
+            exp2 = expval(machine, prog, pauli_str)
             exp_vals.append(exp2)
 
         return exp_vals
@@ -3401,7 +3343,7 @@ QUnet主要是用于解决图像分割的技术。
         def __init__(self):
             super(QMLPModel, self).__init__()
             self.ave_pool2d = AvgPool2D([7, 7], [7, 7], "valid")
-            self.quantum_circuit = QuantumLayer(build_qmlp_circuit, 128, "CPU", 16, diff_method="finite_diff")
+            self.quantum_circuit = QuantumLayer(build_qmlp_circuit, 128, diff_method="finite_diff")
 
             self.linear = Linear(16, 10)
 
@@ -3414,8 +3356,6 @@ QUnet主要是用于解决图像分割的技术。
             return result
 
     def vqnet_test_QMLPModel():
-        # train num=1000, test_num=100
-        # x_train, y_train, x_test, y_test = data_select(1000, 100)
 
         train_size = 1000
         eval_size = 100
@@ -3436,16 +3376,23 @@ QUnet主要是用于解决图像分割的技术。
         optimizer = Adam(model.parameters(), lr=0.005)
         loss_func = CrossEntropyLoss()
         loss_list = []
-        epochs = 30
+        epochs = 5
+        batch_size = 16
+
+        test_acc_list = []      
+        test_loss_list = []     
         for epoch in range(1, epochs):
             total_loss = []
 
             correct = 0
-            n_train = 0
+    
+            train_loss = 0.0
+            train_correct = 0
+            train_total = 0
             for x, y in data_generator(x_train,
-                                       y_train,
-                                       batch_size=16,
-                                       shuffle=True):
+                                    y_train,
+                                    batch_size=batch_size,
+                                    shuffle=True):
 
                 x = x.reshape(-1, 1, 28, 28)
                 optimizer.zero_grad()
@@ -3453,30 +3400,72 @@ QUnet主要是用于解决图像分割的技术。
                 output = model(x)
                 # Calculating loss
                 loss = loss_func(y, output)
-                loss_np = np.array(loss.data)
-                print("loss: ", loss_np)
-                np_output = np.array(output.data, copy=False)
 
-                temp_out = np_output.argmax(axis=1)
-                temp_output = np.zeros((temp_out.size, 10))
-                temp_output[np.arange(temp_out.size), temp_out] = 1
-                temp_maks = (temp_output == y)
+                train_loss += loss.item()
 
-                correct += np.sum(np.array(temp_maks))
-                n_train += 160
+                # 
+                pred = output.argmax(dim=1).numpy()
+                true = pyvqnet.tensor.to_tensor(y).argmax(dim=1)
+                train_correct += (pred == true).sum().item()
+                train_total += batch_size
 
                 # Backward pass
                 loss.backward()
                 # Optimize the weights
                 optimizer._step()
-                total_loss.append(loss_np)
+                total_loss.append(loss.item())
+            # epoch
+            epoch_loss = np.sum(total_loss) / len(total_loss)
+            loss_list.append(epoch_loss)
+            train_acc = correct / train_total
             print("##########################")
-            print(f"Train Accuracy: {correct / n_train}")
-            loss_list.append(np.sum(total_loss) / len(total_loss))
-            # train_acc_list.append(correct / n_train)
+            print(f"Train Accuracy: {train_acc}")
             print("epoch: ", epoch)
-            # print(100. * (epoch + 1) / epochs)
             print("{:.0f} loss is : {:.10f}".format(epoch, loss_list[-1]))
+
+            # -------------------- （epoch）-------------------- #
+            model.eval()  # 
+            test_loss = 0.0
+            test_correct = 0
+            test_total = 0
+            with pyvqnet.no_grad():  # 
+                #  batch_size （，）
+                for x_batch, y_batch in data_generator(x_test,
+                                                    y_test,
+                                                    batch_size=batch_size,
+                                                    shuffle=False):
+                    x_batch = x_batch.reshape(-1, 1, 28, 28)
+                    
+                    output:pyvqnet.tensor.QTensor = model(x_batch)
+                    loss = loss_func(y_batch, output)
+                    test_loss += loss.item() * len(x_batch)  # 
+
+                    # 
+                    pred = output.argmax(dim=1)
+                    true = pyvqnet.tensor.to_tensor(y_batch).argmax(dim=1)
+                    test_correct += (pred == true).sum().item()
+                    test_total += len(x_batch)
+
+            avg_test_loss = test_loss / test_total
+            test_acc = test_correct / test_total
+            test_loss_list.append(avg_test_loss)
+            test_acc_list.append(test_acc)
+
+            print(f"Test Accuracy: {test_acc:.4f}, Test Loss: {avg_test_loss:.6f}")
+            # ------------------------------------------------------------------ #
+
+        # 
+        plt.figure(figsize=(8, 6))
+        plt.plot(range(1, len(loss_list)+1), loss_list, 'b-o', label='Training Loss')
+        plt.plot(range(1, len(test_loss_list)+1), test_loss_list, 'r-s', label='Test Loss')
+        plt.xlabel('Epoch')
+        plt.ylabel('Loss')
+        plt.title('Training and Test Loss Curves')
+        plt.legend()
+        plt.grid(True)
+        plt.tight_layout()
+        plt.savefig('loss_curves.png')
+        plt.show()
 
     if __name__ == "__main__":
 
@@ -5559,6 +5548,8 @@ vqe_func_analytic()函数是使用参数偏移计算理论梯度,vqe_func_shots(
 在VQNet中使用QuantumLayer进行模型训练
 =========================================
 
+此例子线路使用pyqpanda3构建
+
 .. code-block::
 
     from pyvqnet.nn.module import Module
@@ -5570,9 +5561,9 @@ vqe_func_analytic()函数是使用参数偏移计算理论梯度,vqe_func_shots(
 
     from pyvqnet.tensor.tensor import QTensor
     import random
-    import pyqpanda as pq
-    from pyvqnet.qnn.quantumlayer import QuantumLayer
-    from pyqpanda import *
+    import pyqpanda3.core as pq
+    from pyvqnet.qnn.pq3.quantumlayer import QuantumLayer
+    from pyvqnet.qnn.pq3 import probs_measure
     random.seed(1234)
 
     qvc_train_data = [0,1,0,0,1,
@@ -5592,60 +5583,61 @@ vqe_func_analytic()函数是使用参数偏移计算理论梯度,vqe_func_shots(
     0, 0, 1, 0, 1,
     0, 0, 1, 1, 0]
 
-    def qvc_circuits(input,weights,qlist,clist,machine):
+    def qvc_circuits(input,weights):
 
         def get_cnot(nqubits):
             cir = pq.QCircuit()
             for i in range(len(nqubits)-1):
-                cir.insert(pq.CNOT(nqubits[i],nqubits[i+1]))
-            cir.insert(pq.CNOT(nqubits[len(nqubits)-1],nqubits[0]))
+                cir << pq.CNOT(nqubits[i],nqubits[i+1])
+            cir << pq.CNOT(nqubits[len(nqubits)-1],nqubits[0])
             return cir
 
         def build_circult(weights, xx, nqubits):
             
             def Rot(weights_j, qubits):
                 circult = pq.QCircuit()
-                circult.insert(pq.RZ(qubits, weights_j[0]))
-                circult.insert(pq.RY(qubits, weights_j[1]))
-                circult.insert(pq.RZ(qubits, weights_j[2]))
+                circult << pq.RZ(qubits, weights_j[0])
+                circult << pq.RY(qubits, weights_j[1])
+                circult << pq.RZ(qubits, weights_j[2])
                 return circult
             def basisstate():
                 circult = pq.QCircuit()
                 for i in range(len(nqubits)):
                     if xx[i]==1:
-                        circult.insert(pq.X(nqubits[i]))
+                        circult << pq.X(nqubits[i])
                 return circult
 
             circult = pq.QCircuit()
-            circult.insert(basisstate())
+            circult << basisstate()
 
             for i in range(weights.shape[0]):
                 
                 weights_i = weights[i,:,:]
                 for j in range(len(nqubits)):
                     weights_j = weights_i[j]
-                    circult.insert(Rot(weights_j,nqubits[j]))
+                    circult << Rot(weights_j,nqubits[j])
                 cnots = get_cnot(nqubits)  
-                circult.insert(cnots) 
+                circult << cnots
 
-            circult.insert(pq.Z(nqubits[0]))
+            circult << pq.Z(nqubits[0])
             
             prog = pq.QProg() 
             
-            prog.insert(circult)
+            prog << circult
             return prog
 
+        qlist = range(4)
+        machine = pq.CPUQVM()
         weights = weights.reshape([2,4,3])
         prog = build_circult(weights,input,qlist)  
-        prob = machine.prob_run_dict(prog, qlist[0], -1)
-        prob = list(prob.values())
+        prob = probs_measure(machine,prog,[0])
 
         return prob
 
     class Model(Module):
         def __init__(self):
             super(Model, self).__init__()
-            self.qvc = QuantumLayer(qvc_circuits,24,"cpu",4)
+            self.qvc = QuantumLayer(qvc_circuits,24)
 
         def forward(self, x):
             return self.qvc(x)
@@ -5681,9 +5673,7 @@ vqe_func_analytic()函数是使用参数偏移计算理论梯度,vqe_func_shots(
         model.train()
 
         datas,labels = get_data("train")
-        print(datas)
-        print(labels)
-        print(datas.shape)
+
         for i in range(epoch):
             count=0
             sum_loss = 0

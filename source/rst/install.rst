@@ -4,7 +4,7 @@ VQNet 安装步骤
 VQNet python包安装
 ----------------------------------
 
-我们提供了Linux, Windows, arm64 OSX>=13.0 上的python预编译包供安装,需要 **python3.10, python3.11, python3.12** 。
+我们提供了Linux, Windows, macOS 13+ (arm64) 上的python预编译包供安装,需要 **python3.10, python3.11, python3.12** 。
 
 安装命令如下：
 

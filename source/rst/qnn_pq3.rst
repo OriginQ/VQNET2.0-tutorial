@@ -644,6 +644,31 @@ Qconv是一种量子卷积算法接口。
 
 .. _pq3_gate:
 
+
+
+AmplitudeEmbeddingCircuit
+============================
+
+.. py:function:: pyvqnet.qnn.pq3.template.AmplitudeEmbeddingCircuit(input_feat,qubits)
+
+    将 :math:`2^n` 特征编码为 :math:`n` 量子比特的振幅向量。为了表示一个有效的量子态向量, ``features`` 的L2范数必须是1。
+
+    :param input_feat: 表示参数的numpy数组。
+    :param qubits: 量子比特索引列表。
+    :return: 量子线路。
+
+    Example::
+
+        import numpy as np
+        import pyqpanda3.core as pq
+        from pyvqnet.qnn.pq3.template import AmplitudeEmbeddingCircuit
+        input_feat = np.array([2.2, 1, 4.5, 3.7])
+        qlist = range(3)
+        machine = pq.CPUQVM()
+        m_prog = pq.QProg()
+        cir = AmplitudeEmbeddingCircuit(input_feat,qlist)
+
+
 BasicEmbeddingCircuit
 ============================
 
