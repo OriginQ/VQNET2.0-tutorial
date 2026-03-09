@@ -90,7 +90,6 @@ QTensor's 函数与属性
 
             # 4
 
- 
 
     .. py:method:: numel
 
@@ -195,7 +194,6 @@ QTensor's 函数与属性
             # [0., 0., 0., 0.]
         
 
- 
 
     .. py:method:: backward(grad=None)
 

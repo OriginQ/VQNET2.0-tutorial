@@ -534,7 +534,7 @@ Circuit-centric quantum classifiers算法示例
         # build the gram matrix
 
         gamma = params[0]
-        gram = tensor.zeros(shape=[X_1.shape[0], X_2.shape[0]],dtype=7)
+        gram = tensor.zeros(shape=[X_1.shape[0], X_2.shape[0]],dtype=kfloat64)
 
         for i in range(len(X_1_proj)):
             for j in range(len(X_2_proj)):
@@ -784,8 +784,8 @@ Circuit-centric quantum classifiers算法示例
             super(Qcnn_ising, self).__init__()
             self.conv = conv_net
             self.qm = QMachine(num_wires,dtype=kcomplex128)
-            self.weights = Parameter((18, 2), dtype=7)
-            self.weights_last = Parameter((4 ** 2 -1,1), dtype=7)
+            self.weights = Parameter((18, 2), dtype=kfloat64)
+            self.weights_last = Parameter((4 ** 2 -1,1), dtype=kfloat64)
 
         def forward(self, input):
             self.qm.reset_states(input.shape[0])
@@ -3912,7 +3912,7 @@ Dropout是经典深度神经网络(DNN)的一种常用技术,可防止计算单�
     import pyvqnet 
     from pyvqnet.qnn.vqc import *
     import numpy as np
-    from pyvqnet import tensor
+    from pyvqnet import tensor, kfloat32
     from sklearn.model_selection import train_test_split
     from matplotlib import ticker
     import matplotlib.pyplot as plt
@@ -4142,8 +4142,8 @@ Dropout是经典深度神经网络(DNN)的一种常用技术,可防止计算单�
                 rng = np.random.default_rng(tmp_seed)
                 
                 optimizer.zero_grad()
-                data, label = QTensor(X,requires_grad=True,dtype=6), QTensor(y,
-                                                    dtype=6,
+                data, label = QTensor(X,requires_grad=True,dtype=kfloat32), QTensor(y,
+                                                    dtype=kfloat32,
                                                     requires_grad=False)
 
                 result = model(data, keep_rot)
@@ -4161,8 +4161,8 @@ Dropout是经典深度神经网络(DNN)的一种常用技术,可防止计算单�
                 )
                 
                 
-                data_test, label_test = QTensor(X_test,requires_grad=True,dtype=6), QTensor(y_test,
-                                                    dtype=6,
+                data_test, label_test = QTensor(X_test,requires_grad=True,dtype=kfloat32), QTensor(y_test,
+                                                    dtype=kfloat32,
                                                     requires_grad=False)
                 result_test = model(data_test, keep_rot)
                 test_cost = loss(label_test, result_test)
