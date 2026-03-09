@@ -573,11 +573,12 @@ CommController
             from pyvqnet.distributed import CommController,get_rank,get_local_rank
             from pyvqnet.tensor import tensor
             import numpy as np
+            from pyvqnet import kcomplex64
             Comm_OP = CommController("nccl")
 
             groups = Comm_OP.split_group([[0, 1]])
 
-            complex_data = tensor.QTensor([3+1j, 2, 1 + get_rank()],dtype=8).reshape((3,1)).toGPU(1000+ get_local_rank())
+            complex_data = tensor.QTensor([3+1j, 2, 1 + get_rank()],dtype=kcomplex64).reshape((3,1)).toGPU(1000+ get_local_rank())
 
             print(f"allreduce_group before rank {get_rank()}: {complex_data}")
 
@@ -600,11 +601,12 @@ CommController
             from pyvqnet.distributed import CommController,get_rank,get_local_rank
             from pyvqnet.tensor import tensor
             import numpy as np
+            from pyvqnet import kcomplex64
             Comm_OP = CommController("nccl")
 
             groups = Comm_OP.split_group([[0, 1]])
 
-            complex_data = tensor.QTensor([3+1j, 2, 1 + get_rank()],dtype=8).reshape((3,1)).toGPU(1000+ get_local_rank())
+            complex_data = tensor.QTensor([3+1j, 2, 1 + get_rank()],dtype=kcomplex64).reshape((3,1)).toGPU(1000+ get_local_rank())
 
             print(f"reduce_group before rank {get_rank()}: {complex_data}")
 
@@ -627,11 +629,12 @@ CommController
             from pyvqnet.distributed import CommController,get_rank,get_local_rank
             from pyvqnet.tensor import tensor
             import numpy as np
+            from pyvqnet import kcomplex64
             Comm_OP = CommController("nccl")
 
             groups = Comm_OP.split_group([[0, 1]])
 
-            complex_data = tensor.QTensor([3+1j, 2, 1 + get_rank()],dtype=8).reshape((3,1)).toGPU(1000+ get_local_rank())
+            complex_data = tensor.QTensor([3+1j, 2, 1 + get_rank()],dtype=kcomplex64).reshape((3,1)).toGPU(1000+ get_local_rank())
 
             print(f"broadcast_group before rank {get_rank()}: {complex_data}")
 
@@ -653,12 +656,12 @@ CommController
             
             from pyvqnet.distributed import CommController,get_rank,init_group
             from pyvqnet.tensor import tensor
-
+            from pyvqnet import kcomplex64
             Comm_OP = CommController("mpi")
             group = init_group([[0,1]])
             #mpi init group internally
             # A list of lists, where each sublist contains a communicator and the corresponding rank list.
-            complex_data = tensor.QTensor([3+1j, 2, 1 + get_rank()],dtype=8).reshape((3,1))
+            complex_data = tensor.QTensor([3+1j, 2, 1 + get_rank()],dtype=kcomplex64).reshape((3,1))
             print(f" before rank {get_rank()}: {complex_data}")
             for comm_ in group:
                 if Comm_OP.getRank() in comm_[1]:
@@ -670,7 +673,7 @@ CommController
             from pyvqnet.tensor import tensor
             Comm_OP = CommController("nccl")
             groups = Comm_OP.split_group([[0, 1]])
-            complex_data = tensor.QTensor([3+1j, 2, 1 + get_rank()],dtype=8).reshape((3,1)).toGPU(1000+ get_local_rank())
+            complex_data = tensor.QTensor([3+1j, 2, 1 + get_rank()],dtype=kcomplex64).reshape((3,1)).toGPU(1000+ get_local_rank())
             print(f" before rank {get_rank()}: {complex_data}")
             complex_data = Comm_OP.all_gather_group(complex_data, group = groups[0])
             print(f"after rank {get_rank()}: {complex_data}")
@@ -691,10 +694,11 @@ CommController
 
             from pyvqnet import tensor
             import pyvqnet
+            from pyvqnet import kcomplex64
             from pyvqnet.distributed import CommController,get_rank,get_local_rank
             Comm_OP = CommController("nccl")
 
-            complex_data = tensor.QTensor([3+1j, 2, 1 + get_rank()],dtype=8).reshape((3,1)).toGPU(1000+ get_local_rank())
+            complex_data = tensor.QTensor([3+1j, 2, 1 + get_rank()],dtype=kcomplex64).reshape((3,1)).toGPU(1000+ get_local_rank())
 
             out_data = tensor.empty([2,3,1],dtype=pyvqnet.kcomplex64).toGPU(pyvqnet.DEV_GPU_0+ get_local_rank())
             work = Comm_OP.nccl_async_all_gather(out_data, complex_data, group = None,async_op=True)

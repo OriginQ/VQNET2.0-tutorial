@@ -1875,7 +1875,7 @@ fuse_module
 
     Examples::
     
-        from pyvqnet import tensor 
+        from pyvqnet import tensor,kfloat32
         from pyvqnet.nn import Linear
         from pyvqnet.nn import Module, BatchNorm1d, BatchNorm2d, Conv1D, Conv2D
 
@@ -1938,7 +1938,7 @@ fuse_module
             for data, label in data_generator(X_train, y_train, batch_size, False):
                 optimizer.zero_grad()
                 data, label = QTensor(data,requires_grad=True).toGPU(), QTensor(label,
-                                                    dtype=6,
+                                                    dtype=kfloat32,
                                                     requires_grad=False).toGPU()
                 
                 result = model(data)
