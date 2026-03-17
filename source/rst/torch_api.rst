@@ -2591,13 +2591,13 @@ TorchQcloud3QuantumLayer
 
 .. py:class:: pyvqnet.qnn.vqc.torch.TorchQcloud3QuantumLayer(origin_qprog_func, qcloud_token, para_num, pauli_str_dict=None, shots = 1000, initializer=None, dtype=None, name="", diff_method="parameter_shift", submit_kwargs={}, query_kwargs={})
 
-    使用 pyqpanda3的本源量子真实芯片的抽象计算模块。 它提交参数化量子电路到真实芯片并获得测量结果。
+    使用 pyqpanda3的本源量子 https://qcloud.originqc.com.cn/  真实芯片的抽象计算模块。 它提交参数化量子电路到真实芯片并获得测量结果。
     如果 diff_method == "random_coordinate_descent" ,该层将随机选择单个参数来计算梯度,其他参数将保持为零。参考:https://arxiv.org/abs/2311.00088
 
     .. note::
 
         qcloud_token 为您到 https://qcloud.originqc.com.cn/ 中申请的api token。
-        origin_qprog_func 需要返回pypqanda3.core.QProg类型的数据,如果没有设置pauli_str_dict,需要保证该QProg中已经插入了measure。
+        origin_qprog_func 需要返回pypqanda3.core.QProg类型的数据,如果没有设置测量观测量pauli_str_dict,需要保证该QProg中已经插入了measure。
         origin_qprog_func 的形式必须按照如下:
 
         origin_qprog_func(input,param )
