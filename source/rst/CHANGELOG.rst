@@ -23,11 +23,13 @@ Changed
 - 减少安装whl时候对部分cuda runtime库的依赖。
 - pyvqnet的QTensor数据类型不再是整数，而是特定的数据类型。
 - 修改QTensor pickle的逻辑，不再pickle grad。
+- 删除is_dense
 
 Fixed
 ===================
 - 解决 ``use_bias=False`` 情况下 ``Linear`` 的错误。
 - 解决MAX_GPUS的问题，当前最大GPU数量为16。
+- 解决windows jupyter上导入错误。
 
 
 [v2.17.2] - 2025-11-18

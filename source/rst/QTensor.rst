@@ -141,23 +141,6 @@ QTensor's 函数与属性
             print(a.dtype)
             # 4
 
- 
-    .. py:attribute:: is_dense
-
-        是否是稠密张量。
-
-        :return: 当该数据是稠密的时候, 返回1；否则返回 0。
-
-        Example::
-
-            from pyvqnet.tensor import QTensor
-
-            a = QTensor([2, 3, 4, 5])
-            print(a.is_dense)
-            #1
-
-
- 
 
     .. py:attribute:: is_contiguous
 
