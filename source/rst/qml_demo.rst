@@ -25,7 +25,7 @@
 变分量子线路通常定义一个子线路,这是一种基本的电路架构,可以通过重复层构建复杂变分电路。
 我们的电路层由多个旋转逻辑门以及将每个量子位与其相邻的量子位纠缠在一起的 ``CNOT`` 逻辑门组成。
 我们还需要一个线路将经典数据编码到量子态上,使得线路测量的输出与输入有关联。
-本例中,我们把二进制输入编码到对应顺序的量子比特上。例如输入数据1101被编码到4个量子比特。
+本例中,我们把二进制输入编码到对应顺序的量子比特上。例如输入数据1101被编码到4个量子比特。本示例使用pyqpanda3.
 
 .. math::
 
@@ -39,80 +39,84 @@
 
 .. code-block::
 
-    import pyqpanda as pq
-
-    def qvc_circuits(input,weights,qlist,clist,machine):
-
-        def get_cnot(nqubits):
-            cir = pq.QCircuit()
-            for i in range(len(nqubits)-1):
-                cir.insert(pq.CNOT(nqubits[i],nqubits[i+1]))
-            cir.insert(pq.CNOT(nqubits[len(nqubits)-1],nqubits[0]))
-            return cir
-
-        def build_circult(weights, xx, nqubits):
-            
-            def Rot(weights_j, qubits):
-                circult = pq.QCircuit()
-                circult.insert(pq.RZ(qubits, weights_j[0]))
-                circult.insert(pq.RY(qubits, weights_j[1]))
-                circult.insert(pq.RZ(qubits, weights_j[2]))
-                return circult
-            def basisstate():
-                circult = pq.QCircuit()
-                for i in range(len(nqubits)):
-                    if xx[i] == 1:
-                        circult.insert(pq.X(nqubits[i]))
-                return circult
-
-            circult = pq.QCircuit()
-            circult.insert(basisstate())
-
-            for i in range(weights.shape[0]):
-                
-                weights_i = weights[i,:,:]
-                for j in range(len(nqubits)):
-                    weights_j = weights_i[j]
-                    circult.insert(Rot(weights_j,nqubits[j]))
-                cnots = get_cnot(nqubits)  
-                circult.insert(cnots) 
-
-            circult.insert(pq.Z(nqubits[0]))
-            
-            prog = pq.QProg() 
-            prog.insert(circult)
-            return prog
-
-        weights = weights.reshape([2,4,3])
-        prog = build_circult(weights,input,qlist)  
-        prob = machine.prob_run_dict(prog, qlist[0], -1)
-        prob = list(prob.values())
-        
-        return prob
-
-模型构建
--------------------
-我们已经定义了可变量子线路 ``qvc_circuits`` 。我们希望将其用于我们VQNet的自动微分逻辑中,并使用VQNet的优化算法进行模型训练。我们定义了一个 Model 类,该类继承于抽象类 ``Module``。
-Model中使用 :ref:`QuantumLayer` 类这个可进行自动微分的量子计算层。``qvc_circuits`` 为我们希望运行的量子线路,24 为所有需要训练的量子线路参数的个数,"cpu" 表示这里使用 pyqpanda 的 全振幅模拟器,4表示需要申请4个量子比特。
-在 ``forward()`` 函数中,用户定义了模型前向运行的逻辑。
-
-.. code-block::
-
+    import pyqpanda3.core as pq
     from pyvqnet.nn.module import Module
     from pyvqnet.optim.sgd import SGD
     from pyvqnet.nn.loss import CategoricalCrossEntropy
     from pyvqnet.tensor.tensor import QTensor
     from pyvqnet.data import data_generator as dataloader
-    import pyqpanda as pq
-    from pyvqnet.qnn.quantumlayer import QuantumLayer
-    from pyqpanda import *
+    
+    from pyvqnet.qnn.pq3.quantumlayer import QuantumLayer
+    from pyvqnet.qnn.pq3.measure import probs_measure
+    qnum = 4
+    def qvc_circuits(input,weights):
+        
+        qlist = range(qnum)
+        machine =pq.CPUQVM()
+        def get_cnot(nqubits):
+            cir = pq.QCircuit()
+            for i in range(len(nqubits)-1):
+                cir << pq.CNOT(nqubits[i],nqubits[i+1])
+            cir << pq.CNOT(nqubits[len(nqubits)-1],nqubits[0])
+            return cir
+
+        def build_circult(weights, xx, nqubits):
+
+            def Rot(weights_j, qubits):
+                circult = pq.QCircuit()
+                circult << pq.RZ(qubits, weights_j[0])
+                circult << pq.RY(qubits, weights_j[1])
+                circult << pq.RZ(qubits, weights_j[2])
+                return circult
+            def basisstate():
+                circult = pq.QCircuit()
+                for i in range(len(nqubits)):
+                    if xx[i] == 1:
+                        circult << pq.X(nqubits[i])
+                return circult
+
+            circult = pq.QCircuit()
+            circult << basisstate()
+
+            for i in range(weights.shape[0]):
+
+                weights_i = weights[i,:,:]
+                for j in range(len(nqubits)):
+                    weights_j = weights_i[j]
+                    circult << Rot(weights_j,nqubits[j])
+                cnots = get_cnot(nqubits)
+                circult << cnots
+
+            circult << pq.Z(nqubits[0])
+
+            prog = pq.QProg()
+            prog << circult
+            return prog
+
+        weights = weights.reshape([2,4,3])
+        prog = build_circult(weights,input,qlist)
+        prob = probs_measure(machine,prog,qlist[0])  
+        
+        return prob
+
+
+
+模型构建
+-------------------
+我们已经定义了可变量子线路 ``qvc_circuits`` 。我们希望将其用于我们VQNet的自动微分逻辑中,并使用VQNet的优化算法进行模型训练。我们定义了一个 Model 类,该类继承于抽象类 ``Module``。
+Model中使用 ``pyvqnet.qnn.pq3.QuantumLayer`` 类这个可进行自动微分的量子计算层。``qvc_circuits`` 为我们希望运行的量子线路,24 为所有需要训练的量子线路参数的个数,"cpu" 表示这里使用 pyqpanda 的 全振幅模拟器,4表示需要申请4个量子比特。
+在 ``forward()`` 函数中,用户定义了模型前向运行的逻辑。
+
+.. code-block::
+
     class Model(Module):
         def __init__(self):
             super(Model, self).__init__()
-            self.qvc = QuantumLayer(qvc_circuits,24,"cpu",4)
+            self.qvc = QuantumLayer(qvc_circuits,24)
 
         def forward(self, x):
             return self.qvc(x)
+
 
 
 模型训练和测试
@@ -121,7 +125,7 @@ Model中使用 :ref:`QuantumLayer` 类这个可进行自动微分的量子计算
 
 .. code-block::
 
-    import numpy as np
+        import numpy as np
     import os
     qvc_train_data = [0,1,0,0,1,
     0, 1, 0, 1, 0,
@@ -143,22 +147,24 @@ Model中使用 :ref:`QuantumLayer` 类这个可进行自动微分的量子计算
     def get_data(dataset_str):
         if dataset_str == "train":
             datasets = np.array(qvc_train_data)
-            
+
         else:
             datasets = np.array(qvc_test_data)
-            
+
         datasets = datasets.reshape([-1,5])
         data = datasets[:,:-1]
         label = datasets[:,-1].astype(int)
         label = np.eye(2)[label].reshape(-1,2)
         return data, label
 
+
+
 接着就可以按照一般神经网络训练的模式进行模型前传,损失函数计算,反向运算,优化器运算,直到迭代次数达到预设值。
 其所使用的训练数据是上述生成的qvc_train_data,测试数据为qvc_test_data。
 
 .. code-block::
 
-    def get_accuary(result,label):
+        def get_accuary(result,label):
         result,label = np.array(result.data), np.array(label.data)
         score = np.sum(np.argmax(result,axis=1)==np.argmax(label,1))
         return score
@@ -5539,7 +5545,7 @@ vqe_func_analytic()函数是使用参数偏移计算理论梯度,vqe_func_shots(
 
 
 
-在VQNet使用量子计算层进行模型训练
+在VQNet使用QuantumLayer进行模型训练
 ***************************************
 
 以下是使用 ``QuantumLayer``, ``NoiseQuantumLayer``,  等VQNet接口实现量子机器学习的例子。
