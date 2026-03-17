@@ -818,7 +818,7 @@ Circuit-centric quantum classifiers算法示例
             train_cost.backward()
             opti.step()
 
-            train_cost_epochs.append(train_cost.to_numpy()[0])
+            train_cost_epochs.append(train_cost.to_numpy())
             # compute accuracy on training data
 
             train_acc = tensor.sums(result[tensor.arange(0, len(y_train)), y_train] > 0.5) / result.shape[0]
@@ -830,7 +830,7 @@ Circuit-centric quantum classifiers算法示例
             test_acc = tensor.sums(test_out[tensor.arange(0, len(y_test)), y_test] > 0.5) / test_out.shape[0]
             test_acc_epochs.append(test_acc.to_numpy())
             test_cost = 1.0 - tensor.sums(test_out[tensor.arange(0, len(y_test)), y_test]) / len(y_test)
-            test_cost_epochs.append(test_cost.to_numpy()[0])
+            test_cost_epochs.append(test_cost.to_numpy())
 
 
 
