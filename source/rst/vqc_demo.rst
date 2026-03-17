@@ -65,9 +65,9 @@ Circuit-centric quantum classifiers算法示例
 
                 def basisstate(qm,xx, nqubits):
                     for i in nqubits:
-                        qcircuit.rz(q_machine=qm, wires=i, params=xx[:,[i]])
-                        qcircuit.ry(q_machine=qm, wires=i, params=xx[:,[i]])
-                        qcircuit.rz(q_machine=qm, wires=i, params=xx[:,[i]])
+                        qcircuit.rz(q_machine=qm, wires=i, params=xx[:,i])
+                        qcircuit.ry(q_machine=qm, wires=i, params=xx[:,i])
+                        qcircuit.rz(q_machine=qm, wires=i, params=xx[:,i])
 
                 basisstate(qm,xx,nqubits)
 
@@ -2059,10 +2059,10 @@ VSQL量子整体模型如下:
 
         def forward(self,x):
             def get_pauli_str(n_start, n_qsc):
-                D = {}
-                D['wires']= [i for i in range(n_start, n_start + n_qsc)]
-                D["observables"] = ["X" for i in range(n_start, n_start + n_qsc)]
-                D["coefficient"] = [1 for i in range(n_start, n_start + n_qsc)]
+                pauli_str =""
+                for position in range(n_start, n_start + n_qsc):
+                    pauli_str += "X" + str(position)+" "
+                D = {pauli_str:1}
                 return D
             #this reset states to shape of batchsize
             self.qm.reset_states(x.shape[0])
