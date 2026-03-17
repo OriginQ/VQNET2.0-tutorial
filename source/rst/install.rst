@@ -24,7 +24,27 @@ VQNet python包安装
     
     conda install -c conda-forge "libstdcxx-ng>=12"
 
-对于Windows, Linux系统, pyvqnet软件包自带基于Nvidia CUDA对经典神经网络计算加速功能。软件包编译时针对以下 CUDA 架构进行了优化：**sm_80** (NVIDIA A100, A30 系列数据中心 GPU) 和 **sm_86** (NVIDIA GeForce RTX 30 系列消费级 GPU)。请确保使用支持上述架构的 GPU，否则程序可能无法正常运行。
+对于Windows, Linux系统, pyvqnet软件包自带基于Nvidia CUDA对经典神经网络计算加速功能,依赖于CUDA11.8的特定版本 NVIDIA CUDA 运行时库（随软件包自动安装）。
+软件包编译时针对以下 CUDA 架构进行了优化：
+**sm_80** (NVIDIA A100, A30 系列数据中心 GPU) 和 **sm_86** (NVIDIA GeForce RTX 30 系列消费级 GPU)，请确保使用支持上述架构的 GPU，否则程序可能无法正常运行。
+
+    .. important::
+
+        请注意，由于本软件包不区分CPU/GPU版本，在windows下和Linux均依赖NVIDIA CUDA 运行时库，其随软件自动安装，可能会与当前环境下依赖不同版本的其他软件（例如基于cuda12的torch)产生冲突。
+        
+        相关库版本如下：
+        ::
+
+            "nvidia-cublas-cu11==11.11.3.6",
+            "nvidia-cuda-runtime-cu11==11.8.89",
+            "nvidia-nccl-cu11== 2.19.3",
+            "nvidia-cuda-cupti-cu11==11.8.87",
+            "nvidia-cuda-nvrtc-cu11==11.8.89",
+            "nvidia-cufft-cu11==10.9.0.58",
+            "nvidia-cusolver-cu11==11.4.1.48",
+            "nvidia-cusparse-cu11==11.7.5.86",
+            "nvidia-nvtx-cu11==11.8.86",
+            "nvidia-curand-cu11==10.3.0.86",
 
 
 
