@@ -10,7 +10,7 @@ VQNet量子机器学习所使用的数据结构QTensor的python接口介绍。QT
 QTensor's 函数与属性
 ******************************************
 
-.. py:class:: pyvqnet.tensor.tensor.QTensor(data, requires_grad=False, nodes=None, device=0, dtype=None, name="")
+.. py:class:: pyvqnet.tensor.tensor.QTensor(data, requires_grad=False, nodes=None, device=pyvqnet.DEV_CPU, dtype=None, name="")
 
     具有动态计算图构造和自动微分的张量。
 

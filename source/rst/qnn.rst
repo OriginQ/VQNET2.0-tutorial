@@ -208,18 +208,18 @@ QpandaQCircuitVQCLayerLite
 
     .. note::
         qprog_with_measure是pyqpanda2中定义的量子线路函数 :https://pyqpanda-toturial.readthedocs.io/zh/latest/QCircuit.html。
-        
         此函数必须包含以下参数作为函数入参(即使某个参数未实际使用),否则无法在QpandaQCircuitVQCLayerLite中正常运行。
-
+        
         与QuantumLayer相比。该接口传入的变分线路运行函数中,用户应该手动创建量子比特和模拟器: https://pyqpanda-toturial.readthedocs.io/zh/latest/QuantumMachine.html,
-
         如果qprog_with_measure需要quantum measure,用户还需要手动创建需要分配cbits: https://pyqpanda-toturial.readthedocs.io/zh/latest/Measure.html
         
-        量子线路函数 qprog_with_measure (input,param,nqubits,ncubits)的使用可参考下面的例子。
+        qprog_with_measure的使用可参考下面的例子。
+
+        qprog_with_measure(input,param,nqubits,ncubits)
         
-        `input`: 输入一维经典数据。如果没有,输入 None。
-        
-        `param`: 输入一维的变分量子线路的待训练参数。
+            `input`: 输入一维经典数据。如果没有,输入 None。
+            
+            `param`: 输入一维的变分量子线路的待训练参数。
 
     .. note::
 

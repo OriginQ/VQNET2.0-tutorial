@@ -35,11 +35,13 @@ QuantumLayer
         此函数必须包含输入和参数两个参数作为函数入参(即使某个参数未实际使用),输出为线路的测量结果或者期望值（需要为np.ndarray或包含数值的列表）,否则无法在QpandaQCircuitVQCLayerLite中正常运行。
 
         
-        量子线路函数 qprog_with_measure (input,param)的使用可参考下面的例子。
+        量子线路函数 qprog_with_measure的使用可参考下面的例子。
+
+        qprog_with_measure(input,param)
         
-        `input`: 输入一维经典数据。如果没有,输入 None。
-        
-        `param`: 输入一维的变分量子线路的待训练参数。
+            `input`: 输入一维经典数据。如果没有,输入 None。
+            
+            `param`: 输入一维的变分量子线路的待训练参数。
 
     .. note::
 
@@ -139,8 +141,7 @@ QpandaQProgVQCLayer
 
         此函数必须包含输入和参数两个参数作为函数入参(即使某个参数未实际使用),输出为pyqpanda3.core.QProg类型数据,否则无法在QuantumLayerV3中正常运行。
 
-
-        origin_qprog_func (input,param )
+        origin_qprog_func (input,param)
 
         `input`:用户定义的数组类输入 1 维经典数据。
 
@@ -221,7 +222,6 @@ QuantumBatchAsyncQcloudLayer
         origin_qprog_func 的形式必须按照如下:
 
         origin_qprog_func(input,param)
-        
             `input`: 输入1~2维经典数据,二维的情况下,第一个维度为批处理大小。
             
             `param`: 输入一维的变分量子线路的待训练参数。
