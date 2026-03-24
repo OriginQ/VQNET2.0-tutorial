@@ -20,7 +20,7 @@ QuantumLayer
 
 	变分量子层的抽象计算模块。对一个参数化的量子线路使用pyqpanda3进行仿真,得到测量结果。该变分量子层继承了VQNet框架的梯度计算模块,可以使用参数漂移法等计算线路参数的梯度,训练变分量子线路模型或将变分量子线路嵌入混合量子和经典模型。
     
-    :param qprog_with_measure: 用pyQPand构建的量子线路运行和测量函数。
+    :param qprog_with_measure: 用pyQPanda构建的量子线路运行和测量函数。
     :param para_num: `int` - 参数个数。
     :param diff_method: 求解量子线路参数梯度的方法,“参数位移”或“有限差分”,默认参数偏移。
     :param delta: 有限差分计算梯度时的 \delta。
@@ -217,7 +217,7 @@ QuantumBatchAsyncQcloudLayer
     .. note::
 
         qcloud_token 为您到 https://qcloud.originqc.com.cn/ 中申请的api token。
-        origin_qprog_func 需要返回pypqanda3.core.QProg类型的数据,如果没有设置测量的观测量pauli_str_dict,需要保证该QProg中已经插入了measure。
+        origin_qprog_func 需要返回pyqpanda3.core.QProg类型的数据,如果没有设置测量的观测量pauli_str_dict,需要保证该QProg中已经插入了measure。
         origin_qprog_func 的形式必须按照如下:
 
         origin_qprog_func(input,param)
@@ -235,7 +235,7 @@ QuantumBatchAsyncQcloudLayer
     :param qcloud_token: `str` - 量子机的类型或用于执行的云令牌。
     :param para_num: `int` - 参数数量,参数是大小为[para_num]的QTensor。
     :param pauli_str_dict: `dict|list` - 表示量子电路中泡利运算符的字典或字典列表。 默认为“无”,则进行测量操作,如果输入泡利算符的字典,则会计算单个期望或者多个期望。
-    :param shot: `int` - 测量次数。 默认值为 1000。
+    :param shots: `int` - 测量次数。 默认值为 1000。
     :param initializer: 参数值的初始化器。 默认为“无”,使用0~2*pi正态分布。
     :param dtype: 参数的数据类型。 默认值为 None,即使用默认数据类型pyvqnet.kfloat32。
     :param name: 模块的名称。 默认为空字符串。
@@ -325,7 +325,7 @@ QuantumBatchAsyncQcloudLayer
 QuantumLayerAdjoint
 ============================
 
-.. py:class:: pyvqnet.qnn.pq3.quantumlayer.QuantumLayerAdjoint(pq3_vqc_circuit,param_num,pauli_dicts,dtype = None，name="")
+.. py:class:: pyvqnet.qnn.pq3.quantumlayer.QuantumLayerAdjoint(pq3_vqc_circuit,param_num,pauli_dicts,dtype = None,name="")
 
     本类使用 pyqpanda3 的 VQCircuit 接口 https://qcloud.originqc.com.cn/document/qpanda-3/d8/d94/tutorial_variational_quantum_circuit.html，通过伴随法计算量子电路中参数相对于哈密顿量的梯度。
     
@@ -1280,7 +1280,7 @@ expval
     expval api现在支持pyqpanda3 的模拟器 。 
     
     :param machine: 由pyQPanda创建的量子虚拟机。
-    :param prog: pyQPanda创建的量子工程。
+    :param prog: pyQPanda创建的量子程序。
     :param pauli_str_dict: 哈密顿量观测值。
 
     :return: 期望值。
@@ -1319,7 +1319,7 @@ QuantumMeasure
 
 
     :param machine: pyQPanda分配的量子虚拟机。
-    :param prog: pyQPanda创建的量子工程。
+    :param prog: pyQPanda创建的量子程序。
     :param measure_qubits: 列表包含测量比特索引。
     :param shots: 测量次数,默认值为1000次。
     :param qcloud_option: 设置 qcloud 配置,默认为“”,可以传入一个QCloudOptions类,只在使用qcloud 下有用。
@@ -1362,7 +1362,7 @@ ProbsMeasure
     ProbsMeasure api现在只支持pyQPanda ``CPUQVM`` 或 ``QCloud`` 。
 
     :param measure_qubits: 列表包含测量比特索引
-    :param prog: qpanda创建的量子工程。
+    :param prog: qpanda创建的量子程序。
     :param machine: pyQPanda分配的量子虚拟机。
     :param shots: 测量次数,默认为1,计算理论值。
     :return: 按字典顺序测量量子比特。
