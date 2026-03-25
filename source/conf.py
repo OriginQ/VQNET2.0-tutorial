@@ -149,11 +149,14 @@ latex_engine = 'xelatex'
 latex_elements = {
     'papersize': 'a4paper',
     'pointsize': '11pt',
+    'extraclassoptions': 'openany,oneside',
     'preamble': r'''
 \usepackage{xeCJK}
-\setCJKmainfont[BoldFont=STZhongsong, ItalicFont=STKaiti]{STSong}
-\setCJKsansfont[BoldFont=STHeiti]{STXihei}
-\setCJKmonofont{STFangsong}
+\usepackage{fancyhdr}
+% Use fonts available on Windows
+\setCJKmainfont[BoldFont=SimHei, ItalicFont=KaiTi]{SimSun}
+\setCJKsansfont{SimHei}
+\setCJKmonofont{Microsoft YaHei}
 \XeTeXlinebreaklocale "zh"
 \XeTeXlinebreakskip = 0pt plus 1pt
 \parindent 2em
@@ -161,5 +164,11 @@ latex_elements = {
 \setcounter{tocdepth}{3}
 \renewcommand\familydefault{\ttdefault}
 \renewcommand\CJKfamilydefault{\CJKrmdefault}
+% Completely fix repeating section titles - force static content everywhere
+\fancyhf{}
+\renewcommand{\leftmark}{VQNET v2.17.3}
+\renewcommand{\rightmark}{}
+\fancyfoot[C]{\thepage}
+\pagestyle{fancy}
 '''
 }
