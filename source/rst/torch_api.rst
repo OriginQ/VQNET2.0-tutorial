@@ -1011,7 +1011,7 @@ GroupNorm
 
 .. py:class:: pyvqnet.nn.torch.GroupNorm(num_groups: int, num_channels: int, epsilon = 1e-5, affine = True, dtype = None, name = "")
 
-    对小批量输入应用组归一化。输入: :math:`(N, C, *)` 其中 :math:`C=\text{num_channels}` , 输出: :math:`(N, C, *)` 。
+    对小批量输入应用组归一化。输入: :math:`(N, C, *)` 其中 :math:`C=\mathrm{num\_channels}` , 输出: :math:`(N, C, *)` 。
 
     此层实现论文 `组归一化 <https://arxiv.org/abs/1803.08494>`__ 中描述的操作。
 
@@ -8744,7 +8744,7 @@ CommController
 -------------------------
 
 .. py:class:: pyvqnet.distributed.ControlComm.CommController(backend,rank=None,world_size=None)
-    :no-index:
+   :no-index:
 
     CommController用于控制在cpu、gpu下数据通信的控制器, 通过设置参数 `backend` 来生成cpu(gloo)、gpu(nccl)的控制器。
     这个类会调用 backend,rank,world_size 初始化 ``torch.distributed.init_process_group(backend,rank,world_size)``
@@ -8787,7 +8787,7 @@ CommController
 
             for p in processes:
                 p.join()
- 
+        #python test.py
 
     .. py:method:: getRank()
         :no-index:
@@ -8827,7 +8827,7 @@ CommController
 
                 for p in processes:
                     p.join()
-            
+            #python test.py
 
 
     .. py:method:: getSize()
@@ -8869,7 +8869,7 @@ CommController
 
                 for p in processes:
                     p.join()
-            
+            #python test.py
 
 
     .. py:method:: getLocalRank()
@@ -8911,7 +8911,7 @@ CommController
 
                 for p in processes:
                     p.join()
-
+            #python test.py
  
     .. py:method:: split_group(rankL)
         :no-index:
@@ -8923,7 +8923,7 @@ CommController
 
         Examples::
 
-            from pyvqnet.distributed import get_local_rank,CommController,init_group
+            from pyvqnet.distributed import get_local_rank,CommController
             import pyvqnet
             import numpy as np
             from pyvqnet.tensor import tensor
@@ -8959,10 +8959,7 @@ CommController
 
                 for p in processes:
                     p.join()
- 
-
-
- 
+            #python test.py
     .. py:method:: barrier()
         :no-index:
 
@@ -8989,7 +8986,6 @@ CommController
                 pp.barrier()
 
 
-
             if __name__ == "__main__":
                 world_size = 4
                 processes = []
@@ -9001,6 +8997,7 @@ CommController
 
                 for p in processes:
                     p.join()
+            #python test.py
 
     .. py:method:: allreduce(tensor, c_op = "avg")
         :no-index:
@@ -9012,7 +9009,7 @@ CommController
 
         Examples::
 
-            from pyvqnet.distributed import get_local_rank,CommController,init_group
+            from pyvqnet.distributed import get_local_rank,CommController
             import pyvqnet
             import numpy as np
             from pyvqnet.tensor import tensor
@@ -9027,8 +9024,6 @@ CommController
                 os.environ['MASTER_PORT'] = '29500'
                 os.environ['LOCAL_RANK'] = f"{rank}"
                 Comm_OP = CommController("gloo", rank=rank, world_size=size)
-
-            
 
                 num = tensor.to_tensor(np.random.rand(1, 5))
                 print(f"rank {Comm_OP.getRank()}  {num}")
@@ -9048,7 +9043,7 @@ CommController
 
                 for p in processes:
                     p.join()
-            
+            #python test.py
 
  
     .. py:method:: reduce(tensor, root = 0, c_op = "avg")
@@ -9062,7 +9057,7 @@ CommController
 
         Examples::
 
-            from pyvqnet.distributed import get_local_rank,CommController,init_group
+            from pyvqnet.distributed import get_local_rank,CommController
             import pyvqnet
             import numpy as np
             from pyvqnet.tensor import tensor
@@ -9077,8 +9072,6 @@ CommController
                 os.environ['MASTER_PORT'] = '29500'
                 os.environ['LOCAL_RANK'] = f"{rank}"
                 Comm_OP = CommController("gloo", rank=rank, world_size=size)
-
-            
 
                 num = tensor.to_tensor(np.random.rand(1, 5))
                 print(f"before rank {Comm_OP.getRank()}  {num}")
@@ -9098,7 +9091,7 @@ CommController
 
                 for p in processes:
                     p.join()
- 
+            #python test.py
  
     .. py:method:: broadcast(tensor, root = 0)
         :no-index:
@@ -9110,7 +9103,7 @@ CommController
 
         Examples::
 
-            from pyvqnet.distributed import get_local_rank,CommController,init_group
+            from pyvqnet.distributed import get_local_rank,CommController
             import pyvqnet
             import numpy as np
             from pyvqnet.tensor import tensor
@@ -9125,8 +9118,6 @@ CommController
                 os.environ['MASTER_PORT'] = '29500'
                 os.environ['LOCAL_RANK'] = f"{rank}"
                 Comm_OP = CommController("gloo", rank=rank, world_size=size)
-
-            
 
                 num = tensor.to_tensor(np.random.rand(1, 5))+ rank
                 print(f"before rank {Comm_OP.getRank()}  {num}")
@@ -9146,7 +9137,7 @@ CommController
 
                 for p in processes:
                     p.join()
-            
+            #python test.py
 
  
     .. py:method:: allgather(tensor)
@@ -9164,8 +9155,7 @@ CommController
             from pyvqnet.tensor import tensor
             pyvqnet.backends.set_backend("torch")
             import os
-            import multiprocessing as mp
-
+            import torch.multiprocessing as mp
 
             def init_process(rank, size):
                 """ Initialize the distributed environment. """
@@ -9192,7 +9182,7 @@ CommController
 
                 for p in processes:
                     p.join()
-
+            #python test.py
 
     .. py:method:: send(tensor, dest)
         :no-index:
@@ -9240,7 +9230,7 @@ CommController
 
                 for p in processes:
                     p.join()
- 
+            #python test.py
  
     .. py:method:: recv(tensor, source)
         :no-index:
@@ -9288,7 +9278,7 @@ CommController
 
                 for p in processes:
                     p.join()
-            
+            #python test.py
 
     .. py:method:: allreduce_group(tensor, c_op = "avg", group = None)
         :no-index:
@@ -9343,7 +9333,7 @@ CommController
 
                 for p in processes:
                     p.join()
-
+            #python test.py
 
     .. py:method:: reduce_group(tensor, root = 0, c_op = "avg", group = None)
         :no-index:
@@ -9395,7 +9385,7 @@ CommController
 
                 for p in processes:
                     p.join()
-                        
+            #python test.py
 
  
     .. py:method:: broadcast_group(tensor, root = 0, group = None)
@@ -9409,7 +9399,7 @@ CommController
 
         Examples::
             
-            from pyvqnet.distributed import get_local_rank,CommController,init_group
+            from pyvqnet.distributed import get_local_rank,CommController
             import pyvqnet
             import numpy as np
             from pyvqnet.tensor import tensor
@@ -9450,7 +9440,7 @@ CommController
 
                 for p in processes:
                     p.join()
-
+            #python test.py
 
     .. py:method:: allgather_group(tensor, group = None)
         :no-index:
@@ -9500,3 +9490,4 @@ CommController
                 for p in processes:
                     p.join()
 
+            #python test.py

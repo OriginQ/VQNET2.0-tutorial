@@ -5733,23 +5733,17 @@ QNSPSAOptimizer
 
     .. math::
 
-        \begin{equation}
         \widehat{\nabla f}(\mathbf{x}) \approx \frac{f(\mathbf{x}+\epsilon \mathbf{h})-f(\mathbf{x}-\epsilon \mathbf{h})}{2\epsilon}
-        \end{equation}
 
     通过状态重叠测量计算 Fubini-Study 度量：
 
     .. math::
 
-        \begin{equation}
         \widehat{\mathbf{g}}(\mathbf{x}) \approx \frac{\delta F}{8\epsilon^2}(\mathbf{h}_1\mathbf{h}_2^\intercal + \mathbf{h}_2\mathbf{h}_1^\intercal)
-        \end{equation}
 
     .. math::
 
-        \begin{equation}
         \delta F = F(\mathbf{x}+\epsilon\mathbf{h}_1+\epsilon\mathbf{h}_2) - F(\mathbf{x}+\epsilon\mathbf{h}_1) - F(\mathbf{x}-\epsilon\mathbf{h}_1+\epsilon\mathbf{h}_2) + F(\mathbf{x}-\epsilon\mathbf{h}_1)
-        \end{equation}
 
     其中 δF 测量四个电路的重叠差异评价。
 
@@ -5757,9 +5751,7 @@ QNSPSAOptimizer
 
     .. math::
 
-        \begin{equation}
         \mathbf{x}^{(t+1)} = \mathbf{x}^{(t)} - \eta \widehat{\mathbf{g}}^{-1}(\mathbf{x}^{(t)})\widehat{\nabla f}(\mathbf{x}^{(t)})
-        \end{equation}
 
     :param stepsize: 用户自定义学习率超参数 :math:`\eta` （默认值：1e-3）
     :param regularization: 用于 Fubini-Study 度量张量的正则化项 :math:`\beta` ，用于数值稳定性（默认值：1e-3）

@@ -1049,7 +1049,7 @@ GroupNorm
 
 .. py:class:: pyvqnet.nn.group_norm.GroupNorm(num_groups: int, num_channels: int, epsilon = 1e-5, affine = True, dtype = None, name = "")
 
-    对小批量输入应用组归一化。输入: :math:`(N, C, *)` 其中 :math:`C=\text{num_channels}` , 输出: :math:`(N, C, *)` 。
+    对小批量输入应用组归一化。输入: :math:`(N, C, *)` 其中 :math:`C=\mathrm{num\_channels}` , 输出: :math:`(N, C, *)` 。
 
     此层实现论文 `组归一化 <https://arxiv.org/abs/1803.08494>`__ 中描述的操作。
 
@@ -2680,10 +2680,10 @@ Adagrad
     参考:https://databricks.com/glossary/adagrad。
 
     .. math::
-        \begin{align}
-        moment\_new &= moment + g * g\\param\_new 
+        \begin{aligned}
+        moment\_new &= moment + g * g\\param\_new
         &= param - \frac{lr * g}{\sqrt{moment\_new} + \epsilon}
-        \end{align}
+        \end{aligned}
 
     :param params: 需要优化的模型参数。
     :param lr: 学习率(默认值:0.01)。
