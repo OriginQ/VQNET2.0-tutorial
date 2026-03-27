@@ -27,7 +27,7 @@ VQNet使用torch进行底层计算
         , ``_parmeters`` 中的数据为 ``torch.nn.Parameter`` 类型,无法使用QTensor接口。
 
 
-        请注意：``pyvqnet.backends.set_backend("torch")`` 以及 ``pyvqnet.backends.set_backend("pyvqnet")`` 会修改全局运行后端。
+        请注意： ``pyvqnet.backends.set_backend("torch")`` 以及 ``pyvqnet.backends.set_backend("pyvqnet")`` 会修改全局运行后端。
         不同后端配置下创建的 ``QTensor`` ，其底层数据结构不同，无法一起运算。
 
 
@@ -43,7 +43,7 @@ set_backend
 
 .. py:function:: pyvqnet.backends.set_backend(backend_name)
 
-    该用于切换计算和数据存储后端，可选择使用 pyvqnet 原生计算、C++自动微分、或基于 PyTorch 的后端，从而在不同性能和兼容性需求间灵活切换。默认为 "pyvqnet",可设置为 "torch"。
+    该用于切换计算和数据存储后端，可选择使用 pyvqnet 原生计算、C++自动微分、或基于 PyTorch 的后端，从而在不同性能和兼容性需求间灵活切换。默认为 "pyvqnet-ad",可设置为 "torch"。
     
     使用 ``pyvqnet.backends.set_backend("pyvqnet")`` 后,VQNet ``QTensor`` 的 ``data`` 成员变量均使用 ``pyvqnet._core.Tensor`` 储存数据,并使用pyvqnet c++库计算,
     自动微分在python完成。
@@ -99,7 +99,7 @@ QTensor函数
 .. code-block::
 
     import pyvqnet
-    pyvqnet.backends.set_backend("pyvqnet")
+    pyvqnet.backends.set_backend("torch")
 
 在 :ref:`qtensor_api` 下的所有成员函数,创建函数,数学函数,逻辑函数,矩阵变换等均使用torch进行计算。使用 ``QTensor.data`` 可获取torch数据。
 

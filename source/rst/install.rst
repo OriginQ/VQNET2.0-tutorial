@@ -30,7 +30,7 @@ VQNet python包安装
 
     .. important::
 
-        请注意，由于本软件包不区分CPU/GPU版本，在windows下和Linux均依赖NVIDIA CUDA 运行时库，其随软件自动安装，可能会与当前环境下依赖不同版本的其他软件（例如基于cuda12的torch)产生冲突。
+        请注意，由于本软件包不区分CPU/GPU版本，在windows下和Linux均依赖NVIDIA CUDA 运行时库，其随软件自动安装，可能会与当前环境下依赖不同版本的其他软件(例如基于cuda12的torch)产生冲突。
         
         相关库版本如下：
         ::
