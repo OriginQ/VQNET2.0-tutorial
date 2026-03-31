@@ -5177,6 +5177,7 @@ QNG
         from pyvqnet.tensor import QTensor, tensor
         import pyvqnet
         import numpy as np
+
         from pyvqnet.qnn.vqc import wrapper_calculate_qng
 
         class QModel(pyvqnet.nn.Module):
@@ -5210,35 +5211,31 @@ QNG
                 self.rz_layer1(q_machine=self.qm, params=x[:, [0]])
                 self.rz_layer2(q_machine=self.qm, params=x[:, [1]])
 
-                self.u2_layer1(q_machine=self.qm, params=x[:, [3, 4]])  #
+                self.u2_layer1(q_machine=self.qm, params=x[:, [4, 5]])  #
 
                 self.cnot01(q_machine=self.qm)
                 self.cnot12(q_machine=self.qm)
                 ry(q_machine=self.qm, wires=0, params=np.pi / 7)
-
-                self.l_train1(q_machine=self.qm)
-                self.l_train2(q_machine=self.qm)
-
-                rz(q_machine=self.qm, wires=1, params=x[:, [2]])
+                ry(q_machine=self.qm, wires=1, params=x[:, [2]])
+                rx(q_machine=self.qm, wires=2, params=x[:, [3]])
+                rz(q_machine=self.qm, wires=1, params=x[:, [3]])
                 ry(q_machine=self.qm, wires=0, params=np.pi / 7)
-                rz(q_machine=self.qm, wires=1, params=x[:, [2]])
+                rz(q_machine=self.qm, wires=1, params=x[:, [3]])
 
                 self.cnot01(q_machine=self.qm)
                 self.cnot12(q_machine=self.qm)
                 rlt = self.measure(q_machine=self.qm)
                 return rlt
 
-
         qmodel = QModel(3, pyvqnet.kcomplex64)
 
-        x = QTensor([[1111.0, 2222, 444, 55, 666]])
+        x = QTensor([[1111.0, 2222, 333,444, 55, 666]], requires_grad=True)
 
         qng = pyvqnet.qnn.vqc.QNG(qmodel,0.01)
-
         qng.step(x)
 
-        print(qmodel.parameters())
-        #[[[333.0084]], [[4443.9985]]]
+        print(x)
+        print(x.grad)
 
 
 wrapper_single_qubit_op_fuse
