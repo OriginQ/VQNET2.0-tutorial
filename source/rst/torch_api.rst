@@ -4624,7 +4624,7 @@ VQC_QuantumEmbedding
 
                 self.ansatz = VQC_QuantumEmbedding(num_repetitions_input, depth_input,
                                                 num_unitary_layers,
-                                                num_repetitions, initial=tensor.full([1],12.0),dtype=pyvqnet.kfloat64)
+                                                num_repetitions, initial=tensor.full([1],12.0),dtype=pyvqnet.kfloat32)
 
                 self.measure = MeasureAll(obs={f"Z{nq-1}":1})
                 self.device = QMachine(nq)
@@ -8069,7 +8069,7 @@ VQC_QuantumEmbedding
 
                 self.ansatz = VQC_QuantumEmbedding(num_repetitions_input, depth_input,
                                                 num_unitary_layers,
-                                                num_repetitions, initial=tensor.full([1],12.0),dtype=pyvqnet.kfloat64)
+                                                num_repetitions, initial=tensor.full([1],12.0),dtype=pyvqnet.kfloat32)
 
                 self.measure = MeasureAll(obs={f"Z{nq-1}":1})
                 self.device = TNQMachine(nq)
