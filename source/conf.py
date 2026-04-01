@@ -26,7 +26,13 @@ release = 'v2.17.3'
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = ['sphinx.ext.autodoc', 'sphinx.ext.napoleon','sphinx.ext.autosummary']
+extensions = ['sphinx.ext.autodoc', 'sphinx.ext.napoleon','sphinx.ext.autosummary','sphinx.ext.intersphinx']
+
+# Suppress nitpicky warnings about undefined references in PDF build
+nitpicky = False
+
+# Python domain settings - use unqualified type names for simpler references
+python_use_unqualified_type_names = True
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -153,6 +159,9 @@ latex_elements = {
     'preamble': r'''
 \usepackage{xeCJK}
 \usepackage{fancyhdr}
+% Fix fancyhdr headheight warning
+\setlength{\headheight}{14pt}
+\addtolength{\topmargin}{-2pt}
 % Use fonts available on Windows
 \setCJKmainfont[BoldFont=SimHei, ItalicFont=KaiTi]{SimSun}
 \setCJKsansfont{SimHei}
