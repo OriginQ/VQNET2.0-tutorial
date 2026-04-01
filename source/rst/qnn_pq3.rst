@@ -230,6 +230,9 @@ QuantumBatchAsyncQcloudLayer
 
         该类计算梯度需要额外使用芯片进行线路计算个数与参数个数、数据个数、数据维度的乘积线性相关。
 
+    .. note::
+
+        在当前版本中，单次线路提交至 QCloud 的默认总超时时间为 60 秒。如果因 QCloud 繁忙而导致超时，您可以在 ``query_kwargs`` 中设置 `total_timeout` 键的值，来指定所需的等待秒数。
 
     :param origin_qprog_func: QPanda 构建的变分量子电路函数,必须返回QProg。
     :param qcloud_token: `str` - 量子机的类型或用于执行的云令牌。
@@ -241,7 +244,7 @@ QuantumBatchAsyncQcloudLayer
     :param name: 模块的名称。 默认为空字符串。
     :param diff_method: 梯度计算的微分方法。 默认为“parameter_shift”,"random_coordinate_descent"。
     :param submit_kwargs: 用于提交量子电路的附加关键字参数,默认:{"chip_id":"origin_wukong","is_amend":True,"is_mapping":True,"is_optimization":True,"compile_level":3,"default_task_group_size":200,"test_qcloud_fake":False},当设置test_qcloud_fake为True则本地CPUQVM模拟。
-    :param query_kwargs: 用于查询量子结果的附加关键字参数,默认:{"timeout":2,"print_query_info":True,"sub_circuits_split_size":1}。
+    :param query_kwargs: 用于查询量子结果的附加关键字参数,默认:{"timeout":1,"total_timeout":60, "print_query_info":True,"sub_circuits_split_size":1}。
     :return: 一个可以计算量子电路的模块。
     
     Example::

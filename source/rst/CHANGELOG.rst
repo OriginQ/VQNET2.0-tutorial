@@ -24,6 +24,8 @@ Changed
 - pyvqnet的QTensor数据类型不再是整数，而是特定的数据类型。
 - 修改QTensor pickle的逻辑，不再pickle grad。
 - 删除is_dense
+- 移除了 pq2 的 ``QuantumBatchAsyncQcloudLayer`` 。
+- 更新了 pq3 的 ``QuantumBatchAsyncQcloudLayer`` 文档。
 
 Fixed
 ===================
