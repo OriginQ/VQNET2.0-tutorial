@@ -10,7 +10,7 @@ VQNet量子机器学习所使用的数据结构QTensor的python接口介绍。QT
 QTensor's 函数与属性
 ******************************************
 
-.. py:class:: pyvqnet.tensor.tensor.QTensor(data, requires_grad=False, nodes=None, device=0, dtype=None, name="")
+.. py:class:: pyvqnet.tensor.tensor.QTensor(data, requires_grad=False, nodes=None, device=pyvqnet.DEV_CPU, dtype=None, name="")
 
     具有动态计算图构造和自动微分的张量。
 
@@ -21,11 +21,6 @@ QTensor's 函数与属性
     :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
     :param name: QTensor的名字,default:""。
     :return: 输出 QTensor。
-
-    .. note::
-
-            QTensor 内部数据类型dtype支持kbool,kuint8,kint8,kint16,kint32,kint64,kfloat32,kfloat64,kcomplex64,kcomplex128.
-            分别对应C++的 bool,uint8_t,int8_t,int16_t,int32_t,int64_t,float,double,complex<float>,complex<double>.
 
     Example::
 
@@ -56,7 +51,7 @@ QTensor's 函数与属性
 
             from pyvqnet.tensor import QTensor
 
-            a = QTensor([2, 3, 4, 5], requires_grad=True)
+            a = QTensor([2.0, 3.0, 4.0, 5.0], requires_grad=True)
             print(a.ndim)
 
             # 1
@@ -73,7 +68,7 @@ QTensor's 函数与属性
 
             from pyvqnet.tensor import QTensor
 
-            a = QTensor([2, 3, 4, 5], requires_grad=True)
+            a = QTensor([2.0, 3.0, 4.0, 5.0], requires_grad=True)
             print(a.shape)
 
             # [4]
@@ -90,12 +85,11 @@ QTensor's 函数与属性
 
             from pyvqnet.tensor import QTensor
 
-            a = QTensor([2, 3, 4, 5], requires_grad=True)
+            a = QTensor([2.0, 3.0, 4.0, 5.0], requires_grad=True)
             print(a.size)
 
             # 4
 
- 
 
     .. py:method:: numel
 
@@ -107,20 +101,35 @@ QTensor's 函数与属性
 
             from pyvqnet.tensor import QTensor
 
-            a = QTensor([2, 3, 4, 5], requires_grad=True)
+            a = QTensor([2.0, 3.0, 4.0, 5.0], requires_grad=True)
             print(a.numel())
 
             # 4
 
 
- 
 
     .. py:attribute:: dtype
 
         返回张量的数据类型。
 
-        QTensor 内部数据类型dtype支持kbool = 0, kuint8 = 1, kint8 = 2,kint16 = 3,kint32 = 4,kint64 = 5, 
-        kfloat32 = 6, kfloat64 = 7, kcomplex64 = 8, kcomplex128 = 9 .
+        支持数据类型如下：
+
+            =========================================  ===============================
+            dtype                                      description
+            =========================================  ===============================
+            ``pyvqnet.kbool``                          布尔变量
+            ``pyvqnet.kuint8``                         8比特整数 (无符号)
+            ``pyvqnet.kint8``                          8比特整数 (有符号)
+            ``pyvqnet.kint16``                         16比特整数 (signed)
+            ``pyvqnet.kint32``                         32比特整数 (signed)
+            ``pyvqnet.kint64``                         64比特整数 (signed)
+            ``pyvqnet.kfloat32``                       32比特浮点数, 见 https://en.wikipedia.org/wiki/IEEE_754
+            ``pyvqnet.kfloat64``                       64比特浮点数, 见 https://en.wikipedia.org/wiki/IEEE_754
+            ``pyvqnet.kcomplex64``                     64比特复数，由两个 `float32` 构成
+            ``pyvqnet.kcomplex128``                    128比特复数，由两个 `float64` 构成
+            ``pyvqnet.kbfloat16``                      16比特浮点数, 有时被称为脑浮点格式（Brain floating point），其位分配为 1 位符号位、8 位指数位、7 位尾数位
+            =========================================  ===============================
+
 
         :return: 张量的数据类型。
 
@@ -132,23 +141,6 @@ QTensor's 函数与属性
             print(a.dtype)
             # 4
 
- 
-    .. py:attribute:: is_dense
-
-        是否是稠密张量。
-
-        :return: 当该数据是稠密的时候, 返回1；否则返回 0。
-
-        Example::
-
-            from pyvqnet.tensor import QTensor
-
-            a = QTensor([2, 3, 4, 5])
-            print(a.is_dense)
-            #1
-
-
- 
 
     .. py:attribute:: is_contiguous
 
@@ -179,13 +171,12 @@ QTensor's 函数与属性
         Example::
 
             from pyvqnet.tensor import QTensor
-            t3 = QTensor([2, 3, 4, 5], requires_grad=True)
+            t3 = QTensor([2.0, 3.0, 4.0, 5.0], requires_grad=True)
             t3.zero_grad()
             print(t3.grad)
             # [0., 0., 0., 0.]
         
 
- 
 
     .. py:method:: backward(grad=None)
 
@@ -210,11 +201,15 @@ QTensor's 函数与属性
 
         :return: 一个新的 numpy.ndarray 包含 QTensor 数据
 
+        .. note:: 
+            
+            numpy不支持bfloat16类型，需要先转成其他numpy支持的数据类型例如float32，再调用该接口。
+
         Example::
 
             from pyvqnet.tensor import tensor
             from pyvqnet.tensor import QTensor
-            t3 = QTensor([2, 3, 4, 5], requires_grad=True)
+            t3 = QTensor([2.0, 3.0, 4.0, 5.0], requires_grad=True)
             t4 = t3.to_numpy()
             print(t4)
 
@@ -3219,7 +3214,7 @@ select
         from pyvqnet.tensor import tensor
         from pyvqnet.tensor import QTensor
         import numpy as np
-        t = QTensor(np.arange(1,25).reshape(2,3,4))
+        t = QTensor(np.arange(1,25.0).reshape(2,3,4))
               
         indx = [":", "0", ":"]        
         t.requires_grad = True
@@ -3247,7 +3242,7 @@ concatenate
 
         from pyvqnet.tensor import tensor
         from pyvqnet.tensor import QTensor
-        x = QTensor([[1, 2, 3],[4,5,6]], requires_grad=True)
+        x = QTensor([[1.0, 2, 3],[4,5,6]], requires_grad=True)
         y = 1-x
         x = tensor.concatenate([x,y],1)
         print(x)
@@ -4064,4 +4059,6 @@ no_grad
             x = tensor.QTensor([1.0, 2.0, 3.0],requires_grad=True)
             y = tensor.tan(x)
             y.backward()
-        #RuntimeError: output requires_grad is False.
+        """
+        RuntimeError: The output tensor does not require gradients (output.requires_grad == False). This may occur if you used a non-autograd function in the forward pass. To enable gradient computation, ensure that all operations are performed on tensors with requires_grad=True, or use autograd-compatible functions.
+        """

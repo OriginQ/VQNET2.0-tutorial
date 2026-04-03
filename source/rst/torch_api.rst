@@ -7,7 +7,9 @@ VQNet使用torch进行底层计算
 
     .. important::
 
-        **如需要使用以下功能, 请自行安装 torch >= 2.4.0 , 本软件安装时候不自动安装 torch 。**
+        **如需要使用以下功能, 请自行安装2.4.0~2.6.0版本的torch。**
+        **如果安装GPU版本的torch，需要使用兼容cuda11.8版本的torch, 否则可能由于 NVIDIA CUDA 运行时库问题导致您的torch无法使用。**
+        **本软件安装时候不自动安装 torch 。**
 
 自2.15.0版本开始,本软件支持使用 `pytorch` 作为计算后端进行底层运算,可接入基于pytorch的模型、代码、第三方库进行二次开发。
 
@@ -25,7 +27,7 @@ VQNet使用torch进行底层计算
         , ``_parmeters`` 中的数据为 ``torch.nn.Parameter`` 类型,无法使用QTensor接口。
 
 
-        请注意：``pyvqnet.backends.set_backend("torch")`` 以及 ``pyvqnet.backends.set_backend("pyvqnet")`` 会修改全局运行后端。
+        请注意： ``pyvqnet.backends.set_backend("torch")`` 以及 ``pyvqnet.backends.set_backend("pyvqnet")`` 会修改全局运行后端。
         不同后端配置下创建的 ``QTensor`` ，其底层数据结构不同，无法一起运算。
 
 
@@ -41,7 +43,7 @@ set_backend
 
 .. py:function:: pyvqnet.backends.set_backend(backend_name)
 
-    该用于切换计算和数据存储后端，可选择使用 pyvqnet 原生计算、C++自动微分、或基于 PyTorch 的后端，从而在不同性能和兼容性需求间灵活切换。默认为 "pyvqnet",可设置为 "torch"。
+    该用于切换计算和数据存储后端，可选择使用 pyvqnet 原生计算、C++自动微分、或基于 PyTorch 的后端，从而在不同性能和兼容性需求间灵活切换。默认为 "pyvqnet-ad",可设置为 "torch"。
     
     使用 ``pyvqnet.backends.set_backend("pyvqnet")`` 后,VQNet ``QTensor`` 的 ``data`` 成员变量均使用 ``pyvqnet._core.Tensor`` 储存数据,并使用pyvqnet c++库计算,
     自动微分在python完成。
@@ -97,7 +99,7 @@ QTensor函数
 .. code-block::
 
     import pyvqnet
-    pyvqnet.backends.set_backend("pyvqnet")
+    pyvqnet.backends.set_backend("torch")
 
 在 :ref:`qtensor_api` 下的所有成员函数,创建函数,数学函数,逻辑函数,矩阵变换等均使用torch进行计算。使用 ``QTensor.data`` 可获取torch数据。
 
@@ -1009,7 +1011,7 @@ GroupNorm
 
 .. py:class:: pyvqnet.nn.torch.GroupNorm(num_groups: int, num_channels: int, epsilon = 1e-5, affine = True, dtype = None, name = "")
 
-    对小批量输入应用组归一化。输入: :math:`(N, C, *)` 其中 :math:`C=\text{num_channels}` , 输出: :math:`(N, C, *)` 。
+    对小批量输入应用组归一化。输入: :math:`(N, C, *)` 其中 :math:`C=\mathrm{num\_channels}` , 输出: :math:`(N, C, *)` 。
 
     此层实现论文 `组归一化 <https://arxiv.org/abs/1803.08494>`__ 中描述的操作。
 
@@ -2480,6 +2482,9 @@ TorchQcloudQuantumLayer
             `cbits`: 由QuantumBatchAsyncQcloudLayer分配的经典比特, 数量为  `num_cubits`, 类型为 pyQpanda.ClassicalCondition,无需用户额外在函数中定义。。
             
 
+    .. note::
+
+        在当前版本中，单次线路提交至 QCloud 的默认总超时时间为 60 秒。如果因 QCloud 繁忙而导致超时，您可以在 ``query_kwargs`` 中设置 `total_timeout` 键的值，来指定所需的等待秒数。
 
     :param origin_qprog_func: QPanda 构建的变分量子电路函数,必须返回QProg。
     :param qcloud_token: `str` - 量子机的类型或用于执行的云令牌。
@@ -2492,8 +2497,8 @@ TorchQcloudQuantumLayer
     :param dtype: 参数的数据类型。 默认值为 None,即使用默认数据类型pyvqnet.kfloat32。
     :param name: 模块的名称。 默认为空字符串。
     :param diff_method: 梯度计算的微分方法。 默认为“parameter_shift”,"random_coordinate_descent"。
-    :param submit_kwargs: 用于提交量子电路的附加关键字参数,默认:{"chip_id":pyqpanda.real_chip_type.origin_72,"is_amend":True,"is_mapping":True,"is_optimization":True,"compile_level":3,"default_task_group_size":200,"test_qcloud_fake":False},当设置test_qcloud_fake为True则本地CPUQVM模拟。
-    :param query_kwargs: 用于查询量子结果的附加关键字参数,默认:{"timeout":2,"print_query_info":True,"sub_circuits_split_size":1}。
+    :param submit_kwargs: 用于提交量子电路的附加关键字参数,默认:{"chip_id":"origin_wukong","is_amend":True,"is_mapping":True,"is_optimization":True,"compile_level":3,"default_task_group_size":200,"test_qcloud_fake":False},当设置test_qcloud_fake为True则本地CPUQVM模拟。
+    :param query_kwargs: 用于查询量子结果的附加关键字参数,默认:{"timeout":1,"total_timeout":60,"print_query_info":True,"sub_circuits_split_size":1}。
     :return: 一个可以计算量子电路的模块。
     
     Example::
@@ -2589,13 +2594,13 @@ TorchQcloud3QuantumLayer
 
 .. py:class:: pyvqnet.qnn.vqc.torch.TorchQcloud3QuantumLayer(origin_qprog_func, qcloud_token, para_num, pauli_str_dict=None, shots = 1000, initializer=None, dtype=None, name="", diff_method="parameter_shift", submit_kwargs={}, query_kwargs={})
 
-    使用 pyqpanda3的本源量子真实芯片的抽象计算模块。 它提交参数化量子电路到真实芯片并获得测量结果。
+    使用 pyqpanda3的本源量子 https://qcloud.originqc.com.cn/  真实芯片的抽象计算模块。 它提交参数化量子电路到真实芯片并获得测量结果。
     如果 diff_method == "random_coordinate_descent" ,该层将随机选择单个参数来计算梯度,其他参数将保持为零。参考:https://arxiv.org/abs/2311.00088
 
     .. note::
 
         qcloud_token 为您到 https://qcloud.originqc.com.cn/ 中申请的api token。
-        origin_qprog_func 需要返回pypqanda3.core.QProg类型的数据,如果没有设置pauli_str_dict,需要保证该QProg中已经插入了measure。
+        origin_qprog_func 需要返回pypqanda3.core.QProg类型的数据,如果没有设置测量观测量pauli_str_dict,需要保证该QProg中已经插入了measure。
         origin_qprog_func 的形式必须按照如下:
 
         origin_qprog_func(input,param )
@@ -2622,7 +2627,7 @@ TorchQcloud3QuantumLayer
     :param dtype: 参数的数据类型。 默认值为 None,即使用默认数据类型pyvqnet.kfloat32。
     :param name: 模块的名称。 默认为空字符串。
     :param diff_method: 梯度计算的微分方法。 默认为“parameter_shift”,"random_coordinate_descent"。
-    :param submit_kwargs: 用于提交量子电路的附加关键字参数,默认:{"chip_id":pyqpanda.real_chip_type.origin_72,"is_amend":True,"is_mapping":True,"is_optimization":True,"compile_level":3,"default_task_group_size":200,"test_qcloud_fake":False},当设置test_qcloud_fake为True则本地CPUQVM模拟。
+    :param submit_kwargs: 用于提交量子电路的附加关键字参数,默认:{"chip_id":"origin_wukong","is_amend":True,"is_mapping":True,"is_optimization":True,"compile_level":3,"default_task_group_size":200,"test_qcloud_fake":False},当设置test_qcloud_fake为True则本地CPUQVM模拟。
     :param query_kwargs: 用于查询量子结果的附加关键字参数,默认:{"timeout":2,"print_query_info":True,"sub_circuits_split_size":1}。
     :return: 一个可以计算量子电路的模块。
 
@@ -4619,7 +4624,7 @@ VQC_QuantumEmbedding
 
                 self.ansatz = VQC_QuantumEmbedding(num_repetitions_input, depth_input,
                                                 num_unitary_layers,
-                                                num_repetitions, initial=tensor.full([1],12.0),dtype=pyvqnet.kfloat64)
+                                                num_repetitions, initial=tensor.full([1],12.0),dtype=pyvqnet.kfloat32)
 
                 self.measure = MeasureAll(obs={f"Z{nq-1}":1})
                 self.device = QMachine(nq)
@@ -8064,7 +8069,7 @@ VQC_QuantumEmbedding
 
                 self.ansatz = VQC_QuantumEmbedding(num_repetitions_input, depth_input,
                                                 num_unitary_layers,
-                                                num_repetitions, initial=tensor.full([1],12.0),dtype=pyvqnet.kfloat64)
+                                                num_repetitions, initial=tensor.full([1],12.0),dtype=pyvqnet.kfloat32)
 
                 self.measure = MeasureAll(obs={f"Z{nq-1}":1})
                 self.device = TNQMachine(nq)
@@ -8742,7 +8747,7 @@ CommController
 -------------------------
 
 .. py:class:: pyvqnet.distributed.ControlComm.CommController(backend,rank=None,world_size=None)
-    :no-index:
+   :no-index:
 
     CommController用于控制在cpu、gpu下数据通信的控制器, 通过设置参数 `backend` 来生成cpu(gloo)、gpu(nccl)的控制器。
     这个类会调用 backend,rank,world_size 初始化 ``torch.distributed.init_process_group(backend,rank,world_size)``
@@ -8785,7 +8790,7 @@ CommController
 
             for p in processes:
                 p.join()
- 
+        #python test.py
 
     .. py:method:: getRank()
         :no-index:
@@ -8825,7 +8830,7 @@ CommController
 
                 for p in processes:
                     p.join()
-            
+            #python test.py
 
 
     .. py:method:: getSize()
@@ -8867,7 +8872,7 @@ CommController
 
                 for p in processes:
                     p.join()
-            
+            #python test.py
 
 
     .. py:method:: getLocalRank()
@@ -8909,7 +8914,7 @@ CommController
 
                 for p in processes:
                     p.join()
-
+            #python test.py
  
     .. py:method:: split_group(rankL)
         :no-index:
@@ -8921,7 +8926,7 @@ CommController
 
         Examples::
 
-            from pyvqnet.distributed import get_local_rank,CommController,init_group
+            from pyvqnet.distributed import get_local_rank,CommController
             import pyvqnet
             import numpy as np
             from pyvqnet.tensor import tensor
@@ -8957,10 +8962,7 @@ CommController
 
                 for p in processes:
                     p.join()
- 
-
-
- 
+            #python test.py
     .. py:method:: barrier()
         :no-index:
 
@@ -8987,7 +8989,6 @@ CommController
                 pp.barrier()
 
 
-
             if __name__ == "__main__":
                 world_size = 4
                 processes = []
@@ -8999,6 +9000,7 @@ CommController
 
                 for p in processes:
                     p.join()
+            #python test.py
 
     .. py:method:: allreduce(tensor, c_op = "avg")
         :no-index:
@@ -9010,7 +9012,7 @@ CommController
 
         Examples::
 
-            from pyvqnet.distributed import get_local_rank,CommController,init_group
+            from pyvqnet.distributed import get_local_rank,CommController
             import pyvqnet
             import numpy as np
             from pyvqnet.tensor import tensor
@@ -9025,8 +9027,6 @@ CommController
                 os.environ['MASTER_PORT'] = '29500'
                 os.environ['LOCAL_RANK'] = f"{rank}"
                 Comm_OP = CommController("gloo", rank=rank, world_size=size)
-
-            
 
                 num = tensor.to_tensor(np.random.rand(1, 5))
                 print(f"rank {Comm_OP.getRank()}  {num}")
@@ -9046,7 +9046,7 @@ CommController
 
                 for p in processes:
                     p.join()
-            
+            #python test.py
 
  
     .. py:method:: reduce(tensor, root = 0, c_op = "avg")
@@ -9060,7 +9060,7 @@ CommController
 
         Examples::
 
-            from pyvqnet.distributed import get_local_rank,CommController,init_group
+            from pyvqnet.distributed import get_local_rank,CommController
             import pyvqnet
             import numpy as np
             from pyvqnet.tensor import tensor
@@ -9075,8 +9075,6 @@ CommController
                 os.environ['MASTER_PORT'] = '29500'
                 os.environ['LOCAL_RANK'] = f"{rank}"
                 Comm_OP = CommController("gloo", rank=rank, world_size=size)
-
-            
 
                 num = tensor.to_tensor(np.random.rand(1, 5))
                 print(f"before rank {Comm_OP.getRank()}  {num}")
@@ -9096,7 +9094,7 @@ CommController
 
                 for p in processes:
                     p.join()
- 
+            #python test.py
  
     .. py:method:: broadcast(tensor, root = 0)
         :no-index:
@@ -9108,7 +9106,7 @@ CommController
 
         Examples::
 
-            from pyvqnet.distributed import get_local_rank,CommController,init_group
+            from pyvqnet.distributed import get_local_rank,CommController
             import pyvqnet
             import numpy as np
             from pyvqnet.tensor import tensor
@@ -9123,8 +9121,6 @@ CommController
                 os.environ['MASTER_PORT'] = '29500'
                 os.environ['LOCAL_RANK'] = f"{rank}"
                 Comm_OP = CommController("gloo", rank=rank, world_size=size)
-
-            
 
                 num = tensor.to_tensor(np.random.rand(1, 5))+ rank
                 print(f"before rank {Comm_OP.getRank()}  {num}")
@@ -9144,7 +9140,7 @@ CommController
 
                 for p in processes:
                     p.join()
-            
+            #python test.py
 
  
     .. py:method:: allgather(tensor)
@@ -9162,8 +9158,7 @@ CommController
             from pyvqnet.tensor import tensor
             pyvqnet.backends.set_backend("torch")
             import os
-            import multiprocessing as mp
-
+            import torch.multiprocessing as mp
 
             def init_process(rank, size):
                 """ Initialize the distributed environment. """
@@ -9190,7 +9185,7 @@ CommController
 
                 for p in processes:
                     p.join()
-
+            #python test.py
 
     .. py:method:: send(tensor, dest)
         :no-index:
@@ -9238,7 +9233,7 @@ CommController
 
                 for p in processes:
                     p.join()
- 
+            #python test.py
  
     .. py:method:: recv(tensor, source)
         :no-index:
@@ -9286,7 +9281,7 @@ CommController
 
                 for p in processes:
                     p.join()
-            
+            #python test.py
 
     .. py:method:: allreduce_group(tensor, c_op = "avg", group = None)
         :no-index:
@@ -9341,7 +9336,7 @@ CommController
 
                 for p in processes:
                     p.join()
-
+            #python test.py
 
     .. py:method:: reduce_group(tensor, root = 0, c_op = "avg", group = None)
         :no-index:
@@ -9393,7 +9388,7 @@ CommController
 
                 for p in processes:
                     p.join()
-                        
+            #python test.py
 
  
     .. py:method:: broadcast_group(tensor, root = 0, group = None)
@@ -9407,7 +9402,7 @@ CommController
 
         Examples::
             
-            from pyvqnet.distributed import get_local_rank,CommController,init_group
+            from pyvqnet.distributed import get_local_rank,CommController
             import pyvqnet
             import numpy as np
             from pyvqnet.tensor import tensor
@@ -9448,7 +9443,7 @@ CommController
 
                 for p in processes:
                     p.join()
-
+            #python test.py
 
     .. py:method:: allgather_group(tensor, group = None)
         :no-index:
@@ -9498,3 +9493,4 @@ CommController
                 for p in processes:
                     p.join()
 
+            #python test.py

@@ -3,6 +3,37 @@ VQNet Changelog
 ######################
 
 
+[v2.17.3] - 2026-03-30
+***************************
+
+Added
+===================
+- 增加bfloat16数据类型。
+- 增加异步的NCCL通信接口： ``nccl_async_all_gather``, ``nccl_async_all_reduce``, ``nccl_async_reduce``, ``nccl_async_broadcast``, ``nccl_async_send``, ``nccl_async_recv`` 。
+- 增加对最新本源量子芯片的支持，芯片ID为 ``WK_C180``
+- 增加 ``data_ptr`` 等接口，实验性增加对 `triton <https://triton-lang.org/main/index.html>`_ 的支持。
+- 增加Lincese文件。
+
+Changed
+===================
+
+- 默认后端改为 "pyvqnet-ad".
+- MacOS上的计算基于arm的neon指令进行实现.
+- ``matmul`` 接口支持超过4维的数据进行运算。
+- 减少安装whl时候对部分cuda runtime库的依赖。
+- pyvqnet的QTensor数据类型不再是整数，而是特定的数据类型。
+- 修改QTensor pickle的逻辑，不再pickle grad。
+- 删除is_dense
+- 移除了 pq2 的 ``QuantumBatchAsyncQcloudLayer`` 。
+- 更新了 pq3 的 ``QuantumBatchAsyncQcloudLayer`` 文档。
+
+Fixed
+===================
+- 解决 ``use_bias=False`` 情况下 ``Linear`` 的错误。
+- 解决MAX_GPUS的问题，当前最大GPU数量为16。
+- 解决windows jupyter上导入错误。
+
+
 [v2.17.2] - 2025-11-18
 ***************************
 

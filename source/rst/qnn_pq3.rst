@@ -20,7 +20,7 @@ QuantumLayer
 
 	变分量子层的抽象计算模块。对一个参数化的量子线路使用pyqpanda3进行仿真,得到测量结果。该变分量子层继承了VQNet框架的梯度计算模块,可以使用参数漂移法等计算线路参数的梯度,训练变分量子线路模型或将变分量子线路嵌入混合量子和经典模型。
     
-    :param qprog_with_measure: 用pyQPand构建的量子线路运行和测量函数。
+    :param qprog_with_measure: 用pyQPanda构建的量子线路运行和测量函数。
     :param para_num: `int` - 参数个数。
     :param diff_method: 求解量子线路参数梯度的方法,“参数位移”或“有限差分”,默认参数偏移。
     :param delta: 有限差分计算梯度时的 \delta。
@@ -35,11 +35,13 @@ QuantumLayer
         此函数必须包含输入和参数两个参数作为函数入参(即使某个参数未实际使用),输出为线路的测量结果或者期望值（需要为np.ndarray或包含数值的列表）,否则无法在QpandaQCircuitVQCLayerLite中正常运行。
 
         
-        量子线路函数 qprog_with_measure (input,param)的使用可参考下面的例子。
+        量子线路函数 qprog_with_measure的使用可参考下面的例子。
+
+        qprog_with_measure(input,param)
         
-        `input`: 输入一维经典数据。如果没有,输入 None。
-        
-        `param`: 输入一维的变分量子线路的待训练参数。
+            `input`: 输入一维经典数据。如果没有,输入 None。
+            
+            `param`: 输入一维的变分量子线路的待训练参数。
 
     .. note::
 
@@ -48,7 +50,7 @@ QuantumLayer
 
     .. note::
 
-        该类计算梯度需要额外使用pyqpanda3进行线路计算个数与参数个数、数据个数、数据维度的乘积线性相关。
+        该类在计算梯度时，需要额外使用 pyqpanda3，其计算量与线路计算个数、参数个数、数据个数以及数据维度的乘积呈线性相关。
 
 
     Example::
@@ -139,14 +141,12 @@ QpandaQProgVQCLayer
 
         此函数必须包含输入和参数两个参数作为函数入参(即使某个参数未实际使用),输出为pyqpanda3.core.QProg类型数据,否则无法在QuantumLayerV3中正常运行。
 
-
-        origin_qprog_func (input,param )
+        origin_qprog_func (input,param)
 
         `input`:用户定义的数组类输入 1 维经典数据。
 
         `param`:array_like 输入用户定义的 1 维量子电路参数。
 
-       
 
     .. note::
 
@@ -174,19 +174,12 @@ QpandaQProgVQCLayer
 
             cir<<pq.RZ(m_qlist[0], input[0])
             cir<<pq.RX(m_qlist[2], input[2])
-            
             qcir = pq.RX(m_qlist[1], param[1]).control(m_qlist[0])
-        
             cir<<qcir
-
             qcir = pq.RY(m_qlist[0], param[2]).control(m_qlist[1])
-        
             cir<<qcir
-
             cir<<pq.RY(m_qlist[0], input[1])
-
             qcir = pq.RZ(m_qlist[0], param[3]).control(m_qlist[1])
-        
             cir<<qcir
             m_prog<<cir
 
@@ -219,17 +212,16 @@ QuantumBatchAsyncQcloudLayer
 
 .. py:class:: pyvqnet.qnn.pq3.quantumlayer.QuantumBatchAsyncQcloudLayer(origin_qprog_func, qcloud_token, para_num, pauli_str_dict=None, shots = 1000, initializer=None, dtype=None, name="", diff_method="parameter_shift", submit_kwargs={}, query_kwargs={})
 
-    使用 pyqpanda3 QCloud 的本源量子真实芯片的抽象计算模块。 它提交参数化量子电路到真实芯片并获得测量结果。
+    使用 pyqpanda3 QCloud 的本源量子 https://qcloud.originqc.com.cn/ 真实芯片的抽象计算模块。 它提交参数化量子电路到真实芯片并获得测量结果。
     如果 diff_method == "random_coordinate_descent" ,该层将随机选择单个参数来计算梯度,其他参数将保持为零。参考:https://arxiv.org/abs/2311.00088
 
     .. note::
 
         qcloud_token 为您到 https://qcloud.originqc.com.cn/ 中申请的api token。
-        origin_qprog_func 需要返回pypqanda3.core.QProg类型的数据,如果没有设置pauli_str_dict,需要保证该QProg中已经插入了measure。
+        origin_qprog_func 需要返回pyqpanda3.core.QProg类型的数据,如果没有设置测量的观测量pauli_str_dict,需要保证该QProg中已经插入了measure。
         origin_qprog_func 的形式必须按照如下:
 
         origin_qprog_func(input,param)
-        
             `input`: 输入1~2维经典数据,二维的情况下,第一个维度为批处理大小。
             
             `param`: 输入一维的变分量子线路的待训练参数。
@@ -238,18 +230,21 @@ QuantumBatchAsyncQcloudLayer
 
         该类计算梯度需要额外使用芯片进行线路计算个数与参数个数、数据个数、数据维度的乘积线性相关。
 
+    .. note::
+
+        在当前版本中，单次线路提交至 QCloud 的默认总超时时间为 60 秒。如果因 QCloud 繁忙而导致超时，您可以在 ``query_kwargs`` 中设置 `total_timeout` 键的值，来指定所需的等待秒数。
 
     :param origin_qprog_func: QPanda 构建的变分量子电路函数,必须返回QProg。
     :param qcloud_token: `str` - 量子机的类型或用于执行的云令牌。
     :param para_num: `int` - 参数数量,参数是大小为[para_num]的QTensor。
     :param pauli_str_dict: `dict|list` - 表示量子电路中泡利运算符的字典或字典列表。 默认为“无”,则进行测量操作,如果输入泡利算符的字典,则会计算单个期望或者多个期望。
-    :param shot: `int` - 测量次数。 默认值为 1000。
+    :param shots: `int` - 测量次数。 默认值为 1000。
     :param initializer: 参数值的初始化器。 默认为“无”,使用0~2*pi正态分布。
     :param dtype: 参数的数据类型。 默认值为 None,即使用默认数据类型pyvqnet.kfloat32。
     :param name: 模块的名称。 默认为空字符串。
     :param diff_method: 梯度计算的微分方法。 默认为“parameter_shift”,"random_coordinate_descent"。
     :param submit_kwargs: 用于提交量子电路的附加关键字参数,默认:{"chip_id":"origin_wukong","is_amend":True,"is_mapping":True,"is_optimization":True,"compile_level":3,"default_task_group_size":200,"test_qcloud_fake":False},当设置test_qcloud_fake为True则本地CPUQVM模拟。
-    :param query_kwargs: 用于查询量子结果的附加关键字参数,默认:{"timeout":2,"print_query_info":True,"sub_circuits_split_size":1}。
+    :param query_kwargs: 用于查询量子结果的附加关键字参数,默认:{"timeout":1,"total_timeout":60, "print_query_info":True,"sub_circuits_split_size":1}。
     :return: 一个可以计算量子电路的模块。
     
     Example::
@@ -270,7 +265,6 @@ QuantumBatchAsyncQcloudLayer
             cir << pq.RY(m_qlist[2],param[1])
             cir << pq.H(m_qlist[2])
             m_prog = pq.QProg(cir)
-
 
             for idx, ele in enumerate(measure_qubits):
                 m_prog << pq.measure(m_qlist[ele], m_qlist[idx])  # pylint: disable=expression-not-assigned
@@ -334,7 +328,7 @@ QuantumBatchAsyncQcloudLayer
 QuantumLayerAdjoint
 ============================
 
-.. py:class:: pyvqnet.qnn.pq3.quantumlayer.QuantumLayerAdjoint(pq3_vqc_circuit,param_num,pauli_dicts,dtype = None，name="")
+.. py:class:: pyvqnet.qnn.pq3.quantumlayer.QuantumLayerAdjoint(pq3_vqc_circuit,param_num,pauli_dicts,dtype = None,name="")
 
     本类使用 pyqpanda3 的 VQCircuit 接口 https://qcloud.originqc.com.cn/document/qpanda-3/d8/d94/tutorial_variational_quantum_circuit.html，通过伴随法计算量子电路中参数相对于哈密顿量的梯度。
     
@@ -533,10 +527,6 @@ grad
 
 
 
-
-
-
-
 QLinear
 ==============
 
@@ -643,6 +633,31 @@ Qconv是一种量子卷积算法接口。
 
 
 .. _pq3_gate:
+
+
+
+AmplitudeEmbeddingCircuit
+============================
+
+.. py:function:: pyvqnet.qnn.pq3.template.AmplitudeEmbeddingCircuit(input_feat,qubits)
+
+    将 :math:`2^n` 特征编码为 :math:`n` 量子比特的振幅向量。为了表示一个有效的量子态向量, ``features`` 的L2范数必须是1。
+
+    :param input_feat: 表示参数的numpy数组。
+    :param qubits: 量子比特索引列表。
+    :return: 量子线路。
+
+    Example::
+
+        import numpy as np
+        import pyqpanda3.core as pq
+        from pyvqnet.qnn.pq3.template import AmplitudeEmbeddingCircuit
+        input_feat = np.array([2.2, 1, 4.5, 3.7])
+        qlist = range(3)
+        machine = pq.CPUQVM()
+        m_prog = pq.QProg()
+        cir = AmplitudeEmbeddingCircuit(input_feat,qlist)
+
 
 BasicEmbeddingCircuit
 ============================
@@ -1268,7 +1283,7 @@ expval
     expval api现在支持pyqpanda3 的模拟器 。 
     
     :param machine: 由pyQPanda创建的量子虚拟机。
-    :param prog: pyQPanda创建的量子工程。
+    :param prog: pyQPanda创建的量子程序。
     :param pauli_str_dict: 哈密顿量观测值。
 
     :return: 期望值。
@@ -1307,7 +1322,7 @@ QuantumMeasure
 
 
     :param machine: pyQPanda分配的量子虚拟机。
-    :param prog: pyQPanda创建的量子工程。
+    :param prog: pyQPanda创建的量子程序。
     :param measure_qubits: 列表包含测量比特索引。
     :param shots: 测量次数,默认值为1000次。
     :param qcloud_option: 设置 qcloud 配置,默认为“”,可以传入一个QCloudOptions类,只在使用qcloud 下有用。
@@ -1350,7 +1365,7 @@ ProbsMeasure
     ProbsMeasure api现在只支持pyQPanda ``CPUQVM`` 或 ``QCloud`` 。
 
     :param measure_qubits: 列表包含测量比特索引
-    :param prog: qpanda创建的量子工程。
+    :param prog: qpanda创建的量子程序。
     :param machine: pyQPanda分配的量子虚拟机。
     :param shots: 测量次数,默认为1,计算理论值。
     :return: 按字典顺序测量量子比特。
