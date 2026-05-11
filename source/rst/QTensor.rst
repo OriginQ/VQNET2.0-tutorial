@@ -3300,7 +3300,7 @@ permute
 
 .. py:function:: pyvqnet.tensor.permute(t: pyvqnet.tensor.QTensor, dim: list)
 
-    根据输入的 dim 的顺序,改变t 的轴的顺序。如果 dims = None,则按顺序反转 t 的轴。
+    根据输入的 dim 的顺序,改变t 的轴的顺序。
 
     :param t: 输入 QTensor 。
     :param dim: 维度的新顺序(整数列表)。
@@ -3334,7 +3334,7 @@ transpose
 
 .. py:function:: pyvqnet.tensor.transpose(t: pyvqnet.tensor.QTensor, dim: list)
 
-    根据输入的 dim 的顺序,改变t 的轴的顺序。如果 dims = None,则按顺序反转 t 的轴。该函数功能与 permute 一致。
+    根据输入的 dim 的顺序,改变t 的轴的顺序。如果 dims = None,则按顺序反转 t 的轴。
 
     :param t: 输入 QTensor 。
     :param dim: 维度的新顺序(整数列表)。
