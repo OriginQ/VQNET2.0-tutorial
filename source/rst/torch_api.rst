@@ -5279,7 +5279,7 @@ vqc_basisrotation
 
         vqc_basisrotation(q_machine=qm,
                         wires=wires,
-                        unitary_matrix=QTensor(umat, dtype=qm.state.dtype))
+                        unitary_matrix=QTensor(umat, dtype=qm.states.dtype))
 
         print(qm.states)
 

@@ -3952,7 +3952,7 @@ VQC_BasisRotation
         for i in range(len(umat)):
             hadamard(q_machine=qm, wires=i)
         isingzz(q_machine=qm, params=QTensor([0.55]), wires=[0,2])
-        VQC_BasisRotation(q_machine=qm, wires=wires,unitary_matrix=QTensor(umat,dtype=qm.state.dtype))
+        VQC_BasisRotation(q_machine=qm, wires=wires,unitary_matrix=QTensor(umat,dtype=qm.states.dtype))
         
         print(qm.states)
         
