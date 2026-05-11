@@ -1340,21 +1340,23 @@ Quantum_Embedding
 expval
 ============================
 
-.. py:function:: pyvqnet.qnn.pq3.measure.expval(machine,prog,pauli_str_dict)
+.. py:function:: pyvqnet.qnn.pq3.measure.expval(machine,prog,pauli_str_dict,shots=1000,noise_model=None)
 
 	提供的哈密顿量观测值的期望值。
-    
+
     如果观测值是 :math:`0.7Z\otimes X\otimes I+0.2I\otimes Z\otimes I`,
     那么 Hamiltonian dict 将是 ``{{'Z0, X1':0.7} ,{'Z1':0.2}}`` 。
 
-    expval api现在支持pyqpanda3 的模拟器 。 
-    
+    expval api现在支持pyqpanda3 的模拟器 。
+
     :param machine: 由pyQPanda创建的量子虚拟机。
     :param prog: pyQPanda创建的量子程序。
     :param pauli_str_dict: 哈密顿量观测值。
+    :param shots: 测量次数,默认值为1000。
+    :param noise_model: 噪声模型,默认值为None(理想模拟)。
 
     :return: 期望值。
-               
+
 
     Example::
 
@@ -1378,12 +1380,12 @@ expval
 QuantumMeasure
 ============================
 
-.. py:function:: pyvqnet.qnn.pq3.measure.QuantumMeasure(machine,prog,measure_qubits:list,shots:int = 1000, qcloud_option="")
+.. py:function:: pyvqnet.qnn.pq3.measure.QuantumMeasure(machine,prog,measure_qubits:list,shots:int = 1000, qcloud_option=””,noise_model=None)
 
     计算量子线路测量。返回通过蒙特卡罗方法获得的测量结果。
 
     更多详情请访问  https://pyqpanda-toturial.readthedocs.io/zh/latest/Measure.html?highlight=measure_all 。
-    
+
     QuantumMeasure api现在只支持QPanda ``CPUQVM`` 或 ``QCloud`` 。
 
 
@@ -1392,7 +1394,8 @@ QuantumMeasure
     :param prog: pyQPanda创建的量子程序。
     :param measure_qubits: 列表包含测量比特索引。
     :param shots: 测量次数,默认值为1000次。
-    :param qcloud_option: 设置 qcloud 配置,默认为“”,可以传入一个QCloudOptions类,只在使用qcloud 下有用。
+    :param qcloud_option: 设置 qcloud 配置,默认为””,可以传入一个QCloudOptions类,只在使用qcloud 下有用。
+    :param noise_model: 噪声模型,默认值为None(理想模拟)。
     :return: 返回通过蒙特卡罗方法获得的测量结果。
 
     Example::
@@ -1423,10 +1426,10 @@ QuantumMeasure
 ProbsMeasure
 ============================
 
-.. py:function:: pyvqnet.qnn.pq3.measure.ProbsMeasure(machine,prog,measure_qubits:list,shots=1)
+.. py:function:: pyvqnet.qnn.pq3.measure.ProbsMeasure(machine,prog,measure_qubits:list,shots=1,noise_model=None)
 
 	计算线路概率测量。
-    
+
     更多详情请访问 https://pyqpanda-toturial.readthedocs.io/zh/latest/PMeasure.html。
 
     ProbsMeasure api现在只支持pyQPanda ``CPUQVM`` 或 ``QCloud`` 。
@@ -1435,6 +1438,7 @@ ProbsMeasure
     :param prog: qpanda创建的量子程序。
     :param machine: pyQPanda分配的量子虚拟机。
     :param shots: 测量次数,默认为1,计算理论值。
+    :param noise_model: 噪声模型,默认值为None(理想模拟)。
     :return: 按字典顺序测量量子比特。
 
 
