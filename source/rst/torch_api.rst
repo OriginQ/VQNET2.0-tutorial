@@ -5420,7 +5420,11 @@ QuantumLayerAdjoint
 以MPS方式构建量子线路弥补对大比特量子线路构建支持。
 
 .. warning::
-        
+
+        使用本模块以下功能需额外安装 ``tensornetwork`` 和 ``torch``。默认安装 ``pyvqnet`` 不包含这两个依赖，请使用 ``pip install tensornetwork torch`` 安装。
+
+.. warning::
+
         通过 ``TNQMachine`` 中 ``use_mps`` 参数开启MPS构建量子线路功能， 支持大比特(100以及以上)量子线路实现。
 
 .. warning::
