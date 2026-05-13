@@ -18,6 +18,8 @@ Changed
 - 删除已废弃的 ``QuantumLayerMultiProcess``、``DataParallelHybirdVQCQpandaQVMLayer``、``HybirdVQCQpanda3QVMLayer`` 接口。
 - ``split_group`` 重命名为 ``split_groups``。
 - 依赖于cuda12.6的nvidia runtime 。
+- "chip_id" 默认改为 "WK_C180" 。
+- ``ComplexEntangelingTemplate`` 改为 ``ComplexEntanglingTemplate``
 
 Fixed
 ===================
@@ -25,7 +27,7 @@ Fixed
 - 修复 ``cuda_masked_fill`` 对 complex64/complex128 类型的支持。
 - 修复 ``bfloat16`` 下 ``log_softmax`` 前向计算产生错误 +inf 值的问题。
 - 修复跨 GPU 内存访问时缺少 ``CUDAGuard`` 导致的设备错误。
-
+- 修改大量笔误。
 
 [v2.17.3] - 2026-03-30
 ***************************

@@ -39,9 +39,9 @@ QuantumLayer
 
         qprog_with_measure(input,param)
         
-            `input`: 输入一维经典数据。如果没有,输入 None。
+            `input`: 输入一维经典数据。如果没有,输入 None
             
-            `param`: 输入一维的变分量子线路的待训练参数。
+            `param`: 输入一维的变分量子线路的待训练参数
 
     .. note::
 
@@ -143,9 +143,9 @@ QpandaQProgVQCLayer
 
         origin_qprog_func (input,param)
 
-        `input`:用户定义的数组类输入 1 维经典数据。
+        `input`:用户定义的数组类输入 1 维经典数据
 
-        `param`:array_like 输入用户定义的 1 维量子电路参数。
+        `param`:array_like 输入用户定义的 1 维量子电路参数
 
 
     .. note::
@@ -222,9 +222,10 @@ QuantumBatchAsyncQcloudLayer
         origin_qprog_func 的形式必须按照如下:
 
         origin_qprog_func(input,param)
-            `input`: 输入1~2维经典数据,二维的情况下,第一个维度为批处理大小。
-            
-            `param`: 输入一维的变分量子线路的待训练参数。
+
+            `input`: 输入1~2维经典数据,二维的情况下,第一个维度为批处理大小
+
+            `param`: 输入一维的变分量子线路的待训练参数
 
     .. note::
 
