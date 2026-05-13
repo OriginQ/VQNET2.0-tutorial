@@ -507,7 +507,7 @@ VQCQCloudLayer
     :param pauli_str_dict: 泡利算符字典,用于期望值计算。默认值为 None,则进行测量操作。
     :param shots: 测量次数。默认值为 1000。
     :param name: 模块名称。默认为空字符串。
-    :param submit_kwargs: 用于提交量子电路的附加关键字参数,默认:{"chip_id":"origin_wukong","is_amend":True,"is_mapping":True,"is_optimization":True,"compile_level":3,"default_task_group_size":200,"test_qcloud_fake":False},当设置test_qcloud_fake为True则本地CPUQVM模拟。
+    :param submit_kwargs: 用于提交量子电路的附加关键字参数,默认:{"if_print_qcloud_log":False,"chip_id":"WK_C180","is_amend":True,"is_mapping":True,"is_optimization":True,"compile_level":3,"default_task_group_size":200,"test_qcloud_fake":False,"server_ip_address":""},当设置test_qcloud_fake为True则本地CPUQVM模拟。
     :param query_kwargs: 用于查询量子结果的附加关键字参数,默认:{"timeout":1,"total_timeout":60, "print_query_info":True,"sub_circuits_split_size":1}。
 
     Example::
