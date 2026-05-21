@@ -53,58 +53,7 @@ NCCL安装
 ^^^^^^^^^^^^^^^^^^^^^^
 
 NCCL为GPU间通信的常用库, **VQNet中GPU的分布式计算功能则基于NCCL进行实现**,本软件默认在安装时候同时安装NCCL的动态链接库, 一般不需要安装NCCL。
-如果要安装NCCL,可以按照以下介绍如何在Linux系统中对NCCL进行安装(目前基于GPU的分布式计算功能仅在Linux上实现).
 
-
-从github上将NCCL的仓库拉到本地:
-
-.. code-block::
-
-    git clone https://github.com/NVIDIA/nccl.git
-
-进入nccl根目录并编译
-
-.. code-block::
-    
-    cd nccl
-    make -j src.build
-
-如果cuda没有安装到默认的路径即/usr/local/cuda, 则需要定义CUDA的路径, 使用以下代码来编译
-
-.. code-block::
-
-    make src.build CUDA_HOME=<path to cuda install>
-
-并且可以根据BUILDDIR指定安装目录, 指令如下
-
-.. code-block::
-    
-    make src.build CUDA_HOME=<path to cuda install> BUILDDIR=/usr/local/nccl
-
-安装完成后在.bashrc文件中添加配置
-
-.. code-block::
-    
-    vim ~/.bashrc
-
-    # 在最下面加入
-    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/nccl/lib
-    export PATH=$PATH:/usr/local/nccl/bin
-
-保存后, 执行
-
-.. code-block::
-    
-    source ~/.bashrc
-
-可以通过nccl-test进行验证
-
-.. code-block::
-    
-    git clone https://github.com/NVIDIA/nccl-tests.git
-    cd nccl-tests
-    make -j12 CUDA_HOME=/usr/local/cuda
-    ./build/all_reduce_perf -b 8 -e 256M -f 2 -g 1
 
 节点间通信环境部署
 ^^^^^^^^^^^^^^^^^^^^^^
