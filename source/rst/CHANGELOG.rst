@@ -11,6 +11,7 @@ Added
 - ``vqnetrun`` 新增 ``--backend nccl`` 模式支持，可通过 ``--nproc_per_node``, ``--nnodes``, ``--node_rank``, ``--master_addr``, ``--master_port``, ``--nccl_socket_ifname`` 参数控制 NCCL 分布式启动。
 - 新增 ``VQCQCloudLayer`` 接口，用于将 VQC Module 提交到 QCloud 真实芯片或 pyqpanda3 本地模拟器执行，支持 parameter_shift 反向传播。
 - ``CommController`` 新增 ``destroy()`` 方法用于 NCCL 通信资源清理。
+-
 
 Changed
 ===================
@@ -20,6 +21,9 @@ Changed
 - 依赖于cuda12.6的nvidia runtime 。
 - "chip_id" 默认改为 "WK_C180" 。
 - ``ComplexEntangelingTemplate`` 改为 ``ComplexEntanglingTemplate``
+- 文档 ``vqc.rst`` 新增 "测试2：10量子比特 VQC 梯度对比" 基准测试章节，对比 VQNet / TorchQuantum / DeepQuantum / Pennylane / MindQuantum 五个框架的梯度计算性能。
+- 更新基准测试硬件规格表，加入 CUDA 12.6、torchquantum 0.2.0、mindquantum 0.12.0 版本信息。
+
 
 Fixed
 ===================
