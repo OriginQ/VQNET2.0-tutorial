@@ -6042,7 +6042,7 @@ QNSPSAOptimizer
 测试2：10量子比特 VQC 梯度对比
 ------------------------------------------------------------
 
-本测试了本源量子大模型论文中所使用的 10 量子比特、10 层 VQC 线路上，对比 VQNet、TorchQuantum（TQ）、DeepQuantum（DQ）、Pennylane（PL）及 MindQuantum（MQ）五个框架的梯度计算性能。线路结构为：
+本测试基于本源量子大模型论文中的 10 量子比特、10 层 VQC 线路，对比 VQNet、TorchQuantum（TQ）、DeepQuantum（DQ）、Pennylane（PL）及 MindQuantum（MQ）五个框架的梯度计算性能。线路结构为：
 
   RY(data) → [RY(param) → CRZ(param) → RY(param) → CRZ(param)] × L
 
