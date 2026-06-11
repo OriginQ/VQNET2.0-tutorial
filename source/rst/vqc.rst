@@ -61,7 +61,6 @@
     y.backward()
     print(y)
 
-
 如果要使用一些带训练参数的变分量子线路逻辑门,而不止像上例一样将数据编码到线路上,可以参考下面例子:
 
 .. code-block::
@@ -113,6 +112,60 @@
     y.backward()
     print(y)
 
+
+以下示例展示了如何在GPU上进行变分量子计算（包含数据编码与含参变分线路）：
+
+.. code-block::
+
+    from pyvqnet.nn import Module,Linear,ModuleList
+    from pyvqnet.qnn.vqc.qcircuit import VQC_HardwareEfficientAnsatz,RZZ,RZ,rz,ry,cnot
+    from pyvqnet.qnn.vqc import Probability,QMachine
+    from pyvqnet import tensor
+    from pyvqnet import DEV_GPU
+    class QM(Module):
+        def __init__(self, name=""):
+            super().__init__(name)
+            self.linearx = Linear(4,2)
+            self.ansatz = VQC_HardwareEfficientAnsatz(4, ["rx", "RY", "rz"],
+                                        entangle_gate="cnot",
+                                        entangle_rules="linear",
+                                        depth=2)
+            #基于VQC的RZ 在0比特上
+            self.encode1 = RZ(wires=0)
+            #基于VQC的RZ 在1比特上
+            self.encode2 = RZ(wires=1)
+            #设置RZ 有要训练参数has_params = True,需要训练trainable= True
+            self.vqc = RZ(has_params = True,trainable = True,wires=1)
+            #基于VQC的概率测量 在0,2比特上
+            self.measure = Probability(wires=[0,2])
+            #量子设备QMachine,使用4个比特。
+            self.device = QMachine(4)
+        def forward(self, x, *args, **kwargs):
+            #必须要将states reset到与输入一样的batchsize。
+            self.device.reset_states(x.shape[0])
+            y = self.linearx(x)
+            #将输入编码到RZ门上,注意输入必须是 [batchsize,1]的shape
+            self.encode1(params = y[:, 0],q_machine = self.device,)
+            #将输入编码到RZ门上,注意输入必须是 [batchsize,1]的shape
+            self.encode2(params = y[:, 1],q_machine = self.device,)
+            #使用RZ门构成的含参变分线路,会加入训练。
+            self.vqc(q_machine =self.device)
+            self.ansatz(q_machine =self.device)
+            return self.measure(q_machine =self.device)
+
+    bz =3
+    #create tensor on GPU
+    inputx = tensor.arange(1.0,bz*4+1,device=DEV_GPU).reshape([bz,4])
+    inputx.requires_grad= True
+    #像其他Module一样定义
+    qlayer = QM()
+    #move module to GPU
+    qlayer = qlayer.to(DEV_GPU)
+    #前传
+    y = qlayer(inputx)
+    #反传
+    y.backward()
+    print(y)
 
 模拟器
 =========================================
