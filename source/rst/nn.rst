@@ -192,7 +192,7 @@ toGPU
         Module在不同GPU上无法进行计算。
         如果您尝试在 ID 超过验证 GPU 最大数量的 GPU 上创建 QTensor,将引发 Cuda 错误。
 
-    :param device: 当前保存QTensor的设备,默认:DEV_GPU_0。device= pyvqnet.DEV_GPU_0,存储在第一个 GPU 中,devcie = DEV_GPU_1,存储在第二个 GPU 中,依此类推
+    :param device: 当前保存QTensor的设备,默认:DEV_GPU_0。device= pyvqnet.DEV_GPU_0,存储在第一个 GPU 中,device = DEV_GPU_1,存储在第二个 GPU 中,依此类推
     :return: Module 移动到 GPU 设备。
 
     Examples::
@@ -298,7 +298,7 @@ ModuleList
 
     将子模块保存在列表中。 ModuleList 可以像普通的 Python 列表一样被索引, 它包含的Module的内部参数等可以被保存起来。
 
-    :param modules: nn.Modules 列表
+    :param modules: nn.Module 列表
 
     :return: 一个模块列表
 
@@ -308,7 +308,7 @@ ModuleList
         from pyvqnet.nn import Module,Linear,ModuleList
         from pyvqnet.qnn import ProbsMeasure,QuantumLayer
         import pyqpanda as pq
-        def pqctest (input,param,qubits,cubits,m_machine):
+        def pqctest (input,param,qubits,cbits,m_machine):
             circuit = pq.QCircuit()
             circuit.insert(pq.H(qubits[0]))
             circuit.insert(pq.H(qubits[1]))
@@ -439,9 +439,9 @@ Conv1D
     :param use_bias: `bool` - 是否使用偏置项, 默认使用。
     :param kernel_initializer: `callable` - 卷积核初始化方法。默认为空,使用kaiming_uniform。
     :param bias_initializer: `callable` - 偏置初始化方法。默认为空,使用kaiming_uniform。
-    :param dilation_rate: `int` - 空洞大小,defaults: 1。
+    :param dilation_rate: `int` - 空洞大小,默认:  1。
     :param group: `int` -  分组卷积的分组数. Default: 1。
-    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
+    :param dtype: 参数的数据类型,默认: None,使用默认数据类型:kfloat32,代表32位浮点数。
     :param name: 模块的名字,default:""。
 
     :return: 一维卷积实例。
@@ -488,9 +488,9 @@ Conv2D
     :param use_bias: `bool` - 是否使用偏置项, 默认使用。
     :param kernel_initializer: `callable` - 卷积核初始化方法。默认为空,使用kaiming_uniform。
     :param bias_initializer: `callable` - 偏置初始化方法。默认为空,使用kaiming_uniform。
-    :param dilation_rate: `int` - 空洞大小,defaults: 1。
+    :param dilation_rate: `int` - 空洞大小,默认:  1。
     :param group: `int` -  分组卷积的分组数. Default: 1。
-    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
+    :param dtype: 参数的数据类型,默认: None,使用默认数据类型:kfloat32,代表32位浮点数。
     :param name: 模块的名字,default:""。
 
     :return: 二维卷积实例。
@@ -535,7 +535,7 @@ ConvT2D
 
 .. py:class:: pyvqnet.nn.ConvT2D(input_channels,output_channels,kernel_size,stride=[1, 1],padding="valid",use_bias="True", kernel_initializer=None,bias_initializer=None, dilation_rate: int = 1, out_padding = (0,0), group: int = 1, dtype = None, name = "")
 
-    在输入上进行二维转置卷积运算。 Conv2D模块的输入具有形状(batch_size, input_channels, height, width)。
+    在输入上进行二维转置卷积运算。 ConvT2D模块的输入具有形状(batch_size, input_channels, height, width)。
 
     :param input_channels: `int` - 输入数据的通道数。
     :param output_channels: `int` - 输出数据的通道数。
@@ -545,10 +545,10 @@ ConvT2D
     :param use_bias: `bool` - 是否使用偏置项, 默认使用。
     :param kernel_initializer: `callable` - 卷积核初始化方法。默认为空,使用kaiming_uniform。
     :param bias_initializer: `callable` - 偏置项初始化方法。默认为空,使用kaiming_uniform。
-    :param dilation_rate: `int` - 空洞大小,defaults: 1。
+    :param dilation_rate: `int` - 空洞大小,默认:  1。
     :param out_padding: 在输出形状中每个维度的一侧添加的额外尺寸。默认值:(0,0)
     :param group: `int` -  分组卷积的分组数. Default: 1。
-    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
+    :param dtype: 参数的数据类型,默认: None,使用默认数据类型:kfloat32,代表32位浮点数。
     :param name: 模块的名字,default:""。
 
     :return: 二维转置卷积实例。
@@ -595,7 +595,7 @@ AvgPool1D
     对一维输入进行平均池化。输入具有形状(batch_size, input_channels, in_height)。
 
     :param kernel: 平均池化的窗口大小。
-    :param strides: 窗口移动的步长。
+    :param stride: 窗口移动的步长。
     :param padding: 填充选项, "valid" or "same" 或者整数指定填充长度。 默认 "valid"。
     :param name: 模块的名字,default:""。
 
@@ -637,7 +637,7 @@ MaxPool1D
     对一维输入进行最大池化。输入具有形状(batch_size, input_channels, in_height)。
 
     :param kernel: 最大池化的窗口大小。
-    :param strides: 窗口移动的步长。
+    :param stride: 窗口移动的步长。
     :param padding: 填充选项, "valid" or "same" 或者整数指定填充长度。 默认 "valid"。
     :param name: 命名,默认为""。
 
@@ -676,7 +676,7 @@ AvgPool2D
     对二维输入进行平均池化。输入具有形状(batch_size, input_channels, height, width)。
 
     :param kernel: 平均池化的窗口大小。
-    :param strides: 窗口移动的步长。
+    :param stride: 窗口移动的步长。
     :param padding: 填充选项, "valid" or "same" 或包含2个整数的元组,整数为两个维度上的填充长度。 默认 "valid"。
     :param name: 命名,默认为""。
 
@@ -713,7 +713,7 @@ MaxPool2D
     对二维输入进行最大池化。输入具有形状(batch_size, input_channels, height, width)。
 
     :param kernel: 最大池化的窗口大小。
-    :param strides: 窗口移动的步长。
+    :param stride: 窗口移动的步长。
     :param padding: 填充选项, "valid" or "same" 或包含2个整数的元组,整数为两个维度上的填充长度。 默认 "valid"。
     :param name: 命名,默认为""。
 
@@ -754,7 +754,7 @@ Embedding
     :param num_embeddings: `int` - 嵌入字典的大小。
     :param embedding_dim: `int` - 每个嵌入向量的大小
     :param weight_initializer: `callable` - 参数初始化方式,默认正态分布。
-    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
+    :param dtype: 参数的数据类型,默认: None,使用默认数据类型:kfloat32,代表32位浮点数。
     :param name: 嵌入层的命名,默认为""。
 
     :return: a Embedding 实例。
@@ -820,7 +820,7 @@ BatchNorm2d
     :param affine: `bool` - 一个布尔值,当设置为 ``True`` 时,此模块具有可学习的每通道仿射参数,初始化为 1(用于权重)和 0(用于偏差)。默认值:``True``。
     :param beta_initializer: `callable` - beta的初始化方式,默认全零初始化。
     :param gamma_initializer: `callable` - gamma的的初始化方式,默认全一初始化。
-    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
+    :param dtype: 参数的数据类型,默认: None,使用默认数据类型:kfloat32,代表32位浮点数。
     :param name: 批归一化层命名,默认为""。
 
     :return: 二维批归一化层实例。
@@ -883,7 +883,7 @@ BatchNorm1d
     :param affine: `bool` - 一个布尔值,当设置为 ``True`` 时,此模块具有可学习的每通道仿射参数,初始化为 1(用于权重)和 0(用于偏差)。默认值:``True``。
     :param beta_initializer: `callable` - beta的初始化方式,默认全零初始化。
     :param gamma_initializer: `callable` - gamma的的初始化方式,默认全一初始化。
-    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
+    :param dtype: 参数的数据类型,默认: None,使用默认数据类型:kfloat32,代表32位浮点数。
     :param name: 批归一化层命名,默认为""。
 
     :return: 一维批归一化层实例。
@@ -925,7 +925,7 @@ LayerNormNd
     :param norm_shape: `float` - 标准化形状。
     :param epsilon: `float` - 数值稳定性常数,默认为 1e-5。
     :param affine: `bool` - 一个布尔值,当设置为 ``True`` 时,此模块具有可学习的每通道仿射参数,初始化为 1(用于权重)和 0(用于偏差)。默认值:``True``。
-    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
+    :param dtype: 参数的数据类型,默认: None,使用默认数据类型:kfloat32,代表32位浮点数。
     :param name: 这个模块的名字, 默认为""。
 
     :return: 一个 LayerNormNd 类
@@ -967,7 +967,7 @@ LayerNorm2d
     :param norm_size: `float` - 归一化大小,应该等于 C * H * W。
     :param epsilon: `float` - 数值稳定性常数,默认为 1e-5。
     :param affine: `bool` - 一个布尔值,当设置为 ``True`` 时,此模块具有可学习的每通道仿射参数,初始化为 1(用于权重)和 0(用于偏差)。默认值:``True``。
-    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
+    :param dtype: 参数的数据类型,默认: None,使用默认数据类型:kfloat32,代表32位浮点数。
     :param name: 这个模块的名字, 默认为""。
 
     :return: 二维层归一化实例。
@@ -1020,7 +1020,7 @@ LayerNorm1d
     :param norm_size: `float` - 归一化大小,应该等于最后一维大小。
     :param epsilon: `float` - 数值稳定性常数,默认为 1e-5。
     :param affine: `bool` - 一个布尔值,当设置为 ``True`` 时,此模块具有可学习的每通道仿射参数,初始化为 1(用于权重)和 0(用于偏差)。默认值:``True``。
-    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
+    :param dtype: 参数的数据类型,默认: None,使用默认数据类型:kfloat32,代表32位浮点数。
     :param name: 这个模块的名字, 默认为""。
 
     :return: 一维层归一化实例。
@@ -1063,7 +1063,7 @@ GroupNorm
     :param num_channels (int): 输入中预期的通道数
     :param eps: 添加到分母的值,以实现数值稳定性。默认值:1e-5
     :param affine: 一个布尔值,当设置为 ``True`` 时,此模块具有可学习的每通道仿射参数,初始化为 1(用于权重)和 0(用于偏差)。默认值: ``True``。
-    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
+    :param dtype: 参数的数据类型,默认: None,使用默认数据类型:kfloat32,代表32位浮点数。
     :param name: 这个模块的名字, 默认为""。
 
     :return: GroupNorm 类
@@ -1091,7 +1091,7 @@ Linear
     :param weight_initializer: `callable` - 权重初始化函数,默认为空,使用he_uniform。
     :param bias_initializer: `callable` - 偏置初始化参数,默认为空,使用he_uniform。
     :param use_bias: `bool` - 是否使用偏置项, 默认使用。
-    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
+    :param dtype: 参数的数据类型,默认: None,使用默认数据类型:kfloat32,代表32位浮点数。
     :param name: 线性层的命名,默认为""。
 
     :return: 线性层实例。
@@ -1259,7 +1259,7 @@ GRU
      如果为 False, 则输入形状为 [seq_len,batch_size,feature_dim],默认为 True。
     :param use_bias: 如果为 False,该模块不适用偏置项,默认: True。
     :param bidirectional: 如果为 True, 变为双向GRU, 默认: False。
-    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
+    :param dtype: 参数的数据类型,默认: None,使用默认数据类型:kfloat32,代表32位浮点数。
     :param name: 这个模块的名字, 默认为""。
 
     :return: GRU 实例
@@ -1331,7 +1331,7 @@ RNN
      如果为 False, 则输入形状为 [seq_len,batch_size,feature_dim],默认为 True。
     :param use_bias: 如果为 False, 该模块不适用偏置项,默认: True。
     :param bidirectional: 如果为 True,变为双向RNN,默认: False。
-    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
+    :param dtype: 参数的数据类型,默认: None,使用默认数据类型:kfloat32,代表32位浮点数。
     :param name: 这个模块的名字, 默认为""。
 
     :return: RNN 实例
@@ -1425,7 +1425,7 @@ LSTM
      如果为 False, 则输入形状为 [seq_len,batch_size,feature_dim],默认为 True。
     :param use_bias: 如果为 False,该模块不适用偏置项, 默认: True。
     :param bidirectional: 如果为 True,变为双向LSTM, 默认: False。
-    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
+    :param dtype: 参数的数据类型,默认: None,使用默认数据类型:kfloat32,代表32位浮点数。
     :param name: 这个模块的名字, 默认为""。
 
     :return: LSTM 实例
@@ -1543,7 +1543,7 @@ Dynamic_GRU
     :param batch_first: 如果为 True,输入形状提供为 [批大小,序列长度,特征维度]。如果为 False,输入形状提供为 [序列长度,批大小,特征维度],默认为 True。
     :param use_bias: 如果为False,则该层不使用偏置权重b_ih和b_hh。 默认值:True。
     :param bidirectional: 如果为真,则成为双向 GRU。 默认值:False。
-    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
+    :param dtype: 参数的数据类型,默认: None,使用默认数据类型:kfloat32,代表32位浮点数。
     :param name: 这个模块的名字, 默认为""。
 
     :return: 一个 Dynamic_GRU 类
@@ -1633,7 +1633,7 @@ Dynamic_RNN
      如果为 False, 则输入形状为 [序列长度,批大小,特征维度],默认为 True。
     :param use_bias: 如果为 False, 该模块不适用偏置项,默认: True。
     :param bidirectional: 如果为 True,变为双向RNN,默认: False。
-    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
+    :param dtype: 参数的数据类型,默认: None,使用默认数据类型:kfloat32,代表32位浮点数。
     :param name: 这个模块的名字, 默认为""。
 
     :return: Dynamic_RNN 实例
@@ -1731,7 +1731,7 @@ Dynamic_LSTM
      如果为 False, 则输入形状为 [序列长度,批大小,特征维度],默认为 True。
     :param use_bias: 如果为 False,该模块不适用偏置项, 默认: True。
     :param bidirectional: 如果为 True,变为双向LSTM, 默认: False。
-    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
+    :param dtype: 参数的数据类型,默认: None,使用默认数据类型:kfloat32,代表32位浮点数。
     :param name: 这个模块的名字, 默认为""。
 
     :return: Dynamic_LSTM 实例
@@ -1890,7 +1890,7 @@ fuse_module
         from pyvqnet.utils import set_random_seed
         from pyvqnet.nn import fuse_module
 
-        def get_accuary(result, label):
+        def get_accuracy(result, label):
             result = (result > 0.5).astype(4)
             score = tensor.sums(result == label)
             return score.item()
@@ -1950,13 +1950,13 @@ fuse_module
 
                 sum_loss += loss_b.item()
                 count += batch_size
-                accuary += get_accuary(result, label.reshape([-1,1]))
+                accuary += get_accuracy(result, label.reshape([-1,1]))
                 t = t + 1
             
             loss_history.append(sum_loss/count)
             accuracy_history.append(accuary/count)
             print(
-                f"epoch:{i}, #### loss:{sum_loss/count} #####accuray:{accuary/count}"
+                f"epoch:{i}, #### loss:{sum_loss/count} #####accuracy:{accuary/count}"
             )
         print(f"run time {time() - time2}")
         
@@ -1982,12 +1982,12 @@ SDPA
 =================================
 .. py:class:: pyvqnet.transformer.SDPA(attn_mask=None,dropout_p=0.,scale=None,is_causal=False)
 
-    构造计算查询、键和值张量的缩放点积注意力的类。如果输入为cpu下的QTensor,则使用数学公式计算, 如果输入在gpu下QTensor,则使用flash-attention方法计算。
+    构造计算查询、键和值张量的缩放点积注意力的类。
 
     :param attn_mask: 注意力掩码；形状必须可以广播到注意力权重的形状。
     :param dropout_p: Dropout 概率,如果大于 0.0, 则应用。
     :param scale:  在 softmax 之前应用的缩放因子。
-    :param is_causal: 如果为 "true",则假定存在左上因果注意屏蔽,如果同时设置了 attn_mask 和 is_causal, 则会出现错误。
+    :param is_causal: 如果为 "true",则假定存在左上因果注意力屏蔽,如果同时设置了 attn_mask 和 is_causal, 则会出现错误。
     :return: 一个SDPA类
 
     Examples::
@@ -1998,7 +1998,7 @@ SDPA
 
     .. py:method:: forward(query,key,value)
 
-        进行前向计算,如果输入为cpu下的QTensor,则使用数学公式计算, 如果输入在gpu下QTensor,则使用flash-attention方法计算。
+        进行前向计算
 
         :param query: query输入QTensor。
         :param key: key输入QTensor。

@@ -59,7 +59,7 @@ Circuit-centric quantum classifiers算法示例
                 CNOT(wires = [nqubits[len(nqubits) - 1], nqubits[0]])(q_machine = qm)
 
 
-            def build_circult(weights, xx, nqubits,qm):
+            def build_circuit(weights, xx, nqubits,qm):
                 def Rot(weights_j, nqubits,qm):
                     VQC_RotCircuit(qm,nqubits,weights_j)
 
@@ -79,7 +79,7 @@ Circuit-centric quantum classifiers算法示例
                         Rot(weights_j, nqubits[j],qm)
                     get_cnot(nqubits,qm)
 
-            build_circult(self.w, x,range(4),self.qm)
+            build_circuit(self.w, x,range(4),self.qm)
 
             return qmeasure.MeasureAll(obs={'Z0': 1})(self.qm)
         
@@ -109,7 +109,7 @@ Circuit-centric quantum classifiers算法示例
                 yield data[i:i + batch_size], label[i:i + batch_size]
 
 
-    def get_accuary(result, label):
+    def get_accuracy(result, label):
         result, label = np.array(result.data), np.array(label.data)
         score = np.sum(np.argmax(result, axis=1) == np.argmax(label, 1))
         return score
@@ -169,38 +169,38 @@ Circuit-centric quantum classifiers算法示例
                 optimizer._step()
                 sum_loss += loss_b.item()
                 count += batch_size
-                accuary += get_accuary(result, label)
+                accuary += get_accuracy(result, label)
             print(
-                f"epoch:{i}, #### loss:{sum_loss/count} #####accuray:{accuary/count}"
+                f"epoch:{i}, #### loss:{sum_loss/count} #####accuracy:{accuary/count}"
             )
 
     run2()
     """
-    epoch:0, #### loss:0.07805998176336289 #####accuray:1.0
-    epoch:1, #### loss:0.07268960326910019 #####accuray:1.0
-    epoch:2, #### loss:0.06934810429811478 #####accuray:1.0
-    epoch:3, #### loss:0.06652230024337769 #####accuray:1.0
-    epoch:4, #### loss:0.06363258957862854 #####accuray:1.0
-    epoch:5, #### loss:0.0604777917265892 #####accuray:1.0
-    epoch:6, #### loss:0.05711844265460968 #####accuray:1.0
-    epoch:7, #### loss:0.053814482688903806 #####accuray:1.0
-    epoch:8, #### loss:0.05088095813989639 #####accuray:1.0
-    epoch:9, #### loss:0.04851257503032684 #####accuray:1.0
-    epoch:10, #### loss:0.04672074168920517 #####accuray:1.0
-    epoch:11, #### loss:0.04540069997310638 #####accuray:1.0
-    epoch:12, #### loss:0.04442296177148819 #####accuray:1.0
-    epoch:13, #### loss:0.04368099868297577 #####accuray:1.0
-    epoch:14, #### loss:0.04310029000043869 #####accuray:1.0
-    epoch:15, #### loss:0.04263183027505875 #####accuray:1.0
-    epoch:16, #### loss:0.04224379360675812 #####accuray:1.0
-    epoch:17, #### loss:0.041915199160575865 #####accuray:1.0
-    epoch:18, #### loss:0.04163179695606232 #####accuray:1.0
-    epoch:19, #### loss:0.041383542120456696 #####accuray:1.0
-    epoch:20, #### loss:0.0411631852388382 #####accuray:1.0
-    epoch:21, #### loss:0.04096531867980957 #####accuray:1.0
-    epoch:22, #### loss:0.04078584611415863 #####accuray:1.0
-    epoch:23, #### loss:0.0406215637922287 #####accuray:1.0
-    epoch:24, #### loss:0.040470016002655027 #####accuray:1.0
+    epoch:0, #### loss:0.07805998176336289 #####accuracy:1.0
+    epoch:1, #### loss:0.07268960326910019 #####accuracy:1.0
+    epoch:2, #### loss:0.06934810429811478 #####accuracy:1.0
+    epoch:3, #### loss:0.06652230024337769 #####accuracy:1.0
+    epoch:4, #### loss:0.06363258957862854 #####accuracy:1.0
+    epoch:5, #### loss:0.0604777917265892 #####accuracy:1.0
+    epoch:6, #### loss:0.05711844265460968 #####accuracy:1.0
+    epoch:7, #### loss:0.053814482688903806 #####accuracy:1.0
+    epoch:8, #### loss:0.05088095813989639 #####accuracy:1.0
+    epoch:9, #### loss:0.04851257503032684 #####accuracy:1.0
+    epoch:10, #### loss:0.04672074168920517 #####accuracy:1.0
+    epoch:11, #### loss:0.04540069997310638 #####accuracy:1.0
+    epoch:12, #### loss:0.04442296177148819 #####accuracy:1.0
+    epoch:13, #### loss:0.04368099868297577 #####accuracy:1.0
+    epoch:14, #### loss:0.04310029000043869 #####accuracy:1.0
+    epoch:15, #### loss:0.04263183027505875 #####accuracy:1.0
+    epoch:16, #### loss:0.04224379360675812 #####accuracy:1.0
+    epoch:17, #### loss:0.041915199160575865 #####accuracy:1.0
+    epoch:18, #### loss:0.04163179695606232 #####accuracy:1.0
+    epoch:19, #### loss:0.041383542120456696 #####accuracy:1.0
+    epoch:20, #### loss:0.0411631852388382 #####accuracy:1.0
+    epoch:21, #### loss:0.04096531867980957 #####accuracy:1.0
+    epoch:22, #### loss:0.04078584611415863 #####accuracy:1.0
+    epoch:23, #### loss:0.0406215637922287 #####accuracy:1.0
+    epoch:24, #### loss:0.040470016002655027 #####accuracy:1.0
     """
 
 

@@ -60,41 +60,41 @@
             cir << pq.CNOT(nqubits[len(nqubits)-1],nqubits[0])
             return cir
 
-        def build_circult(weights, xx, nqubits):
+        def build_circuit(weights, xx, nqubits):
 
             def Rot(weights_j, qubits):
-                circult = pq.QCircuit()
-                circult << pq.RZ(qubits, weights_j[0])
-                circult << pq.RY(qubits, weights_j[1])
-                circult << pq.RZ(qubits, weights_j[2])
-                return circult
+                circuit = pq.QCircuit()
+                circuit << pq.RZ(qubits, weights_j[0])
+                circuit << pq.RY(qubits, weights_j[1])
+                circuit << pq.RZ(qubits, weights_j[2])
+                return circuit
             def basisstate():
-                circult = pq.QCircuit()
+                circuit = pq.QCircuit()
                 for i in range(len(nqubits)):
                     if xx[i] == 1:
-                        circult << pq.X(nqubits[i])
-                return circult
+                        circuit << pq.X(nqubits[i])
+                return circuit
 
-            circult = pq.QCircuit()
-            circult << basisstate()
+            circuit = pq.QCircuit()
+            circuit << basisstate()
 
             for i in range(weights.shape[0]):
 
                 weights_i = weights[i,:,:]
                 for j in range(len(nqubits)):
                     weights_j = weights_i[j]
-                    circult << Rot(weights_j,nqubits[j])
+                    circuit << Rot(weights_j,nqubits[j])
                 cnots = get_cnot(nqubits)
-                circult << cnots
+                circuit << cnots
 
-            circult << pq.Z(nqubits[0])
+            circuit << pq.Z(nqubits[0])
 
             prog = pq.QProg()
-            prog << circult
+            prog << circuit
             return prog
 
         weights = weights.reshape([2,4,3])
-        prog = build_circult(weights,input,qlist)
+        prog = build_circuit(weights,input,qlist)
         prob = probs_measure(machine,prog,qlist[0])  
         
         return prob
@@ -164,7 +164,7 @@ Model中使用 ``pyvqnet.qnn.pq3.QuantumLayer`` 类这个可进行自动微分�
 
 .. code-block::
 
-    def get_accuary(result,label):
+    def get_accuracy(result,label):
         result,label = np.array(result.data), np.array(label.data)
         score = np.sum(np.argmax(result,axis=1)==np.argmax(label,1))
         return score
@@ -199,10 +199,10 @@ Model中使用 ``pyvqnet.qnn.pq3.QuantumLayer`` 类这个可进行自动微分�
             optimizer._step()
             sum_loss += loss_b.item()
             count+=batch_size
-            accuary += get_accuary(result,label)
+            accuary += get_accuracy(result,label)
             t = t + 1
 
-        print(f"epoch:{i}, #### loss:{sum_loss/count} #####accuray:{accuary/count}")
+        print(f"epoch:{i}, #### loss:{sum_loss/count} #####accuracy:{accuary/count}")
 
     model.eval()
     count = 0
@@ -216,33 +216,33 @@ Model中使用 ``pyvqnet.qnn.pq3.QuantumLayer`` 类这个可进行自动微分�
         test_loss = loss(testl,test_result)
         sum_loss += test_loss
         count+=test_batch_size
-        accuary += get_accuary(test_result,testl)
-    print(f"test:--------------->loss:{sum_loss/count} #####accuray:{accuary/count}")
+        accuary += get_accuracy(test_result,testl)
+    print(f"test:--------------->loss:{sum_loss/count} #####accuracy:{accuary/count}")
 
 .. code-block::
 
-    epoch:0, #### loss:0.20194714764753977 #####accuray:0.6666666666666666
-    epoch:1, #### loss:0.19724808633327484 #####accuray:0.8333333333333334
-    epoch:2, #### loss:0.19266503552595773 #####accuray:1.0
-    epoch:3, #### loss:0.18812804917494455 #####accuray:1.0
-    epoch:4, #### loss:0.1835678368806839 #####accuray:1.0
-    epoch:5, #### loss:0.1789149840672811 #####accuray:1.0
-    epoch:6, #### loss:0.17410411685705185 #####accuray:1.0
-    epoch:7, #### loss:0.16908332953850427 #####accuray:1.0
-    epoch:8, #### loss:0.16382796317338943 #####accuray:1.0
-    epoch:9, #### loss:0.15835540741682053 #####accuray:1.0
-    epoch:10, #### loss:0.15273457020521164 #####accuray:1.0
-    epoch:11, #### loss:0.14708336691061655 #####accuray:1.0
-    epoch:12, #### loss:0.14155150949954987 #####accuray:1.0
-    epoch:13, #### loss:0.1362930883963903 #####accuray:1.0
-    epoch:14, #### loss:0.1314386005202929 #####accuray:1.0
-    epoch:15, #### loss:0.12707658857107162 #####accuray:1.0
-    epoch:16, #### loss:0.123248390853405 #####accuray:1.0
-    epoch:17, #### loss:0.11995399743318558 #####accuray:1.0
-    epoch:18, #### loss:0.1171633576353391 #####accuray:1.0
-    epoch:19, #### loss:0.11482855677604675 #####accuray:1.0
+    epoch:0, #### loss:0.20194714764753977 #####accuracy:0.6666666666666666
+    epoch:1, #### loss:0.19724808633327484 #####accuracy:0.8333333333333334
+    epoch:2, #### loss:0.19266503552595773 #####accuracy:1.0
+    epoch:3, #### loss:0.18812804917494455 #####accuracy:1.0
+    epoch:4, #### loss:0.1835678368806839 #####accuracy:1.0
+    epoch:5, #### loss:0.1789149840672811 #####accuracy:1.0
+    epoch:6, #### loss:0.17410411685705185 #####accuracy:1.0
+    epoch:7, #### loss:0.16908332953850427 #####accuracy:1.0
+    epoch:8, #### loss:0.16382796317338943 #####accuracy:1.0
+    epoch:9, #### loss:0.15835540741682053 #####accuracy:1.0
+    epoch:10, #### loss:0.15273457020521164 #####accuracy:1.0
+    epoch:11, #### loss:0.14708336691061655 #####accuracy:1.0
+    epoch:12, #### loss:0.14155150949954987 #####accuracy:1.0
+    epoch:13, #### loss:0.1362930883963903 #####accuracy:1.0
+    epoch:14, #### loss:0.1314386005202929 #####accuracy:1.0
+    epoch:15, #### loss:0.12707658857107162 #####accuracy:1.0
+    epoch:16, #### loss:0.123248390853405 #####accuracy:1.0
+    epoch:17, #### loss:0.11995399743318558 #####accuracy:1.0
+    epoch:18, #### loss:0.1171633576353391 #####accuracy:1.0
+    epoch:19, #### loss:0.11482855677604675 #####accuracy:1.0
     [0.3412148654]
-    test:--------------->loss:QTensor(0.3412148654, requires_grad=True) #####accuray:1.0
+    test:--------------->loss:QTensor(0.3412148654, requires_grad=True) #####accuracy:1.0
 
 模型在测试数据上准确率变化情况:
 
@@ -2216,7 +2216,7 @@ Quantum circuit structure learning任务的核心目标就是找到最优的带�
                 circuit.insert(pq.CNOT(qubits[i], qubits[i + 1]))
             return circuit
 
-        def Q_quantum_net(q_input_features, q_weights_flat, qubits, cubits, machine):
+        def Q_quantum_net(q_input_features, q_weights_flat, qubits, cbits, machine):
             """
             The variational quantum circuit.
             """
@@ -2420,7 +2420,7 @@ Quantum circuit structure learning任务的核心目标就是找到最优的带�
                 circuit.insert(pq.CNOT(qubits[i], qubits[i + 1]))
             return circuit
 
-        def Q_quantum_net(q_input_features, q_weights_flat, qubits, cubits, machine):
+        def Q_quantum_net(q_input_features, q_weights_flat, qubits, cbits, machine):
             """
             The variational quantum circuit.
             """
@@ -3580,7 +3580,7 @@ QUnet主要是用于解决图像分割的技术。
         encodings = int(encodings[0])
         return [i for i, b in enumerate(f'{encodings:0{CIRCUIT_SIZE}b}') if b == '1']
 
-    def build_qc(x, weights, qubits, cubits ,machine):
+    def build_qc(x, weights, qubits, cbits ,machine):
 
 
         cir = pq.QCircuit()
@@ -3737,7 +3737,7 @@ QUnet主要是用于解决图像分割的技术。
 1.3.1 环境准备
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-环境采用python3.8,建议使用conda进行环境配置,自带numpy,scipy,matplotlib,sklearn等工具包,方便使用,如果采用的是python环境,需要安装相关的包
+环境采用python3.10,建议使用conda进行环境配置,自带numpy,scipy,matplotlib,sklearn等工具包,方便使用,如果采用的是python环境,需要安装相关的包
 还需要准备如下环境pyvqnet
 
 1.3.2 数据准备
@@ -4982,16 +4982,16 @@ VQNet提供了 ``QuantumNeuron`` 模块实现该算法。首先初始化一个�
 
 |
 
-随机参数偏移算法
+随机参数移位算法
 ===================================
 
-在量子变分线路中,使用参数偏移法 `parameter-shift` 计算量子参数的梯度是一种常用的方法。
-参数偏移法并不普遍适用所有的量子含参逻辑门。
+在量子变分线路中,使用参数移位法 `parameter-shift` 计算量子参数的梯度是一种常用的方法。
+参数移位法并不普遍适用所有的量子含参逻辑门。
 在它不成立(或不知道成立)的情况下,我们要么必须将门分解为兼容的门,要么使用梯度的替代估计器,例如有限差分近似。
 但是,由于增加了电路复杂性或梯度值中的潜在误差,这两种替代方案都可能存在缺陷。
-Banchi 和 Crooks 1 发现一种可以适用在任一酉矩阵量子逻辑门上的 `随机参数偏移算法(Stochastic Parameter-Shift Rule) <https://arxiv.org/abs/2005.10299>`_ 。
+Banchi 和 Crooks 1 发现一种可以适用在任一酉矩阵量子逻辑门上的 `随机参数移位算法(Stochastic Parameter-Shift Rule) <https://arxiv.org/abs/2005.10299>`_ 。
 
-下面展示适用VQNet对一个量子变分线路使用随机参数偏移法计算梯度的示例。其中, **pyqpanda建议版本为3.7.12** 。示例线路定义如下: 
+下面展示适用VQNet对一个量子变分线路使用随机参数移位法计算梯度的示例。其中, **pyqpanda建议版本为3.7.12** 。示例线路定义如下: 
 
 .. code-block::
 
@@ -5034,7 +5034,7 @@ Banchi 和 Crooks 1 发现一种可以适用在任一酉矩阵量子逻辑门上
         exp2 = expval(machine, m_prog, pauli_dict, q)
         return exp2
 
-随机参数偏移法首先随机从[0,1]的均匀分布中采样一个变量s,接着对线路分别进行如下的酉矩阵变换: 
+随机参数移位法首先随机从[0,1]的均匀分布中采样一个变量s,接着对线路分别进行如下的酉矩阵变换: 
 
      a) :math:`e^{i(1-s)(\hat{H} + \theta\hat{V})}`
      b) :math:`e^{+i\tfrac{\pi}{4}\hat{V}}`
@@ -5073,14 +5073,14 @@ Banchi 和 Crooks 1 发现一种可以适用在任一酉矩阵量子逻辑门上
 将上一步骤中 :math:`\tfrac{\pi}{4}` 变成  :math:`-\tfrac{\pi}{4}`,
 重复进行 a, b, c 操作,获取观测量的期望 :math:`\langle r_- \rangle` 。
 
-随机参数偏移算法计算的梯度公式如下: 
+随机参数移位算法计算的梯度公式如下: 
 
  .. math::
 
      \mathbb{E}_{s\in\mathcal{U}[0,1]}[\langle r_+ \rangle - \langle r_-\rangle]
 
-我们画出使用随机参数偏移法计算的参数 :math:`\theta_1` 梯度与观测量期望的之间的关系。
-通过观察可见,观测量期望符合 :math:`\cos(2\theta_1)` 的函数形式；而使用随机参数偏移法计算梯度
+我们画出使用随机参数移位法计算的参数 :math:`\theta_1` 梯度与观测量期望的之间的关系。
+通过观察可见,观测量期望符合 :math:`\cos(2\theta_1)` 的函数形式；而使用随机参数移位法计算梯度
 符合 :math:`-2\sin(2\theta_1)` , 正好是 :math:`\cos(2\theta_1)` 的微分。
 
 .. code-block::
@@ -5200,7 +5200,7 @@ VQNet实现了该算法的一个示例: 使用VQE 求解目标Hamiltonian的基�
     H = 4  + 2I\otimes X + 4I \otimes Z - X\otimes X + 5 Y\otimes Y + 2Z\otimes X.
 
 为了执行“双随机”梯度下降,我们简单地应用随机梯度下降方法,但另外也均匀采样每个优化步骤的哈密顿期望项的子集。
-vqe_func_analytic()函数是使用参数偏移计算理论梯度,vqe_func_shots()则是使用随机采样值以及随机采样哈密顿期望子集的“双随机”梯度计算。
+vqe_func_analytic()函数是使用参数移位计算理论梯度,vqe_func_shots()则是使用随机采样值以及随机采样哈密顿期望子集的“双随机”梯度计算。
 
 .. code-block::
 
@@ -5353,42 +5353,42 @@ vqe_func_analytic()函数是使用参数偏移计算理论梯度,vqe_func_shots(
             cir.insert(pq.CNOT(nqubits[len(nqubits) - 1], nqubits[0]))
             return cir
 
-        def build_circult(weights, xx, nqubits):
+        def build_circuit(weights, xx, nqubits):
             def Rot(weights_j, qubits):
-                circult = pq.QCircuit()
-                circult.insert(pq.RZ(qubits, weights_j[0]))
-                circult.insert(pq.RY(qubits, weights_j[1]))
-                circult.insert(pq.RZ(qubits, weights_j[2]))
-                return circult
+                circuit = pq.QCircuit()
+                circuit.insert(pq.RZ(qubits, weights_j[0]))
+                circuit.insert(pq.RY(qubits, weights_j[1]))
+                circuit.insert(pq.RZ(qubits, weights_j[2]))
+                return circuit
 
             def basisstate():
-                circult = pq.QCircuit()
+                circuit = pq.QCircuit()
                 for i in range(len(nqubits)):
                     if xx[i] == 1:
-                        circult.insert(pq.X(nqubits[i]))
-                return circult
+                        circuit.insert(pq.X(nqubits[i]))
+                return circuit
 
-            circult = pq.QCircuit()
-            circult.insert(basisstate())
+            circuit = pq.QCircuit()
+            circuit.insert(basisstate())
 
             for i in range(weights.shape[0]):
 
                 weights_i = weights[i, :, :]
                 for j in range(len(nqubits)):
                     weights_j = weights_i[j]
-                    circult.insert(Rot(weights_j, nqubits[j]))
+                    circuit.insert(Rot(weights_j, nqubits[j]))
                 cnots = get_cnot(nqubits)
-                circult.insert(cnots)
+                circuit.insert(cnots)
 
-            circult.insert(pq.Z(nqubits[0]))
+            circuit.insert(pq.Z(nqubits[0]))
 
             prog = pq.QProg()
 
-            prog.insert(circult)
+            prog.insert(circuit)
             return prog
 
         weights = weights.reshape([2, 4, 3])
-        prog = build_circult(weights, x, qlist)
+        prog = build_circuit(weights, x, qlist)
         prob = machine.prob_run_dict(prog, qlist[0], -1)
         prob = list(prob.values())
 
@@ -5400,20 +5400,20 @@ vqe_func_analytic()函数是使用参数偏移计算理论梯度,vqe_func_shots(
         Quantum circuits run function
         """
         prog = pq.QProg()
-        circult = pq.QCircuit()
-        circult.insert(pq.RZ(qlist[0], x[0]))
-        circult.insert(pq.RZ(qlist[1], x[1]))
-        circult.insert(pq.CNOT(qlist[0], qlist[1]))
-        circult.insert(pq.CNOT(qlist[1], qlist[2]))
-        circult.insert(pq.CNOT(qlist[2], qlist[3]))
-        circult.insert(pq.RY(qlist[0], weights[0]))
-        circult.insert(pq.RY(qlist[1], weights[1]))
-        circult.insert(pq.RY(qlist[2], weights[2]))
+        circuit = pq.QCircuit()
+        circuit.insert(pq.RZ(qlist[0], x[0]))
+        circuit.insert(pq.RZ(qlist[1], x[1]))
+        circuit.insert(pq.CNOT(qlist[0], qlist[1]))
+        circuit.insert(pq.CNOT(qlist[1], qlist[2]))
+        circuit.insert(pq.CNOT(qlist[2], qlist[3]))
+        circuit.insert(pq.RY(qlist[0], weights[0]))
+        circuit.insert(pq.RY(qlist[1], weights[1]))
+        circuit.insert(pq.RY(qlist[2], weights[2]))
 
-        circult.insert(pq.CNOT(qlist[0], qlist[1]))
-        circult.insert(pq.CNOT(qlist[1], qlist[2]))
-        circult.insert(pq.CNOT(qlist[2], qlist[3]))
-        prog.insert(circult)
+        circuit.insert(pq.CNOT(qlist[0], qlist[1]))
+        circuit.insert(pq.CNOT(qlist[1], qlist[2]))
+        circuit.insert(pq.CNOT(qlist[2], qlist[3]))
+        prog.insert(circuit)
         prob = machine.prob_run_dict(prog, qlist[0], -1)
         prob = list(prob.values())
 
@@ -5446,7 +5446,7 @@ vqe_func_analytic()函数是使用参数偏移计算理论梯度,vqe_func_shots(
         label = np.eye(2)[label].reshape(-1, 2)
         return data, label
 
-    def get_accuary(result, label):
+    def get_accuracy(result, label):
         result, label = np.array(result.data), np.array(label.data)
         score = np.sum(np.argmax(result, axis=1) == np.argmax(label, 1))
         return score
@@ -5500,11 +5500,11 @@ vqe_func_analytic()函数是使用参数偏移计算理论梯度,vqe_func_shots(
                 optimizer._step()
                 sum_loss += loss_b.item()
                 count += batch_size
-                accuary += get_accuary(result, label)
+                accuary += get_accuracy(result, label)
                 t = t + 1
 
             print(
-                f"epoch:{i}, #### loss:{sum_loss/count} #####accuray:{accuary/count}"
+                f"epoch:{i}, #### loss:{sum_loss/count} #####accuracy:{accuary/count}"
             )
         print("start testing..............")
         model.eval()
@@ -5520,9 +5520,9 @@ vqe_func_analytic()函数是使用参数偏移计算理论梯度,vqe_func_shots(
             test_loss = loss(testl, test_result)
             sum_loss += test_loss
             count += test_batch_size
-            accuary += get_accuary(test_result, testl)
+            accuary += get_accuracy(test_result, testl)
         print(
-            f"test:--------------->loss:{sum_loss/count} #####accuray:{accuary/count}"
+            f"test:--------------->loss:{sum_loss/count} #####accuracy:{accuary/count}"
         )
 
 
@@ -5530,18 +5530,18 @@ vqe_func_analytic()函数是使用参数偏移计算理论梯度,vqe_func_shots(
 
         run()
 
-    # epoch:0, #### loss:0.2255942871173223 #####accuray:0.5833333333333334
-    # epoch:1, #### loss:0.1989427705605825 #####accuray:1.0
-    # epoch:2, #### loss:0.16489211718241373 #####accuray:1.0
-    # epoch:3, #### loss:0.13245886812607446 #####accuray:1.0
-    # epoch:4, #### loss:0.11463981121778488 #####accuray:1.0
-    # epoch:5, #### loss:0.1078591321905454 #####accuray:1.0
-    # epoch:6, #### loss:0.10561319688955943 #####accuray:1.0
-    # epoch:7, #### loss:0.10483601937691371 #####accuray:1.0
-    # epoch:8, #### loss:0.10457512239615123 #####accuray:1.0
-    # epoch:9, #### loss:0.10448987782001495 #####accuray:1.0
+    # epoch:0, #### loss:0.2255942871173223 #####accuracy:0.5833333333333334
+    # epoch:1, #### loss:0.1989427705605825 #####accuracy:1.0
+    # epoch:2, #### loss:0.16489211718241373 #####accuracy:1.0
+    # epoch:3, #### loss:0.13245886812607446 #####accuracy:1.0
+    # epoch:4, #### loss:0.11463981121778488 #####accuracy:1.0
+    # epoch:5, #### loss:0.1078591321905454 #####accuracy:1.0
+    # epoch:6, #### loss:0.10561319688955943 #####accuracy:1.0
+    # epoch:7, #### loss:0.10483601937691371 #####accuracy:1.0
+    # epoch:8, #### loss:0.10457512239615123 #####accuracy:1.0
+    # epoch:9, #### loss:0.10448987782001495 #####accuracy:1.0
     # start testing..............
-    # test:--------------->loss:[0.3134713] #####accuray:1.0
+    # test:--------------->loss:[0.3134713] #####accuracy:1.0
 
 
 
@@ -5597,44 +5597,44 @@ vqe_func_analytic()函数是使用参数偏移计算理论梯度,vqe_func_shots(
             cir << pq.CNOT(nqubits[len(nqubits)-1],nqubits[0])
             return cir
 
-        def build_circult(weights, xx, nqubits):
+        def build_circuit(weights, xx, nqubits):
             
             def Rot(weights_j, qubits):
-                circult = pq.QCircuit()
-                circult << pq.RZ(qubits, weights_j[0])
-                circult << pq.RY(qubits, weights_j[1])
-                circult << pq.RZ(qubits, weights_j[2])
-                return circult
+                circuit = pq.QCircuit()
+                circuit << pq.RZ(qubits, weights_j[0])
+                circuit << pq.RY(qubits, weights_j[1])
+                circuit << pq.RZ(qubits, weights_j[2])
+                return circuit
             def basisstate():
-                circult = pq.QCircuit()
+                circuit = pq.QCircuit()
                 for i in range(len(nqubits)):
                     if xx[i]==1:
-                        circult << pq.X(nqubits[i])
-                return circult
+                        circuit << pq.X(nqubits[i])
+                return circuit
 
-            circult = pq.QCircuit()
-            circult << basisstate()
+            circuit = pq.QCircuit()
+            circuit << basisstate()
 
             for i in range(weights.shape[0]):
                 
                 weights_i = weights[i,:,:]
                 for j in range(len(nqubits)):
                     weights_j = weights_i[j]
-                    circult << Rot(weights_j,nqubits[j])
+                    circuit << Rot(weights_j,nqubits[j])
                 cnots = get_cnot(nqubits)  
-                circult << cnots
+                circuit << cnots
 
-            circult << pq.Z(nqubits[0])
+            circuit << pq.Z(nqubits[0])
             
             prog = pq.QProg() 
             
-            prog << circult
+            prog << circuit
             return prog
 
         qlist = range(4)
         machine = pq.CPUQVM()
         weights = weights.reshape([2,4,3])
-        prog = build_circult(weights,input,qlist)  
+        prog = build_circuit(weights,input,qlist)  
         prob = probs_measure(machine,prog,[0])
 
         return prob
@@ -5661,7 +5661,7 @@ vqe_func_analytic()函数是使用参数偏移计算理论梯度,vqe_func_shots(
         label = np.eye(2)[label].reshape(-1,2)
         return data, label
 
-    def get_accuary(result,label):
+    def get_accuracy(result,label):
         result,label = np.array(result.data), np.array(label.data)
         score = np.sum(np.argmax(result,axis=1)==np.argmax(label,1))
         return score
@@ -5695,10 +5695,10 @@ vqe_func_analytic()函数是使用参数偏移计算理论梯度,vqe_func_shots(
                 optimizer._step()
                 sum_loss += loss_b.item()
                 count+=batch_size
-                accuary += get_accuary(result,label)
+                accuary += get_accuracy(result,label)
                 t = t + 1
 
-            print(f"epoch:{i}, #### loss:{sum_loss/count} #####accuray:{accuary/count}")
+            print(f"epoch:{i}, #### loss:{sum_loss/count} #####accuracy:{accuary/count}")
         print("start testing..............")
         model.eval()
         count = 0
@@ -5712,8 +5712,8 @@ vqe_func_analytic()函数是使用参数偏移计算理论梯度,vqe_func_shots(
             test_loss = loss(testl,test_result)
             sum_loss += test_loss
             count+=test_batch_size
-            accuary += get_accuary(test_result,testl)
-        print(f"test:--------------->loss:{sum_loss/count} #####accuray:{accuary/count}")
+            accuary += get_accuracy(test_result,testl)
+        print(f"test:--------------->loss:{sum_loss/count} #####accuracy:{accuary/count}")
 
     if __name__=="__main__":
 
@@ -5725,27 +5725,27 @@ vqe_func_analytic()函数是使用参数偏移计算理论梯度,vqe_func_shots(
 .. code-block::
 	
 	start training..............
-	epoch:0, #### loss:[0.20585182] #####accuray:0.6
-	epoch:1, #### loss:[0.17479989] #####accuray:1.0
-	epoch:2, #### loss:[0.12679021] #####accuray:1.0
-	epoch:3, #### loss:[0.11088503] #####accuray:1.0
-	epoch:4, #### loss:[0.10598478] #####accuray:1.0
-	epoch:5, #### loss:[0.10482856] #####accuray:1.0
-	epoch:6, #### loss:[0.10453037] #####accuray:1.0
-	epoch:7, #### loss:[0.10445572] #####accuray:1.0
-	epoch:8, #### loss:[0.10442699] #####accuray:1.0
-	epoch:9, #### loss:[0.10442187] #####accuray:1.0
-	epoch:10, #### loss:[0.10442089] #####accuray:1.0
-	epoch:11, #### loss:[0.10442062] #####accuray:1.0
-	epoch:12, #### loss:[0.10442055] #####accuray:1.0
-	epoch:13, #### loss:[0.10442055] #####accuray:1.0
-	epoch:14, #### loss:[0.10442055] #####accuray:1.0
-	epoch:15, #### loss:[0.10442055] #####accuray:1.0
-	epoch:16, #### loss:[0.10442055] #####accuray:1.0
+	epoch:0, #### loss:[0.20585182] #####accuracy:0.6
+	epoch:1, #### loss:[0.17479989] #####accuracy:1.0
+	epoch:2, #### loss:[0.12679021] #####accuracy:1.0
+	epoch:3, #### loss:[0.11088503] #####accuracy:1.0
+	epoch:4, #### loss:[0.10598478] #####accuracy:1.0
+	epoch:5, #### loss:[0.10482856] #####accuracy:1.0
+	epoch:6, #### loss:[0.10453037] #####accuracy:1.0
+	epoch:7, #### loss:[0.10445572] #####accuracy:1.0
+	epoch:8, #### loss:[0.10442699] #####accuracy:1.0
+	epoch:9, #### loss:[0.10442187] #####accuracy:1.0
+	epoch:10, #### loss:[0.10442089] #####accuracy:1.0
+	epoch:11, #### loss:[0.10442062] #####accuracy:1.0
+	epoch:12, #### loss:[0.10442055] #####accuracy:1.0
+	epoch:13, #### loss:[0.10442055] #####accuracy:1.0
+	epoch:14, #### loss:[0.10442055] #####accuracy:1.0
+	epoch:15, #### loss:[0.10442055] #####accuracy:1.0
+	epoch:16, #### loss:[0.10442055] #####accuracy:1.0
 
 	start testing..............
 	[0.3132616580]
-	test:--------------->loss:QTensor(0.3132616580, requires_grad=True) #####accuray:1.0
+	test:--------------->loss:QTensor(0.3132616580, requires_grad=True) #####accuracy:1.0
 
 在VQNet中使用NoiseQuantumLayer进行模型训练
 =============================================

@@ -18,7 +18,7 @@ QTensor's 函数与属性
     :param requires_grad: 是否应该跟踪张量的梯度,默认为 False。
     :param nodes: 计算图中的后继者列表,默认为无。
     :param device: 储存在哪个设备上,默认: pyvqnet.DEV_CPU,在CPU上。
-    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
+    :param dtype: 参数的数据类型,默认: None,使用默认数据类型:kfloat32,代表32位浮点数。
     :param name: QTensor的名字,default:""。
     :return: 输出 QTensor。
 
@@ -120,9 +120,9 @@ QTensor's 函数与属性
             ``pyvqnet.kbool``                          布尔变量
             ``pyvqnet.kuint8``                         8比特整数 (无符号)
             ``pyvqnet.kint8``                          8比特整数 (有符号)
-            ``pyvqnet.kint16``                         16比特整数 (signed)
-            ``pyvqnet.kint32``                         32比特整数 (signed)
-            ``pyvqnet.kint64``                         64比特整数 (signed)
+            ``pyvqnet.kint16``                         16比特整数 (有符号)
+            ``pyvqnet.kint32``                         32比特整数 (有符号)
+            ``pyvqnet.kint64``                         64比特整数 (有符号)
             ``pyvqnet.kfloat32``                       32比特浮点数, 见 https://en.wikipedia.org/wiki/IEEE_754
             ``pyvqnet.kfloat64``                       64比特浮点数, 见 https://en.wikipedia.org/wiki/IEEE_754
             ``pyvqnet.kcomplex64``                     64比特复数，由两个 `float32` 构成
@@ -295,7 +295,7 @@ QTensor's 函数与属性
 
         返回输入 QTensor 中所有元素的最小值的索引, 或返回 QTensor 按某一维度的最小值的索引。
 
-        :param dim: 计算argmax的轴, 只接受单个维度。 如果 dim == None, 则返回输入张量中所有元素的最小值的索引。有效的 dim 范围是 [-R, R), 其中 R 是输入的 ndim。 当 dim < 0 时, 它的工作方式与 dim + R 相同。
+        :param dim: 计算argmin的轴, 只接受单个维度。 如果 dim == None, 则返回输入张量中所有元素的最小值的索引。有效的 dim 范围是 [-R, R), 其中 R 是输入的 ndim。 当 dim < 0 时, 它的工作方式与 dim + R 相同。
         :param keepdims: 输出 QTensor 是否保留了最小值索引操作的轴, 默认是False。
 
         :return: 输入 QTensor 中最小值的索引。
@@ -352,7 +352,7 @@ QTensor's 函数与属性
 
     .. py:method:: all()
 
-        判断张量内数据是否全为全零。
+        判断张量内数据是否全为非零。
 
         :return: 返回True, 如果全为非0;否则返回False。
 
@@ -803,7 +803,7 @@ QTensor's 函数与属性
             QTensor在不同GPU上无法进行计算。
             如果您尝试在 ID 超过验证 GPU 最大数量的 GPU 上创建 QTensor, 将引发 Cuda 错误。
 
-        :param device: 当前保存QTensor的设备, 默认:DEV_GPU_0, device = pyvqnet.DEV_GPU_0, 存储在第一个 GPU 中, devcie = DEV_GPU_1, 存储在第二个 GPU 中, 依此类推。
+        :param device: 当前保存QTensor的设备, 默认:DEV_GPU_0, device = pyvqnet.DEV_GPU_0, 存储在第一个 GPU 中, device = DEV_GPU_1, 存储在第二个 GPU 中, 依此类推。
 
         :return: QTensor 克隆到 GPU 设备。
 
@@ -844,7 +844,7 @@ QTensor's 函数与属性
             QTensor在不同GPU上无法进行计算。
             如果您尝试在 ID 超过验证 GPU 最大数量的 GPU 上创建 QTensor, 将引发 Cuda 错误。
 
-        :param device: 当前保存QTensor的设备, 默认:DEV_GPU_0。device = pyvqnet.DEV_GPU_0, 存储在第一个 GPU 中, devcie = DEV_GPU_1, 存储在第二个 GPU 中, 依此类推。
+        :param device: 当前保存QTensor的设备, 默认:DEV_GPU_0。device = pyvqnet.DEV_GPU_0, 存储在第一个 GPU 中, device = DEV_GPU_1, 存储在第二个 GPU 中, 依此类推。
         :return: QTensor 移动到 GPU 设备。
 
         Examples::
@@ -859,7 +859,7 @@ QTensor's 函数与属性
 
     .. py:method:: toCPU()
 
-        移动QTensor到特定的GPU设备
+        移动QTensor到CPU
 
         :return: QTensor 移动到 CPU 设备。
 
@@ -927,13 +927,13 @@ QTensor's 函数与属性
 ones
 ==============================
 
-.. py:function:: pyvqnet.tensor.ones(shape,device=pyvqnet.DEV_CPU,dtype-None)
+.. py:function:: pyvqnet.tensor.ones(shape,device=pyvqnet.DEV_CPU,dtype=None)
 
     创建元素全一的 QTensor 。
 
     :param shape: 数据的形状。
     :param device: 储存在哪个设备上,默认: pyvqnet.DEV_CPU,在CPU上。
-    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
+    :param dtype: 参数的数据类型,默认: None,使用默认数据类型:kfloat32,代表32位浮点数。
 
     :return: 返回新的 QTensor 。
 
@@ -958,7 +958,7 @@ ones_like
 
     :param t: 输入 QTensor 。
     :param device: 储存在哪个设备上,默认: pyvqnet.DEV_CPU,在CPU上。
-    :param dtype: 参数的数据类型,defaults:None,跟输入的dtype一样。
+    :param dtype: 参数的数据类型,默认: None,跟输入的dtype一样。
 
     :return: 新的全一  QTensor 。
 
@@ -983,7 +983,7 @@ full
     :param shape: 要创建的张量形状。
     :param value: 填充的值。
     :param device: 储存在哪个设备上,默认: pyvqnet.DEV_CPU,在CPU上。
-    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
+    :param dtype: 参数的数据类型,默认: None,使用默认数据类型:kfloat32,代表32位浮点数。
 
     :return: 输出新 QTensor 。 
 
@@ -1011,7 +1011,7 @@ full_like
     :param t: 输入 QTensor 。
     :param value: 填充 QTensor 的值。
     :param device: 储存在哪个设备上,默认: pyvqnet.DEV_CPU,在CPU上。
-    :param dtype: 参数的数据类型,defaults:None,跟输入的dtype一样。
+    :param dtype: 参数的数据类型,默认: None,跟输入的dtype一样。
 
     :return: 输出 QTensor。
 
@@ -1039,7 +1039,7 @@ zeros
 
     :param shape: 输入形状。
     :param device: 储存在哪个设备上,默认: pyvqnet.DEV_CPU,在CPU上。
-    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
+    :param dtype: 参数的数据类型,默认: None,使用默认数据类型:kfloat32,代表32位浮点数。
 
     :return: 输出 QTensor 。
 
@@ -1068,7 +1068,7 @@ zeros_like
 
     :param t: 输入参考 QTensor 。
     :param device: 储存在哪个设备上,默认: pyvqnet.DEV_CPU,在CPU上。
-    :param dtype: 参数的数据类型,defaults:None,跟输入的dtype一样。
+    :param dtype: 参数的数据类型,默认: None,跟输入的dtype一样。
 
     :return: 输出 QTensor 。
 
@@ -1095,7 +1095,7 @@ arange
     :param end: 间隔结束。
     :param step: 值之间的间距,默认为1。
     :param device: 要使用的设备,默认 = pyvqnet.DEV_CPU,使用 CPU 设备。
-    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
+    :param dtype: 参数的数据类型,默认: None,使用默认数据类型:kfloat32,代表32位浮点数。
     :param requires_grad: 是否计算梯度,默认为False。
 
     :return: 输出 QTensor 。
@@ -1121,7 +1121,7 @@ linspace
     :param end: 间隔结束。
     :param num: 间隔的个数。
     :param device: 要使用的设备,默认 = pyvqnet.DEV_CPU ,使用 CPU 设备。
-    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
+    :param dtype: 参数的数据类型,默认: None,使用默认数据类型:kfloat32,代表32位浮点数。
     :param requires_grad: 是否计算梯度,默认为False。
 
     :return: 输出 QTensor 。
@@ -1147,7 +1147,7 @@ logspace
     :param num: 要生成的样本数
     :param base: 对数刻度的基数
     :param device: 要使用的设备,默认 = pyvqnet.DEV_CPU ,使用 CPU 设备。
-    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
+    :param dtype: 参数的数据类型,默认: None,使用默认数据类型:kfloat32,代表32位浮点数。
     :param requires_grad: 是否计算梯度,默认为False。
 
     :return: 输出 QTensor 。
@@ -1173,7 +1173,7 @@ eye
     :param size: 要创建的(正方形)QTensor 的大小。
     :param offset: 对角线的索引:0(默认)表示主对角线,正值表示上对角线,负值表示下对角线。
     :param device: 要使用的设备,默认 =pyvqnet.DEV_CPU ,使用 CPU 设备。
-    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
+    :param dtype: 参数的数据类型,默认: None,使用默认数据类型:kfloat32,代表32位浮点数。
 
     :return: 输出 QTensor 。
 
@@ -1275,9 +1275,9 @@ randu
 
     :param shape: 要创建的 QTensor 的形状。
     :param min: 分布的下限,默认: 0。
-    :param max: 分布的上线,默认: 1。
+    :param max: 分布的上限,默认: 1。
     :param device: 要使用的设备,默认 =pyvqnet.DEV_CPU ,使用 CPU 设备。
-    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
+    :param dtype: 参数的数据类型,默认: None,使用默认数据类型:kfloat32,代表32位浮点数。
     :param requires_grad: 是否计算梯度,默认为False。
 
     :return: 输出 QTensor 。
@@ -1305,9 +1305,9 @@ randn
 
     :param shape: 要创建的 QTensor 的形状。
     :param mean: 分布的均值,默认: 0。
-    :param max: 分布的方差,默认: 1。
+    :param std: 分布的方差,默认: 1。
     :param device: 要使用的设备,默认 = pyvqnet.DEV_CPU ,使用 CPU 设备。
-    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
+    :param dtype: 参数的数据类型,默认: None,使用默认数据类型:kfloat32,代表32位浮点数。
     :param requires_grad: 是否计算梯度,默认为False。
 
     :return: 输出 QTensor 。
@@ -1327,7 +1327,7 @@ randn
 
 binomial
 ==============================
-.. py:function:: pyvqnet.tensor.binomial(total_countst, probs)
+.. py:function:: pyvqnet.tensor.binomial(total_counts, probs)
 
     创建一个由 :attr:`total_count` 和 :attr:`probs` 参数化的二项分布。
 
@@ -3300,7 +3300,7 @@ permute
 
 .. py:function:: pyvqnet.tensor.permute(t: pyvqnet.tensor.QTensor, dim: list)
 
-    根据输入的 dim 的顺序,改变t 的轴的顺序。如果 dims = None,则按顺序反转 t 的轴。
+    根据输入的 dim 的顺序,改变t 的轴的顺序。
 
     :param t: 输入 QTensor 。
     :param dim: 维度的新顺序(整数列表)。
@@ -3334,7 +3334,7 @@ transpose
 
 .. py:function:: pyvqnet.tensor.transpose(t: pyvqnet.tensor.QTensor, dim: list)
 
-    根据输入的 dim 的顺序,改变t 的轴的顺序。如果 dims = None,则按顺序反转 t 的轴。该函数功能与 permute 一致。
+    根据输入的 dim 的顺序,改变t 的轴的顺序。如果 dims = None,则按顺序反转 t 的轴。
 
     :param t: 输入 QTensor 。
     :param dim: 维度的新顺序(整数列表)。
@@ -4006,12 +4006,12 @@ functional_conv2d
 
     :param x: 4维输入张量。
     :param weight: 4维核张量。
-    :param weight: 4维核张量。
+
 
     :param stride: `tuple` - 步长，默认为 (1, 1)
     :param padding: 填充，控制输入的填充量。它可以是字符串 {‘valid’, ‘same’} 或一个整数元组，用于指定应用于输入的隐式填充量，默认为(0,0)
-    :param dilation_rate: `tuple` - 核元素之间的间距。默认值：(0,0)
-    :param group: `int` - 组数。默认值：1
+    :param dilation: `tuple` - 核元素之间的间距。默认值：(0,0)
+    :param groups: `int` - 组数。默认值：1
 
     :return: qtensor
 

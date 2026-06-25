@@ -18,13 +18,13 @@ QuantumLayer
 
 .. py:class:: pyvqnet.qnn.pq3.quantumlayer.QuantumLayer(qprog_with_measure,para_num,diff_method:str = "parameter_shift",delta:float = 0.01,dtype=None,name="")
 
-	变分量子层的抽象计算模块。对一个参数化的量子线路使用pyqpanda3进行仿真,得到测量结果。该变分量子层继承了VQNet框架的梯度计算模块,可以使用参数漂移法等计算线路参数的梯度,训练变分量子线路模型或将变分量子线路嵌入混合量子和经典模型。
+	变分量子层的抽象计算模块。对一个参数化的量子线路使用pyqpanda3进行仿真,得到测量结果。该变分量子层继承了VQNet框架的梯度计算模块,可以使用参数移位法等计算线路参数的梯度,训练变分量子线路模型或将变分量子线路嵌入混合量子和经典模型。
     
-    :param qprog_with_measure: 用pyQPanda构建的量子线路运行和测量函数。
+    :param qprog_with_measure: 用pyqpanda3构建的量子线路运行和测量函数。
     :param para_num: `int` - 参数个数。
-    :param diff_method: 求解量子线路参数梯度的方法,“参数位移”或“有限差分”,默认参数偏移。
+    :param diff_method: 求解量子线路参数梯度的方法,"parameter_shift"或"finite_diff"，默认为 "parameter_shift"。 。
     :param delta: 有限差分计算梯度时的 \delta。
-    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
+    :param dtype: 参数的数据类型,默认: None,使用默认数据类型:kfloat32,代表32位浮点数。
     :param name: 这个模块的名字, 默认为""。
 
     :return: 一个可以计算量子线路的模块。
@@ -32,16 +32,16 @@ QuantumLayer
     .. note::
         qprog_with_measure是pyQPanda中定义的量子线路函数 :https://qcloud.originqc.com.cn/document/qpanda-3/dc/d12/tutorial_quantum_program.html。
         
-        此函数必须包含输入和参数两个参数作为函数入参(即使某个参数未实际使用),输出为线路的测量结果或者期望值（需要为np.ndarray或包含数值的列表）,否则无法在QpandaQCircuitVQCLayerLite中正常运行。
+        此函数必须包含输入和参数两个参数作为函数入参(即使某个参数未实际使用),输出为线路的测量结果或者期望值（需要为np.ndarray或包含数值的列表）,否则无法在QuantumLayer中正常运行。
 
         
         量子线路函数 qprog_with_measure的使用可参考下面的例子。
 
         qprog_with_measure(input,param)
         
-            `input`: 输入一维经典数据。如果没有,输入 None。
+            `input`: 输入一维经典数据。如果没有,输入 None
             
-            `param`: 输入一维的变分量子线路的待训练参数。
+            `param`: 输入一维的变分量子线路的待训练参数
 
     .. note::
 
@@ -121,7 +121,7 @@ QpandaQProgVQCLayer
 
     它将参数化的量子电路提交给 本地QPanda3全振幅模拟器中计算,并训练线路中的参数。
     它支持批量数据并使用参数移位规则来估计参数的梯度。
-    对于 CRX、CRY、CRZ,此层使用 https://iopscience.iop.org/article/10.1088/1367-2630/ac2cb3 中的公式,其余逻辑门采用默认的参数漂移法计算梯度。
+    对于 CRX、CRY、CRZ,此层使用 https://iopscience.iop.org/article/10.1088/1367-2630/ac2cb3 中的公式,其余逻辑门采用默认的参数移位法计算梯度。
 
     :param origin_qprog_func: 由 QPanda 构建的可调用量子电路函数。
     :param para_num: `int` - 参数数量；参数是一维的。
@@ -137,15 +137,15 @@ QpandaQProgVQCLayer
     .. note::
 
         origin_qprog_func 是用户使用 pyqpanda3 定义的量子电路函数:
-        https://qcloud.originqc.com.cn/document/qpanda-3/dc/d12/tutorial_quantum_program.html。。
+        https://qcloud.originqc.com.cn/document/qpanda-3/dc/d12/tutorial_quantum_program.html 。
 
         此函数必须包含输入和参数两个参数作为函数入参(即使某个参数未实际使用),输出为pyqpanda3.core.QProg类型数据,否则无法在QuantumLayerV3中正常运行。
 
         origin_qprog_func (input,param)
 
-        `input`:用户定义的数组类输入 1 维经典数据。
+        `input`:用户定义的数组类输入 1 维经典数据
 
-        `param`:array_like 输入用户定义的 1 维量子电路参数。
+        `param`:array_like 输入用户定义的 1 维量子电路参数
 
 
     .. note::
@@ -167,7 +167,7 @@ QpandaQProgVQCLayer
 
         def qfun(input, param ):
             m_qlist = range(3)
-            cubits = range(3)
+            cbits = range(3)
             measure_qubits = [0,1, 2]
             m_prog = pq.QProg()
             cir = pq.QCircuit(3)
@@ -184,7 +184,7 @@ QpandaQProgVQCLayer
             m_prog<<cir
 
             for idx, ele in enumerate(measure_qubits):
-                m_prog << pq.measure(m_qlist[ele], cubits[idx])  # pylint: disable=expression-not-assigned
+                m_prog << pq.measure(m_qlist[ele], cbits[idx])  # pylint: disable=expression-not-assigned
             return m_prog
 
         from pyvqnet.utils.initializer import ones
@@ -222,9 +222,10 @@ QuantumBatchAsyncQcloudLayer
         origin_qprog_func 的形式必须按照如下:
 
         origin_qprog_func(input,param)
-            `input`: 输入1~2维经典数据,二维的情况下,第一个维度为批处理大小。
-            
-            `param`: 输入一维的变分量子线路的待训练参数。
+
+            `input`: 输入1~2维经典数据,二维的情况下,第一个维度为批处理大小
+
+            `param`: 输入一维的变分量子线路的待训练参数
 
     .. note::
 
@@ -243,7 +244,7 @@ QuantumBatchAsyncQcloudLayer
     :param dtype: 参数的数据类型。 默认值为 None,即使用默认数据类型pyvqnet.kfloat32。
     :param name: 模块的名称。 默认为空字符串。
     :param diff_method: 梯度计算的微分方法。 默认为“parameter_shift”,"random_coordinate_descent"。
-    :param submit_kwargs: 用于提交量子电路的附加关键字参数,默认:{"chip_id":"origin_wukong","is_amend":True,"is_mapping":True,"is_optimization":True,"compile_level":3,"default_task_group_size":200,"test_qcloud_fake":False},当设置test_qcloud_fake为True则本地CPUQVM模拟。
+    :param submit_kwargs: 用于提交量子电路的附加关键字参数,默认:{"if_print_qcloud_log":False,"chip_id":"WK_C180","is_amend":True,"is_mapping":True,"is_optimization":True,"compile_level":3,"default_task_group_size":200,"test_qcloud_fake":False,"server_ip_address":""},当设置test_qcloud_fake为True则本地CPUQVM模拟。
     :param query_kwargs: 用于查询量子结果的附加关键字参数,默认:{"timeout":1,"total_timeout":60, "print_query_info":True,"sub_circuits_split_size":1}。
     :return: 一个可以计算量子电路的模块。
     
@@ -480,11 +481,78 @@ QuantumLayerAdjoint
         <QTensor [2, 5] DEV_CPU kfloat32>
         """
 
+VQCQCloudLayer
+============================
+
+.. py:class:: pyvqnet.qnn.pq3.vqc_qcloud_layer.VQCQCloudLayer(vqc_module, qcloud_token, pauli_str_dict=None, shots=1000, name="", submit_kwargs={}, query_kwargs={})
+
+    提交 VQC Module 到 QCloud 真实芯片或 pyqpanda3 本地模拟器上执行。
+
+    正向传播:不执行VQNet的量子变分线路计算,而是调用量子真实芯片或者qpanda本地模拟器计算。
+
+    反向传播:使用 parameter_shift 规则计算梯度。对每个输入维度和 VQC 中的每个可训练参数,
+    生成 +/- pi/2 偏移的线路并提交计算,获取结果后计算 jacobian。梯度会设置到输入张量和 VQC 的可训练 Parameters 上。
+
+    .. note::
+
+        单次线路提交至 QCloud 的默认总超时时间为 60 秒。如果因 QCloud 繁忙而导致超时,可以在 ``query_kwargs`` 中设置 ``total_timeout`` 键的值来指定等待秒数。
+
+    .. note::
+
+        在 ``vqc_module`` 中不能定义测量函数(如 ``MeasureAll``),测量应通过 ``pauli_str_dict`` 参数指定观测量来完成。
+        例如:``VQCQCloudLayer(vqc_module, token, pauli_str_dict={'Z0': 1, 'Z1': 1})``。
+
+    :param vqc_module: VQNet VQC Module,必须包含 save_ir=True 的 QMachine。
+    :param qcloud_token: QCloud API token。若使用本地模拟器可传入空字符串。
+    :param pauli_str_dict: 泡利算符字典,用于期望值计算。默认值为 None,则进行测量操作。
+    :param shots: 测量次数。默认值为 1000。
+    :param name: 模块名称。默认为空字符串。
+    :param submit_kwargs: 用于提交量子电路的附加关键字参数,默认:{"if_print_qcloud_log":False,"chip_id":"WK_C180","is_amend":True,"is_mapping":True,"is_optimization":True,"compile_level":3,"default_task_group_size":200,"test_qcloud_fake":False,"server_ip_address":""},当设置test_qcloud_fake为True则本地CPUQVM模拟。
+    :param query_kwargs: 用于查询量子结果的附加关键字参数,默认:{"timeout":1,"total_timeout":60, "print_query_info":True,"sub_circuits_split_size":1}。
+
+    Example::
+
+        from pyvqnet.qnn.vqc import *
+        from pyvqnet.qnn.pq3 import VQCQCloudLayer
+        from pyvqnet.nn import Module
+        import pyvqnet
+
+        class QModel(Module):
+            def __init__(self, num_wires, dtype):
+                super(QModel, self).__init__()
+                self._num_wires = num_wires
+                self._dtype = dtype
+                self.qm = QMachine(num_wires, dtype=dtype, save_ir=True)
+                self.rx_layer = RX(has_params=True, trainable=False, wires=0)
+                self.u1 = U1(has_params=True, trainable=True, wires=[1])
+                self.cnot = CNOT(wires=[0, 1])
+
+            def forward(self, x, *args, **kwargs):
+                self.qm.reset_states(x.shape[0])
+                self.rx_layer(params=x[:, [0]], q_machine=self.qm)
+                self.cnot(q_machine=self.qm)
+                self.u1(q_machine=self.qm)
+                return x
+
+        qmodel = QModel(num_wires=2, dtype=pyvqnet.kcomplex64)
+        layer = VQCQCloudLayer(
+            qmodel,
+            "your_qcloud_token",
+            pauli_str_dict={'Z0': 1, 'Z1': 1},
+            shots=1000,
+            submit_kwargs={"test_qcloud_fake": True},
+        )
+        x = pyvqnet.tensor.QTensor([[0.5, 0.3], [0.5, 0.3]], requires_grad=True)
+        y = layer(x)
+        y.backward()
+        print(x.grad)
+        print(qmodel.u1.params.grad)
+
 grad
 ==============
 .. py:function:: pyvqnet.qnn.pq3.quantumlayer.grad(quantum_prog_func, input_params, *args)
 
-    grad 函数提供了一种对用户设计的含参量子线路参数的梯度使用参数漂移法计算的接口。
+    grad 函数提供了一种对用户设计的含参量子线路参数的梯度使用参数移位法计算的接口。
     用户可按照如下例子,使用pyqpanda设计线路运行函数 ``quantum_prog_func`` ,并作为参数送入grad函数。
     grad函数的第二个参数则是想要计算量子逻辑门参数梯度的坐标。
     返回值的形状为  [num of parameters,num of output]。
@@ -534,7 +602,7 @@ QLinear 实现了一种量子全连接算法。首先将数据编码到量子态
 
 .. image:: ./images/qlinear_cir.png
 
-.. py:class:: pyvqnet.qnn.qlinear.QLinear(input_channels,output_channels,machine: str = "CPU"))
+.. py:class:: pyvqnet.qnn.qlinear.QLinear(input_channels,output_channels,machine: str = "CPU")
 
     量子全连接模块。全连接模块的输入为形状（输入通道、输出通道）。
     
@@ -547,7 +615,7 @@ QLinear 实现了一种量子全连接算法。首先将数据编码到量子态
     :param machine: `str` - 使用的虚拟机,默认使用CPU模拟。
     :return: 量子全连接层。
 
-    Exmaple::
+    Example::
 
         from pyvqnet.tensor import QTensor
         from pyvqnet.qnn.qlinear import QLinear
@@ -594,7 +662,7 @@ Qconv是一种量子卷积算法接口。
     :param padding: `tuple` - 填充,默认为（0,0）。
     :param kernel_initializer: `callable` - 默认为正态分布。
     :param machine: `str` - 使用的虚拟机,默认使用CPU模拟。
-    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
+    :param dtype: 参数的数据类型,默认: None,使用默认数据类型:kfloat32,代表32位浮点数。
     :param name: 这个模块的名字, 默认为""。
 
 
@@ -1186,10 +1254,10 @@ StronglyEntanglingTemplate
         circuit.print_circuit(qubits)
 
 
-ComplexEntangelingTemplate
+ComplexEntanglingTemplate
 ============================
 
-.. py:class:: pyvqnet.qnn.pq3.ComplexEntangelingTemplate(weights,num_qubits,depth)
+.. py:class:: pyvqnet.qnn.pq3.ComplexEntanglingTemplate(weights,num_qubits,depth)
 
 
     由 U3 门和 CNOT 门组成的强纠缠层。
@@ -1203,7 +1271,7 @@ ComplexEntangelingTemplate
 
     Example::
 
-        from pyvqnet.qnn.pq3 import ComplexEntangelingTemplate
+        from pyvqnet.qnn.pq3 import ComplexEntanglingTemplate
         import pyqpanda3.core as pq
         from pyvqnet.tensor import *
         depth =3
@@ -1215,7 +1283,7 @@ ComplexEntangelingTemplate
 
         qubits = range(num_qubits)
 
-        circuit = ComplexEntangelingTemplate(weights, num_qubits=num_qubits,depth=depth)
+        circuit = ComplexEntanglingTemplate(weights, num_qubits=num_qubits,depth=depth)
         result = circuit.create_circuit(qubits)
         circuit.print_circuit(qubits)
 
@@ -1249,7 +1317,7 @@ Quantum_Embedding
         
         nq = depth_input * num_repetitions_input
         qubits = range(nq)
-        cubits = range(nq)
+        cbits = range(nq)
 
         data_in = tensor.ones([12, depth_input])
         data_in.requires_grad = True
@@ -1273,21 +1341,23 @@ Quantum_Embedding
 expval
 ============================
 
-.. py:function:: pyvqnet.qnn.pq3.measure.expval(machine,prog,pauli_str_dict)
+.. py:function:: pyvqnet.qnn.pq3.measure.expval(machine,prog,pauli_str_dict,shots=1000,noise_model=None)
 
 	提供的哈密顿量观测值的期望值。
-    
+
     如果观测值是 :math:`0.7Z\otimes X\otimes I+0.2I\otimes Z\otimes I`,
     那么 Hamiltonian dict 将是 ``{{'Z0, X1':0.7} ,{'Z1':0.2}}`` 。
 
-    expval api现在支持pyqpanda3 的模拟器 。 
-    
+    expval api现在支持pyqpanda3 的模拟器 。
+
     :param machine: 由pyQPanda创建的量子虚拟机。
     :param prog: pyQPanda创建的量子程序。
     :param pauli_str_dict: 哈密顿量观测值。
+    :param shots: 测量次数,默认值为1000。
+    :param noise_model: 噪声模型,默认值为None(理想模拟)。
 
     :return: 期望值。
-               
+
 
     Example::
 
@@ -1311,12 +1381,12 @@ expval
 QuantumMeasure
 ============================
 
-.. py:function:: pyvqnet.qnn.pq3.measure.QuantumMeasure(machine,prog,measure_qubits:list,shots:int = 1000, qcloud_option="")
+.. py:function:: pyvqnet.qnn.pq3.measure.QuantumMeasure(machine,prog,measure_qubits:list,shots:int = 1000, qcloud_option=””,noise_model=None)
 
     计算量子线路测量。返回通过蒙特卡罗方法获得的测量结果。
 
     更多详情请访问  https://pyqpanda-toturial.readthedocs.io/zh/latest/Measure.html?highlight=measure_all 。
-    
+
     QuantumMeasure api现在只支持QPanda ``CPUQVM`` 或 ``QCloud`` 。
 
 
@@ -1325,7 +1395,8 @@ QuantumMeasure
     :param prog: pyQPanda创建的量子程序。
     :param measure_qubits: 列表包含测量比特索引。
     :param shots: 测量次数,默认值为1000次。
-    :param qcloud_option: 设置 qcloud 配置,默认为“”,可以传入一个QCloudOptions类,只在使用qcloud 下有用。
+    :param qcloud_option: 设置 qcloud 配置,默认为””,可以传入一个QCloudOptions类,只在使用qcloud 下有用。
+    :param noise_model: 噪声模型,默认值为None(理想模拟)。
     :return: 返回通过蒙特卡罗方法获得的测量结果。
 
     Example::
@@ -1356,10 +1427,10 @@ QuantumMeasure
 ProbsMeasure
 ============================
 
-.. py:function:: pyvqnet.qnn.pq3.measure.ProbsMeasure(machine,prog,measure_qubits:list,shots=1)
+.. py:function:: pyvqnet.qnn.pq3.measure.ProbsMeasure(machine,prog,measure_qubits:list,shots=1,noise_model=None)
 
 	计算线路概率测量。
-    
+
     更多详情请访问 https://pyqpanda-toturial.readthedocs.io/zh/latest/PMeasure.html。
 
     ProbsMeasure api现在只支持pyQPanda ``CPUQVM`` 或 ``QCloud`` 。
@@ -1368,6 +1439,7 @@ ProbsMeasure
     :param prog: qpanda创建的量子程序。
     :param machine: pyQPanda分配的量子虚拟机。
     :param shots: 测量次数,默认为1,计算理论值。
+    :param noise_model: 噪声模型,默认值为None(理想模拟)。
     :return: 按字典顺序测量量子比特。
 
 

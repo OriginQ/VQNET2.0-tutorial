@@ -4,16 +4,18 @@ VQNet的分布式计算模块
 *********************************************************
 
 分布式计算​​是指通过多台设备（如GPU/CPU节点）协同完成神经网络的训练或推理任务，利用并行处理加速计算并扩展模型规模。
-其核心是通过​​分布式接口​​（如MPI、NCCL、gRP）协调设备间的通信与同步
+其核心是通过​​分布式接口​​（如MPI、NCCL）协调设备间的通信与同步
 
-VQNet的分布式计算模块模块使用mpi启动多进程并行计算, 使用nccl进行GPU之间通信。该功能仅在linux操作系统下能够使用。
+VQNet的分布式计算模块使用mpi启动多进程并行计算, 使用nccl进行GPU之间通信。该功能仅在linux操作系统下能够使用。
 
+.. important::
 
+    VQNet的分布式计算模块仅支持Linux。
 
 环境部署
 =================================
 
-以下介绍VQNet分别基于CPU、GPU分布式计算所需的Linux系统下环境的部署.该部分必须MPI的支持, 以下介绍MPI的环境部署。
+以下介绍VQNet分别基于CPU、GPU分布式计算所需的Linux系统下环境的部署.该部分必须有MPI的支持, 以下介绍MPI的环境部署。
 
 MPI安装
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -51,58 +53,7 @@ NCCL安装
 ^^^^^^^^^^^^^^^^^^^^^^
 
 NCCL为GPU间通信的常用库, **VQNet中GPU的分布式计算功能则基于NCCL进行实现**,本软件默认在安装时候同时安装NCCL的动态链接库, 一般不需要安装NCCL。
-如果要安装NCCL,可以按照以下介绍如何在Linux系统中对NCCL进行安装(目前基于GPU的分布式计算功能仅在Linux上实现).
 
-
-从github上将NCCL的仓库拉到本地:
-
-.. code-block::
-
-    git clone https://github.com/NVIDIA/nccl.git
-
-进入nccl根目录并编译
-
-.. code-block::
-    
-    cd nccl
-    make -j src.build
-
-如果cuda没有安装到默认的路径即/usr/local/cuda, 则需要定义CUDA的路径, 使用以下代码来编译
-
-.. code-block::
-
-    make src.build CUDA_HOME=<path to cuda install>
-
-并且可以根据BUILDDIR指定安装目录, 指令如下
-
-.. code-block::
-    
-    make src.build CUDA_HOME=<path to cuda install> BUILDDIR=/usr/local/nccl
-
-安装完成后在.bashrc文件中添加配置
-
-.. code-block::
-    
-    vim ~/.bashrc
-
-    # 在最下面加入
-    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/nccl/lib
-    export PATH=$PATH:/usr/local/nccl/bin
-
-保存后, 执行
-
-.. code-block::
-    
-    source ~/.bashrc
-
-可以通过nccl-test进行验证
-
-.. code-block::
-    
-    git clone https://github.com/NVIDIA/nccl-tests.git
-    cd nccl-tests
-    make -j12 CUDA_HOME=/usr/local/cuda
-    ./build/all_reduce_perf -b 8 -e 256M -f 2 -g 1
 
 节点间通信环境部署
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -114,20 +65,22 @@ NCCL为GPU间通信的常用库, **VQNet中GPU的分布式计算功能则基于N
 .. code-block::
 
     # 在每个节点上执行
-    ssh-keygen
-    
-    # 之后一直回车,在.ssh文件夹下生成一个公钥(id_rsa.pub)一个私钥(id_rsa)
-    # 将其另外两个节点的公钥都添加到第一个节点的authorized_keys文件中,
-    # 再将第一个节点authorized_keys文件传到另外两个节点便可以实现节点间的免密通信
+    ssh-keygen -t rsa
+
+    # 之后一直回车,在.ssh文件夹下生成一个公钥(id_rsa.pub)和一个私钥(id_rsa)
+    # 使用ssh-copy-id将各节点的公钥复制到主节点node0
     # 在子节点node1上执行
-    cat ~/.ssh/id_dsa.pub >> node0:~/.ssh/authorized_keys
+    ssh-copy-id node0
 
     # 在子节点node2上执行
-    cat ~/.ssh/id_dsa.pub >> node0:~/.ssh/authorized_keys
-    
-    # 先删除node1、node2中的authorized_keys文件后,在node0上将authorized_keys文件拷贝到另外两个节点上
-    scp ~/.ssh/authorized_keys  node1:~/.ssh/authorized_keys
-    scp ~/.ssh/authorized_keys  node2:~/.ssh/authorized_keys
+    ssh-copy-id node0
+
+    # 在主节点node0上,将node0自己的公钥也加入authorized_keys
+    cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
+
+    # 再将node0上的authorized_keys文件分发到各子节点
+    scp ~/.ssh/authorized_keys node1:~/.ssh/authorized_keys
+    scp ~/.ssh/authorized_keys node2:~/.ssh/authorized_keys
 
     # 保证三个不同节点生成的公钥都在authorized_keys文件中,即可实现节点间的免密通信
 
@@ -147,9 +100,8 @@ NCCL为GPU间通信的常用库, **VQNet中GPU的分布式计算功能则基于N
     systemctl start rpcbind
     systemctl start nfs
 
-    # 在所有子结点node1,node2上mount要共享的目录
-    mount node1:/data/mpi/ /data/mpi
-    mount node2:/data/mpi/ /data/mpi
+    # 在所有子节点node1,node2上mount主节点node0的共享目录
+    mount node0:/data/mpi /data/mpi
 
 分布式启动
 =================================
@@ -172,6 +124,127 @@ n, np
 
         # vqnetrun -n 2 python test.py
         # vqnetrun -np 2 python test.py
+
+backend
+^^^^^^^^^^^^^^^^^^^^^^
+
+``vqnetrun`` 接口中可以通过 ``--backend`` 参数选择分布式后端,支持 ``mpi`` (默认) 和 ``nccl`` 两种模式。
+MPI 模式支持多节点跨主机执行, NCCL 模式用于单机多 GPU 场景,采用去中心化启动模型(每个节点独立运行 vqnetrun)。
+
+    Example::
+
+        from pyvqnet.distributed import CommController
+        Comm_OP = CommController("nccl")
+
+        rank = Comm_OP.getRank()
+        size = Comm_OP.getSize()
+        print(f"rank: {rank}, size {size}")
+
+        # 单机多GPU:
+        # vqnetrun --backend nccl --nproc_per_node 2 python test.py
+
+        # 多节点情况下,每个节点独立执行:
+        # 节点0: vqnetrun --backend nccl --nproc_per_node 2 --nnodes 2 --node_rank 0 --master_addr 10.0.0.1 python test.py
+        # 节点1: vqnetrun --backend nccl --nproc_per_node 2 --nnodes 2 --node_rank 1 --master_addr 10.0.0.1 python test.py
+
+nproc_per_node
+^^^^^^^^^^^^^^^^^^^^^^
+
+``vqnetrun`` 接口中可以通过 ``--nproc_per_node`` 参数控制每个节点启动的进程数,仅在 NCCL 模式下使用。
+
+    Example::
+
+        from pyvqnet.distributed import CommController
+        Comm_OP = CommController("nccl")
+
+        rank = Comm_OP.getRank()
+        size = Comm_OP.getSize()
+        print(f"rank: {rank}, size {size}")
+
+        # vqnetrun --backend nccl --nproc_per_node 4 python test.py
+
+nnodes
+^^^^^^^^^^^^^^^^^^^^^^
+
+``vqnetrun`` 接口中可以通过 ``--nnodes`` 参数控制总节点数,仅在 NCCL 模式下使用,默认值为 1。
+
+    Example::
+
+        from pyvqnet.distributed import CommController
+        Comm_OP = CommController("nccl")
+
+        rank = Comm_OP.getRank()
+        size = Comm_OP.getSize()
+        print(f"rank: {rank}, size {size}")
+
+        # vqnetrun --backend nccl --nproc_per_node 2 --nnodes 2 --node_rank 0 --master_addr 10.0.0.1 python test.py
+
+node_rank
+^^^^^^^^^^^^^^^^^^^^^^
+
+``vqnetrun`` 接口中可以通过 ``--node_rank`` 参数控制当前节点的 rank,仅在 NCCL 模式下使用,默认值为 0。
+
+    Example::
+
+        from pyvqnet.distributed import CommController
+        Comm_OP = CommController("nccl")
+
+        rank = Comm_OP.getRank()
+        size = Comm_OP.getSize()
+        print(f"rank: {rank}, size {size}")
+
+        # 节点0: vqnetrun --backend nccl --nproc_per_node 2 --nnodes 3 --node_rank 0 --master_addr 10.0.0.1 python test.py
+        # 节点1: vqnetrun --backend nccl --nproc_per_node 2 --nnodes 3 --node_rank 1 --master_addr 10.0.0.1 python test.py
+        # 节点2: vqnetrun --backend nccl --nproc_per_node 2 --nnodes 3 --node_rank 2 --master_addr 10.0.0.1 python test.py
+
+master_addr
+^^^^^^^^^^^^^^^^^^^^^^
+
+``vqnetrun`` 接口中可以通过 ``--master_addr`` 参数指定主节点地址,仅在 NCCL 模式下使用,默认值为 ``127.0.0.1``。
+
+    Example::
+
+        from pyvqnet.distributed import CommController
+        Comm_OP = CommController("nccl")
+
+        rank = Comm_OP.getRank()
+        size = Comm_OP.getSize()
+        print(f"rank: {rank}, size {size}")
+
+        # vqnetrun --backend nccl --nproc_per_node 2 --nnodes 2 --node_rank 0 --master_addr 10.0.0.1 python test.py
+
+master_port
+^^^^^^^^^^^^^^^^^^^^^^
+
+``vqnetrun`` 接口中可以通过 ``--master_port`` 参数指定主节点端口,仅在 NCCL 模式下使用,默认值为 ``29500``。
+
+    Example::
+
+        from pyvqnet.distributed import CommController
+        Comm_OP = CommController("nccl")
+
+        rank = Comm_OP.getRank()
+        size = Comm_OP.getSize()
+        print(f"rank: {rank}, size {size}")
+
+        # vqnetrun --backend nccl --nproc_per_node 2 --master_port 29600 python test.py
+
+nccl_socket_ifname
+^^^^^^^^^^^^^^^^^^^^^^
+
+``vqnetrun`` 接口中可以通过 ``--nccl_socket_ifname`` 参数指定 NCCL 使用的网络接口名,仅在 NCCL 模式下使用。
+该参数对应环境变量 ``NCCL_SOCKET_IFNAME``,用于在多网卡环境下指定 NCCL 通信使用的网卡。
+
+    Example::
+
+        from pyvqnet.distributed import CommController
+        Comm_OP = CommController("nccl")
+
+        rank = Comm_OP.getRank()
+        size = Comm_OP.getSize()
+        print(f"rank: {rank}, size {size}")
+
+        # vqnetrun --backend nccl --nproc_per_node 2 --nccl_socket_ifname eth0 python test.py
 
 H, hosts
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -279,6 +352,37 @@ start-timeout
 
         # vqnetrun -np 4 --start-timeout 10 python test.py
 
+
+disable-cache
+^^^^^^^^^^^^^^^^^^^^^^
+``vqnetrun`` 接口中可以通过 ``--disable-cache`` 标志禁用初始化检查缓存。默认情况下, vqnetrun 会将初始化检查的结果缓存 60 分钟, 如果禁用了缓存, 则每次运行都会重新执行初始化检查。
+
+执行代码如下
+
+    Example::
+
+        from pyvqnet.distributed import CommController, get_host_name
+        Comm_OP = CommController("mpi") # init mpi controller
+
+        rank = Comm_OP.getRank()
+        size = Comm_OP.getSize()
+        print(f"rank: {rank}, size {size}")
+        print(f"LocalRank {Comm_OP.getLocalRank()} hosts name {get_host_name()}")
+
+        # vqnetrun -np 4 --disable-cache python test.py
+
+
+cb, check-build
+^^^^^^^^^^^^^^^^^^^^^^
+
+``vqnetrun`` 接口中可以通过 ``-cb``, ``--check-build`` 标志查看当前构建支持的分布式后端和通信库。
+
+执行代码如下
+
+    Example::
+
+        # vqnetrun -cb
+        # vqnetrun --check-build
 
 h
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -538,7 +642,7 @@ CommController
             
             # vqnetrun -n 2 python test.py
 
-    .. py:method:: split_group(rankL)
+    .. py:method:: split_groups(rankL)
         
         根据入参设置的进程号列表用于划分多个通信组。
 
@@ -553,7 +657,7 @@ CommController
             import numpy as np
             Comm_OP = CommController("mpi")
 
-            groups = Comm_OP.split_group([[0, 1],[2,3]])
+            groups = Comm_OP.split_groups([[0, 1],[2,3]])
             print(groups)
             #[[<mpi4py.MPI.Intracomm object at 0x7f53691f3230>, [0, 3]], [<mpi4py.MPI.Intracomm object at 0x7f53691f3010>, [2, 1]]]
 
@@ -565,7 +669,7 @@ CommController
 
         :param tensor: 输入数据.
         :param c_op: 计算方法.
-        :param group: 当使用mpi后端时候，输入由 `init_group` 或 `split_group` 生成的组对应通信组，当使用nccl后端时候输入`split_group` 生成的组序号。
+        :param group: 当使用mpi后端时候，输入由 `init_group` 或 `split_groups` 生成的组对应通信组，当使用nccl后端时候输入`split_groups` 生成的组序号。
 
 
         Examples::
@@ -576,7 +680,7 @@ CommController
             from pyvqnet import kcomplex64
             Comm_OP = CommController("nccl")
 
-            groups = Comm_OP.split_group([[0, 1]])
+            groups = Comm_OP.split_groups([[0, 1]])
 
             complex_data = tensor.QTensor([3+1j, 2, 1 + get_rank()],dtype=kcomplex64).reshape((3,1)).toGPU(1000+ get_local_rank())
 
@@ -593,7 +697,7 @@ CommController
         :param tensor: 输入数据.
         :param root: 指定进程号.
         :param c_op: 计算方法.
-        :param group: 当使用mpi后端时候，输入由 `init_group` 或 `split_group` 生成的组对应通信组，当使用nccl后端时候输入`split_group` 生成的组序号。
+        :param group: 当使用mpi后端时候，输入由 `init_group` 或 `split_groups` 生成的组对应通信组，当使用nccl后端时候输入`split_groups` 生成的组序号。
 
 
         Examples::
@@ -604,7 +708,7 @@ CommController
             from pyvqnet import kcomplex64
             Comm_OP = CommController("nccl")
 
-            groups = Comm_OP.split_group([[0, 1]])
+            groups = Comm_OP.split_groups([[0, 1]])
 
             complex_data = tensor.QTensor([3+1j, 2, 1 + get_rank()],dtype=kcomplex64).reshape((3,1)).toGPU(1000+ get_local_rank())
 
@@ -621,7 +725,7 @@ CommController
 
         :param tensor: 输入数据.
         :param root: 指定从哪个进程号广播， 默认为0.
-        :param group: 当使用mpi后端时候，输入由 `init_group` 或 `split_group` 生成的组对应通信组，当使用nccl后端时候输入`split_group` 生成的组序号。
+        :param group: 当使用mpi后端时候，输入由 `init_group` 或 `split_groups` 生成的组对应通信组，当使用nccl后端时候输入`split_groups` 生成的组序号。
 
 
         Examples::
@@ -632,7 +736,7 @@ CommController
             from pyvqnet import kcomplex64
             Comm_OP = CommController("nccl")
 
-            groups = Comm_OP.split_group([[0, 1]])
+            groups = Comm_OP.split_groups([[0, 1]])
 
             complex_data = tensor.QTensor([3+1j, 2, 1 + get_rank()],dtype=kcomplex64).reshape((3,1)).toGPU(1000+ get_local_rank())
 
@@ -649,7 +753,7 @@ CommController
         组内allgather通信接口。
 
         :param tensor: 输入数据.
-        :param group: 当使用mpi后端时候，输入由 `init_group` 或 `split_group` 生成的组对应通信组，当使用nccl后端时候输入`split_group` 生成的组序号。
+        :param group: 当使用mpi后端时候，输入由 `init_group` 或 `split_groups` 生成的组对应通信组，当使用nccl后端时候输入`split_groups` 生成的组序号。
 
 
         Examples::
@@ -665,17 +769,17 @@ CommController
             print(f" before rank {get_rank()}: {complex_data}")
             for comm_ in group:
                 if Comm_OP.getRank() in comm_[1]:
-                    complex_data = Comm_OP.all_gather_group(complex_data, comm_[0])
+                    complex_data = Comm_OP.allgather_group(complex_data, comm_[0])
                     print(f"after rank {get_rank()}: {complex_data}")
             # mpirun -n 2 python test.py
 
             from pyvqnet.distributed import CommController,get_rank,get_local_rank
             from pyvqnet.tensor import tensor
             Comm_OP = CommController("nccl")
-            groups = Comm_OP.split_group([[0, 1]])
+            groups = Comm_OP.split_groups([[0, 1]])
             complex_data = tensor.QTensor([3+1j, 2, 1 + get_rank()],dtype=kcomplex64).reshape((3,1)).toGPU(1000+ get_local_rank())
             print(f" before rank {get_rank()}: {complex_data}")
-            complex_data = Comm_OP.all_gather_group(complex_data, group = groups[0])
+            complex_data = Comm_OP.allgather_group(complex_data, group = groups[0])
             print(f"after rank {get_rank()}: {complex_data}")
             # mpirun -n 2 python test.py
 
@@ -709,7 +813,6 @@ CommController
         对GPU上数据使用NCCL进行异步或同步allreduce。
 
         :param tensor: 需要归约的 QTensor。
-        :param dest: 要归约的 QTensor 的目标排名。
         :param c_op: 计算方法，可以是 "sum" 或 "avg"，默认值为 "avg"。
         :param group: 通信进程组，group 是一个包含组索引的元组。默认值：None，不使用任何组。
         :param async_op: 此操作是否为异步操作，默认值：False。
@@ -731,7 +834,7 @@ CommController
         对GPU上数据使用NCCL进行异步或同步reduce。
 
         :param tensor_: 需要归约的 QTensor。
-        :param dest: 要归约的 QTensor 的目标排名。
+        :param dest: 要归约的 QTensor 的目标进程号/rank。
         :param c_op: 计算方法，可以是 "sum" 或 "avg"，默认值为 "avg"。
         :param group: 通信进程组，group 是一个包含组索引的元组。默认值：None，不使用任何组。
         :param async_op: 此操作是否为异步操作，默认值：False。
@@ -776,10 +879,10 @@ CommController
 
     .. py:method:: nccl_async_send( t, dest, async_op=False ):
 
-        对GPU上数据使用NCCL进行异步或同步P2Psend。
+        对GPU上数据使用NCCL进行异步或同步P2P send。
 
         :param t: 需要发送的 QTensor。
-        :param dest: 要发送 QTensor 的目标排名。
+        :param dest: 要发送 QTensor 的目标进程号/rank。
         :param async_op: 此操作是否为异步操作，默认值：False。
         :return: Work，一个异步通信句柄。使用 wait() 等待此操作完成。
 
@@ -803,10 +906,10 @@ CommController
 
     .. py:method:: nccl_async_recv( t, src, async_op=False ):
 
-        对GPU上数据使用NCCL进行异步或同步P2Precv。
+        对GPU上数据使用NCCL进行异步或同步P2P recv。
         
         :param t: 需要接受的 QTensor。
-        :param src: 要接受 QTensor 的目标排名。
+        :param src: 要接受 QTensor 的目标进程号/rank。
         :param async_op: 此操作是否为异步操作，默认值：False。
         :return: Work，一个异步通信句柄。使用 wait() 等待此操作完成。
 
@@ -933,7 +1036,7 @@ PipelineParallelTrainingWrapper
     :return:
         PipelineParallelTrainingWrapper 实例。
 
-    以下使用 CIFAR10数据库 `CIFAR10_Dataset`,在2块GPU上训练AlexNet上的分类任务。
+    以下使用 CIFAR10数据集 `CIFAR10_Dataset`,在2块GPU上训练AlexNet上的分类任务。
     本例子中分成两个流水线并行进程 `pipeline_parallel_size` = 2。
     批处理大小为 `train_batch_size` = 64, 单GPU 上为 `train_micro_batch_size_per_gpu` = 32。
     其他配置参数可见 `args`。
@@ -1608,7 +1711,7 @@ DistributeQMachine
 
     .. note::
 
-        输入的比特数是整个量子线路所需要的比特数量，通过DistributeQMachine会根据全局比特数构建量子模拟器, 其比特数量为 ``nums_wires - global_qubit``，
+        输入的比特数是整个量子线路所需要的比特数量，通过DistributeQMachine会根据全局比特数构建量子模拟器, 其比特数量为 ``num_wires - global_qubit``，
         反传必须基于 ``DistQuantumLayerAdjoint``。
 
     .. warning::

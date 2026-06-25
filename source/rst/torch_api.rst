@@ -7,8 +7,8 @@ VQNet使用torch进行底层计算
 
     .. important::
 
-        **如需要使用以下功能, 请自行安装2.4.0~2.6.0版本的torch。**
-        **如果安装GPU版本的torch，需要使用兼容cuda11.8版本的torch, 否则可能由于 NVIDIA CUDA 运行时库问题导致您的torch无法使用。**
+        **如需要使用以下功能, 请自行安装2.11.0版本的torch。**
+        **如果安装GPU版本的torch，需要使用兼容cuda12.6版本的torch, 否则可能由于 NVIDIA CUDA 运行时库问题导致您的torch无法使用。**
         **本软件安装时候不自动安装 torch 。**
 
 自2.15.0版本开始,本软件支持使用 `pytorch` 作为计算后端进行底层运算,可接入基于pytorch的模型、代码、第三方库进行二次开发。
@@ -224,7 +224,7 @@ TorchModule
             Module在不同GPU上无法进行计算。
             如果您尝试在 ID 超过验证 GPU 最大数量的 GPU 上创建 QTensor,将引发 Cuda 错误。
 
-        :param device: 当前保存QTensor的设备,默认:DEV_GPU_0。device= pyvqnet.DEV_GPU_0,存储在第一个 GPU 中,devcie = DEV_GPU_1,存储在第二个 GPU 中,依此类推
+        :param device: 当前保存QTensor的设备,默认:DEV_GPU_0。device= pyvqnet.DEV_GPU_0,存储在第一个 GPU 中,device = DEV_GPU_1,存储在第二个 GPU 中,依此类推
         :return: Module 移动到 GPU 设备。
 
         Examples::
@@ -407,7 +407,7 @@ Linear
     :param weight_initializer: `callable` - 权重初始化函数,默认为空,使用he_uniform。
     :param bias_initializer: `callable` - 偏置初始化参数,默认为空,使用he_uniform。
     :param use_bias: `bool` - 是否使用偏置项, 默认使用。
-    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
+    :param dtype: 参数的数据类型,默认: None,使用默认数据类型:kfloat32,代表32位浮点数。
     :param name: 线性层的命名,默认为""。
 
     :return: 线性层实例。
@@ -450,9 +450,9 @@ Conv1D
     :param use_bias: `bool` - 是否使用偏置项, 默认使用。
     :param kernel_initializer: `callable` - 卷积核初始化方法。默认为空,使用kaiming_uniform。
     :param bias_initializer: `callable` - 偏置初始化方法。默认为空,使用kaiming_uniform。
-    :param dilation_rate: `int` - 空洞大小,defaults: 1。
+    :param dilation_rate: `int` - 空洞大小,默认:  1。
     :param group: `int` -  分组卷积的分组数. Default: 1。
-    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
+    :param dtype: 参数的数据类型,默认: None,使用默认数据类型:kfloat32,代表32位浮点数。
     :param name: 模块的名字,default:""。
 
     :return: 一维卷积实例。
@@ -500,9 +500,9 @@ Conv2D
     :param use_bias: `bool` - 是否使用偏置项, 默认使用。
     :param kernel_initializer: `callable` - 卷积核初始化方法。默认为空,使用kaiming_uniform。
     :param bias_initializer: `callable` - 偏置初始化方法。默认为空,使用kaiming_uniform。
-    :param dilation_rate: `int` - 空洞大小,defaults: 1。
+    :param dilation_rate: `int` - 空洞大小,默认:  1。
     :param group: `int` -  分组卷积的分组数. Default: 1。
-    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
+    :param dtype: 参数的数据类型,默认: None,使用默认数据类型:kfloat32,代表32位浮点数。
     :param name: 模块的名字,default:""。
 
     :return: 二维卷积实例。
@@ -549,10 +549,10 @@ ConvT2D
     :param use_bias: `bool` - 是否使用偏置项, 默认使用。
     :param kernel_initializer: `callable` - 卷积核初始化方法。默认为空,使用kaiming_uniform。
     :param bias_initializer: `callable` - 偏置项初始化方法。默认为空,使用kaiming_uniform。
-    :param dilation_rate: `int` - 空洞大小,defaults: 1。
+    :param dilation_rate: `int` - 空洞大小,默认:  1。
     :param out_padding: 在输出形状中每个维度的一侧添加的额外尺寸。默认值:(0,0)
     :param group: `int` -  分组卷积的分组数. Default: 1。
-    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
+    :param dtype: 参数的数据类型,默认: None,使用默认数据类型:kfloat32,代表32位浮点数。
     :param name: 模块的名字,default:""。
 
     :return: 二维转置卷积实例。
@@ -589,7 +589,7 @@ AvgPool1D
         该类的 ``_parmeters`` 中的数据为 ``torch.nn.Parameter`` 类型。
 
     :param kernel: 平均池化的窗口大小。
-    :param strides: 窗口移动的步长。
+    :param stride: 窗口移动的步长。
     :param padding: 填充选项, 整数指定填充长度。 默认 0。
     :param name: 模块的名字,default:""。
 
@@ -629,7 +629,7 @@ MaxPool1D
         该类的 ``_parmeters`` 中的数据为 ``torch.nn.Parameter`` 类型。
 
     :param kernel: 最大池化的窗口大小。
-    :param strides: 窗口移动的步长。
+    :param stride: 窗口移动的步长。
     :param padding: 填充选项,整数指定填充长度。 默认 0。
     :param name: 命名,默认为""。
 
@@ -669,7 +669,7 @@ AvgPool2D
         该类的 ``_parmeters`` 中的数据为 ``torch.nn.Parameter`` 类型。
 
     :param kernel: 平均池化的窗口大小。
-    :param strides: 窗口移动的步长。
+    :param stride: 窗口移动的步长。
     :param padding: 填充选项, 包含2个整数的元组,整数为两个维度上的填充长度。 默认:(0,0)。
     :param name: 命名,默认为""。
 
@@ -709,7 +709,7 @@ MaxPool2D
         该类的 ``_parmeters`` 中的数据为 ``torch.nn.Parameter`` 类型。
 
     :param kernel: 最大池化的窗口大小。
-    :param strides: 窗口移动的步长。
+    :param stride: 窗口移动的步长。
     :param padding: 填充选项, 包含2个整数的元组,整数为两个维度上的填充长度。 默认: (0,0)。
     :param name: 命名,默认为""。
 
@@ -753,7 +753,7 @@ Embedding
     :param num_embeddings: `int` - 嵌入字典的大小。
     :param embedding_dim: `int` - 每个嵌入向量的大小
     :param weight_initializer: `callable` - 参数初始化方式,默认正态分布。
-    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
+    :param dtype: 参数的数据类型,默认: None,使用默认数据类型:kfloat32,代表32位浮点数。
     :param name: 嵌入层的命名,默认为""。
 
     :return: a Embedding 实例。
@@ -800,7 +800,7 @@ BatchNorm2d
     :param affine: `bool` - 一个布尔值,当设置为 ``True`` 时,此模块具有可学习的每通道仿射参数,初始化为 1(用于权重)和 0(用于偏差)。默认值:``True``。
     :param beta_initializer: `callable` - beta的初始化方式,默认全零初始化。
     :param gamma_initializer: `callable` - gamma的的初始化方式,默认全一初始化。
-    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
+    :param dtype: 参数的数据类型,默认: None,使用默认数据类型:kfloat32,代表32位浮点数。
     :param name: 批归一化层命名,默认为""。
 
     :return: 二维批归一化层实例。
@@ -851,7 +851,7 @@ BatchNorm1d
     :param affine: `bool` - 一个布尔值,当设置为 ``True`` 时,此模块具有可学习的每通道仿射参数,初始化为 1(用于权重)和 0(用于偏差)。默认值:``True``。
     :param beta_initializer: `callable` - beta的初始化方式,默认全零初始化。
     :param gamma_initializer: `callable` - gamma的的初始化方式,默认全一初始化。
-    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
+    :param dtype: 参数的数据类型,默认: None,使用默认数据类型:kfloat32,代表32位浮点数。
     :param name: 批归一化层命名,默认为""。
 
     :return: 一维批归一化层实例。
@@ -896,7 +896,7 @@ LayerNormNd
     :param norm_shape: `float` - 标准化形状。
     :param epsilon: `float` - 数值稳定性常数,默认为 1e-5。
     :param affine: `bool` - 一个布尔值,当设置为 ``True`` 时,此模块具有可学习的每通道仿射参数,初始化为 1(用于权重)和 0(用于偏差)。默认值:``True``。
-    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
+    :param dtype: 参数的数据类型,默认: None,使用默认数据类型:kfloat32,代表32位浮点数。
     :param name: 这个模块的名字, 默认为""。
 
     :return: 一个 LayerNormNd 类
@@ -940,7 +940,7 @@ LayerNorm2d
     :param norm_size: `float` - 归一化大小,应该等于 C * H * W。
     :param epsilon: `float` - 数值稳定性常数,默认为 1e-5。
     :param affine: `bool` - 一个布尔值,当设置为 ``True`` 时,此模块具有可学习的每通道仿射参数,初始化为 1(用于权重)和 0(用于偏差)。默认值:``True``。
-    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
+    :param dtype: 参数的数据类型,默认: None,使用默认数据类型:kfloat32,代表32位浮点数。
     :param name: 这个模块的名字, 默认为""。
 
     :return: 二维层归一化实例。
@@ -986,7 +986,7 @@ LayerNorm1d
     :param norm_size: `float` - 归一化大小,应该等于最后一维大小。
     :param epsilon: `float` - 数值稳定性常数,默认为 1e-5。
     :param affine: `bool` - 一个布尔值,当设置为 ``True`` 时,此模块具有可学习的每通道仿射参数,初始化为 1(用于权重)和 0(用于偏差)。默认值:``True``。
-    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
+    :param dtype: 参数的数据类型,默认: None,使用默认数据类型:kfloat32,代表32位浮点数。
     :param name: 这个模块的名字, 默认为""。
 
     :return: 一维层归一化实例。
@@ -1032,7 +1032,7 @@ GroupNorm
     :param num_channels (int): 输入中预期的通道数
     :param eps: 添加到分母的值,以实现数值稳定性。默认值:1e-5
     :param affine: 一个布尔值,当设置为 ``True`` 时,此模块具有可学习的每通道仿射参数,初始化为 1(用于权重)和 0(用于偏差)。默认值: ``True``。
-    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
+    :param dtype: 参数的数据类型,默认: None,使用默认数据类型:kfloat32,代表32位浮点数。
     :param name: 这个模块的名字, 默认为""。
 
     :return: GroupNorm 类对象
@@ -1206,7 +1206,7 @@ GRU
      如果为 False, 则输入形状为 [seq_len,batch_size,feature_dim],默认为 True。
     :param use_bias: 如果为 False,该模块不适用偏置项,默认: True。
     :param bidirectional: 如果为 True, 变为双向GRU, 默认: False。
-    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
+    :param dtype: 参数的数据类型,默认: None,使用默认数据类型:kfloat32,代表32位浮点数。
     :param name: 这个模块的名字, 默认为""。
 
     :return: GRU 实例
@@ -1256,7 +1256,7 @@ RNN
      如果为 False, 则输入形状为 [seq_len,batch_size,feature_dim],默认为 True。
     :param use_bias: 如果为 False, 该模块不适用偏置项,默认: True。
     :param bidirectional: 如果为 True,变为双向RNN,默认: False。
-    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
+    :param dtype: 参数的数据类型,默认: None,使用默认数据类型:kfloat32,代表32位浮点数。
     :param name: 这个模块的名字, 默认为""。
 
     :return: RNN 实例
@@ -1309,7 +1309,7 @@ LSTM
      如果为 False, 则输入形状为 [seq_len,batch_size,feature_dim],默认为 True。
     :param use_bias: 如果为 False,该模块不适用偏置项, 默认: True。
     :param bidirectional: 如果为 True,变为双向LSTM, 默认: False。
-    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
+    :param dtype: 参数的数据类型,默认: None,使用默认数据类型:kfloat32,代表32位浮点数。
     :param name: 这个模块的名字, 默认为""。
 
     :return: LSTM 实例
@@ -1368,7 +1368,7 @@ Dynamic_GRU
     :param batch_first: 如果为 True,输入形状提供为 [批大小,序列长度,特征维度]。如果为 False,输入形状提供为 [序列长度,批大小,特征维度],默认为 True。
     :param use_bias: 如果为False,则该层不使用偏置权重b_ih和b_hh。 默认值:True。
     :param bidirectional: 如果为真,则成为双向 GRU。 默认值:False。
-    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
+    :param dtype: 参数的数据类型,默认: None,使用默认数据类型:kfloat32,代表32位浮点数。
     :param name: 这个模块的名字, 默认为""。
 
     :return: 一个 Dynamic_GRU 类
@@ -1451,7 +1451,7 @@ Dynamic_RNN
      如果为 False, 则输入形状为 [序列长度,批大小,特征维度],默认为 True。
     :param use_bias: 如果为 False, 该模块不适用偏置项,默认: True。
     :param bidirectional: 如果为 True,变为双向RNN,默认: False。
-    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
+    :param dtype: 参数的数据类型,默认: None,使用默认数据类型:kfloat32,代表32位浮点数。
     :param name: 这个模块的名字, 默认为""。
 
     :return: Dynamic_RNN 实例
@@ -1542,7 +1542,7 @@ Dynamic_LSTM
      如果为 False, 则输入形状为 [序列长度,批大小,特征维度],默认为 True。
     :param use_bias: 如果为 False,该模块不适用偏置项, 默认: True。
     :param bidirectional: 如果为 True,变为双向LSTM, 默认: False。
-    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
+    :param dtype: 参数的数据类型,默认: None,使用默认数据类型:kfloat32,代表32位浮点数。
     :param name: 这个模块的名字, 默认为""。
 
     :return: Dynamic_LSTM 实例
@@ -1643,7 +1643,7 @@ SDPA
 
 .. py:class:: pyvqnet.nn.torch.SDPA(attn_mask=None,dropout_p=0.,scale=None,is_causal=False)
 
-    构造计算查询、键和值张量的缩放点积注意力的类。如果输入为cpu下的QTensor,则使用数学公式计算, 如果输入在gpu下QTensor,则使用flash-attention方法计算。
+    构造计算查询、键和值张量的缩放点积注意力的类。
     
     .. warning::
 
@@ -1652,7 +1652,7 @@ SDPA
     :param attn_mask: 注意掩码；默认值: 无。shape 必须可广播到注意权重的形状。
     :param dropout_p: Dropout 概率；默认值: 0,如果大于 0.0,则应用 dropout。
     :param scale: 在 softmax 之前应用的缩放因子,默认值: 无。
-    :param is_causal: 默认值: False,如果设置为 true,则当掩码为方阵时,注意掩码为下三角矩阵。如果同时设置了 attn_mask 和 is_causal,则会引发错误。
+    :param is_causal: 默认值: False,如果设置为 true,则当掩码为方阵时,注意力掩码为下三角矩阵。如果同时设置了 attn_mask 和 is_causal,则会引发错误。
     :return: 一个SDPA类
 
     Examples::
@@ -1665,7 +1665,7 @@ SDPA
 
     .. py:method:: forward(query,key,value)
 
-        进行前向计算,如果输入为cpu下的QTensor,则使用数学公式计算, 如果输入在gpu下QTensor,则使用flash-attention方法计算。
+        进行前向计算
 
         :param query: query输入QTensor。
         :param key: key输入QTensor。
@@ -2352,7 +2352,7 @@ Tanh
 
 .. warning::
 
-    以下 TorchQpandaQuantumLayer, TorchQcloudQuantumLayer 的量子计算部分使用pyqpanda2 https://pyqpanda-toturial.readthedocs.io/zh/latest/。
+    以下 TorchQpandaQuantumLayer 的量子计算部分使用pyqpanda2 https://pyqpanda-toturial.readthedocs.io/zh/latest/。
 
     您需要自行安装pyqpanda2, `pip install pyqpanda` 
 
@@ -2363,13 +2363,13 @@ TorchQpandaQuantumLayer
 
 .. py:class:: pyvqnet.qnn.vqc.torch.TorchQpandaQuantumLayer(qprog_with_measure,para_num,diff_method:str = "parameter_shift",delta:float = 0.01,dtype=None,name="")
 
-	变分量子层的抽象计算模块。对一个参数化的量子线路使用pyqpanda2进行仿真,得到测量结果。该变分量子层继承了VQNet框架的梯度计算模块,可以使用参数漂移法等计算线路参数的梯度,训练变分量子线路模型或将变分量子线路嵌入混合量子和经典模型。
+	变分量子层的抽象计算模块。对一个参数化的量子线路使用pyqpanda2进行仿真,得到测量结果。该变分量子层继承了VQNet框架的梯度计算模块,可以使用参数移位法等计算线路参数的梯度,训练变分量子线路模型或将变分量子线路嵌入混合量子和经典模型。
     
-    :param qprog_with_measure: 用pyQPand构建的量子线路运行和测量函数。
+    :param qprog_with_measure: 用pyqpanda3构建的量子线路 运行和测量函数。
     :param para_num: `int` - 参数个数。
-    :param diff_method: 求解量子线路参数梯度的方法,“参数位移”或“有限差分”,默认参数偏移。
+    :param diff_method: 求解量子线路参数梯度的方法,"parameter_shift"或"finite_diff"，默认为 "parameter_shift"。 。
     :param delta: 有限差分计算梯度时的 \delta。
-    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
+    :param dtype: 参数的数据类型,默认: None,使用默认数据类型:kfloat32,代表32位浮点数。
     :param name: 这个模块的名字, 默认为""。
 
     :return: 一个可以计算量子线路的模块。
@@ -2383,7 +2383,7 @@ TorchQpandaQuantumLayer
 
         如果qprog_with_measure需要quantum measure,用户还需要手动创建需要分配cbits: https://pyqpanda-toturial.readthedocs.io/zh/latest/Measure.html
         
-        量子线路函数 qprog_with_measure (input,param,nqubits,ncubits)的使用可参考下面的例子。
+        量子线路函数 qprog_with_measure (input,param)的使用可参考下面的例子。
         
         `input`: 输入一维经典数据。如果没有,输入 None。
         
@@ -2453,133 +2453,6 @@ TorchQpandaQuantumLayer
         print(input.grad)
 
 
-TorchQcloudQuantumLayer
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-当您安装最新版本pyqpanda2,可以使用本接口定义一个变分线路,并提交到originqc的真实芯片上运行。
-
-.. py:class:: pyvqnet.qnn.vqc.torch.TorchQcloudQuantumLayer(origin_qprog_func, qcloud_token, para_num, num_qubits, num_cubits, pauli_str_dict=None, shots = 1000, initializer=None, dtype=None, name="", diff_method="parameter_shift", submit_kwargs={}, query_kwargs={})
-
-    使用 pyqpanda QCloud 从版本 3.8.2.2 开始的本源量子真实芯片的抽象计算模块。 它提交参数化量子电路到真实芯片并获得测量结果。
-    如果 diff_method == "random_coordinate_descent" ,该层将随机选择单个参数来计算梯度,其他参数将保持为零。参考:https://arxiv.org/abs/2311.00088
-
-    .. note::
-
-        qcloud_token 为您到 https://qcloud.originqc.com.cn/ 中申请的api token。
-        origin_qprog_func 需要返回pypqanda.QProg类型的数据,如果没有设置pauli_str_dict,需要保证该QProg中已经插入了measure。
-        origin_qprog_func 的形式必须按照如下:
-
-        origin_qprog_func(input,param,qubits,cbits,machine)
-        
-            `input`: 输入1~2维经典数据,二维的情况下,第一个维度为批处理大小。
-            
-            `param`: 输入一维的变分量子线路的待训练参数。
-
-            `machine`: 由QuantumBatchAsyncQcloudLayer创建的模拟器QCloud,无需用户额外在函数中定义。
-            
-            `qubits`: 由QuantumBatchAsyncQcloudLayer创建的模拟器QCloud创建的量子比特,数量为  `num_qubits`, 类型为pyQpanda.Qubits,无需用户额外在函数中定义。
-            
-            `cbits`: 由QuantumBatchAsyncQcloudLayer分配的经典比特, 数量为  `num_cubits`, 类型为 pyQpanda.ClassicalCondition,无需用户额外在函数中定义。。
-            
-
-    .. note::
-
-        在当前版本中，单次线路提交至 QCloud 的默认总超时时间为 60 秒。如果因 QCloud 繁忙而导致超时，您可以在 ``query_kwargs`` 中设置 `total_timeout` 键的值，来指定所需的等待秒数。
-
-    :param origin_qprog_func: QPanda 构建的变分量子电路函数,必须返回QProg。
-    :param qcloud_token: `str` - 量子机的类型或用于执行的云令牌。
-    :param para_num: `int` - 参数数量,参数是大小为[para_num]的QTensor。
-    :param num_qubits: `int` - 量子电路中的量子比特数量。
-    :param num_cubits: `int` - 量子电路中用于测量的经典比特数量。
-    :param pauli_str_dict: `dict|list` - 表示量子电路中泡利运算符的字典或字典列表。 默认为“无”,则进行测量操作,如果输入泡利算符的字典,则会计算单个期望或者多个期望。
-    :param shot: `int` - 测量次数。 默认值为 1000。
-    :param initializer: 参数值的初始化器。 默认为“无”,使用0~2*pi正态分布。
-    :param dtype: 参数的数据类型。 默认值为 None,即使用默认数据类型pyvqnet.kfloat32。
-    :param name: 模块的名称。 默认为空字符串。
-    :param diff_method: 梯度计算的微分方法。 默认为“parameter_shift”,"random_coordinate_descent"。
-    :param submit_kwargs: 用于提交量子电路的附加关键字参数,默认:{"chip_id":"origin_wukong","is_amend":True,"is_mapping":True,"is_optimization":True,"compile_level":3,"default_task_group_size":200,"test_qcloud_fake":False},当设置test_qcloud_fake为True则本地CPUQVM模拟。
-    :param query_kwargs: 用于查询量子结果的附加关键字参数,默认:{"timeout":1,"total_timeout":60,"print_query_info":True,"sub_circuits_split_size":1}。
-    :return: 一个可以计算量子电路的模块。
-    
-    Example::
-
-        import pyqpanda as pq
-        import pyvqnet
-        from pyvqnet.qnn.vqc.torch import TorchQcloudQuantumLayer
-
-        pyvqnet.backends.set_backend("torch")
-        def qfun(input,param, m_machine, m_qlist,cubits):
-            measure_qubits = [0,2]
-            m_prog = pq.QProg()
-            cir = pq.QCircuit()
-            cir.insert(pq.RZ(m_qlist[0],input[0]))
-            cir.insert(pq.CNOT(m_qlist[0],m_qlist[1]))
-            cir.insert(pq.RY(m_qlist[1],param[0]))
-            cir.insert(pq.CNOT(m_qlist[0],m_qlist[2]))
-            cir.insert(pq.RZ(m_qlist[1],input[1]))
-            cir.insert(pq.RY(m_qlist[2],param[1]))
-            cir.insert(pq.H(m_qlist[2]))
-            m_prog.insert(cir)
-
-            for idx, ele in enumerate(measure_qubits):
-                m_prog << pq.Measure(m_qlist[ele], cubits[idx])  # pylint: disable=expression-not-assigned
-            return m_prog
-
-        l = TorchQcloudQuantumLayer(qfun,
-                        "3047DE8A59764BEDAC9C3282093B16AF1",
-                        2,
-                        6,
-                        6,
-                        pauli_str_dict=None,
-                        shots = 1000,
-                        initializer=None,
-                        dtype=None,
-                        name="",
-                        diff_method="parameter_shift",
-                        submit_kwargs={"test_qcloud_fake":True},
-                        query_kwargs={})
-        x = pyvqnet.tensor.QTensor([[0.56,1.2],[0.56,1.2],[0.56,1.2],[0.56,1.2],[0.56,1.2]],requires_grad= True)
-        y = l(x)
-        print(y)
-        y.backward()
-        print(l.m_para.grad)
-        print(x.grad)
-
-        def qfun2(input,param, m_machine, m_qlist,cubits):
-            measure_qubits = [0,2]
-            m_prog = pq.QProg()
-            cir = pq.QCircuit()
-            cir.insert(pq.RZ(m_qlist[0],input[0]))
-            cir.insert(pq.CNOT(m_qlist[0],m_qlist[1]))
-            cir.insert(pq.RY(m_qlist[1],param[0]))
-            cir.insert(pq.CNOT(m_qlist[0],m_qlist[2]))
-            cir.insert(pq.RZ(m_qlist[1],input[1]))
-            cir.insert(pq.RY(m_qlist[2],param[1]))
-            cir.insert(pq.H(m_qlist[2]))
-            m_prog.insert(cir)
-
-            return m_prog
-        l = TorchQcloudQuantumLayer(qfun2,
-                "3047DE8A59764BEDAC9C3282093B16AF",
-                2,
-                6,
-                6,
-                pauli_str_dict={'Z0 X1':10,'':-0.5,'Y2':-0.543},
-                shots = 1000,
-                initializer=None,
-                dtype=None,
-                name="",
-                diff_method="parameter_shift",
-                submit_kwargs={"test_qcloud_fake":True},
-                query_kwargs={})
-        x = pyvqnet.tensor.QTensor([[0.56,1.2],[0.56,1.2],[0.56,1.2],[0.56,1.2]],requires_grad= True)
-        y = l(x)
-        print(y)
-        y.backward()
-        print(l.m_para.grad)
-        print(x.grad)
-
-
 
 .. warning::
 
@@ -2627,7 +2500,7 @@ TorchQcloud3QuantumLayer
     :param dtype: 参数的数据类型。 默认值为 None,即使用默认数据类型pyvqnet.kfloat32。
     :param name: 模块的名称。 默认为空字符串。
     :param diff_method: 梯度计算的微分方法。 默认为“parameter_shift”,"random_coordinate_descent"。
-    :param submit_kwargs: 用于提交量子电路的附加关键字参数,默认:{"chip_id":"origin_wukong","is_amend":True,"is_mapping":True,"is_optimization":True,"compile_level":3,"default_task_group_size":200,"test_qcloud_fake":False},当设置test_qcloud_fake为True则本地CPUQVM模拟。
+    :param submit_kwargs: 用于提交量子电路的附加关键字参数,默认:{"if_print_qcloud_log":False,"chip_id":"WK_C180","is_amend":True,"is_mapping":True,"is_optimization":True,"compile_level":3,"default_task_group_size":200,"test_qcloud_fake":False,"server_ip_address":""},当设置test_qcloud_fake为True则本地CPUQVM模拟。
     :param query_kwargs: 用于查询量子结果的附加关键字参数,默认:{"timeout":2,"print_query_info":True,"sub_circuits_split_size":1}。
     :return: 一个可以计算量子电路的模块。
 
@@ -2641,7 +2514,7 @@ TorchQcloud3QuantumLayer
         def qfun(input,param):
 
             m_qlist = range(6)
-            cubits = range(6)
+            cbits = range(6)
             measure_qubits = [0,2]
             m_prog = pq.QProg()
             cir = pq.QCircuit()
@@ -2655,7 +2528,7 @@ TorchQcloud3QuantumLayer
             m_prog<<cir
 
             for idx, ele in enumerate(measure_qubits):
-                m_prog << pq.measure(m_qlist[ele], cubits[idx])  # pylint: disable=expression-not-assigned
+                m_prog << pq.measure(m_qlist[ele], cbits[idx])  # pylint: disable=expression-not-assigned
             return m_prog
 
         l = TorchQcloud3QuantumLayer(qfun,
@@ -2679,7 +2552,7 @@ TorchQcloud3QuantumLayer
         def qfun2(input,param ):
 
             m_qlist = range(6)
-            cubits = range(6)
+            cbits = range(6)
             measure_qubits = [0,2]
             m_prog = pq.QProg()
             cir = pq.QCircuit()
@@ -2721,13 +2594,13 @@ TorchQpanda3QuantumLayer
 
 .. py:class:: pyvqnet.qnn.vqc.torch.TorchQpanda3QuantumLayer(qprog_with_measure,para_num,diff_method:str = "parameter_shift",delta:float = 0.01,dtype=None,name="")
 
-	变分量子层的抽象计算模块。对一个参数化的量子线路使用pyqpanda3进行仿真,得到测量结果。该变分量子层继承了VQNet框架的梯度计算模块,可以使用参数漂移法等计算线路参数的梯度,训练变分量子线路模型或将变分量子线路嵌入混合量子和经典模型。
+	变分量子层的抽象计算模块。对一个参数化的量子线路使用pyqpanda3进行仿真,得到测量结果。该变分量子层继承了VQNet框架的梯度计算模块,可以使用参数移位法等计算线路参数的梯度,训练变分量子线路模型或将变分量子线路嵌入混合量子和经典模型。
     
-    :param qprog_with_measure: 用pyQPand构建的量子线路运行和测量函数。
+    :param qprog_with_measure: 用pyqpanda3构建的量子线路 运行和测量函数。
     :param para_num: `int` - 参数个数。
-    :param diff_method: 求解量子线路参数梯度的方法,“参数位移”或“有限差分”,默认参数偏移。
+    :param diff_method: 求解量子线路参数梯度的方法,"parameter_shift"或"finite_diff"，默认为 "parameter_shift"。 。
     :param delta: 有限差分计算梯度时的 \delta。
-    :param dtype: 参数的数据类型,defaults:None,使用默认数据类型:kfloat32,代表32位浮点数。
+    :param dtype: 参数的数据类型,默认: None,使用默认数据类型:kfloat32,代表32位浮点数。
     :param name: 这个模块的名字, 默认为""。
 
     :return: 一个可以计算量子线路的模块。
@@ -2737,7 +2610,7 @@ TorchQpanda3QuantumLayer
         
         此函数必须包含以下参数作为函数入参（即使某个参数未实际使用）,否则无法在本函数中正常运行。
 
-        量子线路函数 qprog_with_measure (input,param,nqubits,ncubits)的使用可参考下面的例子。
+        量子线路函数 qprog_with_measure (input,param)的使用可参考下面的例子。
         
         `input`: 输入一维经典数据。如果没有,输入 None。
         
@@ -2853,7 +2726,7 @@ QMachine
         (batchsize,*) 维度从而适应批量数据训练。
 
     :param num_wires: 量子比特数。
-    :param dtype: 计算数据的数据类型。默认值是pyvqnet。kcomplex64,对应的参数精度为pyvqnet.kfloat32。
+    :param dtype: 计算数据的数据类型。默认值是pyvqnet.kcomplex64,对应的参数精度为pyvqnet.kfloat32。
     :param grad_mode: 梯度计算模式,可为 "adjoint",默认值:"",使用自动微分模拟。
     :param save_ir: 设置为True时,将操作保存到originIR,默认值:False。
 
@@ -5279,7 +5152,7 @@ vqc_basisrotation
 
         vqc_basisrotation(q_machine=qm,
                         wires=wires,
-                        unitary_matrix=QTensor(umat, dtype=qm.state.dtype))
+                        unitary_matrix=QTensor(umat, dtype=qm.states.dtype))
 
         print(qm.states)
 
@@ -5415,12 +5288,16 @@ QuantumLayerAdjoint
 
 矩阵乘积态（Matrix Product State, MPS）是张量网络的一种特殊形式，MPS 将量子态表示为一系列矩阵的乘积，从而有效减少参数数量，降低了计算复杂度。
 
-下面接口则是基于 ``torch`` 后端，对张量网络构建量子线路的功能支持，包括对构建量子线路基类、量子逻辑门、量子线路以及测量方法，并通过自动微分模拟代替参数漂移法计算参数梯度。
+下面接口则是基于 ``torch`` 后端，对张量网络构建量子线路的功能支持，包括对构建量子线路基类、量子逻辑门、量子线路以及测量方法，并通过自动微分模拟代替参数移位法计算参数梯度。
 
 以MPS方式构建量子线路弥补对大比特量子线路构建支持。
 
 .. warning::
-        
+
+        使用本模块以下功能需额外安装 ``tensornetwork`` 和 ``torch``。默认安装 ``pyvqnet`` 不包含这两个依赖，请使用 ``pip install tensornetwork torch`` 安装。
+
+.. warning::
+
         通过 ``TNQMachine`` 中 ``use_mps`` 参数开启MPS构建量子线路功能， 支持大比特(100以及以上)量子线路实现。
 
 .. warning::
@@ -5475,7 +5352,7 @@ TNQModule
                     CNOT(wires = [nqubits[len(nqubits) - 1], nqubits[0]])(q_machine = qm)
 
 
-                def build_circult(weights, xx, nqubits,qm):
+                def build_circuit(weights, xx, nqubits,qm):
                     def Rot(weights_j, nqubits,qm):#pylint:disable=invalid-name
                         VQC_RotCircuit(qm,nqubits,weights_j)
 
@@ -5495,7 +5372,7 @@ TNQModule
                             Rot(weights_j, nqubits[j],qm)
                         get_cnot(nqubits,qm)
 
-                build_circult(self.w, x,range(4),self.qm)
+                build_circuit(self.w, x,range(4),self.qm)
 
                 y= qmeasure.MeasureAll(obs={'Z0': 1})(self.qm)
                 return y
@@ -5532,7 +5409,7 @@ TNQMachine
 
 
     :param num_wires: 量子比特数。
-    :param dtype: 计算数据的数据类型。默认值是pyvqnet。kcomplex64,对应的参数精度为pyvqnet.kfloat32。
+    :param dtype: 计算数据的数据类型。默认值是pyvqnet.kcomplex64,对应的参数精度为pyvqnet.kfloat32。
     :param use_mps: 是否基于mpscircuit进行模拟, 用于模拟大比特量子线路执行。
 
     :return: 输出一个TNQMachine对象。
@@ -5564,7 +5441,7 @@ TNQMachine
                     CNOT(wires = [nqubits[len(nqubits) - 1], nqubits[0]])(q_machine = qm)
 
 
-                def build_circult(weights, xx, nqubits,qm):
+                def build_circuit(weights, xx, nqubits,qm):
                     def Rot(weights_j, nqubits,qm):#pylint:disable=invalid-name
                         VQC_RotCircuit(qm,nqubits,weights_j)
 
@@ -5584,7 +5461,7 @@ TNQMachine
                             Rot(weights_j, nqubits[j],qm)
                         get_cnot(nqubits,qm)
 
-                build_circult(self.w, x,range(4),self.qm)
+                build_circuit(self.w, x,range(4),self.qm)
 
                 y= qmeasure.MeasureAll(obs={'Z0': 1})(self.qm)
                 return y
@@ -8916,7 +8793,7 @@ CommController
                     p.join()
             #python test.py
  
-    .. py:method:: split_group(rankL)
+    .. py:method:: split_groups(rankL)
         :no-index:
 
         根据入参设置的进程号列表用于划分多个通信组。
@@ -8942,7 +8819,7 @@ CommController
                 os.environ['LOCAL_RANK'] = f"{rank}"
                 Comm_OP = CommController("gloo", rank=rank, world_size=size)
 
-                group = Comm_OP.split_group([[1,3]])
+                group = Comm_OP.split_groups([[1,3]])
 
                 num = tensor.to_tensor(np.random.rand(1, 5)+get_local_rank()*10)
                 print(f"before rank {Comm_OP.getRank()}  {num}\n")
@@ -9311,7 +9188,7 @@ CommController
                 Comm_OP = CommController("gloo", rank=rank, world_size=size)
 
                 rankL = [[0,1],[2,3]]
-                groups = Comm_OP.split_group(rankL)
+                groups = Comm_OP.split_groups(rankL)
                 num = tensor.to_tensor(np.ones(5)+get_local_rank()*1000)
 
                 print(f"before rank {Comm_OP.getRank()}  {num}")
@@ -9366,7 +9243,7 @@ CommController
                 os.environ['LOCAL_RANK'] = f"{rank}"
                 Comm_OP = CommController("gloo", rank=rank, world_size=size)
                 rankL = [[1,3],[0,2]]
-                group = Comm_OP.split_group([[1,3],[0,2]])
+                group = Comm_OP.split_groups([[1,3],[0,2]])
 
                 num = tensor.to_tensor(np.random.rand(1, 5)+get_local_rank()*10)
                 print(f"before rank {Comm_OP.getRank()}  {num}\n")
@@ -9419,7 +9296,7 @@ CommController
                 Comm_OP = CommController("gloo", rank=rank, world_size=size)
 
                 rankL = [[2,3],[0,1,4]]
-                group = Comm_OP.split_group(rankL)
+                group = Comm_OP.split_groups(rankL)
 
                 num = tensor.to_tensor(np.random.rand(1, 5))+ rank*1000
                 print(f"before rank {Comm_OP.getRank()}  {num}")
@@ -9471,13 +9348,13 @@ CommController
                 os.environ['LOCAL_RANK'] = f"{rank}"
                 Comm_OP = CommController("nccl", rank=rank, world_size=size)
 
-                group = Comm_OP.split_group([[0,1]])
+                group = Comm_OP.split_groups([[0,1]])
                 print(f"get_world_size {get_world_size()}")
 
                 num = tensor.QTensor(np.random.rand(5,4)+get_local_rank()*100,device=pyvqnet.DEV_GPU_0+get_local_rank())
                 print(f"before rank {Comm_OP.getRank()}  {num}\n")
 
-                num = Comm_OP.all_gather_group(num,group[0])
+                num = Comm_OP.allgather_group(num,group[0])
                 print(f"after rank {Comm_OP.getRank()}  {num}\n")
 
 
