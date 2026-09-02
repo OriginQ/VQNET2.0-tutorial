@@ -7,7 +7,7 @@ VQNet量子机器学习所使用的数据结构QTensor的python接口介绍。QT
 
 
 
-QTensor's 函数与属性
+QTensor 的函数与属性
 ******************************************
 
 .. py:class:: pyvqnet.tensor.tensor.QTensor(data, requires_grad=False, nodes=None, device=pyvqnet.DEV_CPU, dtype=None, name="")
@@ -255,7 +255,7 @@ QTensor's 函数与属性
         返回输入 QTensor 中所有元素的最大值的索引, 或返回 QTensor 按某一维度的最大值的索引。
 
         :param dim: 计算argmax的轴, 只接受单个维度。 如果 dim == None, 则返回输入张量中所有元素的最大值的索引。有效的 dim 范围是 [-R, R), 其中 R 是输入的 ndim。 当 dim < 0 时, 它的工作方式与 dim + R 相同。
-        :param keepdims: 输出 QTensor 是否保留了最大值索引操作的轴, 默认是False。
+        :param keepdim: 输出 QTensor 是否保留了最大值索引操作的轴, 默认是False。
 
         :return: 输入 QTensor 中最大值的索引。
 
@@ -296,7 +296,7 @@ QTensor's 函数与属性
         返回输入 QTensor 中所有元素的最小值的索引, 或返回 QTensor 按某一维度的最小值的索引。
 
         :param dim: 计算argmin的轴, 只接受单个维度。 如果 dim == None, 则返回输入张量中所有元素的最小值的索引。有效的 dim 范围是 [-R, R), 其中 R 是输入的 ndim。 当 dim < 0 时, 它的工作方式与 dim + R 相同。
-        :param keepdims: 输出 QTensor 是否保留了最小值索引操作的轴, 默认是False。
+        :param keepdim: 输出 QTensor 是否保留了最小值索引操作的轴, 默认是False。
 
         :return: 输入 QTensor 中最小值的索引。
 
@@ -807,7 +807,7 @@ QTensor's 函数与属性
 
         :return: QTensor 克隆到 GPU 设备。
 
-        Examples::
+        Example::
 
             from pyvqnet.tensor import QTensor
             a = QTensor([2])
@@ -822,7 +822,7 @@ QTensor's 函数与属性
 
         :return: QTensor 克隆到 CPU 设备。
 
-        Examples::
+        Example::
 
             from pyvqnet.tensor import QTensor
             a = QTensor([2])
@@ -847,7 +847,7 @@ QTensor's 函数与属性
         :param device: 当前保存QTensor的设备, 默认:DEV_GPU_0。device = pyvqnet.DEV_GPU_0, 存储在第一个 GPU 中, device = DEV_GPU_1, 存储在第二个 GPU 中, 依此类推。
         :return: QTensor 移动到 GPU 设备。
 
-        Examples::
+        Example::
 
             from pyvqnet.tensor import QTensor
             a = QTensor([2])
@@ -863,7 +863,7 @@ QTensor's 函数与属性
 
         :return: QTensor 移动到 CPU 设备。
 
-        Examples::
+        Example::
 
             from pyvqnet.tensor import QTensor
             a = QTensor([2])
@@ -879,7 +879,7 @@ QTensor's 函数与属性
 
         :return: 该 QTensor 的数据是否存储在 GPU 主机内存上。
 
-        Examples::
+        Example::
         
             from pyvqnet.tensor import QTensor
             a = QTensor([2])
@@ -894,7 +894,7 @@ QTensor's 函数与属性
 
         :return: 该 QTensor 的数据是否存储在 CPU 主机内存上。
 
-        Examples::
+        Example::
         
             from pyvqnet.tensor import QTensor
             a = QTensor([2])
@@ -910,7 +910,7 @@ QTensor's 函数与属性
 
         :return:  QTensor。
 
-        Examples::
+        Example::
         
             from pyvqnet.tensor import QTensor
             from pyvqnet import kcomplex128
@@ -1365,7 +1365,7 @@ multinomial
     :return:
          输出采样索引
 
-    Examples::
+    Example::
 
         from pyvqnet import tensor
         weights = tensor.QTensor([0.1,10, 3, 1]) 
@@ -1392,7 +1392,7 @@ triu
 
     :return: 输出 QTensor。
 
-    Examples::
+    Example::
 
         from pyvqnet.tensor import tensor
         a = tensor.arange(1.0, 2 * 6 * 5 + 1.0).reshape([2, 6, 5])
@@ -1425,7 +1425,7 @@ tril
 
     :return: 输出 QTensor。
 
-    Examples::
+    Example::
 
         from pyvqnet.tensor import tensor
         a = tensor.arange(1.0, 2 * 6 * 5 + 1.0).reshape([12, 5])
@@ -1514,12 +1514,12 @@ round
 sort
 ==============================
 
-.. py:function:: pyvqnet.tensor.sort(t, axis: int, descending=False, stable=True)
+.. py:function:: pyvqnet.tensor.sort(t, dim: int, descending=False, stable=True)
 
     按指定轴对输入 QTensor 进行排序。
 
     :param t: 输入 QTensor 。
-    :param axis: 排序使用的轴。
+    :param dim: 排序使用的轴。
     :param descending: 如果是True,进行降序排序,否则使用升序排序。默认为升序。
     :param stable: 是否使用稳定排序,默认为稳定排序。
     :return: 输出 QTensor 。
@@ -1543,12 +1543,12 @@ sort
 argsort
 ==============================
 
-.. py:function:: pyvqnet.tensor.argsort(t, axis: int, descending=False, stable=True)
+.. py:function:: pyvqnet.tensor.argsort(t, dim: int, descending=False, stable=True)
 
     对输入变量沿给定轴进行排序,输出排序好的数据的相应索引。
 
     :param t: 输入 QTensor 。
-    :param axis: 排序使用的轴。
+    :param dim: 排序使用的轴。
     :param descending: 如果是True,进行降序排序,否则使用升序排序。默认为升序。
     :param stable: 是否使用稳定排序,默认为稳定排序。
     :return: 输出 QTensor 。
@@ -1572,7 +1572,7 @@ argsort
 topK
 ==============================
 
-.. py:function:: pyvqnet.tensor.topK(t, k, axis=-1, if_descent=True)
+.. py:function:: pyvqnet.tensor.topK(t, k, dim=-1, if_descent=True)
 
     返回给定输入张量沿给定维度的 k 个最大元素。
 
@@ -1580,12 +1580,12 @@ topK
 
     :param t: 输入 QTensor 。
     :param k: 取排序后的 k 的个数。
-    :param axis: 要排序的维度。默认 = -1,最后一个轴。
+    :param dim: 要排序的维度。默认 = -1,最后一个轴。
     :param if_descent: 排序使用升序还是降序,默认降序。
 
     :return: 新的 QTensor 。
 
-    Examples::
+    Example::
 
         from pyvqnet.tensor import tensor, QTensor
         x = QTensor([
@@ -1608,7 +1608,7 @@ topK
 argtopK
 ==============================
 
-.. py:function:: pyvqnet.tensor.argtopK(t, k, axis=-1, if_descent=True)
+.. py:function:: pyvqnet.tensor.argtopK(t, k, dim=-1, if_descent=True)
 
     返回给定输入张量沿给定维度的 k 个最大元素的索引。
 
@@ -1616,12 +1616,12 @@ argtopK
 
     :param t: 输入 QTensor 。
     :param k: 取排序后的 k 的个数。
-    :param axis: 要排序的维度。默认 = -1,最后一个轴。
+    :param dim: 要排序的维度。默认 = -1,最后一个轴。
     :param if_descent: 排序使用升序还是降序,默认降序。
 
     :return: 新的 QTensor 。
 
-    Examples::
+    Example::
 
         from pyvqnet.tensor import tensor, QTensor
         x = QTensor([
@@ -1734,13 +1734,13 @@ divide
 sums
 ==============================
 
-.. py:function:: pyvqnet.tensor.sums(t: pyvqnet.tensor.QTensor, axis: Optional[int] = None, keepdims=False)
+.. py:function:: pyvqnet.tensor.sums(t: pyvqnet.tensor.QTensor, dim: Optional[int] = None, keepdim=False)
 
-    对输入的 QTensor 按 axis 设定的轴计算元素和,如果 axis 是None,则返回所有元素和。
+    对输入的 QTensor 按 dim 设定的轴计算元素和,如果 dim 是None,则返回所有元素和。
 
     :param t: 输入 QTensor 。
-    :param axis: 用于求和的轴,默认为None。
-    :param keepdims: 输出张量是否保留了减小的维度。默认为False。
+    :param dim: 用于求和的轴,默认为None。
+    :param keepdim: 输出张量是否保留了减小的维度。默认为False。
     :return: 输出 QTensor 。
 
     Example::
@@ -1756,12 +1756,12 @@ sums
 cumsum
 ==============================
 
-.. py:function:: pyvqnet.tensor.cumsum(t, axis=-1)
+.. py:function:: pyvqnet.tensor.cumsum(t, dim=-1)
 
     返回维度轴中输入元素的累积总和。
 
     :param t: 输入 QTensor 。
-    :param axis: 计算的轴,默认 -1,使用最后一个轴。
+    :param dim: 计算的轴,默认 -1,使用最后一个轴。
     :return: 输出 QTensor 。
 
     Example::
@@ -1779,13 +1779,13 @@ cumsum
 mean
 ==============================
 
-.. py:function:: pyvqnet.tensor.mean(t: pyvqnet.tensor.QTensor, axis=None, keepdims=False)
+.. py:function:: pyvqnet.tensor.mean(t: pyvqnet.tensor.QTensor, dim=None, keepdim=False)
 
-    对输入的 QTensor 按 axis 设定的轴计算元素的平均,如果 axis 是None,则返回所有元素平均。
+    对输入的 QTensor 按 dim 设定的轴计算元素的平均,如果 dim 是None,则返回所有元素平均。
 
     :param t: 输入 QTensor ,需要是浮点数或者复数。
-    :param axis: 用于求平均的轴,默认为None。
-    :param keepdims: 输出张量是否保留了减小的维度。默认为False。
+    :param dim: 用于求平均的轴,默认为None。
+    :param keepdim: 输出张量是否保留了减小的维度。默认为False。
     :return: 输出 QTensor 或 均值。
 
     Example::
@@ -1793,7 +1793,7 @@ mean
         from pyvqnet.tensor import tensor
         from pyvqnet.tensor import QTensor
         t = QTensor([[1, 2, 3], [4, 5, 6.0]])
-        x = tensor.mean(t, axis=1)
+        x = tensor.mean(t, dim=1)
         print(x)
 
         # [2. 5.]
@@ -1801,13 +1801,13 @@ mean
 median
 ==============================
 
-.. py:function:: pyvqnet.tensor.median(t: pyvqnet.tensor.QTensor, axis=None, keepdims=False)
+.. py:function:: pyvqnet.tensor.median(t: pyvqnet.tensor.QTensor, dim=None, keepdim=False)
 
-    对输入的 QTensor 按 axis 设定的轴计算元素的平均,如果 axis 是None,则返回所有元素平均。
+    对输入的 QTensor 按 dim 设定的轴计算元素的平均,如果 dim 是None,则返回所有元素平均。
 
     :param t: 输入 QTensor 。
-    :param axis: 用于求平均的轴,默认为None。
-    :param keepdims: 输出张量是否保留了减小的维度。默认为False。
+    :param dim: 用于求平均的轴,默认为None。
+    :param keepdim: 输出张量是否保留了减小的维度。默认为False。
     :return: 输出 QTensor 或 中值。
 
     Example::
@@ -1833,13 +1833,13 @@ median
 std
 ==============================
 
-.. py:function:: pyvqnet.tensor.std(t: pyvqnet.tensor.QTensor, axis=None, keepdims=False, unbiased=True)
+.. py:function:: pyvqnet.tensor.std(t: pyvqnet.tensor.QTensor, dim=None, keepdim=False, unbiased=True)
 
-    对输入的 QTensor 按 axis 设定的轴计算元素的标准差,如果 axis 是None,则返回所有元素标准差。
+    对输入的 QTensor 按 dim 设定的轴计算元素的标准差,如果 dim 是None,则返回所有元素标准差。
 
     :param t: 输入 QTensor 。
-    :param axis: 用于求标准差的轴,默认为None。
-    :param keepdims: 输出张量是否保留了减小的维度。默认为False。
+    :param dim: 用于求标准差的轴,默认为None。
+    :param keepdim: 输出张量是否保留了减小的维度。默认为False。
     :param unbiased: 是否使用贝塞尔修正,默认使用。
     :return: 输出 QTensor 或 标准差。
 
@@ -1866,13 +1866,13 @@ std
 var
 ==============================
 
-.. py:function:: pyvqnet.tensor.var(t: pyvqnet.tensor.QTensor, axis=None, keepdims=False, unbiased=True)
+.. py:function:: pyvqnet.tensor.var(t: pyvqnet.tensor.QTensor, dim=None, keepdim=False, unbiased=True)
 
-    对输入的 QTensor 按 axis 设定的轴计算元素的方差,如果 axis 是None,则返回所有元素方差。
+    对输入的 QTensor 按 dim 设定的轴计算元素的方差,如果 dim 是None,则返回所有元素方差。
 
     :param t: 输入 QTensor 。
-    :param axis: 用于求方差的轴,默认为None。
-    :param keepdims: 输出张量是否保留了减小的维度。默认为False。
+    :param dim: 用于求方差的轴,默认为None。
+    :param keepdim: 输出张量是否保留了减小的维度。默认为False。
     :param unbiased: 是否使用贝塞尔修正,默认使用。
     :return: 输出 QTensor 或方差。
 
@@ -2455,12 +2455,12 @@ log
 log_softmax
 ==============================
 
-.. py:function:: pyvqnet.tensor.log_softmax(t, axis=-1)
+.. py:function:: pyvqnet.tensor.log_softmax(t, dim=-1)
 
-    顺序计算在轴axis上的softmax函数以及log函数的结果。
+    顺序计算在dim维度上的softmax函数以及log函数的结果。
 
     :param t: 输入 QTensor 。
-    :param axis: 用于求softmax的轴,默认为-1。
+    :param dim: 用于求softmax的轴,默认为-1。
 
     :return: 输出 QTensor。
 
@@ -2537,7 +2537,7 @@ eigh
 
         返回特征值以及特征向量
 
-    Examples::
+    Example::
 
         import numpy as np
         import pyvqnet
@@ -2567,13 +2567,13 @@ eigh
 frobenius_norm
 ==============================
 
-.. py:function:: pyvqnet.tensor.frobenius_norm(t: QTensor, axis: int = None, keepdims=False)
+.. py:function:: pyvqnet.tensor.frobenius_norm(t: QTensor, dim: int = None, keepdim=False)
 
-    对输入的 QTensor 按 axis 设定的轴计算张量的F范数,如果 axis 是None,则返回所有元素F范数。
+    对输入的 QTensor 按 dim 设定的轴计算张量的F范数,如果 dim 是None,则返回所有元素F范数。
 
     :param t: 输入 QTensor 。
-    :param axis: 用于求F范数的轴,默认为None。
-    :param keepdims: 输出张量是否保留了减小的维度。默认为False。
+    :param dim: 用于求F范数的轴,默认为None。
+    :param keepdim: 输出张量是否保留了减小的维度。默认为False。
     :return: 输出 QTensor 或 F范数值。
 
 
@@ -2644,13 +2644,13 @@ minimum
 min
 ==============================
 
-.. py:function:: pyvqnet.tensor.min(t: pyvqnet.tensor.QTensor, axis=None, keepdims=False)
+.. py:function:: pyvqnet.tensor.min(t: pyvqnet.tensor.QTensor, dim=None, keepdim=False)
 
-    对输入的 QTensor 按 axis 设定的轴计算元素的最小值,如果 axis 是None,则返回所有元素的最小值。
+    对输入的 QTensor 按 dim 设定的轴计算元素的最小值,如果 dim 是None,则返回所有元素的最小值。
 
     :param t: 输入 QTensor 。
-    :param axis: 用于求最小值的轴,默认为None。
-    :param keepdims: 输出张量是否保留了减小的维度。默认为False。
+    :param dim: 用于求最小值的轴,默认为None。
+    :param keepdim: 输出张量是否保留了减小的维度。默认为False。
 
     :return: 输出 QTensor 或浮点数。
 
@@ -2659,7 +2659,7 @@ min
         from pyvqnet.tensor import tensor
         from pyvqnet.tensor import QTensor
         t = QTensor([[1, 2, 3], [4, 5, 6]])
-        x = tensor.min(t, axis=1, keepdims=True)
+        x = tensor.min(t, dim=1, keepdim=True)
         print(x)
 
         # [
@@ -2670,13 +2670,13 @@ min
 max
 ==============================
 
-.. py:function:: pyvqnet.tensor.max(t: pyvqnet.tensor.QTensor, axis=None, keepdims=False)
+.. py:function:: pyvqnet.tensor.max(t: pyvqnet.tensor.QTensor, dim=None, keepdim=False)
 
-    对输入的 QTensor 按 axis 设定的轴计算元素的最大值,如果 axis 是None,则返回所有元素的最大值。
+    对输入的 QTensor 按 dim 设定的轴计算元素的最大值,如果 dim 是None,则返回所有元素的最大值。
 
     :param t: 输入 QTensor 。
-    :param axis: 用于求最大值的轴,默认为None。
-    :param keepdims: 输出张量是否保留了减小的维度。默认为False。
+    :param dim: 用于求最大值的轴,默认为None。
+    :param keepdim: 输出张量是否保留了减小的维度。默认为False。
     
     :return: 输出 QTensor 或浮点数。
 
@@ -2686,7 +2686,7 @@ max
         from pyvqnet.tensor import tensor
         from pyvqnet.tensor import QTensor
         t = QTensor([[1, 2, 3], [4, 5, 6]])
-        x = tensor.max(t, axis=1, keepdims=True)
+        x = tensor.max(t, dim=1, keepdim=True)
         print(x)
 
         # [
@@ -3230,12 +3230,12 @@ select
 concatenate
 ==============================
 
-.. py:function:: pyvqnet.tensor.concatenate(args: list, axis=1)
+.. py:function:: pyvqnet.tensor.concatenate(args: list, dim=0)
 
-    对 args 内的多个 QTensor 沿 axis 轴进行联结,返回一个新的 QTensor 。
+    对 args 内的多个 QTensor 沿 dim 维度进行联结,返回一个新的 QTensor 。
 
     :param args: 包含输入 QTensor 。
-    :param axis: 要连接的维度。 必须介于 0 和输入张量的最大维数之间。
+    :param dim: 要连接的维度。 必须介于 0 和输入张量的最大维数之间。
     :return: 输出 QTensor 。
 
     Example::
@@ -3257,12 +3257,12 @@ concatenate
 stack
 ==============================
 
-.. py:function:: pyvqnet.tensor.stack(QTensors: list, axis) 
+.. py:function:: pyvqnet.tensor.stack(QTensors: list, dim=0) 
 
-    沿新轴 axis 堆叠输入的 QTensors ,返回一个新的 QTensor。
+    沿新维度 dim 堆叠输入的 QTensors ,返回一个新的 QTensor。
 
     :param QTensors: 包含输入 QTensor 。
-    :param axis: 要堆叠的维度。 必须介于 0 和输入张量的最大维数之间。
+    :param dim: 要堆叠的维度。 必须介于 0 和输入张量的最大维数之间。
     :return: 输出 QTensor 。
 
     Example::
@@ -3404,12 +3404,12 @@ tile
 squeeze
 ==============================
 
-.. py:function:: pyvqnet.tensor.squeeze(t: pyvqnet.tensor.QTensor, axis: int = - 1)
+.. py:function:: pyvqnet.tensor.squeeze(t: pyvqnet.tensor.QTensor, dim: Optional[int] = None)
 
-    删除 axis 指定的轴,该轴的维度为1。如果 axis = None ,则将输入所有长度为1的维度删除。
+    删除 dim 指定的轴,该轴的维度为1。如果 dim = None ,则将输入所有长度为1的维度删除。
 
     :param t: 输入 QTensor 。
-    :param axis: 要压缩的轴,默认为None。 
+    :param dim: 要压缩的轴,默认为None。 
     :return: 输出 QTensor 。
 
     Example::
@@ -3435,12 +3435,12 @@ squeeze
 unsqueeze
 ==============================
 
-.. py:function:: pyvqnet.tensor.unsqueeze(t: pyvqnet.tensor.QTensor, axis: int = 0)
+.. py:function:: pyvqnet.tensor.unsqueeze(t: pyvqnet.tensor.QTensor, dim: int = 0)
 
-    在axis 指定的维度上插入一个维度为的1的轴,返回一个新的 QTensor 。
+    在 dim 指定的维度上插入一个维度为的1的轴,返回一个新的 QTensor 。
 
     :param t: 输入 QTensor 。
-    :param axis: 要插入维度的位置,默认为0。 
+    :param dim: 要插入维度的位置,默认为0。 
     :return: 输出 QTensor 。
 
     Example::
@@ -3491,13 +3491,13 @@ moveaxis
 swapaxis
 ==============================
 
-.. py:function:: pyvqnet.tensor.swapaxis(t, axis1: int, axis2: int)
+.. py:function:: pyvqnet.tensor.swapaxis(t, dim1: int, dim2: int)
 
-    交换输入 t 的 第 axis1 和 axis 维度。
+    交换输入 t 的 第 dim1 和 dim2 维度。
 
     :param t: 输入 QTensor 。
-    :param axis1: 要交换的第一个轴。
-    :param axis2:  要交换的第二个轴。
+    :param dim1: 要交换的第一个轴。
+    :param dim2:  要交换的第二个轴。
     :return: 输出 QTensor 。
 
     Example::
@@ -3535,7 +3535,7 @@ masked_fill
     :param value: 填充值。
     :return: 一个 QTensor。
 
-    Examples::
+    Example::
 
         from pyvqnet.tensor import tensor
         import numpy as np
@@ -3821,7 +3821,7 @@ pad_sequence
         如果 batch_first 为 ``False``,则张量大小为 ``批大小 x 最长序列长度 x *``。
         否则张量的大小为 ``最长序列长度 x 批大小 x *`` 。
 
-    Examples::
+    Example::
 
         from pyvqnet.tensor import tensor
         a = tensor.ones([4, 2,3])
@@ -3879,7 +3879,7 @@ pad_packed_sequence
     :return:
         包含填充序列的张量元组,以及批次中每个序列的长度列表。批次元素将按照最初的顺序重新排序。
 
-    Examples::
+    Example::
 
         from pyvqnet.tensor import tensor
         a = tensor.ones([4, 2,3])
@@ -3957,7 +3957,7 @@ pack_pad_sequence
 
     :return: 一个 :class:`PackedSequence` 对象。
 
-    Examples::
+    Example::
 
         from pyvqnet.tensor import tensor
         a = tensor.ones([4, 2,3])
@@ -4016,7 +4016,7 @@ functional_conv2d
     :return: qtensor
 
 
-    Examples::
+    Example::
 
         from pyvqnet.nn.functional import functional_conv2d
         from pyvqnet.tensor import arange,ones

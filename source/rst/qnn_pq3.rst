@@ -1,3 +1,5 @@
+.. _使用pyqpanda3量子机器学习模块:
+
 使用pyqpanda3量子机器学习模块
 #################################
 
@@ -217,7 +219,7 @@ QuantumBatchAsyncQcloudLayer
 
     .. note::
 
-        qcloud_token 为您到 https://qcloud.originqc.com.cn/ 中申请的api token。
+        qcloud_token 为您到 https://qcloud.originqc.com.cn/ 中申请的 API token。
         origin_qprog_func 需要返回pyqpanda3.core.QProg类型的数据,如果没有设置测量的观测量pauli_str_dict,需要保证该QProg中已经插入了measure。
         origin_qprog_func 的形式必须按照如下:
 
@@ -244,7 +246,7 @@ QuantumBatchAsyncQcloudLayer
     :param dtype: 参数的数据类型。 默认值为 None,即使用默认数据类型pyvqnet.kfloat32。
     :param name: 模块的名称。 默认为空字符串。
     :param diff_method: 梯度计算的微分方法。 默认为“parameter_shift”,"random_coordinate_descent"。
-    :param submit_kwargs: 用于提交量子电路的附加关键字参数,默认:{"if_print_qcloud_log":False,"chip_id":"WK_C180","is_amend":True,"is_mapping":True,"is_optimization":True,"compile_level":3,"default_task_group_size":200,"test_qcloud_fake":False,"server_ip_address":""},当设置test_qcloud_fake为True则本地CPUQVM模拟。
+    :param submit_kwargs: 用于提交量子电路的附加关键字参数,默认:{"if_print_qcloud_log":False,"chip_id":"WK_C180","is_amend":True,"is_mapping":True,"is_optimization":True,"compile_level":3,"default_task_group_size":200,"test_qcloud_fake":False,"server_ip_address":"","use_qwc":True},当设置test_qcloud_fake为True则本地CPUQVM模拟。
     :param query_kwargs: 用于查询量子结果的附加关键字参数,默认:{"timeout":1,"total_timeout":60, "print_query_info":True,"sub_circuits_split_size":1}。
     :return: 一个可以计算量子电路的模块。
     
@@ -272,7 +274,7 @@ QuantumBatchAsyncQcloudLayer
             return m_prog
 
         l = QuantumBatchAsyncQcloudLayer(qfun,
-                        "3047DE8A59764BEDAC9C3282093B16AF1",
+                        "your_api_token",
                         2,
 
                         pauli_str_dict=None,
@@ -307,7 +309,7 @@ QuantumBatchAsyncQcloudLayer
             
             return m_prog
         l = QuantumBatchAsyncQcloudLayer(qfun2,
-                "3047DE8A59764BEDAC9C3282093B16AF",
+                "your_api_token",
                 2,
 
                 pauli_str_dict={'Z0 X1':10,'':-0.5,'Y2':-0.543,"":3333},
@@ -563,7 +565,7 @@ grad
     :return:
             参数的梯度
 
-    Examples::
+    Example::
 
         from pyvqnet.qnn.pq3 import grad, ProbsMeasure
         import pyqpanda3.core as pq
@@ -612,7 +614,7 @@ QLinear 实现了一种量子全连接算法。首先将数据编码到量子态
 
     :param input_channels: `int` - 输入通道数。
     :param output_channels: `int` - 输出通道数。
-    :param machine: `str` - 使用的虚拟机,默认使用CPU模拟。
+    :param machine: `str` - 使用的虚拟机,默认使用 CPU 模拟。
     :return: 量子全连接层。
 
     Example::
@@ -661,7 +663,7 @@ Qconv是一种量子卷积算法接口。
     :param stride: `tuple` - 步长,默认为（1,1）。
     :param padding: `tuple` - 填充,默认为（0,0）。
     :param kernel_initializer: `callable` - 默认为正态分布。
-    :param machine: `str` - 使用的虚拟机,默认使用CPU模拟。
+    :param machine: `str` - 使用的虚拟机,默认使用 CPU 模拟。
     :param dtype: 参数的数据类型,默认: None,使用默认数据类型:kfloat32,代表32位浮点数。
     :param name: 这个模块的名字, 默认为""。
 
@@ -927,7 +929,7 @@ Controlled_Hadamard
 
     :param qubits: 量子比特索引。
 
-    Examples::
+    Example::
 
         import pyqpanda3.core as pq
 
@@ -963,7 +965,7 @@ CCZ
     :param qubits: 量子比特索引。
 
     :return:
-            pyqpanda QCircuit 
+            pyqpanda3 QCircuit 
 
     Example::
 
@@ -995,9 +997,9 @@ FermionicSingleExcitation
     :param qubits: 量子比特索引。
 
     :return:
-            pyqpanda QCircuit
+            pyqpanda3 QCircuit
 
-    Examples::
+    Example::
 
         from pyvqnet.qnn.pq3 import FermionicSingleExcitation, expval
 
@@ -1044,9 +1046,9 @@ FermionicDoubleExcitation
     :param qubits:  量子比特索引。
 
     :return:
-        pyqpanda QCircuit
+        pyqpanda3 QCircuit
 
-    Examples::
+    Example::
 
         import pyqpanda3.core as pq
         from pyvqnet.qnn.pq3 import FermionicDoubleExcitation, expval
@@ -1097,7 +1099,7 @@ UCCSD
         高频状态。 ``init_state`` 在量子比特初始化状态。
     :param qubits: 量子比特索引。
 
-    Examples::
+    Example::
 
         import pyqpanda3.core as pq
         from pyvqnet.tensor import tensor
@@ -1112,39 +1114,6 @@ UCCSD
                                         init_state=[1, 1, 0, 0, 0, 0],
                                         qubits=qlists)
  
-
-
-QuantumPoolingCircuit
-============================
-
-.. py:function:: pyvqnet.qnn.pq3.template.QuantumPoolingCircuit(sources_wires, sinks_wires, params,qubits)
-
-    对数据进行降采样的量子电路。
-
-    为了减少电路中的量子位数量,首先在系统中创建成对的量子位。在最初配对所有量子位之后,将广义2量子位酉元应用于每一对量子位上。并在应用这两个量子位酉元之后,在神经网络的其余部分忽略每对量子位中的一个量子位。
-
-    :param sources_wires: 将被忽略的源量子位索引。
-    :param sinks_wires: 将保留的目标量子位索引。
-    :param params: 输入参数。
-    :param qubits: 量子比特索引。
-
-    :return:
-        pyqpanda QCircuit
-
-    Examples:: 
-
-        from pyvqnet.qnn.pq3.template import QuantumPoolingCircuit
-        import pyqpanda3.core as pq
-        from pyvqnet import tensor
-
-        qlists = range(4)
-        p = tensor.full([6], 0.35)
-        cir = QuantumPoolingCircuit([0, 1], [2, 3], p, qlists)
-        print(cir)
-
-常用量子线路组合
-***********************************
-VQNet提供了量子机器学习研究中常用的一些量子线路
 
 
 HardwareEfficientAnsatz
@@ -1182,7 +1151,7 @@ HardwareEfficientAnsatz
 BasicEntanglerTemplate
 ============================
 
-.. py:class:: pyvqnet.qnn.pq3.template.BasicEntanglerTemplate(weights=None, num_qubits=1, rotation=pyqpanda.RX)
+.. py:class:: pyvqnet.qnn.pq3.template.BasicEntanglerTemplate(weights=None, num_qubits=1, rotation=pyqpanda3.core.RX)
 
     由每个量子位上的单参数单量子位旋转组成的层,后跟一个闭合链或环组合的多个CNOT 门。
 
@@ -1194,7 +1163,7 @@ BasicEntanglerTemplate
 
     :param weights: 形状的权重张量 `(L, len(qubits))`。 每个权重都用作量子含参门中的参数。默认值为: ``None`` ,则使用 `(1,1)` 正态分布随机数作为权重。
     :param num_qubits: 量子比特数,默认为1。
-    :param rotation: 使用单参数单量子比特门,``pyqpanda.RX`` 被用作默认值。
+    :param rotation: 使用单参数单量子比特门, ``pyqpanda3.core.RX`` 被用作默认值。
 
     Example::
 
@@ -1348,7 +1317,7 @@ expval
     如果观测值是 :math:`0.7Z\otimes X\otimes I+0.2I\otimes Z\otimes I`,
     那么 Hamiltonian dict 将是 ``{{'Z0, X1':0.7} ,{'Z1':0.2}}`` 。
 
-    expval api现在支持pyqpanda3 的模拟器 。
+    expval API 现在支持pyqpanda3 的模拟器 。
 
     :param machine: 由pyQPanda创建的量子虚拟机。
     :param prog: pyQPanda创建的量子程序。
@@ -1385,9 +1354,7 @@ QuantumMeasure
 
     计算量子线路测量。返回通过蒙特卡罗方法获得的测量结果。
 
-    更多详情请访问  https://pyqpanda-toturial.readthedocs.io/zh/latest/Measure.html?highlight=measure_all 。
-
-    QuantumMeasure api现在只支持QPanda ``CPUQVM`` 或 ``QCloud`` 。
+    QuantumMeasure API 现在只支持QPanda ``CPUQVM`` 或 ``QCloud`` 。
 
 
 
@@ -1431,9 +1398,8 @@ ProbsMeasure
 
 	计算线路概率测量。
 
-    更多详情请访问 https://pyqpanda-toturial.readthedocs.io/zh/latest/PMeasure.html。
 
-    ProbsMeasure api现在只支持pyQPanda ``CPUQVM`` 或 ``QCloud`` 。
+    ProbsMeasure API 现在只支持pyQPanda ``CPUQVM`` 或 ``QCloud`` 。
 
     :param measure_qubits: 列表包含测量比特索引
     :param prog: qpanda创建的量子程序。
@@ -1571,7 +1537,7 @@ Purity
     :return:
             纯度
 
-    Examples::
+    Example::
 
         from pyvqnet.qnn.pq3.measure import Purity
         qstate = [(0.9306699299765968 + 0j), (0.18865613455240968 + 0j),

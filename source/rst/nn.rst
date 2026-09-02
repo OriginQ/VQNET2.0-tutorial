@@ -50,7 +50,7 @@ CPU下模型训练
 GPU下模型训练
 =================================
 
-您需要安装linux版本下的pyvqnet才能使用GPU。需要保证数据QTensor以及Module均在GPU上。可使用 `toGPU` 转移数据或者 `gpu` 创建副本,或者在数据创建函数中使用device指定。
+您需要安装 Linux 版本下的 pyvqnet 才能使用 GPU。需要保证数据 QTensor 以及 Module 均在 GPU 上。可使用 `toGPU` 转移数据或者 `gpu` 创建副本,或者在数据创建函数中使用device指定。
 
 请参考以下例子:
 
@@ -195,7 +195,7 @@ toGPU
     :param device: 当前保存QTensor的设备,默认:DEV_GPU_0。device= pyvqnet.DEV_GPU_0,存储在第一个 GPU 中,device = DEV_GPU_1,存储在第二个 GPU 中,依此类推
     :return: Module 移动到 GPU 设备。
 
-    Examples::
+    Example::
 
         from pyvqnet.nn.conv import ConvT2D 
         test_conv = ConvT2D(3, 2, [4,4], [2, 2], "same")
@@ -213,7 +213,7 @@ toCPU
 
     :return: Module 移动到 CPU 设备。
 
-    Examples::
+    Example::
 
         from pyvqnet.nn.conv import ConvT2D 
         test_conv = ConvT2D(3, 2, [4,4], [2, 2], "same")
@@ -306,43 +306,49 @@ ModuleList
 
         from pyvqnet.tensor import *
         from pyvqnet.nn import Module,Linear,ModuleList
-        from pyvqnet.qnn import ProbsMeasure,QuantumLayer
-        import pyqpanda as pq
-        def pqctest (input,param,qubits,cbits,m_machine):
+        from pyvqnet.qnn.pq3 import ProbsMeasure,QuantumLayer
+        import pyqpanda3.core as pq
+        def pqctest (input,param):
+            num_of_qubits = 4
+
+            m_machine = pq.CPUQVM()# outside
+            
+            qubits = range(num_of_qubits)
+
             circuit = pq.QCircuit()
-            circuit.insert(pq.H(qubits[0]))
-            circuit.insert(pq.H(qubits[1]))
-            circuit.insert(pq.H(qubits[2]))
-            circuit.insert(pq.H(qubits[3]))
+            circuit << pq.H(qubits[0])
+            circuit << pq.H(qubits[1])
+            circuit << pq.H(qubits[2])
+            circuit << pq.H(qubits[3])
 
-            circuit.insert(pq.RZ(qubits[0],input[0]))
-            circuit.insert(pq.RZ(qubits[1],input[1]))
-            circuit.insert(pq.RZ(qubits[2],input[2]))
-            circuit.insert(pq.RZ(qubits[3],input[3]))
+            circuit << pq.RZ(qubits[0],input[0])
+            circuit << pq.RZ(qubits[1],input[1])
+            circuit << pq.RZ(qubits[2],input[2])
+            circuit << pq.RZ(qubits[3],input[3])
 
-            circuit.insert(pq.CNOT(qubits[0],qubits[1]))
-            circuit.insert(pq.RZ(qubits[1],param[0]))
-            circuit.insert(pq.CNOT(qubits[0],qubits[1]))
+            circuit << pq.CNOT(qubits[0],qubits[1])
+            circuit << pq.RZ(qubits[1],param[0])
+            circuit << pq.CNOT(qubits[0],qubits[1])
 
-            circuit.insert(pq.CNOT(qubits[1],qubits[2]))
-            circuit.insert(pq.RZ(qubits[2],param[1]))
-            circuit.insert(pq.CNOT(qubits[1],qubits[2]))
+            circuit << pq.CNOT(qubits[1],qubits[2])
+            circuit << pq.RZ(qubits[2],param[1])
+            circuit << pq.CNOT(qubits[1],qubits[2])
 
-            circuit.insert(pq.CNOT(qubits[2],qubits[3]))
-            circuit.insert(pq.RZ(qubits[3],param[2]))
-            circuit.insert(pq.CNOT(qubits[2],qubits[3]))
+            circuit << pq.CNOT(qubits[2],qubits[3])
+            circuit << pq.RZ(qubits[3],param[2])
+            circuit << pq.CNOT(qubits[2],qubits[3])
 
             prog = pq.QProg()
-            prog.insert(circuit)
+            prog << circuit
 
-            rlt_prob = ProbsMeasure([0,2],prog,m_machine,qubits)
+            rlt_prob = ProbsMeasure(m_machine,prog,[0,2])
             return rlt_prob
 
 
         class M(Module):
             def __init__(self):
                 super(M, self).__init__()
-                self.pqc2 = ModuleList([QuantumLayer(pqctest,3,"cpu",4,1), Linear(4,1)
+                self.pqc2 = ModuleList([QuantumLayer(pqctest,3), Linear(4,1)
                 ])
 
             def forward(self, x, *args, **kwargs):
@@ -1077,6 +1083,115 @@ GroupNorm
         x = QTensor(np.arange(0,60*2*5).reshape([2,10,3,2,5]),requires_grad=True,dtype=kfloat32)
         y = test_conv.forward(x)
         print(y)
+
+RMSNorm
+=================================
+
+.. py:class:: pyvqnet.nn.RMSNorm(normalized_shape, eps:float = 1e-5, affine:bool = True, dtype=None)
+
+    对输入的小批量数据应用均方根层归一化(Root Mean Square Layer Normalization)。RMS 取输入最后一维。
+
+    :param normalized_shape: 归一化形状。若为单个整数,则视为 ``[normalized_shape]``。
+    :param eps: 数值稳定性常数,默认为 1e-5。
+    :param affine: 是否使用可学习的仿射参数(gamma),默认为 True。
+    :param dtype: 参数数据类型,默认: None,使用默认数据类型。
+    :return: 一个 RMSNorm 类实例。
+
+    .. note::
+
+            该模块仅在 GPU 下运行。请参考上方「GPU下模型训练」部分将模型与数据转移至 GPU。
+
+    Example::
+
+        import pyvqnet
+        from pyvqnet.nn import RMSNorm
+        from pyvqnet.tensor import tensor, kfloat32
+        rms = RMSNorm(8, eps=1e-5, dtype=kfloat32)
+        rms.toGPU(pyvqnet.DEV_GPU_0)
+        x = tensor.arange(1.0, 17.0, dtype=kfloat32).reshape([2, 8])
+        x = x.GPU(pyvqnet.DEV_GPU_0)
+        x.requires_grad = True
+        y = rms(x)
+        print(y)
+
+        # [[0.1980295,0.3960589,0.5940884,...,1.1881769,1.3862063,1.5842358],
+        #  [0.7082005,0.7868894,0.8655784,...,1.1016452,1.1803341,1.2590231]]
+
+RoPE
+=================================
+
+.. py:class:: pyvqnet.nn.RoPE(head_dim:int, max_seq_len:int = 2048, base:float = 10000.0, rope_type:str = "standard", scale_factor:float = 4.0, original_max_seq_len = None, beta_fast:float = 32.0, beta_slow:float = 1.0)
+
+    旋转位置编码(Rotary Position Embedding)。通过对查询与键张量最后一维(head_dim)的维度对进行旋转,注入位置信息。
+
+    :param head_dim: 注意力头维度(必须为偶数)。
+    :param max_seq_len: 预计算 cos/sin 缓存的最大序列长度,默认为 2048。
+    :param base: RoPE 基础频率,默认为 10000.0(Llama 使用 500000.0)。
+    :param rope_type: 旋转类型,可选 "standard" | "ntk" | "dynamic_ntk" | "yarn",默认为 "standard"。
+    :param scale_factor: 扩展缩放系数(如 4.0 表示 4 倍上下文),默认为 4.0。
+    :param original_max_seq_len: 预训练序列长度,默认为 None。
+    :param beta_fast: YaRN 高频截断,默认为 32.0。
+    :param beta_slow: YaRN 低频截断,默认为 1.0。
+    :return: 一个 RoPE 类实例。
+
+    .. note::
+
+            该模块仅在 GPU 下运行。请参考上方「GPU下模型训练」部分将模型与数据转移至 GPU。
+
+    Example::
+
+        import pyvqnet
+        from pyvqnet.tensor import QTensor, DEV_GPU_0
+        from pyvqnet.nn.rope import RoPE
+        import numpy as np
+
+        # Fixed input
+        q = QTensor(np.arange(1.0, 17.0, dtype=np.float32).reshape([1, 1, 4, 4]), device=DEV_GPU_0)
+        k = QTensor(np.arange(17.0, 33.0, dtype=np.float32).reshape([1, 1, 4, 4]), device=DEV_GPU_0)
+
+        # 1. standard
+        rope = RoPE(4, max_seq_len=4, rope_type="standard")
+        rope.toGPU(DEV_GPU_0)
+        out_q, _ = rope.forward(q, k)
+        print(out_q)
+
+        # [[[[  1.       ,  2.       ,  3.       ,  4.       ],
+        #    [ -3.1887856,  5.919701 ,  7.9894705,  8.059599 ],
+        #    [-13.747593 ,  9.758017 ,  3.6060615, 12.197587 ],
+        #    [-14.986703 , 13.513773 ,-13.015327 , 16.412737 ]]]]
+
+        # 2. ntk
+        rope = RoPE(4, max_seq_len=4, rope_type="ntk", scale_factor=4.0)
+        rope.toGPU(DEV_GPU_0)
+        out_q, _ = rope.forward(q, k)
+        print(out_q)
+
+        # [[[[  1.       ,  2.       ,  3.       ,  4.       ],
+        #    [ -3.1887856,  5.9799814,  7.9894705,  8.014976 ],
+        #    [-13.747593 ,  9.939875 ,  3.6060615, 12.0498495],
+        #    [-14.986703 , 13.879607 ,-13.015327 , 16.10455  ]]]]
+
+        # 3. dynamic_ntk
+        rope = RoPE(4, max_seq_len=4, rope_type="dynamic_ntk", scale_factor=4.0, original_max_seq_len=2)
+        rope.toGPU(DEV_GPU_0)
+        out_q, _ = rope.forward(q, k)
+        print(out_q)
+
+        # [[[[  1.       ,  2.       ,  3.       ,  4.       ],
+        #    [ -3.1887856,  5.959925 ,  7.9894705,  8.0299   ],
+        #    [-13.747593 ,  9.879502 ,  3.6060615, 12.099399 ],
+        #    [-14.986703 , 13.758434 ,-13.015327 , 16.208193 ]]]]
+
+        # 4. yarn
+        rope = RoPE(4, max_seq_len=4, rope_type="yarn", scale_factor=4.0, original_max_seq_len=2)
+        rope.toGPU(DEV_GPU_0)
+        out_q, _ = rope.forward(q, k)
+        print(out_q)
+
+        # [[[[  1.       ,  2.       ,  3.       ,  4.       ],
+        #    [ -3.1887856,  5.9799814,  7.9894705,  8.014976 ],
+        #    [-13.747593 ,  9.939875 ,  3.6060615, 12.0498495],
+        #    [-14.986703 , 13.879607 ,-13.015327 , 16.10455  ]]]]
 
 Linear
 =================================
@@ -1873,13 +1988,12 @@ fuse_module
 
     :return: 模块融合后的模型。
 
-    Examples::
+    Example::
     
         from pyvqnet import tensor,kfloat32
         from pyvqnet.nn import Linear
         from pyvqnet.nn import Module, BatchNorm1d, BatchNorm2d, Conv1D, Conv2D
 
-        from pyvqnet.qnn.vqc import *
         from pyvqnet.optim import Adam
         from pyvqnet.nn import Module,BinaryCrossEntropy, Sigmoid
         from pyvqnet.data import data_generator
@@ -1990,7 +2104,7 @@ SDPA
     :param is_causal: 如果为 "true",则假定存在左上因果注意力屏蔽,如果同时设置了 attn_mask 和 is_causal, 则会出现错误。
     :return: 一个SDPA类
 
-    Examples::
+    Example::
     
         from pyvqnet.transformer import SDPA
         from pyvqnet import tensor
@@ -2005,7 +2119,7 @@ SDPA
         :param value: key输入QTensor。
         :return: SDPA计算返回的QTensor。
 
-        Examples::
+        Example::
         
             from pyvqnet.transformer import SDPA
             from pyvqnet import tensor
@@ -2038,7 +2152,7 @@ SDPA
 
     .. note::
 
-            请注意,跟pytorch等框架不同的是,以下loss函数的前向函数中,第一个参数为标签,第二个参数为预测值。
+            请注意,跟 PyTorch 等框架不同的是,以下loss函数的前向函数中,第一个参数为标签,第二个参数为预测值。
 
 MeanSquaredError
 =================================
@@ -2071,7 +2185,7 @@ MeanSquaredError
 
     .. note::
 
-            请注意,跟pytorch等框架不同的是,以下MeanSquaredError函数的前向函数中,第一个参数为目标值,第二个参数为预测值。
+            请注意,跟 PyTorch 等框架不同的是,以下MeanSquaredError函数的前向函数中,第一个参数为目标值,第二个参数为预测值。
 
     Example::
 
@@ -2121,7 +2235,7 @@ BinaryCrossEntropy
 
     .. note::
 
-            请注意,跟pytorch等框架不同的是,BinaryCrossEntropy函数的前向函数中,第一个参数为目标值,第二个参数为预测值。
+            请注意,跟 PyTorch 等框架不同的是,BinaryCrossEntropy函数的前向函数中,第一个参数为目标值,第二个参数为预测值。
 
     Example::
 
@@ -2161,7 +2275,7 @@ CategoricalCrossEntropy
 
     .. note::
 
-            请注意,跟pytorch等框架不同的是,CategoricalCrossEntropy函数的前向函数中,第一个参数为目标值,第二个参数为预测值。
+            请注意,跟 PyTorch 等框架不同的是,CategoricalCrossEntropy函数的前向函数中,第一个参数为目标值,第二个参数为预测值。
 
     Example::
 
@@ -2180,7 +2294,7 @@ CategoricalCrossEntropy
 SoftmaxCrossEntropy
 =================================
 
-.. py:class:: pyvqnet.nn.SoftmaxCrossEntropy(name="")
+.. py:class:: pyvqnet.nn.SoftmaxCrossEntropy(name:str="", smoothing:float=0.0)
 
     该损失函数将 LogSoftmax 和 NLLLoss 同时计算的平均分类交叉熵,并具有更高的数值稳定性。
 
@@ -2191,6 +2305,7 @@ SoftmaxCrossEntropy
                        = -x[class] + \log\left(\sum_j \exp(x[j])\right)
 
     :param name: 这个模块的名字, 默认为""。
+    :param smoothing: 标签平滑系数,取值范围 [0,1),默认为 0.0(不启用平滑)。启用后对目标标签进行平滑处理以提升数值稳定性与泛化。
     :return: 一个Softmax交叉熵损失函数实例
 
     误差前向计算函数的所需参数:
@@ -2201,7 +2316,7 @@ SoftmaxCrossEntropy
 
     .. note::
 
-            请注意,跟pytorch等框架不同的是,SoftmaxCrossEntropy函数的前向函数中,第一个参数为目标值,第二个参数为预测值。
+            请注意,跟 PyTorch 等框架不同的是,SoftmaxCrossEntropy函数的前向函数中,第一个参数为目标值,第二个参数为预测值。
 
     Example::
 
@@ -2247,7 +2362,7 @@ NLL_Loss
 
     .. note::
 
-            请注意,跟pytorch等框架不同的是,NLL_Loss函数的前向函数中,第一个参数为目标值,第二个参数为预测值。
+            请注意,跟 PyTorch 等框架不同的是,NLL_Loss函数的前向函数中,第一个参数为目标值,第二个参数为预测值。
 
     Example::
 
@@ -2297,7 +2412,7 @@ CrossEntropyLoss
 
     .. note::
 
-            请注意,跟pytorch等框架不同的是,CrossEntropyLoss函数的前向函数中,第一个参数为目标值,第二个参数为预测值。
+            请注意,跟 PyTorch 等框架不同的是,CrossEntropyLoss函数的前向函数中,第一个参数为目标值,第二个参数为预测值。
 
     Example::
 
@@ -2320,6 +2435,354 @@ CrossEntropyLoss
         print(result)
 
         #[1.1508200]
+
+``pyvqnet.nn.functional`` 与 ``pyvqnet.nn._sampling`` 模块提供了一系列底层函数式算子,可用于构建自定义层或实现采样逻辑。
+
+rope (旋转位置编码)
+=================================
+
+.. py:function:: pyvqnet.nn.functional.rope(q, k, cos, sin)
+
+    对查询与键张量应用旋转位置编码(RoPE)的前向计算。
+
+    :param q: 查询张量。
+    :param k: 键张量。
+    :param cos: 预计算的余弦缓存,形状 ``(seq_len, head_dim/2)``。
+    :param sin: 预计算的正弦缓存,形状 ``(seq_len, head_dim/2)``。
+    :return: 应用 RoPE 后的 (q, k) 张量。
+
+    Example::
+
+        import pyvqnet
+        from pyvqnet.tensor import QTensor, tensor, DEV_GPU_0, kfloat32, cos, sin
+        from pyvqnet.nn.functional import rope
+        import numpy as np
+
+        # Precompute cos/sin cache
+        head_dim = 4
+        seq_len = 4
+        half = head_dim // 2
+        i = tensor.arange(0, half, dtype=kfloat32)
+        theta = 1.0 / (10000.0 ** (2.0 * i / head_dim))
+        m = tensor.arange(0, seq_len, dtype=kfloat32).reshape([-1, 1])
+        cos_t = cos(m * theta)
+        sin_t = sin(m * theta)
+        print(cos_t)
+
+        # [[ 1.       , 1.       ],
+        #  [ 0.5403023, 0.99995  ],
+        #  [-0.4161468, 0.9998   ],
+        #  [-0.9899925, 0.99955  ]]
+
+        # Move to GPU and apply
+        q = QTensor(np.arange(1.0, 17.0, dtype=np.float32).reshape([1, 1, 4, 4]), device=DEV_GPU_0)
+        k = QTensor(np.arange(17.0, 33.0, dtype=np.float32).reshape([1, 1, 4, 4]), device=DEV_GPU_0)
+        cos_gpu = QTensor(cos_t.to_numpy(), device=DEV_GPU_0)
+        sin_gpu = QTensor(sin_t.to_numpy(), device=DEV_GPU_0)
+        out_q, out_k = rope(q, k, cos_gpu, sin_gpu)
+        print(out_q)
+
+        # [[[[  1.       ,  2.       ,  3.       ,  4.       ],
+        #    [ -3.1887856,  5.919701 ,  7.9894705,  8.059599 ],
+        #    [-13.747593 ,  9.758017 ,  3.6060615, 12.197587 ],
+        #    [-14.986703 , 13.513773 ,-13.015327 , 16.412737 ]]]]
+
+swiglu (门控线性单元)
+-----------------------------
+
+.. py:function:: pyvqnet.nn.functional.swiglu(gate, up)
+
+    SwiGLU 函数式算子: ``SiLU(gate) * up`` 。
+
+    :param gate: 门控张量。
+    :param up: 上投影张量。
+    :return: 计算得到的张量。
+
+    Example::
+
+        from pyvqnet.tensor import QTensor, kfloat32
+        from pyvqnet.nn.functional import swiglu
+
+        gate = QTensor([1.0, 2.0, 3.0, 4.0], dtype=kfloat32)
+        up = QTensor([0.5, 1.0, 1.5, 2.0], dtype=kfloat32)
+        out = swiglu(gate, up)
+        print(out)
+
+        # [0.3655293,1.761594 ,4.286584 ,7.85611  ]
+
+scaled_softmax (缩放 Softmax)
+=================================
+
+.. py:function:: pyvqnet.nn.functional.scaled_softmax(input, scale: float)
+
+    对输入进行缩放 softmax 计算。
+
+    :param input: 输入张量。
+    :param scale: 缩放系数。
+    :return: 缩放后的 softmax 结果。
+
+    Example::
+
+        from pyvqnet.tensor import QTensor, kfloat32
+        from pyvqnet.nn.functional import scaled_softmax
+
+        x = QTensor([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]], dtype=kfloat32)
+        out = scaled_softmax(x, 0.5)
+        print(out)
+
+        # [[0.1863237,0.3071959,0.5064804],
+        #  [0.1863237,0.3071959,0.5064804]]
+
+scaled_masked_softmax (掩码缩放 Softmax)
+==========================================
+
+.. py:function:: pyvqnet.nn.functional.scaled_masked_softmax(input, mask, scale: float)
+
+    带掩码的缩放 softmax 计算。
+
+    :param input: 输入张量。
+    :param mask: 掩码张量,与 input 形状相同。0=保留,1=掩盖(对应位置被设为 -inf 后参与 softmax,结果为 0)。
+    :param scale: 缩放系数。
+    :return: 缩放后的掩码 softmax 结果。
+
+    Example::
+
+        from pyvqnet.tensor import QTensor, kfloat32
+        from pyvqnet.nn.functional import scaled_masked_softmax
+
+        x = QTensor([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]], dtype=kfloat32)
+        mask = QTensor([[0, 0, 1], [1, 0, 0]], dtype=kfloat32)  # 1=masked
+        out = scaled_masked_softmax(x, mask, 1.0)
+        print(out)
+
+        # [[0.2689414,0.7310586,0.       ],
+        #  [0.       ,0.2689414,0.7310586]]
+
+scaled_upper_triang_masked_softmax (上三角掩码缩放 Softmax)
+=============================================================
+
+.. py:function:: pyvqnet.nn.functional.scaled_upper_triang_masked_softmax(input, scale: float)
+
+    对输入上三角部分进行掩码的缩放 softmax 计算。
+
+    :param input: 输入张量。
+    :param scale: 缩放系数。
+    :return: 计算结果。
+
+    Example::
+
+        from pyvqnet.tensor import QTensor, kfloat32
+        from pyvqnet.nn.functional import scaled_upper_triang_masked_softmax
+
+        x = QTensor([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]], dtype=kfloat32)
+        out = scaled_upper_triang_masked_softmax(x, 1.0)
+        print(out)
+
+        # [[1.       ,0.       ,0.       ],
+        #  [0.2689414,0.7310586,0.       ]]
+
+fused_moe (融合专家混合)
+=====================================
+
+.. py:function:: pyvqnet.nn.functional.fused_moe(input, fc1_weight, fc2_weight, probs, indices, num_experts)
+
+    融合专家混合(MoE)前向计算。
+
+    :param input: 输入张量。
+    :param fc1_weight: 第一层专家权重。
+    :param fc2_weight: 第二层专家权重。
+    :param probs: 专家路由概率。
+    :param indices: 专家索引。
+    :param num_experts: 专家数量。
+    :return: MoE 计算的输出张量。
+
+    .. note::
+
+            该函数仅在 GPU 下运行。请参考上方「GPU下模型训练」部分将模型与数据转移至 GPU。
+
+    Example::
+
+        import pyvqnet
+        from pyvqnet.tensor import QTensor, DEV_GPU_0, kfloat32
+        from pyvqnet.dtype import kint32
+        from pyvqnet.nn.functional import fused_moe
+        import numpy as np
+
+        np.random.seed(42)
+        E = 2
+        x = QTensor(np.random.randn(2, 4).astype(np.float32), device=DEV_GPU_0)
+        w1 = QTensor(np.random.randn(E, 4, 8).astype(np.float32), device=DEV_GPU_0)
+        w2 = QTensor(np.random.randn(E, 4, 4).astype(np.float32), device=DEV_GPU_0)
+        probs = QTensor([[0.7], [0.8]], dtype=kfloat32, device=DEV_GPU_0)
+        idx = QTensor([[0], [1]], dtype=kint32, device=DEV_GPU_0)
+        y = fused_moe(x, w1, w2, probs, idx, E)
+        print(y)
+
+        # [[ 0.4034894,-0.2737532,-1.0371764,-1.3686538],
+        #  [ 3.2209034, 0.9456251, 0.8900909, 2.3802228]]
+
+基于logits的 Top-K 和 Top-P 采样
+=====================================
+
+.. py:function:: pyvqnet.nn._sampling.top_k_top_p_sampling_from_logits(logits, temperature: Union[QTensor, float] = 1.0, top_k: Union[QTensor, int] = 0, top_p: Union[QTensor, float] = 1.0, deterministic: bool = True)
+
+    基于 logits 进行 top-k 与 top-p 联合采样。
+
+    :param logits: 输入 logits 张量。
+    :param temperature: 温度系数,默认为 1.0。
+    :param top_k: 保留概率最高的 k 个词元,0 表示不限制,默认为 0。
+    :param top_p: 累积概率阈值,默认为 1.0(不限制)。
+    :param deterministic: 是否确定性采样,默认为 True。
+    :return: (tokens, valid_mask) 元组。tokens 为采样词元索引,valid_mask 标记每个样本的采样是否有效。
+
+    .. note::
+
+            该函数仅在 GPU 下运行。请参考上方「GPU下模型训练」部分将模型与数据转移至 GPU。
+
+    Example::
+
+        import pyvqnet
+        from pyvqnet.tensor import QTensor, DEV_GPU_0, kfloat32
+        from pyvqnet.nn._sampling import top_k_top_p_sampling_from_logits
+
+        logits = QTensor([[1.0, 2.0, 3.0, 4.0], [4.0, 3.0, 2.0, 1.0]],
+                         dtype=kfloat32, device=DEV_GPU_0)
+        tokens, valid = top_k_top_p_sampling_from_logits(logits, 1.0, 0, 1.0, True)
+        print(tokens)
+        # [3, 0]
+        print(valid)
+        # [ True, True]
+
+基于概率的 Top-K 和 Top-P 联合采样
+---------------------------------------------------------------
+
+.. py:function:: pyvqnet.nn._sampling.top_k_top_p_sampling_from_probs(probs, top_k: Union[QTensor, int] = 0, top_p: Union[QTensor, float] = 1.0, deterministic: bool = True)
+
+    基于概率分布进行 top-k 与 top-p 联合采样。
+
+    :param probs: 输入概率张量。
+    :param top_k: 保留概率最高的 k 个词元,0 表示不限制,默认为 0。
+    :param top_p: 累积概率阈值,默认为 1.0。
+    :param deterministic: 是否确定性采样,默认为 True。
+    :return: (tokens, valid_mask) 元组。
+
+    .. note::
+
+            该函数仅在 GPU 下运行。请参考上方「GPU下模型训练」部分将模型与数据转移至 GPU。
+
+    Example::
+
+        import pyvqnet
+        from pyvqnet.tensor import QTensor, DEV_GPU_0, kfloat32
+        from pyvqnet.nn._sampling import top_k_top_p_sampling_from_probs
+        from pyvqnet.utils import set_random_seed
+
+        set_random_seed(42)
+        probs = QTensor([[0.1, 0.2, 0.3, 0.4], [0.4, 0.3, 0.2, 0.1]],
+                        dtype=kfloat32, device=DEV_GPU_0)
+        tokens, valid = top_k_top_p_sampling_from_probs(probs, 0, 1.0, True)
+        print(tokens)
+        # [3,0]
+        print(valid)
+        # [ True, True]
+
+基于概率的 Top-K 采样
+---------------------------------------------
+
+.. py:function:: pyvqnet.nn._sampling.top_k_sampling_from_probs(probs, top_k: Union[QTensor, int] = 0, deterministic: bool = True)
+
+    基于概率分布进行 top-k 采样。
+
+    :param probs: 输入概率张量。
+    :param top_k: 保留概率最高的 k 个词元,0 表示不限制,默认为 0。
+    :param deterministic: 是否确定性采样,默认为 True。
+    :return: (tokens, valid_mask) 元组。
+
+    .. note::
+
+            该函数仅在 GPU 下运行。请参考上方「GPU下模型训练」部分将模型与数据转移至 GPU。
+
+    Example::
+
+        import pyvqnet
+        from pyvqnet.tensor import QTensor, DEV_GPU_0, kfloat32
+        from pyvqnet.nn._sampling import top_k_sampling_from_probs
+        from pyvqnet.utils import set_random_seed
+
+        set_random_seed(42)
+        probs = QTensor([[0.1, 0.2, 0.3, 0.4], [0.4, 0.3, 0.2, 0.1]],
+                        dtype=kfloat32, device=DEV_GPU_0)
+        tokens, valid = top_k_sampling_from_probs(probs, 0, True)
+        print(tokens)
+        # [3,0]
+        print(valid)
+        # [ True, True]
+
+基于概率的 Top-P 采样
+---------------------------------------------
+
+.. py:function:: pyvqnet.nn._sampling.top_p_sampling_from_probs(probs, top_p: Union[QTensor, float] = 1.0, deterministic: bool = True)
+
+    基于概率分布进行 top-p 采样。
+
+    :param probs: 输入概率张量。
+    :param top_p: 累积概率阈值,默认为 1.0。
+    :param deterministic: 是否确定性采样,默认为 True。
+    :return: (tokens, valid_mask) 元组。
+
+    .. note::
+
+            该函数仅在 GPU 下运行。请参考上方「GPU下模型训练」部分将模型与数据转移至 GPU。
+
+    Example::
+
+        import pyvqnet
+        from pyvqnet.tensor import QTensor, DEV_GPU_0, kfloat32
+        from pyvqnet.nn._sampling import top_p_sampling_from_probs
+        from pyvqnet.utils import set_random_seed
+
+        set_random_seed(42)
+        probs = QTensor([[0.1, 0.2, 0.3, 0.4], [0.4, 0.3, 0.2, 0.1]],
+                        dtype=kfloat32, device=DEV_GPU_0)
+        tokens, valid = top_p_sampling_from_probs(probs, 1.0, True)
+        print(tokens)
+        # [3,0]
+        print(valid)
+        # [ True, True]
+
+基于概率的 Min-P 采样
+---------------------------------------------
+
+.. py:function:: pyvqnet.nn._sampling.min_p_sampling_from_probs(probs, min_p: Union[QTensor, float] = 0.0, deterministic: bool = True)
+
+    基于 min-p 策略的概率采样。
+
+    :param probs: 输入概率张量。
+    :param min_p: 最小概率阈值,默认为 0.0。
+    :param deterministic: 是否确定性采样,默认为 True。
+    :return: (tokens, valid_mask) 元组。
+
+    .. note::
+
+            该函数仅在 GPU 下运行。请参考上方「GPU下模型训练」部分将模型与数据转移至 GPU。
+
+    Example::
+
+        import pyvqnet
+        from pyvqnet.tensor import QTensor, DEV_GPU_0, kfloat32
+        from pyvqnet.nn._sampling import min_p_sampling_from_probs
+        from pyvqnet.utils import set_random_seed
+
+        set_random_seed(42)
+        probs = QTensor([[0.1, 0.2, 0.3, 0.4], [0.4, 0.3, 0.2, 0.1]],
+                        dtype=kfloat32, device=DEV_GPU_0)
+        tokens, valid = min_p_sampling_from_probs(probs, 0.0, True)
+        print(tokens)
+        # [3,0]
+        print(valid)
+        # [ True, True]
+
+
 
 
 激活函数
@@ -2344,7 +2807,7 @@ Sigmoid
 
     :return: 一个Sigmoid激活函数层实例。
 
-    Examples::
+    Example::
 
         from pyvqnet.nn import Sigmoid
         from pyvqnet.tensor import QTensor
@@ -2368,7 +2831,7 @@ Softplus
 
     :return: 一个Softplus激活函数层实例。
 
-    Examples::
+    Example::
 
         from pyvqnet.nn import Softplus
         from pyvqnet.tensor import QTensor
@@ -2392,7 +2855,7 @@ Softsign
 
     :return: 一个Softsign 激活函数层实例。
 
-    Examples::
+    Example::
 
         from pyvqnet.nn import Softsign
         from pyvqnet.tensor import QTensor
@@ -2406,7 +2869,7 @@ Softsign
 
 Softmax
 =================================
-.. py:class:: pyvqnet.nn.Softmax(axis:int = -1,name:str="")
+.. py:class:: pyvqnet.nn.Softmax(dim:int = -1,name:str="")
 
     Softmax 激活函数层。
 
@@ -2414,12 +2877,12 @@ Softmax
         \text{Softmax}(x_{i}) = \frac{\exp(x_i)}{\sum_j \exp(x_j)}
 
 
-    :param axis: 计算的维度(最后一个轴为-1),默认值 = -1。
+    :param dim: 计算的维度(最后一个轴为-1),默认值 = -1。
     :param name: 激活函数层的命名,默认为""。
 
     :return: 一个Softmax 激活函数层实例。
 
-    Examples::
+    Example::
 
         from pyvqnet.nn import Softmax
         from pyvqnet.tensor import QTensor
@@ -2447,7 +2910,7 @@ HardSigmoid
 
     :return: 一个HardSigmoid 激活函数层实例。
 
-    Examples::
+    Example::
 
         from pyvqnet.nn import HardSigmoid
         from pyvqnet.tensor import QTensor
@@ -2457,6 +2920,28 @@ HardSigmoid
 
         # [0.6666667, 0.8333334, 1., 1.]
         
+
+SwiGLU
+=================================
+
+.. py:class:: pyvqnet.nn.SwiGLU(name:str="")
+
+    SwiGLU 激活函数层,是 SwiGLU 门控线性单元的变体: ``SiLU(gate) * up`` 。
+
+    :param name: 激活函数层的命名,默认为""。
+    :return: 一个 SwiGLU 激活函数层实例。
+
+    Example::
+
+        from pyvqnet.nn import SwiGLU
+        from pyvqnet.tensor import QTensor, kfloat32
+        layer = SwiGLU()
+        gate = QTensor([1.0, 2.0, 3.0, 4.0], dtype=kfloat32)
+        up = QTensor([0.5, 1.0, 1.5, 2.0], dtype=kfloat32)
+        y = layer(gate, up)
+        print(y)
+
+        # [0.3655293,1.761594 ,4.286584 ,7.85611  ]
 
 ReLu
 =================================
@@ -2475,7 +2960,7 @@ ReLu
 
     :return: 一个ReLu 激活函数层实例。
 
-    Examples::
+    Example::
 
         from pyvqnet.nn import ReLu
         from pyvqnet.tensor import QTensor
@@ -2505,7 +2990,7 @@ LeakyReLu
 
     :return: 一个LeakyReLu 激活函数层实例。
 
-    Examples::
+    Example::
 
         from pyvqnet.nn import LeakyReLu
         from pyvqnet.tensor import QTensor
@@ -2535,7 +3020,7 @@ Gelu
 
     :return: Gelu 激活函数层实例。
     
-    Examples::
+    Example::
 
         from pyvqnet.tensor import randu, ones_like
         from pyvqnet.nn import Gelu
@@ -2566,7 +3051,7 @@ ELU
 
     :return: ELU 激活函数层实例。
 
-    Examples::
+    Example::
 
         from pyvqnet.nn import ELU
         from pyvqnet.tensor import QTensor
@@ -2590,7 +3075,7 @@ Tanh
 
     :return: Tanh 激活函数层实例。
 
-    Examples::
+    Example::
 
         from pyvqnet.nn import Tanh
         from pyvqnet.tensor import QTensor
@@ -2601,8 +3086,12 @@ Tanh
         # [-0.7615942, 0.9640276, -0.9950548, 0.9993293]
         
 
+
+
+
 优化器模块
 *********************************************************
+
 
 
 .. _Optimizer:
@@ -3028,83 +3517,6 @@ SGD
         # ]
 
 
-Rotosolve
-^^^^^^^^^^^^^^
-Rotosolve算法它允许相对于其他参数的固定值直接跳转到单个参数的最佳值,直接找到量子线路最佳参数的优化算法。
-
-.. py:class:: pyvqnet.optim.rotosolve.Rotosolve(max_iter =50)
-
-    Rotosolve:可以使用 rotosolve 算法来最小化线性组合的量子测量期望值。 请参阅以下论文:
-
-    https://arxiv.org/abs/1903.12166, Ken M. Nakanishi。
-
-    https://arxiv.org/abs/1905.09692, Mateusz Ostaszewski。
-
-    :param max_iter: rotosolve 更新的最大迭代次数。
-
-    :return: 一个 Rotosolve 优化器。
-    
-    Example::
-
-        from pyvqnet.optim.rotosolve import Rotosolve
-        import pyqpanda as pq
-        from pyvqnet.tensor import QTensor
-        from pyvqnet import kfloat64
-        from pyvqnet.qnn.measure import expval
-        machine = pq.CPUQVM()
-        machine.init_qvm()
-        nqbits = machine.qAlloc_many(2)
-
-
-        def gen(param, generators, qbits, circuit):
-            if generators == "X":
-                circuit.insert(pq.RX(qbits, param))
-            elif generators == "Y":
-                circuit.insert(pq.RY(qbits, param))
-            else:
-                circuit.insert(pq.RZ(qbits, param))
-
-
-        def circuits(params, generators, circuit):
-            gen(params[0], generators[0], nqbits[0], circuit)
-            gen(params[1], generators[1], nqbits[1], circuit)
-            circuit.insert(pq.CNOT(nqbits[0], nqbits[1]))
-            prog = pq.QProg()
-            prog.insert(circuit)
-            return prog
-
-
-        def ansatz1(params: QTensor, generators):
-            circuit = pq.QCircuit()
-
-            prog = circuits(params, generators, circuit)
-            return expval(machine, prog, {"Z0": 1},
-                        nqbits), expval(machine, prog, {"Y1": 1}, nqbits)
-
-
-        def ansatz2(params: QTensor, generators):
-            circuit = pq.QCircuit()
-
-            prog = circuits(params, generators, circuit)
-            return expval(machine, prog, {"X0": 1}, nqbits)
-
-
-        def loss(params):
-            Z, Y = ansatz1(params, ["X", "Y"])
-            X = ansatz2(params, ["X", "Y"])
-            return 0.5 * Y + 0.8 * Z - 0.2 * X
-
-
-        t = QTensor([0.3, 0.25],dtype=kfloat64)
-        opt = Rotosolve(max_iter=5)
-
-        costs_rotosolve = opt.minimize(t, loss)
-        print(costs_rotosolve)
-        #[0.7642691884821847, -0.799999999999997, -0.799999999999997, -0.799999999999997, -0.799999999999997]
-
-
-.. figure:: ./images/rotosolve.png
-
 
 指标模块
 *********************************************************
@@ -3444,21 +3856,21 @@ auc_calculate
 
 
 
-兼容triton
+兼容 Triton
 *********************************************************
 
-`triton <https://triton-lang.org/main/index.html>`_  是一种用于编写高效深度学习GPU核函数的语言和编译器。
-用户用Python编写类似NumPy的代码，然后Triton将其编译为高效的GPU代码（类似CUDA但更高级）。
-triton依赖于pytorch的部分接口，VQNet实现了类似pytorch的接口，使得可以接入triton编写的代码进行模型前传反传功能。
+`Triton <https://triton-lang.org/main/index.html>`_ 是一种用于编写高效深度学习 GPU 核函数的语言和编译器。
+用户用 Python 编写类似 NumPy 的代码，然后 Triton 将其编译为高效的 GPU 代码（类似 CUDA 但更高级）。
+Triton 依赖于 PyTorch 的部分接口，VQNet 实现了类似 PyTorch 的接口，使得可以接入 Triton 编写的代码进行模型前传反传功能。
 
-安装triton:
+安装 Triton:
 
 .. code-block::
 
     pip install triton
 
-以下示例修改于triton官方示例： `layer-norm <https://triton-lang.org/main/getting-started/tutorials/05-layer-norm.html>`_ 。
-该示例需要有GPU的Linux上运行，同时需要安装trito 和 pytorch(对比计算正确性时候使用）：
+以下示例修改于 Triton 官方示例： `layer-norm <https://triton-lang.org/main/getting-started/tutorials/05-layer-norm.html>`_ 。
+该示例需要在有 GPU 的 Linux 上运行，同时需要安装 Triton 和 PyTorch（对比计算正确性时候使用）：
 
 .. code-block::
 

@@ -3,6 +3,38 @@ VQNet Changelog
 ######################
 
 
+[v2.18.1] - 2026-07-08
+***************************
+
+Added
+===================
+- 新增张量网络变分量子线路模块 ``pyvqnet.qnn.vqc.tn`` 文档，提供 ``torch`` 后端(``pyvqnet.qnn.vqc.tn.torch``)与 ``pyvqnet`` 后端(``pyvqnet.qnn.vqc.tn.native``)两套实现，包含 ``TNQModule``、``TNQMachine``、量子逻辑门、``MeasureAll`` 测量及模板等接口。该模块以张量网络方式模拟量子线路，支持矩阵乘积态(MPS)表示，以较低的内存开销模拟较大比特规模的线路；``torch`` 后端可与经典 ``torch`` 模型混合组网并参与自动微分，适用于大规模量子机器学习任务。
+- 新增大模型微调损失函数库 ``pyvqnet.torch.trl`` 文档：``sft_loss`` 指令微调交叉熵损失，支持 ``ignore_index`` 掩码跳过 prompt/padding 部分；``dpo_loss`` 直接偏好优化损失，基于策略模型与参考模型在同一偏好对上的概率比构造损失，``beta`` 控制对参考模型的约束强度；``ppo_loss`` 近端策略优化损失，通过 GAE 优势估计与裁剪代理目标稳定训练；``grpo_loss`` 组相对策略优化损失，对同一 prompt 的多个生成结果按组内奖励归一化计算优势，无需额外价值网络；``reward_loss`` 基于 Bradley-Terry 模型的偏好奖励损失。
+- 新增面向大模型推理与训练的 ``nn`` 模块文档：
+
+  - ``RoPE`` 旋转位置编码类及 ``functional.rope`` 函数，支持 ``standard``、``ntk``、``dynamic_ntk``、``yarn`` 四种频率缩放模式，适配长文本外推场景。
+  - ``RMSNorm`` 均方根归一化与 ``SwiGLU`` 门控激活，为当前 Transformer 结构的常用组件。
+  - ``fused_moe`` 融合 MoE 计算接口(CUDA 加速)，按路由索引分组计算各专家 MLP，并按路由概率加权合并输出。
+  - ``scaled_softmax``、``scaled_masked_softmax``、``scaled_upper_triang_masked_softmax`` 缩放 Softmax 系列接口，将缩放因子与注意力掩码融合进单次归一化计算。
+  - ``_sampling`` 解码采样系列接口(``top_k_sampling_from_probs``、``top_p_sampling_from_probs``、``min_p_sampling_from_probs``、``top_k_top_p_sampling_from_probs``、``top_k_top_p_sampling_from_logits``)，支持从概率分布或 logits 按 top-k/top-p/min-p 策略采样，适用于 LLM 推理解码(CUDA 加速，仅推理)。
+- 文档新增 ``pq3 torch`` 量子层(``TorchQpandaQuantumLayer``、``TorchQcloud3QuantumLayer``、``TorchQpanda3QuantumLayer``)，分别对接 qpanda 模拟器、量子云真实芯片与 qpanda3 模拟器，以 ``torch`` 层形式嵌入混合量子-经典模型进行训练。
+- 新增对 ``Python 3.13``、 ``Python 3.14`` 的支持。
+- ``torch`` 后端下新增基于 torch extension 的高性能 CUDA 量子门算子实现(RX、RY、RZ、CNOT、测量等)，针对批量状态向量提供融合 kernel 加速，显著降低大规模参数化线路的训练与模拟耗时。
+
+Changed
+===================
+- ``DistributeQMachine`` 重命名为 ``DistributedQMachine``，文档同步更新。
+- 统一 RST 文档中 ``Examples::`` 标记为 ``Example::``。
+- 改 QTensor reduce api 接口的 `axis` 为 `dim`, `keepdims`为 `keepdim` 。
+- 修正 ``vqc.rst`` 与 ``vqc_demo.rst`` 示例导入路径为公共模块。
+- 合并 ``torch-native``、``torch`` 两个后端。
+- 移除 ``pyvqnet.qnn.vqc.VQC_QuantumPoolingCircuit`` 、 ``pyvqnet.qnn.vqc.sv.torch.vqc_quantumpooling_circuit`` 、 ``pyvqnet.qnn.pq3.template.QuantumPoolingCircuit`` 接口及其文档。
+
+Fixed
+===================
+- 修复张量网络后端文档示例，新增 ``CCZ`` 门文档，移除不支持的 ``vqc_amplitude_embedding``。
+- 修复多处 Sphinx 构建警告(标题下划线长度、标题层级不一致、重复对象描述)。
+
 [v2.18.0] - 2026-04-22
 ***************************
 
@@ -11,7 +43,7 @@ Added
 - ``vqnetrun`` 新增 ``--backend nccl`` 模式支持，可通过 ``--nproc_per_node``, ``--nnodes``, ``--node_rank``, ``--master_addr``, ``--master_port``, ``--nccl_socket_ifname`` 参数控制 NCCL 分布式启动。
 - 新增 ``VQCQCloudLayer`` 接口，用于将 VQC Module 提交到 QCloud 真实芯片或 pyqpanda3 本地模拟器执行，支持 parameter_shift 反向传播。
 - ``CommController`` 新增 ``destroy()`` 方法用于 NCCL 通信资源清理。
--
+- 
 
 Changed
 ===================
@@ -41,7 +73,7 @@ Added
 - 增加bfloat16数据类型。
 - 增加异步的NCCL通信接口： ``nccl_async_all_gather``, ``nccl_async_all_reduce``, ``nccl_async_reduce``, ``nccl_async_broadcast``, ``nccl_async_send``, ``nccl_async_recv`` 。
 - 增加对最新本源量子芯片的支持，芯片ID为 ``WK_C180``
-- 增加 ``data_ptr`` 等接口，实验性增加对 `triton <https://triton-lang.org/main/index.html>`_ 的支持。
+- 增加 ``data_ptr`` 等接口，实验性增加对 `Triton <https://triton-lang.org/main/index.html>`_ 的支持。
 - 
 
 Changed
@@ -82,7 +114,7 @@ Changed
 - 增加 `QiskitLayer`, `CirqLayer` 接口;
 - 为 `QuantumBatchAsyncQcloudLayer` 层增加 `if_print_qcloud_log` 支持打印qcloud 日志;
 - 安装命令改为 ``pip install pyvqnet --upgrade``
-- 支持的python版本改为 `python3.10` , `python3.11` , `python3.12` ;
+- 支持的 Python 版本改为 `Python 3.10` , `Python 3.11` , `Python 3.12` ;
 - 修改指定mpicxx安装命令;
 
 Fixed
@@ -162,7 +194,7 @@ Changed
 - VQC_QuantumEmbedding接口修改
 - 安装本软件包时不再同时安装pyqpanda, 而是同时安装pyqpanda3.
 - VQC接口支持入参使用 `x[:,:2]`,原先只支持 `x[:,[2]]` 形式。
-- 本软件支持3.9,3.10,3.11版本python 不再支持python3.8
+- 本软件支持3.9,3.10,3.11版本 Python 不再支持 Python 3.8
 
 Fixed
 ===================
@@ -211,7 +243,7 @@ Added
 Changed
 ===================
 - 移除了xtensor部分。
-- api文档进行部分修改。区分了基于自动微分的量子机器学习示例以及基于qpanda的机器学习示例,区别基于自动微分的量子机器学习接口以及基于qpanda的机器学习示例接口。
+- API 文档进行部分修改。区分了基于自动微分的量子机器学习示例以及基于qpanda的机器学习示例,区别基于自动微分的量子机器学习接口以及基于qpanda的机器学习示例接口。
 - `matmul` 支持1d@1d,2d@1d,1d@2d。
 - 增加了一些量子计算层别名: `QpandaQCircuitVQCLayer`` = `QuantumLayer` , `QpandaQCircuitVQCLayerLite` = `QuantumLayerV2`, `QpandaQProgVQCLayer` = `QuantumLayerV3`.
 
@@ -284,7 +316,7 @@ Added
 ===================
 
 - 添加新的 `QNG` (量子自然梯度)API 和演示。
-- 添加量子电路优化,例如 `wrapper_single_qubit_op_fuse` , `wrapper_commute_controlled` , `wrapper_merge_rotations` api 和 demo。
+- 添加量子电路优化,例如 `wrapper_single_qubit_op_fuse` , `wrapper_commute_controlled` , `wrapper_merge_rotations` API 和 demo。
 - 添加 `CY`, `SparseHamiltonian` , `HermitianExpval` 。
 - 添加 `is_csr`、 `is_dense`、 `dense_to_csr` 、 `csr_to_dense` 。
 - 添加 `QuantumBatchAsyncQcloudLayer` 支持pyqpanda的QCloud真实芯片计算, `expval_qcloud`。
@@ -297,7 +329,7 @@ Changed
 - 将 `VQC_CSWAP` 电路重构为 `CSWAP`。
 - 移除旧的 QNG 文档。
 - 从 `pyvqnet.qnn.vqc` 中移除函数和类无用的 `num_wires` 参数。
-- 重构 `MeasureAll`, `Probability` api。
+- 重构 `MeasureAll`, `Probability` API。
 - 为 `QuantumMeasure` 增加qtype参数。
 
 Fixed

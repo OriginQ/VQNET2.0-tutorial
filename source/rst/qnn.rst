@@ -3,6 +3,8 @@
 
 .. warning::
 
+    pyqpanda2 是本源量子历史开发的量子计算框架，我们建议新用户使用 pyqpanda3。pyqpanda3 的使用方法可参考 `pyqpanda3 文档 <https://pyqpanda.readthedocs.io/zh/latest/>`_ ，也可参考本文档中 :ref:`使用pyqpanda3量子机器学习模块` 部分。
+
     以下接口的量子计算部分使用pyqpanda2 https://pyqpanda-toturial.readthedocs.io/zh/latest/。
 
     您需要自行安装pyqpanda2, `pip install pyqpanda` 
@@ -133,7 +135,7 @@ QuantumLayer是一个支持量子含参线路作为参数的自动求导模块�
         # [0.2500000, 0.2500000, 0.2500000, 0.2500000]
         # ]
 
-    如果使用GPU,参考下面的例子:
+    如果使用 GPU，参考下面的例子:
 
 
     Example::
@@ -173,7 +175,7 @@ QuantumLayer是一个支持量子含参线路作为参数的自动求导模块�
             rlt_prob = ProbsMeasure([0,2],prog,machine,qubits)
             return rlt_prob
 
-        #这里的"CPU" 指的是qpanda量子计算模拟器使用CPU,跟pyvqnet是否使用GPU无关。
+        #这里的"CPU" 指的是qpanda量子计算模拟器使用 CPU,跟pyvqnet是否使用 GPU 无关。
         pqc = QuantumLayer(pqctest,3,"CPU",4,1)
         #这里使用toGPU将QuantumLayer 移动到GPU上
         pqc.toGPU()
@@ -290,7 +292,7 @@ QpandaQCircuitVQCLayerLite
         # [0.2500000, 0.2500000, 0.2500000, 0.2500000]
         # ]
         
-    如果使用GPU,参考下面的例子:
+    如果使用 GPU，参考下面的例子:
 
 
     Example::

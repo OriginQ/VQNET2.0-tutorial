@@ -19,7 +19,7 @@
 .. code-block::
 
     from pyvqnet.nn import Module,Linear,ModuleList
-    from pyvqnet.qnn.vqc.qcircuit import VQC_HardwareEfficientAnsatz,RZZ,RZ
+    from pyvqnet.qnn.vqc import VQC_HardwareEfficientAnsatz,RZZ,RZ
     from pyvqnet.qnn.vqc import Probability,QMachine
     from pyvqnet import tensor
 
@@ -66,7 +66,7 @@
 .. code-block::
 
     from pyvqnet.nn import Module,Linear,ModuleList
-    from pyvqnet.qnn.vqc.qcircuit import VQC_HardwareEfficientAnsatz,RZZ,RZ,rz,ry,cnot
+    from pyvqnet.qnn.vqc import VQC_HardwareEfficientAnsatz,RZZ,RZ,rz,ry,cnot
     from pyvqnet.qnn.vqc import Probability,QMachine
     from pyvqnet import tensor
 
@@ -118,7 +118,7 @@
 .. code-block::
 
     from pyvqnet.nn import Module,Linear,ModuleList
-    from pyvqnet.qnn.vqc.qcircuit import VQC_HardwareEfficientAnsatz,RZZ,RZ,rz,ry,cnot
+    from pyvqnet.qnn.vqc import VQC_HardwareEfficientAnsatz,RZZ,RZ,rz,ry,cnot
     from pyvqnet.qnn.vqc import Probability,QMachine
     from pyvqnet import tensor
     from pyvqnet import DEV_GPU
@@ -3144,7 +3144,7 @@ VQC_HardwareEfficientAnsatz
     Example::
 
         from pyvqnet.nn import Module,Linear,ModuleList
-        from pyvqnet.qnn.vqc.qcircuit import VQC_HardwareEfficientAnsatz,RZZ,RZ
+        from pyvqnet.qnn.vqc import VQC_HardwareEfficientAnsatz,RZZ,RZ
         from pyvqnet.qnn.vqc import Probability,QMachine
         from pyvqnet import tensor
 
@@ -3199,7 +3199,7 @@ VQC_BasicEntanglerTemplate
     Example::
 
         from pyvqnet.nn import Module, Linear, ModuleList
-        from pyvqnet.qnn.vqc.qcircuit import VQC_BasicEntanglerTemplate, RZZ, RZ
+        from pyvqnet.qnn.vqc import VQC_BasicEntanglerTemplate, RZZ, RZ
         from pyvqnet.qnn.vqc import Probability, QMachine
         from pyvqnet import tensor
 
@@ -3250,7 +3250,7 @@ VQC_StronglyEntanglingTemplate
     Example::
 
         from pyvqnet.nn import Module
-        from pyvqnet.qnn.vqc.qcircuit import VQC_StronglyEntanglingTemplate
+        from pyvqnet.qnn.vqc import VQC_StronglyEntanglingTemplate
         from pyvqnet.qnn.vqc import Probability, QMachine
         from pyvqnet import tensor
 
@@ -3303,7 +3303,7 @@ VQC_QuantumEmbedding
     Example::
 
         from pyvqnet.nn import Module
-        from pyvqnet.qnn.vqc.qcircuit import VQC_QuantumEmbedding
+        from pyvqnet.qnn.vqc import VQC_QuantumEmbedding
         from pyvqnet.qnn.vqc import  QMachine,MeasureAll
         from pyvqnet import tensor
         import pyvqnet
@@ -3597,7 +3597,7 @@ VQC_CRotCircuit
     Example::
 
         from pyvqnet.tensor import QTensor
-        from pyvqnet.qnn.vqc.qcircuit import VQC_CRotCircuit
+        from pyvqnet.qnn.vqc import VQC_CRotCircuit
         from pyvqnet.qnn.vqc import QMachine, MeasureAll
         p = QTensor([2, 3, 4.0])
         qm = QMachine(2)
@@ -3630,10 +3630,10 @@ VQC_Controlled_Hadamard
     :param q_machine: 量子虚拟机设备。
     
 
-    Examples::
+    Example::
 
         from pyvqnet.tensor import QTensor
-        from pyvqnet.qnn.vqc.qcircuit import VQC_Controlled_Hadamard
+        from pyvqnet.qnn.vqc import VQC_Controlled_Hadamard
         from pyvqnet.qnn.vqc import QMachine, MeasureAll
         p = QTensor([0.2, 3, 4.0])
 
@@ -3675,7 +3675,7 @@ VQC_CCZ
     Example::
 
         from pyvqnet.tensor import QTensor
-        from pyvqnet.qnn.vqc.qcircuit import VQC_CCZ
+        from pyvqnet.qnn.vqc import VQC_CCZ
         from pyvqnet.qnn.vqc import QMachine, MeasureAll
         p = QTensor([0.2, 3, 4.0])
 
@@ -3709,10 +3709,10 @@ VQC_FermionicSingleExcitation
 
     
 
-    Examples::
+    Example::
 
         from pyvqnet.tensor import QTensor
-        from pyvqnet.qnn.vqc.qcircuit import VQC_FermionicSingleExcitation
+        from pyvqnet.qnn.vqc import VQC_FermionicSingleExcitation
         from pyvqnet.qnn.vqc import QMachine, MeasureAll
         qm = QMachine(3)
         p0 = QTensor([0.5])
@@ -3760,10 +3760,10 @@ VQC_FermionicDoubleExcitation
 
     
 
-    Examples::
+    Example::
 
         from pyvqnet.tensor import QTensor
-        from pyvqnet.qnn.vqc.qcircuit import VQC_FermionicDoubleExcitation
+        from pyvqnet.qnn.vqc import VQC_FermionicDoubleExcitation
         from pyvqnet.qnn.vqc import QMachine, MeasureAll
         qm = QMachine(5)
         p0 = QTensor([0.5])
@@ -3815,7 +3815,7 @@ VQC_UCCSD
     :param q_machine: 量子虚拟机设备。
     
     
-    Examples::
+    Example::
 
         from pyvqnet.qnn.vqc import VQC_UCCSD, QMachine, MeasureAll
         from pyvqnet.tensor import QTensor
@@ -4015,34 +4015,6 @@ VQC_BasisRotation
         #   [[-0.1715559-0.1614315j  0.1624039-0.0598041j]
         #    [ 0.0608986-0.1078906j -0.305845 +0.1773662j]]]]
 
-VQC_QuantumPoolingCircuit
----------------------------------------------------------------
-
-.. py:function:: pyvqnet.qnn.vqc.VQC_QuantumPoolingCircuit(ignored_wires, sinks_wires, params, q_machine)
-
-    在 ``q_machine`` 上对数据进行降采样的量子电路。为了减少电路中的量子位数量,首先在系统中创建成对的量子位。在最初配对所有量子位之后,将广义2量子位酉元应用于每一对量子位上。并在应用这两个量子位酉元之后,在神经网络的其余部分忽略每对量子位中的一个量子位。
-
-    :param sources_wires: 将被忽略的源量子位索引。
-    :param sinks_wires: 将保留的目标量子位索引。
-    :param params: 输入参数,形状应该为[ len(ignored_wires) + len(sinks_wires) // 2 * 3]。
-    :param q_machine: 量子虚拟机设备。
-
-
-    Examples:: 
-
-        from pyvqnet.qnn.vqc import VQC_QuantumPoolingCircuit, QMachine, MeasureAll
-        from pyvqnet import tensor
-        p = tensor.full([6], 0.35)
-        qm = QMachine(4)
-        VQC_QuantumPoolingCircuit(q_machine=qm,
-                                ignored_wires=[0, 1],
-                                sinks_wires=[2, 3],
-                                params=p)
-        m = MeasureAll(obs={"Z1": 1})
-        exp = m(q_machine=qm)
-        print(exp)
-
-
 vqc_qft_add_to_register
 -------------------------------------
 
@@ -4176,7 +4148,7 @@ VQC_FABLE
 
     :return: 返回一个基于VQC的FABLE类实例。
 
-    Examples::
+    Example::
 
         from pyvqnet.qnn.vqc import VQC_FABLE
         from pyvqnet.qnn.vqc import QMachine
@@ -4211,7 +4183,7 @@ VQC_LCU
     :param wires: 运算符作用的 qlist 索引,可能需要辅助量子位。
     :param check_hermitian: 检查输入是否为 Hermitian,默认值:True。
 
-    Examples::
+    Example::
 
         from pyvqnet.qnn.vqc import VQC_LCU
         from pyvqnet.qnn.vqc import QMachine
@@ -4302,7 +4274,7 @@ Quanvolution
     :param kernel_initializer: 参数的卷积核初始化器。
     :param machine_type_or_cloud_token: 机器类型字符串或 Qcloud 令牌，默认为“cpu”。
 
-    Examples::
+    Example::
 
         from pyvqnet.qnn.qcnn import Quanvolution
         import pyvqnet.tensor as tensor
@@ -5822,7 +5794,7 @@ QNSPSAOptimizer
         :return: 更新后的参数。
 
 
-        Examples::
+        Example::
 
                 from pyvqnet.tensor import QTensor,ones,randu
                 from pyvqnet.qnn.vqc import rx,cry,QMachine,MeasureAll,QModule
@@ -5842,7 +5814,7 @@ QNSPSAOptimizer
 
                 qmd = QModuleDemo()
 
-                from pyvqnet.qnn.vqc.qnspsa import QNSPSAOptimizer
+                from pyvqnet.qnn.vqc.sv.native.qnspsa import QNSPSAOptimizer
                 params = QTensor([0.37454012, 0.95071431])
 
                 params.requires_grad = True
@@ -6107,7 +6079,7 @@ QNSPSAOptimizer
 
   RY(data) → [RY(param) → CRZ(param) → RY(param) → CRZ(param)] × L
 
-每层包含 40 个参数（4 组 × 10 qubit），参数总数 400。batch size 测试范围 1～1024。各框架 trials 次数：VQNet / TQ / DQ 为 20 次，PL / MQ 为 2 次（后两者在批量数据运行下较慢，仅允许2次节约时间）。
+每层包含 40 个参数（4 组 × 10 qubit），参数总数 400。batch size 测试范围 1～1024。各框架 trials 次数：VQNet / TQ / DQ 为 20 次，PL / MQ 为 2 次（后两者在批量数据运行下较慢，仅运行 2 次节约时间）。
 
 .. image:: ./images/grad_benchmarks_10q_ry_crz.png
    :width: 600 px
@@ -6753,4 +6725,2639 @@ QNSPSAOptimizer
 +------------------+-----------+
 | torchquantum     | 0.2.0     |
 +------------------+-----------+
+
+张量网络后端变分量子线路模块
+============================================
+
+.. note::
+
+    本模块基于 ``jax`` 实现自动微分与 GPU 加速。默认安装 ``pyvqnet`` 不包含该依赖，请使用 ``pip install jax``（CPU）或 ``pip install jax[cuda12]``（GPU，需 CUDA 12.6）安装。此外还需额外安装 ``tensornetwork`` ： ``pip install tensornetwork`` 。
+
+张量网络（Tensor Network）通过将复杂的张量分解为多个低维张量的网络，显著降低了计算复杂度。
+
+矩阵乘积态（Matrix Product State, MPS）是张量网络的一种特殊形式，MPS 将量子态表示为一系列矩阵的乘积，从而有效减少参数数量，降低了计算复杂度。
+
+下面接口则是基于 ``pyvqnet`` 后端（默认后端），对张量网络构建量子线路的功能支持，包括对构建量子线路基类、量子逻辑门、量子线路以及测量方法，并通过自动微分模拟代替参数移位法计算参数梯度。
+
+以MPS方式构建量子线路弥补对大比特量子线路构建支持。
+
+.. warning::
+
+        通过 ``TNQMachine`` 中 ``use_mps`` 参数开启MPS构建量子线路功能， 支持大比特(100以及以上)量子线路实现。
+
+.. warning::
+        
+        批量化与经典模块下使用方式不同，基于vmap的方式，数据以及参数构建线路需降一维输入，即对应态矢模拟时代码 ``x[:,i]`` 需要改为 ``x[i]``, 具体可查看下方接口中样例, 批次化执行必须同时基于 ``TNQMachine`` 和 ``TNQModule`` 并使用 ``TNQMachine`` 的 ``reset_states`` 显式指定批次大小。
+
+基类
+--------------------------------------------------
+
+TNQModule
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+基于张量网络编写变分量子线路模型需要继承于 ``TNQModule``
+
+.. py:class:: pyvqnet.qnn.vqc.tn.native.TNQModule(use_jit=True,vectorized_argnums=0,name="")
+
+    在 `pyvqnet` 后端（默认后端）下,定义张量网络下量子变分线路模型 `Module` 应该继承的基类。
+    该类用于使用张量网络来模块来用语执行量子线路。
+
+    :param use_jit: 开启即时编译功能, 默认为True。
+    :param vectorized_argnums: 要被向量化的参数,这些参数应该在同一维共享相同的批次形状,默认值为0
+    :param name: 模块名。
+
+    .. note::
+
+        开启 ``use_jit`` 后，模型会使用 ``jax`` 的 ``jit`` 进行即时编译，首次运行将会进行编译，会耗时较长。
+
+    .. note::
+
+        该类以及其派生类仅适用于 ``pyvqnet.backends.set_backend("pyvqnet")`` 。
+
+    Example::
+
+        import pyvqnet
+        from pyvqnet.nn import Parameter
+        pyvqnet.backends.set_backend("pyvqnet")
+        from pyvqnet.qnn.vqc.tn.native import TNQModule
+        from pyvqnet.qnn.vqc.tn.native import TNQMachine, RX, RY, CNOT, PauliX, PauliZ,qmeasure,qcircuit,VQC_RotCircuit
+        class QModel(TNQModule):
+            def __init__(self, num_wires, dtype,batch_size=2):
+                super(QModel, self).__init__()
+
+                self._num_wires = num_wires
+                self._dtype = dtype
+                self.qm = TNQMachine(num_wires, dtype=dtype)
+
+                self.w = Parameter((2,4,3),initializer=pyvqnet.utils.initializer.quantum_uniform)
+                self.cnot = CNOT(wires=[0, 1])
+                self.batch_size = batch_size
+            def forward(self, x, *args, **kwargs):
+                self.qm.reset_states(batchsize=self.batch_size)
+
+                def get_cnot(nqubits,qm):
+                    for i in range(len(nqubits) - 1):
+                        CNOT(wires = [nqubits[i], nqubits[i + 1]])(q_machine = qm)
+                    CNOT(wires = [nqubits[len(nqubits) - 1], nqubits[0]])(q_machine = qm)
+
+
+                def build_circuit(weights, xx, nqubits,qm):
+                    def Rot(weights_j, nqubits,qm):#pylint:disable=invalid-name
+                        VQC_RotCircuit(qm,nqubits,weights_j)
+
+                    def basisstate(qm,xx, nqubits):
+                        for i in nqubits:
+                            qcircuit.rz(q_machine=qm, wires=i, params=xx[i])
+                            qcircuit.ry(q_machine=qm, wires=i, params=xx[i])
+                            qcircuit.rz(q_machine=qm, wires=i, params=xx[i])
+
+                    basisstate(qm,xx,nqubits)
+
+                    for i in range(weights.shape[0]):
+
+                        weights_i = weights[i, :, :]
+                        for j in range(len(nqubits)):
+                            weights_j = weights_i[j]
+                            Rot(weights_j, nqubits[j],qm)
+                        get_cnot(nqubits,qm)
+
+                build_circuit(self.w, x,range(4),self.qm)
+
+                y= qmeasure.MeasureAll(obs={'Z0': 1})(self.qm)
+                return y
+
+
+        x= pyvqnet.tensor.QTensor([[1,0,0,1],[1,1,0,1]],dtype=pyvqnet.kfloat32)
+        model = QModel(4,pyvqnet.kcomplex64,2)
+        y = model(x)
+        y.backward(pyvqnet.tensor.ones_like(y))
+
+TNQMachine
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+基于张量网络编写变分量子线路设备需要 ``TNQMachine`` 进行初始化。 
+
+.. py:class:: pyvqnet.qnn.vqc.tn.native.TNQMachine(num_wires, dtype=pyvqnet.kcomplex64,use_mps=False)
+
+    变分量子计算的模拟器类,包含states属性为量子线路的statevectors。
+
+    .. warning::
+        
+        在每次运行一个完整的量子线路之前,必须使用 `pyvqnet.qnn.vqc.tn.native.TNQMachine.reset_states(batchsize)` 将模拟器里面初态重新初始化,并且广播为
+        (batchsize,*) 维度从而适应批量数据训练。
+
+    .. warning::
+        
+        在张量网络的量子线路中，默认会开启 ``vmap`` 功能，在线路上的逻辑门参数上均为舍弃了批次维度，
+        使用时，调用参数若维度为 [batch_size, \*], 在使用时舍弃第一个batch_size维度, 直接使用后面维度, 如对输入数据x[:,1] -> x[1], 对可训练参数也一致，可参考下列样例中xx, weights用法.
+
+
+    :param num_wires: 量子比特数。
+    :param dtype: 计算数据的数据类型。默认值是pyvqnet.kcomplex64,对应的参数精度为pyvqnet.kfloat32。
+    :param use_mps: 是否基于mpscircuit进行模拟, 用于模拟大比特量子线路执行。
+
+    :return: 输出一个TNQMachine对象。
+
+    Example::
+        
+        import pyvqnet
+        from pyvqnet.nn import Parameter
+        pyvqnet.backends.set_backend("pyvqnet")
+        from pyvqnet.qnn.vqc.tn.native import TNQModule
+        from pyvqnet.qnn.vqc.tn.native import TNQMachine, RX, RY, CNOT, PauliX, PauliZ,qmeasure,qcircuit,VQC_RotCircuit
+        class QModel(TNQModule):
+            def __init__(self, num_wires, dtype,batch_size=2):
+                super(QModel, self).__init__()
+
+                self._num_wires = num_wires
+                self._dtype = dtype
+                self.qm = TNQMachine(num_wires, dtype=dtype)
+
+                self.w = Parameter((2,4,3),initializer=pyvqnet.utils.initializer.quantum_uniform)
+                self.cnot = CNOT(wires=[0, 1])
+                self.batch_size = batch_size
+            def forward(self, x, *args, **kwargs):
+                self.qm.reset_states(batchsize=self.batch_size)
+
+                def get_cnot(nqubits,qm):
+                    for i in range(len(nqubits) - 1):
+                        CNOT(wires = [nqubits[i], nqubits[i + 1]])(q_machine = qm)
+                    CNOT(wires = [nqubits[len(nqubits) - 1], nqubits[0]])(q_machine = qm)
+
+
+                def build_circuit(weights, xx, nqubits,qm):
+                    def Rot(weights_j, nqubits,qm):#pylint:disable=invalid-name
+                        VQC_RotCircuit(qm,nqubits,weights_j)
+
+                    def basisstate(qm,xx, nqubits):
+                        for i in nqubits:
+                            qcircuit.rz(q_machine=qm, wires=i, params=xx[i])
+                            qcircuit.ry(q_machine=qm, wires=i, params=xx[i])
+                            qcircuit.rz(q_machine=qm, wires=i, params=xx[i])
+
+                    basisstate(qm,xx,nqubits)
+
+                    for i in range(weights.shape[0]):
+
+                        weights_i = weights[i, :, :]
+                        for j in range(len(nqubits)):
+                            weights_j = weights_i[j]
+                            Rot(weights_j, nqubits[j],qm)
+                        get_cnot(nqubits,qm)
+
+                build_circuit(self.w, x,range(4),self.qm)
+
+                y= qmeasure.MeasureAll(obs={'Z0': 1})(self.qm)
+                return y
+
+
+        x= pyvqnet.tensor.QTensor([[1,0,0,1],[1,1,0,1]],dtype=pyvqnet.kfloat32)
+        model = QModel(4,pyvqnet.kcomplex64,2)
+        y = model(x)
+        y.backward(pyvqnet.tensor.ones_like(y))
+
+    .. py:method:: get_states()
+
+        获得张量网络中的states。
+
+变分量子逻辑门模块
+--------------------------------------------------
+
+
+以下 ``pyvqnet.qnn.vqc`` 中的函数接口直接支持 ``pyvqnet`` 后端的 ``QTensor`` 进行计算，通过 ``pyvqnet.qnn.vqc.tn`` 下调用使用。
+
+.. csv-table:: 已支持pyvqnet.qnn.vqc.sv.native接口列表
+   :file: ./images/same_apis_from_tn.csv
+
+以下量子线路模块继承于 ``pyvqnet.qnn.vqc.tn.native.TNQModule``,其中计算使用 ``QTensor`` 进行计算。
+
+
+.. warning::
+
+    该类以及其派生类仅适用于 ``pyvqnet.backends.set_backend("pyvqnet")`` 。
+
+    这些类如果有非参数成员变量 ``_buffers`` ,则其中的数据为 ``QTensor`` 类型。
+    这些类如果有参数成员变量 ``_parmeters`` ,则其中的数据为 ``pyvqnet.nn.Parameter`` 类型。
+
+I
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:class:: pyvqnet.qnn.vqc.tn.native.I(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+    
+    定义一个I逻辑门类 。
+
+    .. warning::
+
+        该类继承于 ``pyvqnet.qnn.vqc.tn.native.QModule`` 以及 ``pyvqnet.nn.Module``。
+        该类可以作为 ``pyvqnet.nn.Module`` 的一个子模块加入 ``TNQModule`` 的模型中。
+
+    :param has_params: 是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
+    :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
+    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
+    :param wires: 线路作用的比特索引,默认为None。
+    :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
+    :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
+    :return: 一个 I 逻辑门实例
+
+    Example::
+
+
+        import pyvqnet
+        pyvqnet.backends.set_backend("pyvqnet")
+        from pyvqnet.qnn.vqc.tn.native import I,TNQMachine
+        device = TNQMachine(4)
+        layer = I(wires=0)
+        batchsize = 1
+        device.reset_states(1)
+        layer(q_machine = device)
+        print(device.get_states())
+
+Hadamard
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:class:: pyvqnet.qnn.vqc.tn.native.Hadamard(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+    
+    定义一个Hadamard逻辑门类 。
+
+    .. warning::
+
+        该类继承于 ``pyvqnet.qnn.vqc.tn.native.QModule`` 以及 ``pyvqnet.nn.Module``。
+        该类可以作为 ``pyvqnet.nn.Module`` 的一个子模块加入 ``TNQModule`` 的模型中。
+
+    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
+    :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
+    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
+    :param wires: 线路作用的比特索引,默认为None。
+    :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
+    :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
+    :return: 一个 Hadamard 逻辑门实例
+
+    Example::
+
+
+        import pyvqnet
+        pyvqnet.backends.set_backend("pyvqnet")
+        from pyvqnet.qnn.vqc.tn.native import Hadamard,TNQMachine
+        device = TNQMachine(4)
+        layer = Hadamard(wires=0)
+        batchsize = 1
+        device.reset_states(1)
+        layer(q_machine = device)
+        print(device.get_states())
+
+T
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:class:: pyvqnet.qnn.vqc.tn.native.T(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+    
+    定义一个T逻辑门类 。
+
+    .. warning::
+
+        该类继承于 ``pyvqnet.qnn.vqc.tn.native.QModule`` 以及 ``pyvqnet.nn.Module``。
+        该类可以作为 ``pyvqnet.nn.Module`` 的一个子模块加入 ``TNQModule`` 的模型中。
+
+    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
+    :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
+    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
+    :param wires: 线路作用的比特索引,默认为None。
+    :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
+    :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
+    :return: 一个 T 逻辑门实例
+
+    Example::
+
+
+        import pyvqnet
+        pyvqnet.backends.set_backend("pyvqnet")
+        from pyvqnet.qnn.vqc.tn.native import T,TNQMachine
+        device = TNQMachine(4)
+        layer = T(wires=0)
+        batchsize = 1
+        device.reset_states(1)
+        layer(q_machine = device)
+        print(device.get_states())
+
+S
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:class:: pyvqnet.qnn.vqc.tn.native.S(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+    
+    定义一个S逻辑门类 。
+
+    .. warning::
+
+        该类继承于 ``pyvqnet.qnn.vqc.tn.native.QModule`` 以及 ``pyvqnet.nn.Module``。
+        该类可以作为 ``pyvqnet.nn.Module`` 的一个子模块加入 ``TNQModule`` 的模型中。
+
+    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
+    :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
+    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
+    :param wires: 线路作用的比特索引,默认为None。
+    :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
+    :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
+    :return: 一个 S 逻辑门实例。
+
+    Example::
+
+
+        import pyvqnet
+        pyvqnet.backends.set_backend("pyvqnet")
+        from pyvqnet.qnn.vqc.tn.native import S,TNQMachine
+        device = TNQMachine(4)
+        layer = S(wires=0)
+        batchsize = 1
+        device.reset_states(1)
+        layer(q_machine = device)
+        print(device.get_states())
+
+PauliX
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:class:: pyvqnet.qnn.vqc.tn.native.PauliX(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+    
+    定义一个PauliX逻辑门类 。
+
+    .. warning::
+
+        该类继承于 ``pyvqnet.qnn.vqc.tn.native.QModule`` 以及 ``pyvqnet.nn.Module``。
+        该类可以作为 ``pyvqnet.nn.Module`` 的一个子模块加入 ``TNQModule`` 的模型中。
+
+
+    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
+    :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
+    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
+    :param wires: 线路作用的比特索引,默认为None。
+    :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
+    :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
+    :return: 一个 PauliX 逻辑门实例。
+
+    Example::
+
+
+        import pyvqnet
+        pyvqnet.backends.set_backend("pyvqnet")
+        from pyvqnet.qnn.vqc.tn.native import PauliX,TNQMachine
+        device = TNQMachine(4)
+        layer = PauliX(wires=0)
+        batchsize = 1
+        device.reset_states(1)
+        layer(q_machine = device)
+        print(device.get_states())
+
+PauliY
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:class:: pyvqnet.qnn.vqc.tn.native.PauliY(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+    
+    定义一个PauliY逻辑门类 。
+
+    .. warning::
+
+        该类继承于 ``pyvqnet.qnn.vqc.tn.native.QModule`` 以及 ``pyvqnet.nn.Module``。
+        该类可以作为 ``pyvqnet.nn.Module`` 的一个子模块加入 ``TNQModule`` 的模型中。
+
+
+    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
+    :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
+    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
+    :param wires: 线路作用的比特索引,默认为None。
+    :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
+    :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
+    :return: 一个 PauliY 逻辑门实例。
+
+    Example::
+
+
+        import pyvqnet
+        pyvqnet.backends.set_backend("pyvqnet")
+        from pyvqnet.qnn.vqc.tn.native import PauliY,TNQMachine
+        device = TNQMachine(4)
+        layer = PauliY(wires=0)
+        batchsize = 1
+        device.reset_states(1)
+        layer(q_machine = device)
+        print(device.get_states())
+
+PauliZ
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:class:: pyvqnet.qnn.vqc.tn.native.PauliZ(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+    
+    定义一个PauliZ逻辑门类 。
+
+    .. warning::
+
+        该类继承于 ``pyvqnet.qnn.vqc.tn.native.QModule`` 以及 ``pyvqnet.nn.Module``。
+        该类可以作为 ``pyvqnet.nn.Module`` 的一个子模块加入 ``TNQModule`` 的模型中。
+
+
+    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
+    :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
+    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
+    :param wires: 线路作用的比特索引,默认为None。
+    :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
+    :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
+    :return: 一个 PauliZ 逻辑门实例。
+
+    Example::
+
+
+        import pyvqnet
+        pyvqnet.backends.set_backend("pyvqnet")
+        from pyvqnet.qnn.vqc.tn.native import PauliZ,TNQMachine
+        device = TNQMachine(4)
+        layer = PauliZ(wires=0)
+        batchsize = 1
+        device.reset_states(1)
+        layer(q_machine = device)
+        print(device.get_states())
+
+RX
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:class:: pyvqnet.qnn.vqc.tn.native.RX(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+    
+    定义一个RX逻辑门类 。
+
+
+    .. warning::
+
+        该类继承于 ``pyvqnet.qnn.vqc.tn.native.QModule`` 以及 ``pyvqnet.nn.Module``。
+        该类可以作为 ``pyvqnet.nn.Module`` 的一个子模块加入 ``TNQModule`` 的模型中。
+
+    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
+    :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
+    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
+    :param wires: 线路作用的比特索引,默认为None。
+    :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
+    :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
+    :return: 一个 RX 逻辑门实例。
+
+    Example::
+
+        import pyvqnet
+        pyvqnet.backends.set_backend("pyvqnet")
+        from pyvqnet.qnn.vqc.tn.native import RX,TNQMachine
+        device = TNQMachine(4)
+        layer = RX(has_params= True, trainable= True, wires=0)
+        batchsize = 2
+        device.reset_states(batchsize)
+        layer(q_machine = device)
+        print(device.get_states())
+
+RY
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:class:: pyvqnet.qnn.vqc.tn.native.RY(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+    
+    定义一个RY逻辑门类 。
+
+    .. warning::
+
+        该类继承于 ``pyvqnet.qnn.vqc.tn.native.QModule`` 以及 ``pyvqnet.nn.Module``。
+        该类可以作为 ``pyvqnet.nn.Module`` 的一个子模块加入 ``TNQModule`` 的模型中。
+
+    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
+    :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
+    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
+    :param wires: 线路作用的比特索引,默认为None。
+    :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
+    :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
+    :return: 一个 RY 逻辑门实例。
+
+    Example::
+
+        import pyvqnet
+        pyvqnet.backends.set_backend("pyvqnet")
+        from pyvqnet.qnn.vqc.tn.native import RY,TNQMachine
+        device = TNQMachine(4)
+        layer = RY(has_params= True, trainable= True, wires=0)
+        batchsize = 2
+        device.reset_states(batchsize)
+        layer(q_machine = device)
+        print(device.get_states())
+
+RZ
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:class:: pyvqnet.qnn.vqc.tn.native.RZ(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+    
+    定义一个RZ逻辑门类 。
+
+    .. warning::
+
+        该类继承于 ``pyvqnet.qnn.vqc.tn.native.QModule`` 以及 ``pyvqnet.nn.Module``。
+        该类可以作为 ``pyvqnet.nn.Module`` 的一个子模块加入 ``TNQModule`` 的模型中。
+
+    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
+    :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
+    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
+    :param wires: 线路作用的比特索引,默认为None。
+    :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
+    :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
+    :return: 一个 RZ 逻辑门实例。
+
+    Example::
+
+        import pyvqnet
+        pyvqnet.backends.set_backend("pyvqnet")
+        from pyvqnet.qnn.vqc.tn.native import RZ,TNQMachine
+        device = TNQMachine(4)
+        layer = RZ(has_params= True, trainable= True, wires=0)
+        batchsize = 2
+        device.reset_states(batchsize)
+        layer(q_machine = device)
+        print(device.get_states())
+
+CRX
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:class:: pyvqnet.qnn.vqc.tn.native.CRX(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+    
+    定义一个CRX逻辑门类 。
+
+    .. warning::
+
+        该类继承于 ``pyvqnet.qnn.vqc.tn.native.QModule`` 以及 ``pyvqnet.nn.Module``。
+        该类可以作为 ``pyvqnet.nn.Module`` 的一个子模块加入 ``TNQModule`` 的模型中。
+
+    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
+    :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
+    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
+    :param wires: 线路作用的比特索引,默认为None。
+    :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
+    :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
+    :return: 一个 CRX 逻辑门实例。
+
+    Example::
+
+        import pyvqnet
+        pyvqnet.backends.set_backend("pyvqnet")
+        from pyvqnet.qnn.vqc.tn.native import CRX,TNQMachine
+        device = TNQMachine(4)
+        layer = CRX(has_params= True, trainable= True, wires=[0,2])
+        batchsize = 2
+        device.reset_states(batchsize)
+        layer(q_machine = device)
+        print(device.get_states())
+
+CRY
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:class:: pyvqnet.qnn.vqc.tn.native.CRY(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+    
+    定义一个CRY逻辑门类 。
+
+    .. warning::
+
+        该类继承于 ``pyvqnet.qnn.vqc.tn.native.QModule`` 以及 ``pyvqnet.nn.Module``。
+        该类可以作为 ``pyvqnet.nn.Module`` 的一个子模块加入 ``TNQModule`` 的模型中。
+
+    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
+    :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
+    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
+    :param wires: 线路作用的比特索引,默认为None。
+    :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
+    :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
+    :return: 一个 CRY 逻辑门实例。
+
+    Example::
+
+        import pyvqnet
+        pyvqnet.backends.set_backend("pyvqnet")
+        from pyvqnet.qnn.vqc.tn.native import CRY,TNQMachine
+        device = TNQMachine(4)
+        layer = CRY(has_params= True, trainable= True, wires=[0,2])
+        batchsize = 2
+        device.reset_states(batchsize)
+        layer(q_machine = device)
+        print(device.get_states())
+
+CRZ
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+.. py:class:: pyvqnet.qnn.vqc.tn.native.CRZ(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+    
+    定义一个CRZ逻辑门类 。
+
+    .. warning::
+
+        该类继承于 ``pyvqnet.qnn.vqc.tn.native.QModule`` 以及 ``pyvqnet.nn.Module``。
+        该类可以作为 ``pyvqnet.nn.Module`` 的一个子模块加入 ``TNQModule`` 的模型中。
+
+    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
+    :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
+    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
+    :param wires: 线路作用的比特索引,默认为None。
+    :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
+    :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
+    :return: 一个 CRZ 逻辑门实例。
+
+    Example::
+
+        import pyvqnet
+        pyvqnet.backends.set_backend("pyvqnet")
+        from pyvqnet.qnn.vqc.tn.native import CRZ,TNQMachine
+        device = TNQMachine(4)
+        layer = CRZ(has_params= True, trainable= True, wires=[0,2])
+        batchsize = 2
+        device.reset_states(batchsize)
+        layer(q_machine = device)
+        print(device.get_states())
+
+U1
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:class:: pyvqnet.qnn.vqc.tn.native.U1(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+    
+    定义一个U1逻辑门类 。
+
+    .. warning::
+
+        该类继承于 ``pyvqnet.qnn.vqc.tn.native.QModule`` 以及 ``pyvqnet.nn.Module``。
+        该类可以作为 ``pyvqnet.nn.Module`` 的一个子模块加入 ``TNQModule`` 的模型中。
+
+    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
+    :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
+    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
+    :param wires: 线路作用的比特索引,默认为None。
+    :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
+    :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
+    :return: 一个 U1 逻辑门实例。
+
+    Example::
+
+        import pyvqnet
+        pyvqnet.backends.set_backend("pyvqnet")
+        from pyvqnet.qnn.vqc.tn.native import U1,TNQMachine
+        device = TNQMachine(4)
+        layer = U1(has_params= True, trainable= True, wires=0)
+        batchsize = 2
+        device.reset_states(batchsize)
+        layer(q_machine = device)
+        print(device.get_states())
+
+U2
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+.. py:class:: pyvqnet.qnn.vqc.tn.native.U2(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+    
+    定义一个U2逻辑门类 。
+
+    .. warning::
+
+        该类继承于 ``pyvqnet.qnn.vqc.tn.native.QModule`` 以及 ``pyvqnet.nn.Module``。
+        该类可以作为 ``pyvqnet.nn.Module`` 的一个子模块加入 ``TNQModule`` 的模型中。
+
+    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
+    :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
+    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
+    :param wires: 线路作用的比特索引,默认为None。
+    :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
+    :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
+    :return: 一个 U2 逻辑门实例。
+
+    Example::
+
+        import pyvqnet
+        pyvqnet.backends.set_backend("pyvqnet")
+        from pyvqnet.qnn.vqc.tn.native import U2,TNQMachine
+        device = TNQMachine(4)
+        layer = U2(has_params= True, trainable= True, wires=0)
+        batchsize = 2
+        device.reset_states(batchsize)
+        layer(q_machine = device)
+        print(device.get_states())
+
+U3
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+.. py:class:: pyvqnet.qnn.vqc.tn.native.U3(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+    
+    定义一个U3逻辑门类 。
+
+    .. warning::
+
+        该类继承于 ``pyvqnet.qnn.vqc.tn.native.QModule`` 以及 ``pyvqnet.nn.Module``。
+        该类可以作为 ``pyvqnet.nn.Module`` 的一个子模块加入 ``TNQModule`` 的模型中。
+
+    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
+    :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
+    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
+    :param wires: 线路作用的比特索引,默认为None。
+    :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
+    :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
+    :return: 一个 U3 逻辑门实例。
+
+    Example::
+
+        import pyvqnet
+        pyvqnet.backends.set_backend("pyvqnet")
+        from pyvqnet.qnn.vqc.tn.native import U3,TNQMachine
+        device = TNQMachine(4)
+        layer = U3(has_params= True, trainable= True, wires=0)
+        batchsize = 2
+        device.reset_states(batchsize)
+        layer(q_machine = device)
+        print(device.get_states())
+
+CNOT
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:class:: pyvqnet.qnn.vqc.tn.native.CNOT(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+    
+    定义一个CNOT逻辑门类,也可称为CX。
+
+    .. warning::
+
+        该类继承于 ``pyvqnet.qnn.vqc.tn.native.QModule`` 以及 ``pyvqnet.nn.Module``。
+        该类可以作为 ``pyvqnet.nn.Module`` 的一个子模块加入 ``TNQModule`` 的模型中。
+
+    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
+    :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
+    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
+    :param wires: 线路作用的比特索引,默认为None。
+    :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
+    :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
+    :return: 一个 CNOT 逻辑门实例。
+
+    Example::
+
+        import pyvqnet
+        pyvqnet.backends.set_backend("pyvqnet")
+        from pyvqnet.qnn.vqc.tn.native import CNOT,TNQMachine
+        device = TNQMachine(4)
+        layer = CNOT(wires=[0,1])
+        batchsize = 2
+        device.reset_states(batchsize)
+        layer(q_machine = device)
+        print(device.get_states())
+
+CY
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:class:: pyvqnet.qnn.vqc.tn.native.CY(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+    
+    定义一个CY逻辑门类 。
+
+    .. warning::
+
+        该类继承于 ``pyvqnet.qnn.vqc.tn.native.QModule`` 以及 ``pyvqnet.nn.Module``。
+        该类可以作为 ``pyvqnet.nn.Module`` 的一个子模块加入 ``TNQModule`` 的模型中。
+
+    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
+    :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
+    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
+    :param wires: 线路作用的比特索引,默认为None。
+    :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
+    :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
+    :return: 一个 CY 逻辑门实例。
+
+    Example::
+
+        import pyvqnet
+        pyvqnet.backends.set_backend("pyvqnet")
+        from pyvqnet.qnn.vqc.tn.native import CY,TNQMachine
+        device = TNQMachine(4)
+        layer = CY(wires=[0,1])
+        batchsize = 2
+        device.reset_states(batchsize)
+        layer(q_machine = device)
+        print(device.get_states())
+
+CZ
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:class:: pyvqnet.qnn.vqc.tn.native.CZ(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+    
+    定义一个CZ逻辑门类 。
+
+    .. warning::
+
+        该类继承于 ``pyvqnet.qnn.vqc.tn.native.QModule`` 以及 ``pyvqnet.nn.Module``。
+        该类可以作为 ``pyvqnet.nn.Module`` 的一个子模块加入 ``TNQModule`` 的模型中。
+
+    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
+    :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
+    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
+    :param wires: 线路作用的比特索引,默认为None。
+    :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
+    :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
+    :return: 一个 CZ 逻辑门实例。
+
+    Example::
+
+        import pyvqnet
+        pyvqnet.backends.set_backend("pyvqnet")
+        from pyvqnet.qnn.vqc.tn.native import CZ,TNQMachine
+        device = TNQMachine(4)
+        layer = CZ(wires=[0,1])
+        batchsize = 2
+        device.reset_states(batchsize)
+        layer(q_machine = device)
+        print(device.get_states())
+
+CR
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:class:: pyvqnet.qnn.vqc.tn.native.CR(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+    
+    定义一个CR逻辑门类 。
+
+    .. warning::
+
+        该类继承于 ``pyvqnet.qnn.vqc.tn.native.QModule`` 以及 ``pyvqnet.nn.Module``。
+        该类可以作为 ``pyvqnet.nn.Module`` 的一个子模块加入 ``TNQModule`` 的模型中。
+
+    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
+    :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
+    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
+    :param wires: 线路作用的比特索引,默认为None。
+    :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
+    :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
+    :return: 一个 CR 逻辑门实例。
+
+    Example::
+
+        import pyvqnet
+        pyvqnet.backends.set_backend("pyvqnet")
+        from pyvqnet.qnn.vqc.tn.native import CR,TNQMachine
+        device = TNQMachine(4)
+        layer = CR(has_params= True, trainable= True, wires=[0,2])
+        batchsize = 2
+        device.reset_states(batchsize)
+        layer(q_machine = device)
+        print(device.get_states())
+
+SWAP
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+.. py:class:: pyvqnet.qnn.vqc.tn.native.SWAP(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+    
+    定义一个SWAP逻辑门类 。
+
+    .. warning::
+
+        该类继承于 ``pyvqnet.qnn.vqc.tn.native.QModule`` 以及 ``pyvqnet.nn.Module``。
+        该类可以作为 ``pyvqnet.nn.Module`` 的一个子模块加入 ``TNQModule`` 的模型中。
+
+    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
+    :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
+    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
+    :param wires: 线路作用的比特索引,默认为None。
+    :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
+    :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
+    :return: 一个 SWAP 逻辑门实例。
+
+    Example::
+
+        import pyvqnet
+        pyvqnet.backends.set_backend("pyvqnet")
+        from pyvqnet.qnn.vqc.tn.native import SWAP,TNQMachine
+        device = TNQMachine(4)
+        layer = SWAP(wires=[0,1])
+        batchsize = 2
+        device.reset_states(batchsize)
+        layer(q_machine = device)
+        print(device.get_states())
+
+CSWAP
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:class:: pyvqnet.qnn.vqc.tn.native.CSWAP(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+    
+    定义一个SWAP逻辑门类 。
+
+    .. math:: CSWAP = \begin{bmatrix}
+            1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+            0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+            0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 \\
+            0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 \\
+            0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 \\
+            0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\
+            0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 \\
+            0 & 0 & 0 & 0 & 0 & 0 & 0 & 1
+        \end{bmatrix}.
+
+    .. warning::
+
+        该类继承于 ``pyvqnet.qnn.vqc.tn.native.QModule`` 以及 ``pyvqnet.nn.Module``。
+        该类可以作为 ``pyvqnet.nn.Module`` 的一个子模块加入 ``TNQModule`` 的模型中。
+
+    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
+    :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
+    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
+    :param wires: 线路作用的比特索引,默认为None。
+    :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
+    :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
+    :return: 一个 CSWAP 逻辑门实例。
+
+    Example::
+
+        import pyvqnet
+        pyvqnet.backends.set_backend("pyvqnet")
+        from pyvqnet.qnn.vqc.tn.native import CSWAP,TNQMachine
+        device = TNQMachine(4)
+        layer = CSWAP(wires=[0,1,2])
+        batchsize = 2
+        device.reset_states(batchsize)
+        layer(q_machine = device)
+        print(device.get_states())
+
+RXX
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+.. py:class:: pyvqnet.qnn.vqc.tn.native.RXX(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+    
+    定义一个RXX逻辑门类 。
+
+    .. warning::
+
+        该类继承于 ``pyvqnet.qnn.vqc.tn.native.QModule`` 以及 ``pyvqnet.nn.Module``。
+        该类可以作为 ``pyvqnet.nn.Module`` 的一个子模块加入 ``TNQModule`` 的模型中。
+
+    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
+    :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
+    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
+    :param wires: 线路作用的比特索引,默认为None。
+    :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
+    :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
+    :return: 一个 RXX 逻辑门实例。
+
+    Example::
+
+        import pyvqnet
+        pyvqnet.backends.set_backend("pyvqnet")
+        from pyvqnet.qnn.vqc.tn.native import RXX,TNQMachine
+        device = TNQMachine(4)
+        layer = RXX(has_params= True, trainable= True, wires=[0,2])
+        batchsize = 2
+        device.reset_states(batchsize)
+        layer(q_machine = device)
+        print(device.get_states())
+
+RYY
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:class:: pyvqnet.qnn.vqc.tn.native.RYY(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+    
+    定义一个RYY逻辑门类 。
+
+    .. warning::
+
+        该类继承于 ``pyvqnet.qnn.vqc.tn.native.QModule`` 以及 ``pyvqnet.nn.Module``。
+        该类可以作为 ``pyvqnet.nn.Module`` 的一个子模块加入 ``TNQModule`` 的模型中。
+
+    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
+    :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
+    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
+    :param wires: 线路作用的比特索引,默认为None。
+    :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
+    :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
+    :return: 一个 RYY 逻辑门实例。
+
+    Example::
+
+        import pyvqnet
+        pyvqnet.backends.set_backend("pyvqnet")
+        from pyvqnet.qnn.vqc.tn.native import RYY,TNQMachine
+        device = TNQMachine(4)
+        layer = RYY(has_params= True, trainable= True, wires=[0,2])
+        batchsize = 2
+        device.reset_states(batchsize)
+        layer(q_machine = device)
+        print(device.get_states())
+
+RZZ
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:class:: pyvqnet.qnn.vqc.tn.native.RZZ(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+    
+    定义一个RZZ逻辑门类 。
+
+    .. warning::
+
+        该类继承于 ``pyvqnet.qnn.vqc.tn.native.QModule`` 以及 ``pyvqnet.nn.Module``。
+        该类可以作为 ``pyvqnet.nn.Module`` 的一个子模块加入 ``TNQModule`` 的模型中。
+
+    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
+    :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
+    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
+    :param wires: 线路作用的比特索引,默认为None。
+    :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
+    :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
+    :return: 一个RZZ 逻辑门实例。
+
+    Example::
+
+        import pyvqnet
+        pyvqnet.backends.set_backend("pyvqnet")
+        from pyvqnet.qnn.vqc.tn.native import RZZ,TNQMachine
+        device = TNQMachine(4)
+        layer = RZZ(has_params= True, trainable= True, wires=[0,2])
+        batchsize = 2
+        device.reset_states(batchsize)
+        layer(q_machine = device)
+        print(device.get_states())
+
+RZX
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:class:: pyvqnet.qnn.vqc.tn.native.RZX(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+    
+    定义一个RZX逻辑门类 。
+
+    .. warning::
+
+        该类继承于 ``pyvqnet.qnn.vqc.tn.native.QModule`` 以及 ``pyvqnet.nn.Module``。
+        该类可以作为 ``pyvqnet.nn.Module`` 的一个子模块加入 ``TNQModule`` 的模型中。
+
+    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
+    :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
+    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
+    :param wires: 线路作用的比特索引,默认为None。
+    :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
+    :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
+    :return: 一个 RZX 逻辑门实例。
+
+    Example::
+
+        import pyvqnet
+        pyvqnet.backends.set_backend("pyvqnet")
+        from pyvqnet.qnn.vqc.tn.native import RZX,TNQMachine
+        device = TNQMachine(4)
+        layer = RZX(has_params= True, trainable= True, wires=[0,2])
+        batchsize = 2
+        device.reset_states(batchsize)
+        layer(q_machine = device)
+        print(device.get_states())
+
+Toffoli
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+.. py:class:: pyvqnet.qnn.vqc.tn.native.Toffoli(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+    
+    定义一个Toffoli逻辑门类 。
+
+    .. warning::
+
+        该类继承于 ``pyvqnet.qnn.vqc.tn.native.QModule`` 以及 ``pyvqnet.nn.Module``。
+        该类可以作为 ``pyvqnet.nn.Module`` 的一个子模块加入 ``TNQModule`` 的模型中。
+
+    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
+    :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
+    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
+    :param wires: 线路作用的比特索引,默认为None。
+    :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
+    :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
+    :return: 一个 Toffoli 逻辑门实例。
+
+    Example::
+
+        import pyvqnet
+        pyvqnet.backends.set_backend("pyvqnet")
+        from pyvqnet.qnn.vqc.tn.native import Toffoli,TNQMachine
+        device = TNQMachine(4)
+        layer = Toffoli(  wires=[0,2,1])
+        batchsize = 2
+        device.reset_states(batchsize)
+        layer(q_machine = device)
+        print(device.get_states())
+
+IsingXX
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+.. py:class:: pyvqnet.qnn.vqc.tn.native.IsingXX(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+    
+    定义一个IsingXX逻辑门类 。
+
+    .. warning::
+
+        该类继承于 ``pyvqnet.qnn.vqc.tn.native.QModule`` 以及 ``pyvqnet.nn.Module``。
+        该类可以作为 ``pyvqnet.nn.Module`` 的一个子模块加入 ``TNQModule`` 的模型中。
+
+    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
+    :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
+    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
+    :param wires: 线路作用的比特索引,默认为None。
+    :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
+    :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
+    :return: 一个 IsingXX 逻辑门实例。
+
+    Example::
+
+        import pyvqnet
+        pyvqnet.backends.set_backend("pyvqnet")
+        from pyvqnet.qnn.vqc.tn.native import IsingXX,TNQMachine
+        device = TNQMachine(4)
+        layer = IsingXX(has_params= True, trainable= True, wires=[0,2])
+        batchsize = 2
+        device.reset_states(batchsize)
+        layer(q_machine = device)
+        print(device.get_states())
+
+IsingYY
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+.. py:class:: pyvqnet.qnn.vqc.tn.native.IsingYY(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+    
+    定义一个IsingYY逻辑门类 。
+
+    .. warning::
+
+        该类继承于 ``pyvqnet.qnn.vqc.tn.native.QModule`` 以及 ``pyvqnet.nn.Module``。
+        该类可以作为 ``pyvqnet.nn.Module`` 的一个子模块加入 ``TNQModule`` 的模型中。
+
+    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
+    :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
+    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
+    :param wires: 线路作用的比特索引,默认为None。
+    :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
+    :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
+    :return: 一个 IsingYY 逻辑门实例。
+
+    Example::
+
+        import pyvqnet
+        pyvqnet.backends.set_backend("pyvqnet")
+        from pyvqnet.qnn.vqc.tn.native import IsingYY,TNQMachine
+        device = TNQMachine(4)
+        layer = IsingYY(has_params= True, trainable= True, wires=[0,2])
+        batchsize = 2
+        device.reset_states(batchsize)
+        layer(q_machine = device)
+        print(device.get_states())
+
+IsingZZ
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:class:: pyvqnet.qnn.vqc.tn.native.IsingZZ(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+    
+    定义一个IsingZZ逻辑门类 。
+
+
+    .. warning::
+
+        该类继承于 ``pyvqnet.qnn.vqc.tn.native.QModule`` 以及 ``pyvqnet.nn.Module``。
+        该类可以作为 ``pyvqnet.nn.Module`` 的一个子模块加入 ``TNQModule`` 的模型中。
+
+    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
+    :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
+    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
+    :param wires: 线路作用的比特索引,默认为None。
+    :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
+    :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
+    :return: 一个 IsingZZ 逻辑门实例。
+
+    Example::
+
+        import pyvqnet
+        pyvqnet.backends.set_backend("pyvqnet")
+        from pyvqnet.qnn.vqc.tn.native import IsingZZ,TNQMachine
+        device = TNQMachine(4)
+        layer = IsingZZ(has_params= True, trainable= True, wires=[0,2])
+        batchsize = 2
+        device.reset_states(batchsize)
+        layer(q_machine = device)
+        print(device.get_states())
+
+IsingXY
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+.. py:class:: pyvqnet.qnn.vqc.tn.native.IsingXY(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+    
+    定义一个IsingXY逻辑门类 。
+
+    .. warning::
+
+        该类继承于 ``pyvqnet.qnn.vqc.tn.native.QModule`` 以及 ``pyvqnet.nn.Module``。
+        该类可以作为 ``pyvqnet.nn.Module`` 的一个子模块加入 ``TNQModule`` 的模型中。
+
+    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
+    :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
+    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
+    :param wires: 线路作用的比特索引,默认为None。
+    :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
+    :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
+    :return: 一个 IsingXY 逻辑门实例。
+
+    Example::
+
+        import pyvqnet
+        pyvqnet.backends.set_backend("pyvqnet")
+        from pyvqnet.qnn.vqc.tn.native import IsingXY,TNQMachine
+        device = TNQMachine(4)
+        layer = IsingXY(has_params= True, trainable= True, wires=[0,2])
+        batchsize = 2
+        device.reset_states(batchsize)
+        layer(q_machine = device)
+        print(device.get_states())
+
+PhaseShift
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+.. py:class:: pyvqnet.qnn.vqc.tn.native.PhaseShift(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+    
+    定义一个PhaseShift逻辑门类 。
+
+    .. warning::
+
+        该类继承于 ``pyvqnet.qnn.vqc.tn.native.QModule`` 以及 ``pyvqnet.nn.Module``。
+        该类可以作为 ``pyvqnet.nn.Module`` 的一个子模块加入 ``TNQModule`` 的模型中。
+
+    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
+    :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
+    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
+    :param wires: 线路作用的比特索引,默认为None。
+    :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
+    :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
+    :return: 一个 PhaseShift 逻辑门实例。
+
+    Example::
+
+        import pyvqnet
+        pyvqnet.backends.set_backend("pyvqnet")
+        from pyvqnet.qnn.vqc.tn.native import PhaseShift,TNQMachine
+        device = TNQMachine(4)
+        layer = PhaseShift(has_params= True, trainable= True, wires=1)
+        batchsize = 2
+        device.reset_states(batchsize)
+        layer(q_machine = device)
+        print(device.get_states())
+
+MultiRZ
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:class:: pyvqnet.qnn.vqc.tn.native.MultiRZ(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+    
+    定义一个MultiRZ逻辑门类 。
+
+    .. warning::
+
+        该类继承于 ``pyvqnet.qnn.vqc.tn.native.QModule`` 以及 ``pyvqnet.nn.Module``。
+        该类可以作为 ``pyvqnet.nn.Module`` 的一个子模块加入 ``TNQModule`` 的模型中。
+
+    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
+    :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
+    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
+    :param wires: 线路作用的比特索引,默认为None。
+    :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
+    :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
+    :return: 一个 MultiRZ 逻辑门实例。
+
+    Example::
+
+        import pyvqnet
+        pyvqnet.backends.set_backend("pyvqnet")
+        from pyvqnet.qnn.vqc.tn.native import MultiRZ,TNQMachine
+        device = TNQMachine(4)
+        layer = MultiRZ(has_params= True, trainable= True, wires=[0,2])
+        batchsize = 2
+        device.reset_states(batchsize)
+        layer(q_machine = device)
+        print(device.get_states())
+
+
+SDG
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+.. py:class:: pyvqnet.qnn.vqc.tn.native.SDG(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+    
+    定义一个SDG逻辑门类 。
+
+    .. warning::
+
+        该类继承于 ``pyvqnet.qnn.vqc.tn.native.QModule`` 以及 ``pyvqnet.nn.Module``。
+        该类可以作为 ``pyvqnet.nn.Module`` 的一个子模块加入 ``TNQModule`` 的模型中。
+
+    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
+    :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
+    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
+    :param wires: 线路作用的比特索引,默认为None。
+    :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
+    :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
+    :return: 一个 SDG 逻辑门实例。
+
+    Example::
+
+
+        import pyvqnet
+        pyvqnet.backends.set_backend("pyvqnet")
+        from pyvqnet.qnn.vqc.tn.native import SDG,TNQMachine
+        device = TNQMachine(4)
+        layer = SDG(wires=0)
+        batchsize = 1
+        device.reset_states(1)
+        layer(q_machine = device)
+        print(device.get_states())
+
+TDG
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:class:: pyvqnet.qnn.vqc.tn.native.TDG(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+    
+    定义一个SDG逻辑门类 。
+
+    .. warning::
+
+        该类继承于 ``pyvqnet.qnn.vqc.tn.native.QModule`` 以及 ``pyvqnet.nn.Module``。
+        该类可以作为 ``pyvqnet.nn.Module`` 的一个子模块加入 ``TNQModule`` 的模型中。
+
+    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
+    :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
+    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
+    :param wires: 线路作用的比特索引,默认为None。
+    :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
+    :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
+    :return: 一个 TDG 逻辑门实例。
+
+    Example::
+
+
+        import pyvqnet
+        pyvqnet.backends.set_backend("pyvqnet")
+        from pyvqnet.qnn.vqc.tn.native import TDG,TNQMachine
+        device = TNQMachine(4)
+        layer = TDG(wires=0)
+        batchsize = 1
+        device.reset_states(1)
+        layer(q_machine = device)
+        print(device.get_states())
+
+ControlledPhaseShift
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+.. py:class:: pyvqnet.qnn.vqc.tn.native.ControlledPhaseShift(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+    
+    定义一个ControlledPhaseShift逻辑门类 。
+
+    .. warning::
+
+        该类继承于 ``pyvqnet.qnn.vqc.tn.native.QModule`` 以及 ``pyvqnet.nn.Module``。
+        该类可以作为 ``pyvqnet.nn.Module`` 的一个子模块加入 ``TNQModule`` 的模型中。
+
+    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
+    :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
+    :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
+    :param wires: 线路作用的比特索引,默认为None。
+    :param dtype: 逻辑门内部矩阵的数据精度,可以设置为pyvqnet.kcomplex64,或pyvqnet.kcomplex128,分别对应float输入或者double入参。
+    :param use_dagger: 是否使用该门的转置共轭版本,默认为False。
+    :return: 一个 ControlledPhaseShift 逻辑门实例。
+
+    Example::
+
+        import pyvqnet
+        pyvqnet.backends.set_backend("pyvqnet")
+        from pyvqnet.qnn.vqc.tn.native import ControlledPhaseShift,TNQMachine
+        device = TNQMachine(4)
+        layer = ControlledPhaseShift(has_params= True, trainable= True, wires=[0,2])
+        batchsize = 2
+        device.reset_states(batchsize)
+        layer(q_machine = device)
+        print(device.get_states())
+
+常见测量接口
+--------------------------------------
+
+VQC_Purity
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:function:: pyvqnet.qnn.vqc.tn.native.VQC_Purity(state, qubits_idx, num_wires, use_tn=False)
+
+    从态矢中计算特定量子比特 ``qubits_idx`` 上的纯度。
+
+    .. math::
+        \gamma = \text{Tr}(\rho^2)
+
+    式中 :math:`\rho` 为密度矩阵。标准化量子态的纯度满足 :math:`\frac{1}{d} \leq \gamma \leq 1` ,
+    其中 :math:`d` 是希尔伯特空间的维数。
+    纯态的纯度是1。
+
+    :param state: TNQMachine.get_states() 获取的量子态
+    :param qubits_idx: 要计算纯度的量子比特位索引
+    :param num_wires: 量子比特数
+    :param use_tn: 张量网络后端时改成True, 默认False
+
+    :return: 对应比特位置上的纯度。
+
+    .. note::
+        
+        批量化必须搭配TNQModule使用。
+
+    Example::
+
+        import pyvqnet
+        from pyvqnet.qnn.vqc.tn.native import TNQMachine, qcircuit, TNQModule,VQC_Purity
+        pyvqnet.backends.set_backend("pyvqnet")
+        from pyvqnet.tensor import QTensor
+
+        x = QTensor([[0.7, 0.4], [1.7, 2.4]], requires_grad=True).toGPU()
+        x.requires_grad = True
+        class QM(TNQModule):
+            def __init__(self, name=""):
+                super().__init__(name)
+                self.device = TNQMachine(3)
+                
+            def forward(self, x):
+                self.device.reset_states(2)
+                qcircuit.rx(q_machine=self.device, wires=0, params=x[0])
+                qcircuit.ry(q_machine=self.device, wires=1, params=x[1])
+                qcircuit.ry(q_machine=self.device, wires=2, params=x[1])
+                qcircuit.cnot(q_machine=self.device, wires=[0, 1])
+                qcircuit.cnot(q_machine=self.device, wires=[2, 1])
+                return VQC_Purity([0, 1], 3, self.device)
+
+        model = QM().toGPU()
+        y_tn = model(x)
+        
+        y_tn.backward(pyvqnet.tensor.ones_like(y_tn))
+        print(y_tn)
+
+VQC_VarMeasure
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+.. py:function:: pyvqnet.qnn.vqc.tn.native.VQC_VarMeasure(q_machine, obs)
+
+    提供的可观察量 ``obs`` 的方差。
+
+    :param q_machine: 从pyqpanda get_qstate()获取的量子态
+    :param obs: 测量观测量,当前支持Hadamard,I,PauliX,PauliY,PauliZ 几种Observable.
+
+    :return: 计算可观测量方差。
+
+    .. note::
+
+        测量结果一般为[b,1],其中b为 q_machine.reset_states(b)的批处理数量b。
+
+    Example::
+
+        import pyvqnet
+        from pyvqnet.qnn.vqc.tn.native import TNQMachine, qcircuit, TNQModule, PauliY
+        from pyvqnet.qnn.vqc import VQC_VarMeasure
+        from pyvqnet.tensor import QTensor
+        from pyvqnet import kfloat64
+        pyvqnet.backends.set_backend("pyvqnet")
+        x = QTensor([[0.7, 0.4], [0.6, 0.4]], requires_grad=True).toGPU()
+        x.requires_grad = True
+        class QM(TNQModule):
+            def __init__(self, name=""):
+                super().__init__(name)
+                self.device = TNQMachine(3)
+                
+            def forward(self, x):
+                self.device.reset_states(2)
+                qcircuit.rx(q_machine=self.device, wires=0, params=x[0])
+                qcircuit.ry(q_machine=self.device, wires=1, params=x[1])
+                qcircuit.ry(q_machine=self.device, wires=2, params=x[1])
+                qcircuit.cnot(q_machine=self.device, wires=[0, 1])
+                qcircuit.cnot(q_machine=self.device, wires=[2, 1])
+                return VQC_VarMeasure(q_machine= self.device, obs=PauliY(wires=0))
+            
+        model = QM().toGPU()
+        y = model(x)
+
+        y.backward(pyvqnet.tensor.ones_like(y))
+        print(y)
+
+        # [[0.9370641],
+        # [0.9516521]]
+
+
+VQC_DensityMatrixFromQstate
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:function:: pyvqnet.qnn.vqc.tn.native.VQC_DensityMatrixFromQstate(state, indices, use_tn=False)
+
+    计算量子态在一组特定量子比特上的密度矩阵。
+
+    :param state: 一维列表状态向量。 这个列表的大小应该是 ``(2**N,)`` 对于量子比特个数 ``N`` ,qstate 应该从 000 ->111 开始。
+    :param indices: 所考虑子系统中的量子比特索引列表。
+    :param use_tn: 张量网络后端时改成True, 默认False.
+    :return: 大小为“(b, 2**len(indices), 2**len(indices))”的密度矩阵,其中b为 q_machine.reset_states(b)的批处理数量b。
+
+    Example::
+
+        import pyvqnet
+        from pyvqnet.tensor import QTensor
+        from pyvqnet.qnn.vqc.tn.native import TNQMachine, qcircuit, VQC_DensityMatrixFromQstate,TNQModule
+        pyvqnet.backends.set_backend("pyvqnet")
+        x = QTensor([[0.7,0.4],[1.7,2.4]], requires_grad=True).toGPU()
+        x.requires_grad = True
+        class QM(TNQModule):
+            def __init__(self, name=""):
+                super().__init__(name=name, use_jit=True)
+                self.device = TNQMachine(3)
+                
+            def forward(self, x):
+                self.device.reset_states(2)
+                qcircuit.rx(q_machine=self.device, wires=0, params=x[0])
+                qcircuit.ry(q_machine=self.device, wires=1, params=x[1])
+                qcircuit.ry(q_machine=self.device, wires=2, params=x[1])
+                qcircuit.cnot(q_machine=self.device, wires=[0, 1])
+                qcircuit.cnot(q_machine=self.device, wires=[2, 1])
+                return VQC_DensityMatrixFromQstate([0,1], 3, self.device)
+            
+        model = QM().toGPU()
+        y = model(x)
+ 
+        y.backward(pyvqnet.tensor.ones_like(y))
+        print(y)
+
+        # [[[0.8155131+0.j        0.1718155+0.j        0.       +0.0627175j
+        #   0.       +0.2976855j]
+        #  [0.1718155+0.j        0.0669081+0.j        0.       +0.0244234j
+        #   0.       +0.0627175j]
+        #  [0.       -0.0627175j 0.       -0.0244234j 0.0089152+0.j
+        #   0.0228937+0.j       ]
+        #  [0.       -0.2976855j 0.       -0.0627175j 0.0228937+0.j
+        #   0.1086637+0.j       ]]
+        # 
+        # [[0.3362115+0.j        0.1471083+0.j        0.       +0.1674582j
+        #   0.       +0.3827205j]
+        #  [0.1471083+0.j        0.0993662+0.j        0.       +0.1131119j
+        #   0.       +0.1674582j]
+        #  [0.       -0.1674582j 0.       -0.1131119j 0.1287589+0.j
+        #   0.1906232+0.j       ]
+        #  [0.       -0.3827205j 0.       -0.1674582j 0.1906232+0.j
+        #   0.4356633+0.j       ]]]   
+
+
+
+Probability
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+.. py:class:: pyvqnet.qnn.vqc.tn.native.Probability(wires=None, name="")
+
+    计算量子线路在特定比特上概率测量结果。
+
+    .. warning::
+        
+        该类继承于 ``pyvqnet.qnn.vqc.tn.native.QModule`` 以及 ``pyvqnet.nn.Module``。
+        该类可以作为 ``pyvqnet.nn.Module`` 的一个子模块加入 ``TNQModule`` 的模型中。
+
+    :param wires: 测量比特的索引,列表、元组或者整数。
+    :param name: 模块的名字,默认:""。
+    :return: 测量结果,QTensor。
+
+    Example::
+
+        import pyvqnet
+        pyvqnet.backends.set_backend("pyvqnet")
+        from pyvqnet.qnn.vqc.tn.native import Probability, qcircuit, TNQMachine, Hadamard, CNOT
+        qm = TNQMachine(2)
+        qm.reset_states(2)
+        Hadamard(wires=0)(q_machine=qm)
+        CNOT(wires=[0, 1])(q_machine=qm)
+        ma = Probability(wires=1)
+        y = ma(q_machine=qm)
+        print(y)
+
+
+MeasureAll
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:class:: pyvqnet.qnn.vqc.tn.native.MeasureAll(obs=None, name="")
+
+    计算量子线路的测量结果,支持输入obs为多个或单个泡利算子或哈密顿量。
+    例如:
+
+    {\'wires\': [0,  1], \'observables\': [\'x\', \'i\'],\'coefficient\':[0.23,-3.5]}
+    或:
+    {\'X0\': 0.23}
+    或:
+    [{\'wires\': [0, 2, 3],\'observables\': [\'X\', \'Y\', \'Z\'],\'coefficient\': [1, 0.5, 0.4]}, {\'wires\': [0, 1, 2],\'observables\': [\'X\', \'Y\', \'Z\'],\'coefficient\': [1, 0.5, 0.4]}]
+
+    .. warning::
+
+        该类继承于 ``pyvqnet.qnn.vqc.tn.native.QModule`` 以及 ``pyvqnet.nn.Module``。
+        该类可以作为 ``pyvqnet.nn.Module`` 的一个子模块加入 ``TNQModule`` 的模型中。
+
+
+    :param obs: observable。
+    :param name: 模块的名字,默认:""。
+    :return: 一个 MeasureAll 测量方法实例。
+
+    Example::
+
+        import pyvqnet
+        pyvqnet.backends.set_backend("pyvqnet")
+        from pyvqnet.qnn.vqc.tn.native import MeasureAll, qcircuit, TNQMachine, Hadamard, CNOT
+        qm = TNQMachine(2)
+        qm.reset_states(2)
+        Hadamard(wires=0)(q_machine=qm)
+        CNOT(wires=[0, 1])(q_machine=qm)
+        obs_list = [{"Z0 Z1": 2}, {"X1 X0": 2}]
+        ma = MeasureAll(obs=obs_list)
+        y = ma(q_machine=qm)
+        print(y)
+
+
+
+Samples
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:class:: pyvqnet.qnn.vqc.tn.native.Samples(wires=None, obs=None, shots = 1,name="")
+
+    获取特定线路上的带有 shot 的样本结果
+
+    .. warning::
+
+        该类继承于 ``pyvqnet.qnn.vqc.tn.native.QModule`` 以及 ``pyvqnet.nn.Module``。
+        该类可以作为 ``pyvqnet.nn.Module`` 的一个子模块加入 ``TNQModule`` 的模型中。
+
+
+    :param wires: 样本量子比特索引。默认值: None,根据运行时使用模拟器的所有比特。
+    :param obs: 该值只能设为None。
+    :param shots: 样本重复次数,默认值: 1。
+    :param name: 此模块的名称,默认值: “”。
+    :return: 一个 Samples 测量方法实例。
+
+    Example::
+
+        import pyvqnet
+        pyvqnet.backends.set_backend("pyvqnet")
+        from pyvqnet.qnn.vqc.tn.native import Samples, TNQMachine, Hadamard, CNOT
+        qm = TNQMachine(3)
+        qm.reset_states(2)
+        Hadamard(wires=0)(q_machine=qm)
+        CNOT(wires=[0, 1])(q_machine=qm)
+        ma = Samples(wires=[0, 1, 2], shots=3)
+        y = ma(q_machine=qm)
+        print(y)
+
+
+
+HermitianExpval
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:class:: pyvqnet.qnn.vqc.tn.native.HermitianExpval(obs=None, name="")
+
+    计算量子线路某个厄密特量的期望。
+
+    .. warning::
+
+        该类继承于 ``pyvqnet.qnn.vqc.tn.native.QModule`` 以及 ``pyvqnet.nn.Module``。
+        该类可以作为 ``pyvqnet.nn.Module`` 的一个子模块加入 ``TNQModule`` 的模型中。
+
+
+    :param obs: 厄密特量。
+    :param name: 模块的名字,默认:""。
+    :return: 一个 HermitianExpval 测量方法实例。
+
+    Example::
+
+        import pyvqnet
+        pyvqnet.backends.set_backend("pyvqnet")
+        from pyvqnet.qnn.vqc.tn.native import TNQModule, TNQMachine, HermitianExpval, RX, RY, CNOT, PauliX, PauliZ, VQC_RotCircuit, rx, ry
+        from pyvqnet.tensor import QTensor, tensor
+        from pyvqnet.nn import Parameter
+        import numpy as np
+        bsz = 3
+        H = np.array([[8, 4, 0, -6], [4, 0, 4, 0], [0, 4, 8, 0], [-6, 0, 0, 0]])
+        class QModel(TNQModule):
+            def __init__(self, num_wires, dtype):
+                super(QModel, self).__init__()
+                self.rot_param = Parameter((3, ))
+                self._num_wires = num_wires
+                self._dtype = dtype
+                self.qm = TNQMachine(num_wires, dtype=dtype)
+                self.rx_layer1 = VQC_RotCircuit
+                self.ry_layer2 = RY(has_params=True,
+                                    trainable=True,
+                                    wires=0,
+                                    init_params=tensor.QTensor([-0.5]))
+                self.xlayer = PauliX(wires=0)
+                self.cnot = CNOT(wires=[0, 1])
+                self.measure = HermitianExpval(obs = {'wires':(1,0),'observables':tensor.to_tensor(H)})
+
+            def forward(self, x, *args, **kwargs):
+                self.qm.reset_states(bsz)
+
+                rx(q_machine=self.qm, wires=0, params=x[1])
+                ry(q_machine=self.qm, wires=1, params=x[0])
+                self.xlayer(q_machine=self.qm)
+                self.rx_layer1(params=self.rot_param, wire=1, q_machine=self.qm)
+                self.ry_layer2(q_machine=self.qm)
+                self.cnot(q_machine=self.qm)
+                rlt = self.measure(q_machine = self.qm)
+
+                return rlt
+
+
+        input_x = tensor.arange(1, bsz * 2 + 1,
+                                dtype=pyvqnet.kfloat32).reshape([bsz, 2])
+        input_x.requires_grad = True
+
+        qunatum_model = QModel(num_wires=2, dtype=pyvqnet.kcomplex64)
+
+        batch_y = qunatum_model(input_x)
+        batch_y.backward(pyvqnet.tensor.ones_like(batch_y))
+ 
+
+
+常见量子线路模版
+--------------------------------------------------
+
+VQC_HardwareEfficientAnsatz
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:class:: pyvqnet.qnn.vqc.tn.native.VQC_HardwareEfficientAnsatz(n_qubits,single_rot_gate_list,entangle_gate="CNOT",entangle_rules='linear',depth=1,initial = None,dtype=None)
+
+    论文介绍的Hardware Efficient Ansatz的实现: `Hardware-efficient Variational Quantum Eigensolver for Small Molecules <https://arxiv.org/pdf/1704.05018.pdf>`__ 。
+
+    .. warning::
+
+        该类继承于 ``pyvqnet.qnn.vqc.tn.native.QModule`` 以及 ``pyvqnet.nn.Module``。
+        该类可以作为 ``pyvqnet.nn.Module`` 的一个子模块加入 ``TNQModule`` 的模型中。
+
+
+    :param n_qubits: 量子比特数。
+    :param single_rot_gate_list: 单个量子比特旋转门列表由一个或多个作用于每个量子比特的旋转门构成。目前支持 Rx、Ry、Rz。
+    :param entangle_gate: 非参数化纠缠门。支持 CNOT、CZ。默认值: CNOT。
+    :param entangle_rules: 纠缠门在电路中的使用方式。'linear' 表示纠缠门将作用于每个相邻的量子比特。'all' 表示纠缠门将作用于任意两个量子比特。默认值: linear。
+    :param depth: 假设的深度,默认值: 1。
+    :param initial: 使用initial 初始化所有其中参数逻辑门的参数,默认值: None,此模块将随机初始化参数。
+    :param dtype: 参数的数据类型,默认值: None,使用float32。
+    :return: 一个 VQC_HardwareEfficientAnsatz 实例。
+
+    Example::
+
+        from pyvqnet.nn import Linear
+        from pyvqnet.qnn.vqc.tn.native.qcircuit import VQC_HardwareEfficientAnsatz,RZZ,RZ
+        from pyvqnet.qnn.vqc.tn.native import Probability,TNQMachine, TNQModule
+        from pyvqnet import tensor
+        import pyvqnet
+        pyvqnet.backends.set_backend("pyvqnet")
+        pyvqnet.utils.set_random_seed(25)
+
+        class QM(TNQModule):
+            def __init__(self, name=""):
+                super().__init__(name)
+                self.linearx = Linear(4,2)
+                self.ansatz = VQC_HardwareEfficientAnsatz(4, ["rx", "RY", "rz"],
+                                            entangle_gate="cnot",
+                                            entangle_rules="linear",
+                                            depth=2)
+                self.encode1 = RZ(wires=0)
+                self.encode2 = RZ(wires=1)
+                self.measure = Probability(wires=[0, 2])
+                self.device = TNQMachine(4)
+            def forward(self, x, *args, **kwargs):
+                self.device.reset_states(bz)
+                y = self.linearx(x)
+                self.encode1(params = y[0],q_machine = self.device,)
+                self.encode2(params = y[1],q_machine = self.device,)
+                self.ansatz(q_machine =self.device)
+                return self.measure(q_machine =self.device)
+
+        bz =3
+        inputx = tensor.arange(1.0,bz*4+1).reshape([bz,4])
+        inputx.requires_grad= True
+        qlayer = QM()
+        y = qlayer(inputx)
+        y.backward(pyvqnet.tensor.ones_like(y))
+        print(y)
+
+
+VQC_BasicEntanglerTemplate
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:class:: pyvqnet.qnn.vqc.tn.native.VQC_BasicEntanglerTemplate(num_layer=1, num_qubits=1, rotation="RX", initial=None, dtype=None)
+
+    由每个量子位上的单参数单量子位旋转组成的层,后跟一个闭合链或环组合的多个CNOT门。
+
+    CNOT 门环将每个量子位与其邻居连接起来,最后一个量子位被认为是第一个量子位的邻居。
+
+    .. warning::
+
+        该类继承于 ``pyvqnet.qnn.vqc.tn.native.QModule`` 以及 ``pyvqnet.nn.Module``。
+        该类可以作为 ``pyvqnet.nn.Module`` 的一个子模块加入 ``TNQModule`` 的模型中。
+
+
+    :param num_layer: 量子比特线路层数。
+    :param num_qubits: 量子比特数,默认为1。
+    :param rotation: 使用单参数单量子比特门,``RX`` 被用作默认值。
+    :param initial: 使用initial 初始化所有其中参数逻辑门的参数,默认值: None,此模块将随机初始化参数。
+    :param dtype: 参数的数据类型,默认值: None,使用float32。
+    :return: 返回一个含可训练参数的VQC_BasicEntanglerTemplate实例。
+
+    Example::
+
+        import pyvqnet
+        pyvqnet.backends.set_backend("pyvqnet")
+        from pyvqnet.qnn.vqc.tn.native import TNQModule, VQC_BasicEntanglerTemplate, Probability, TNQMachine
+        from pyvqnet import tensor
+
+
+        class QM(TNQModule):
+            def __init__(self, name=""):
+                super().__init__(name)
+
+                self.ansatz = VQC_BasicEntanglerTemplate(2,
+                                                    4,
+                                                    "rz",
+                                                    initial=tensor.ones([1, 1]))
+
+                self.measure = Probability(wires=[0, 2])
+                self.device = TNQMachine(4)
+
+            def forward(self,x, *args, **kwargs):
+
+                self.ansatz(q_machine=self.device)
+                return self.measure(q_machine=self.device)
+
+        bz = 1
+        inputx = tensor.arange(1.0, bz * 4 + 1).reshape([bz, 4])
+        qlayer = QM()
+        y = qlayer(inputx)
+        y.backward(pyvqnet.tensor.ones_like(y))
+        print(y)
+
+
+
+VQC_StronglyEntanglingTemplate
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:class:: pyvqnet.qnn.vqc.tn.native.VQC_StronglyEntanglingTemplate(num_layers=1, num_qubits=1, rotation = "RX", initial = None, dtype: = None)
+
+    由单个量子比特旋转和纠缠器组成的层,参考 `circuit-centric classifier design <https://arxiv.org/abs/1804.00633>`__ .
+
+    .. warning::
+
+        该类继承于 ``pyvqnet.qnn.vqc.tn.native.QModule`` 以及 ``pyvqnet.nn.Module``。
+        该类可以作为 ``pyvqnet.nn.Module`` 的一个子模块加入 ``TNQModule`` 的模型中。
+
+
+    :param num_layers: 重复层数,默认值: 1。
+    :param num_qubits: 量子比特数,默认值: 1。
+    :param rotation: 要使用的单参数单量子比特门,默认值: `RX`
+    :param initial: 使用initial 初始化所有其中参数逻辑门的参数,默认值: None,此模块将随机初始化参数。
+    :param dtype: 参数的数据类型,默认值: None,使用 float32。
+    :return: VQC_BasicEntanglerTemplate 实例
+
+
+    Example::
+
+        from pyvqnet.nn.torch import TorchModule,Linear,TorchModuleList
+        from pyvqnet.qnn.vqc.tn.native.qcircuit import VQC_StronglyEntanglingTemplate
+        from pyvqnet.qnn.vqc.tn.native import Probability, TNQMachine, TNQModule
+        from pyvqnet import tensor
+        import pyvqnet
+
+        pyvqnet.backends.set_backend("pyvqnet")
+        pyvqnet.utils.set_random_seed(25)
+        class QM(TNQModule):
+            def __init__(self, name=""):
+                super().__init__(name)
+
+                self.ansatz = VQC_StronglyEntanglingTemplate(2,
+                                                    4,
+                                                    None,
+                                                    initial=tensor.ones([1, 1]))
+
+                self.measure = Probability(wires=[0, 1])
+                self.device = TNQMachine(4)
+
+            def forward(self,x, *args, **kwargs):
+
+                self.ansatz(q_machine=self.device)
+                return self.measure(q_machine=self.device)
+
+        bz = 1
+        inputx = tensor.arange(1.0, bz * 4 + 1).reshape([bz, 4])
+        qlayer = QM()
+        y = qlayer(inputx)
+        y.backward(pyvqnet.tensor.ones_like(y))
+        print(y)
+
+VQC_QuantumEmbedding
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+.. py:class:: pyvqnet.qnn.vqc.tn.native.VQC_QuantumEmbedding(  num_repetitions_input, depth_input, num_unitary_layers, num_repetitions,initial = None,dtype = None,name= "")
+
+    使用 RZ,RY,RZ 创建变分量子电路,将经典数据编码为量子态。
+    参考 `Quantum embeddings for machine learning <https://arxiv.org/abs/2001.03622>`_。
+
+    .. warning::
+
+        该类继承于 ``pyvqnet.qnn.vqc.tn.native.QModule`` 以及 ``pyvqnet.nn.Module``。
+        该类可以作为 ``pyvqnet.nn.Module`` 的一个子模块加入 ``TNQModule`` 的模型中。
+
+
+    :param num_repetitions_input: 子模块中输入编码的重复次数。
+    :paramdepth_input: 输入维数。
+    :param num_unitary_layers: 变分量子门的重复次数。
+    :param num_repetitions: 子模块的重复次数。
+    :param initial: 参数初始化值,默认为None
+    :param dtype: 参数的类型,默认 None,使用float32.
+    :param name: 类的名字
+
+    Example::
+
+        from pyvqnet.qnn.vqc.tn.native.qcircuit import VQC_QuantumEmbedding
+        from pyvqnet.qnn.vqc.tn.native import TNQMachine, MeasureAll, TNQModule
+        from pyvqnet import tensor
+        import pyvqnet
+
+        pyvqnet.backends.set_backend("pyvqnet")
+        pyvqnet.utils.set_random_seed(25)
+        depth_input = 2
+        num_repetitions = 2
+        num_repetitions_input = 2
+        num_unitary_layers = 2
+        nq = depth_input * num_repetitions_input
+        bz = 12
+
+        class QM(TNQModule):
+            def __init__(self, name=""):
+                super().__init__(name)
+
+                self.ansatz = VQC_QuantumEmbedding(num_repetitions_input, depth_input,
+                                                num_unitary_layers,
+                                                num_repetitions, initial=tensor.full([1],12.0),dtype=pyvqnet.kfloat32)
+
+                self.measure = MeasureAll(obs={f"Z{nq-1}":1})
+                self.device = TNQMachine(nq)
+
+            def forward(self, x, *args, **kwargs):
+                self.device.reset_states(bz)
+                self.ansatz(x,q_machine=self.device)
+                return self.measure(q_machine=self.device)
+
+        inputx = tensor.arange(1.0, bz * depth_input + 1).reshape([bz, depth_input])
+        qlayer = QM()
+        y = qlayer(inputx)
+        y.backward(pyvqnet.tensor.ones_like(y))
+        print(y)
+
+
+ExpressiveEntanglingAnsatz
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:class:: pyvqnet.qnn.vqc.tn.native.ExpressiveEntanglingAnsatz(type: int, num_wires: int, depth: int, dtype=None, name: str = "")
+
+    论文 `Expressibility and entangling capability of parameterized quantum circuits for hybrid quantum-classical algorithms <https://arxiv.org/pdf/1905.10876.pdf>`_ 中的 19 种不同的ansatz。
+
+    .. warning::
+
+        该类继承于 ``pyvqnet.qnn.vqc.tn.native.QModule`` 以及 ``pyvqnet.nn.Module``。
+        该类可以作为 ``pyvqnet.nn.Module`` 的一个子模块加入 ``TNQModule`` 的模型中。
+
+
+    :param type: 电路类型从 1 到 19,共19种线路。
+    :param num_wires: 量子比特数。
+    :param depth: 电路深度。
+    :param dtype: 参数的数据类型, 默认值: None, 使用 float32。
+    :param name: 名字,默认"".
+
+    :return:
+        一个 ExpressiveEntanglingAnsatz 实例
+
+    Example::
+
+        from pyvqnet.qnn.vqc.tn.native.qcircuit import ExpressiveEntanglingAnsatz
+        from pyvqnet.qnn.vqc.tn.native import Probability, TNQMachine, MeasureAll, TNQModule
+        from pyvqnet import tensor
+        import pyvqnet
+
+        pyvqnet.backends.set_backend("pyvqnet")
+        pyvqnet.utils.set_random_seed(25)
+
+        class QModel(TNQModule):
+            def __init__(self, num_wires, dtype):
+                super(QModel, self).__init__()
+
+                self._num_wires = num_wires
+                self._dtype = dtype
+                self.qm = TNQMachine(num_wires, dtype=dtype)
+                self.c1 = ExpressiveEntanglingAnsatz(1,3,2)
+                self.measure = MeasureAll(obs={
+                    "Z1":1
+                })
+
+            def forward(self, x, *args, **kwargs):
+                self.qm.reset_states(1)
+                self.c1(q_machine = self.qm)
+                rlt = self.measure(q_machine=self.qm)
+                return rlt
+            
+
+        input_x = tensor.QTensor([[0.1, 0.2, 0.3]])
+
+        qunatum_model = QModel(num_wires=3, dtype=pyvqnet.kcomplex64)
+
+        batch_y = qunatum_model(input_x)
+        batch_y.backward()
+        print(batch_y)
+
+
+vqc_basis_embedding
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:function:: pyvqnet.qnn.vqc.tn.native.vqc_basis_embedding(basis_state,q_machine)
+   :noindex:
+
+    将n个二进制特征编码到 ``q_machine`` 的n个量子比特的基态。该函数别名 `VQC_BasisEmbedding` 。
+
+    例如, 对于 ``basis_state=([0, 1, 1])``, 在量子系统下其基态为 :math:`|011 \rangle`。
+
+    :param basis_state:  ``(n)`` 大小的二进制输入。
+    :param q_machine: 量子虚拟机设备。
+    
+
+    Example::
+
+        import pyvqnet
+        pyvqnet.backends.set_backend("pyvqnet")
+        from pyvqnet.qnn.vqc.tn.native import vqc_basis_embedding,TNQMachine
+        qm  = TNQMachine(3)
+        vqc_basis_embedding(basis_state=[1,1,0],q_machine=qm)
+        print(qm.get_states())
+
+
+
+
+vqc_angle_embedding
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+.. py:function:: pyvqnet.qnn.vqc.tn.native.vqc_angle_embedding(input_feat, wires, q_machine: pyvqnet.qnn.vqc.tn.native.TNQMachine, rotation: str = "X")
+   :noindex:
+
+    将 :math:`N` 特征编码到 :math:`n` 量子比特的旋转角度中, 其中 :math:`N \leq n`。
+    该函数别名 `VQC_AngleEmbedding` 。
+
+    旋转可以选择为 : 'X' , 'Y' , 'Z', 如 ``rotation`` 的参数定义为:
+
+    * ``rotation='X'`` 将特征用作RX旋转的角度。
+
+    * ``rotation='Y'`` 将特征用作RY旋转的角度。
+
+    * ``rotation='Z'`` 将特征用作RZ旋转的角度。
+
+     ``wires`` 代表旋转门在量子比特上的idx。
+
+    :param input_feat: 表示参数的数组。
+    :param wires: 量子比特idx。
+    :param q_machine: 量子虚拟机设备。
+    :param rotation: 旋转门,默认为“X”。
+    
+
+    Example::
+
+        import pyvqnet
+        pyvqnet.backends.set_backend("pyvqnet")
+        from pyvqnet.qnn.vqc.tn.native import vqc_angle_embedding, TNQMachine
+        from pyvqnet.tensor import QTensor
+        qm  = TNQMachine(2)
+        vqc_angle_embedding(QTensor([2.2, 1]), [0, 1], q_machine=qm, rotation='X')
+        print(qm.get_states())
+        vqc_angle_embedding(QTensor([2.2, 1]), [0, 1], q_machine=qm, rotation='Y')
+        print(qm.get_states())
+        vqc_angle_embedding(QTensor([2.2, 1]), [0, 1], q_machine=qm, rotation='Z')
+        print(qm.get_states())
+
+
+vqc_amplitude_embedding
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:function:: pyvqnet.qnn.vqc.tn.native.vqc_amplitude_embedding(input_feature, q_machine)
+
+    将 :math:`2^n` 特征编码为 :math:`n` 量子比特的振幅向量。该函数别名 `VQC_AmplitudeEmbedding` 。
+
+    :param input_feature: 表示参数的numpy数组。
+    :param q_machine: 量子虚拟机设备。
+    
+
+    Example::
+
+        import pyvqnet
+        pyvqnet.backends.set_backend("pyvqnet")
+        from pyvqnet.qnn.vqc.tn.native import vqc_amplitude_embedding, TNQMachine
+        from pyvqnet.tensor import QTensor
+        qm  = TNQMachine(3)
+        vqc_amplitude_embedding(QTensor([3.2,-2,-2,0.3,12,0.1,2,-1]), q_machine=qm)
+        print(qm.get_states())
+
+
+
+vqc_iqp_embedding
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. py:function:: pyvqnet.qnn.vqc.tn.native.vqc_iqp_embedding(input_feat, q_machine: pyvqnet.qnn.vqc.tn.native.TNQMachine, rep: int = 1)
+   :noindex:
+
+    使用IQP线路的对角门将 :math:`n` 特征编码为 :math:`n` 量子比特。该函数别名:  ``VQC_IQPEmbedding`` 。
+
+    编码是由 `Havlicek et al. (2018) <https://arxiv.org/pdf/1804.11326.pdf>`_ 提出。
+
+    通过指定 ``rep`` ,可以重复基本IQP线路。
+
+    :param input_feat: 表示参数的数组。
+    :param q_machine: 量子虚拟机设备。
+    :param rep: 重复量子线路块次数,默认次数为1。
+    
+
+    Example::
+
+        import pyvqnet
+        pyvqnet.backends.set_backend("pyvqnet")
+        from pyvqnet.qnn.vqc.tn.native import vqc_iqp_embedding, TNQMachine
+        from pyvqnet.tensor import QTensor
+        qm  = TNQMachine(3)
+        vqc_iqp_embedding(QTensor([3.2,-2,-2]), q_machine=qm)
+        print(qm.get_states())        
+
+
+
+vqc_rotcircuit
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:function:: pyvqnet.qnn.vqc.tn.native.vqc_rotcircuit(q_machine, wire, params)
+   :noindex:
+
+    任意单量子比特旋转的量子逻辑门组合。该函数别名:  ``VQC_RotCircuit`` 。
+
+    .. math::
+
+        R(\phi,\theta,\omega) = RZ(\omega)RY(\theta)RZ(\phi)= \begin{bmatrix}
+        e^{-i(\phi+\omega)/2}\cos(\theta/2) & -e^{i(\phi-\omega)/2}\sin(\theta/2) \\
+        e^{-i(\phi-\omega)/2}\sin(\theta/2) & e^{i(\phi+\omega)/2}\cos(\theta/2)
+        \end{bmatrix}.
+
+
+    :param q_machine: 量子虚拟机设备。
+    :param wire: 量子比特索引。
+    :param params: 表示参数  :math:`[\phi, \theta, \omega]`。
+    
+
+    Example::
+
+        import pyvqnet
+        pyvqnet.backends.set_backend("pyvqnet")
+        from pyvqnet.qnn.vqc.tn.native import vqc_rotcircuit, TNQMachine
+        from pyvqnet.tensor import QTensor
+        qm  = TNQMachine(3)
+        vqc_rotcircuit(q_machine=qm, wire=[1],params=QTensor([2.0,1.5,2.1]))
+        print(qm.get_states())
+
+
+vqc_crot_circuit
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+.. py:function:: pyvqnet.qnn.vqc.tn.native.vqc_crot_circuit(para,control_qubits,rot_wire,q_machine)
+   :noindex:
+
+	受控Rot单量子比特旋转的量子逻辑门组合。该函数别名:  ``VQC_CRotCircuit`` 。
+
+    .. math:: CR(\phi, \theta, \omega) = \begin{bmatrix}
+            1 & 0 & 0 & 0 \\
+            0 & 1 & 0 & 0\\
+            0 & 0 & e^{-i(\phi+\omega)/2}\cos(\theta/2) & -e^{i(\phi-\omega)/2}\sin(\theta/2)\\
+            0 & 0 & e^{-i(\phi-\omega)/2}\sin(\theta/2) & e^{i(\phi+\omega)/2}\cos(\theta/2)
+        \end{bmatrix}.
+    
+    :param para: 表示参数的数组。
+    :param control_qubits: 控制量子比特索引。
+    :param rot_wire: Rot量子比特索引。
+    :param q_machine: 量子虚拟机设备。
+    
+
+    Example::
+
+        import pyvqnet
+        pyvqnet.backends.set_backend("pyvqnet")
+        from pyvqnet.tensor import QTensor
+        from pyvqnet.qnn.vqc.tn.native import vqc_crot_circuit,TNQMachine, MeasureAll
+        p = QTensor([2, 3, 4.0])
+        qm = TNQMachine(2)
+        vqc_crot_circuit(p, 0, 1, qm)
+        m = MeasureAll(obs={"Z0": 1})
+        exp = m(q_machine=qm)
+        print(exp)
+
+
+
+
+vqc_controlled_hadamard
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+.. py:function:: pyvqnet.qnn.vqc.tn.native.vqc_controlled_hadamard(wires, q_machine)
+   :noindex:
+
+    受控Hadamard逻辑门量子线路。该函数别名:  ``VQC_Controlled_Hadamard`` 。
+
+    .. math:: CH = \begin{bmatrix}
+            1 & 0 & 0 & 0 \\
+            0 & 1 & 0 & 0 \\
+            0 & 0 & \frac{1}{\sqrt{2}} & \frac{1}{\sqrt{2}} \\
+            0 & 0 & \frac{1}{\sqrt{2}} & -\frac{1}{\sqrt{2}}
+        \end{bmatrix}.
+
+    :param wires: 量子比特索引列表, 第一位是控制比特, 列表长度为2。
+    :param q_machine: 量子虚拟机设备。
+    
+
+    Example::
+
+        import pyvqnet
+        pyvqnet.backends.set_backend("pyvqnet")
+        from pyvqnet.tensor import QTensor
+        from pyvqnet.qnn.vqc.tn.native import vqc_controlled_hadamard,\
+            TNQMachine, MeasureAll
+
+        p = QTensor([0.2, 3, 4.0])
+        qm = TNQMachine(3)
+        vqc_controlled_hadamard([1, 0], qm)
+        m = MeasureAll(obs={"Z0": 1})
+        exp = m(q_machine=qm)
+        print(exp)
+
+
+
+vqc_ccz
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:function:: pyvqnet.qnn.vqc.tn.native.vqc_ccz(wires, q_machine)
+   :noindex:
+
+    受控-受控-Z (controlled-controlled-Z) 逻辑门。该函数别名:  ``VQC_CCZ`` 。
+
+    .. math::
+
+        CCZ =
+        \begin{pmatrix}
+        1 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\
+        0 & 1 & 0 & 0 & 0 & 0 & 0 & 0\\
+        0 & 0 & 1 & 0 & 0 & 0 & 0 & 0\\
+        0 & 0 & 0 & 1 & 0 & 0 & 0 & 0\\
+        0 & 0 & 0 & 0 & 1 & 0 & 0 & 0\\
+        0 & 0 & 0 & 0 & 0 & 1 & 0 & 0\\
+        0 & 0 & 0 & 0 & 0 & 0 & 1 & 0\\
+        0 & 0 & 0 & 0 & 0 & 0 & 0 & -1
+        \end{pmatrix}
+    
+    :param wires: 量子比特下标列表,第一位是控制比特。列表长度为3。
+    :param q_machine: 量子虚拟机设备。
+    
+
+    Example::
+
+        import pyvqnet
+        pyvqnet.backends.set_backend("pyvqnet")
+        from pyvqnet.tensor import QTensor
+        from pyvqnet.qnn.vqc.tn.native import vqc_ccz,TNQMachine, MeasureAll
+        p = QTensor([0.2, 3, 4.0])
+
+        qm = TNQMachine(3)
+
+        vqc_ccz([1, 0, 2], qm)
+        m = MeasureAll(obs={"Z0": 1})
+        exp = m(q_machine=qm)
+        print(exp)
+
+
+
+vqc_fermionic_single_excitation
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:function:: pyvqnet.qnn.vqc.tn.native.vqc_fermionic_single_excitation(weight, wires, q_machine)
+   :noindex:
+
+    对泡利矩阵的张量积求幂的耦合簇单激励算子。矩阵形式下式给出:
+
+    .. math::
+
+        \hat{U}_{pr}(\theta) = \mathrm{exp} \{ \theta_{pr} (\hat{c}_p^\dagger \hat{c}_r
+        -\mathrm{H.c.}) \},
+
+    该函数别名:  ``VQC_FermionicSingleExcitation`` 。
+
+    :param weight:  量子比特p上的参数, 只有一个元素.
+    :param wires: 表示区间[r, p]中的量子比特索引子集。最小长度必须为2。第一索引值被解释为r,最后一个索引值被解释为p。
+                中间的索引被CNOT门作用,以计算量子位集的奇偶校验。
+    :param q_machine: 量子虚拟机设备。
+
+    
+
+    Example::
+
+        import pyvqnet
+        pyvqnet.backends.set_backend("pyvqnet")
+        from pyvqnet.tensor import QTensor
+        from pyvqnet.qnn.vqc.tn.native import vqc_fermionic_single_excitation,\
+            TNQMachine, MeasureAll
+        qm = TNQMachine(3)
+        p0 = QTensor([0.5])
+
+        vqc_fermionic_single_excitation(p0, [1, 0, 2], qm)
+        m = MeasureAll(obs={"Z0": 1})
+        exp = m(q_machine=qm)
+        print(exp)
+
+ 
+
+
+vqc_fermionic_double_excitation
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+.. py:function:: pyvqnet.qnn.vqc.tn.native.vqc_fermionic_double_excitation(weight, wires1, wires2, q_machine)
+   :noindex:
+
+    对泡利矩阵的张量积求幂的耦合聚类双激励算子,矩阵形式由下式给出:
+
+    .. math::
+
+        \hat{U}_{pqrs}(\theta) = \mathrm{exp} \{ \theta (\hat{c}_p^\dagger \hat{c}_q^\dagger
+        \hat{c}_r \hat{c}_s - \mathrm{H.c.}) \},
+
+    其中 :math:`\hat{c}` 和 :math:`\hat{c}^\dagger` 是费米子湮灭和
+    创建运算符和索引 :math:`r, s` 和 :math:`p, q` 在占用的和
+    分别为空分子轨道。 使用 `Jordan-Wigner 变换
+    <https://arxiv.org/abs/1208.5986>`_ 上面定义的费米子算子可以写成
+    根据 Pauli 矩阵(有关更多详细信息,请参见
+    `arXiv:1805.04340 <https://arxiv.org/abs/1805.04340>`_)
+
+    .. math::
+
+        \hat{U}_{pqrs}(\theta) = \mathrm{exp} \Big\{
+        \frac{i\theta}{8} \bigotimes_{b=s+1}^{r-1} \hat{Z}_b \bigotimes_{a=q+1}^{p-1}
+        \hat{Z}_a (\hat{X}_s \hat{X}_r \hat{Y}_q \hat{X}_p +
+        \hat{Y}_s \hat{X}_r \hat{Y}_q \hat{Y}_p +\\ \hat{X}_s \hat{Y}_r \hat{Y}_q \hat{Y}_p +
+        \hat{X}_s \hat{X}_r \hat{X}_q \hat{Y}_p - \mathrm{H.c.}  ) \Big\}
+
+    该函数别名:  ``VQC_FermionicDoubleExcitation`` 。
+
+    :param weight: 可变参数
+    :param wires1: 代表的量子比特的索引列表区间 [s, r] 中占据量子比特的子集。第一个索引被解释为 s,最后一索引被解释为 r。 CNOT 门对中间的索引进行操作,以计算一组量子位的奇偶性。
+    :param wires2: 代表的量子比特的索引列表区间 [q, p] 中占据量子比特的子集。第一根索引被解释为 q,最后一索引被解释为 p。 CNOT 门对中间的索引进行操作,以计算一组量子位的奇偶性。
+    :param q_machine: 量子虚拟机设备。
+
+    
+
+    Example::
+
+        import pyvqnet
+        pyvqnet.backends.set_backend("pyvqnet")
+        from pyvqnet.tensor import QTensor
+        from pyvqnet.qnn.vqc.tn.native import vqc_fermionic_double_excitation,\
+            TNQMachine, MeasureAll
+        qm = TNQMachine(5)
+        p0 = QTensor([0.5])
+
+        vqc_fermionic_double_excitation(p0, [0, 1], [2, 3], qm)
+        m = MeasureAll(obs={"Z0": 1})
+        exp = m(q_machine=qm)
+        print(exp)
+ 
+
+vqc_uccsd
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+.. py:function:: pyvqnet.qnn.vqc.tn.native.vqc_uccsd(weights, wires, s_wires, d_wires, init_state, q_machine)
+   :noindex:
+
+    实现酉耦合簇单激发和双激发拟设(UCCSD)。UCCSD 是 VQE 拟设,通常用于运行量子化学模拟。
+
+    在一阶 Trotter 近似内,UCCSD 酉函数由下式给出:
+
+    .. math::
+
+        \hat{U}(\vec{\theta}) =
+        \prod_{p > r} \mathrm{exp} \Big\{\theta_{pr}
+        (\hat{c}_p^\dagger \hat{c}_r-\mathrm{H.c.}) \Big\}
+        \prod_{p > q > r > s} \mathrm{exp} \Big\{\theta_{pqrs}
+        (\hat{c}_p^\dagger \hat{c}_q^\dagger \hat{c}_r \hat{c}_s-\mathrm{H.c.}) \Big\}
+
+    其中 :math:`\hat{c}` 和 :math:`\hat{c}^\dagger` 是费米子湮灭和
+    创建运算符和索引 :math:`r, s` 和 :math:`p, q` 在占用的和
+    分别为空分子轨道。(更多细节见
+    `arXiv:1805.04340 <https://arxiv.org/abs/1805.04340>`_):
+
+    该函数别名:  ``VQC_UCCSD`` 。
+
+    :param weights: 包含参数的大小 ``(len(s_wires)+ len(d_wires))`` 张量
+        :math:`\theta_{pr}` 和 :math:`\theta_{pqrs}` 输入 Z 旋转
+        ``FermionicSingleExcitation`` 和 ``FermionicDoubleExcitation`` 。
+    :param wires: 模板作用的量子比特索引
+    :param s_wires: 包含量子比特索引的列表序列 ``[r,...,p]``
+        由单一激发产生
+        :math:`\vert r, p \rangle = \hat{c}_p^\dagger \hat{c}_r \vert \mathrm{HF} \rangle`,
+        其中 :math:`\vert \mathrm{HF} \rangle` 表示 Hartee-Fock 参考态。
+    :param d_wires: 列表序列,每个列表包含两个列表
+        指定索引 ``[s, ...,r]`` 和 ``[q,..., p]`` 
+        定义双激励 :math:`\vert s, r, q, p \rangle = \hat{c}_p^\dagger \hat{c}_q^\dagger \hat{c}_r\hat{c}_s \vert \mathrm{HF} \rangle` 。
+    :param init_state: 长度 ``len(wires)`` occupation-number vector 表示
+        高频状态。 ``init_state`` 在量子比特初始化状态。
+    :param q_machine: 量子虚拟机设备。
+    
+    
+    Example::
+
+        import pyvqnet
+        pyvqnet.backends.set_backend("pyvqnet")
+        from pyvqnet.qnn.vqc.tn.native import vqc_uccsd, TNQMachine, MeasureAll
+        from pyvqnet.tensor import QTensor
+        p0 = QTensor([2, 0.5, -0.2, 0.3, -2, 1, 3, 0])
+        s_wires = [[0, 1, 2], [0, 1, 2, 3, 4], [1, 2, 3], [1, 2, 3, 4, 5]]
+        d_wires = [[[0, 1], [2, 3]], [[0, 1], [2, 3, 4, 5]], [[0, 1], [3, 4]],
+                [[0, 1], [4, 5]]]
+        qm = TNQMachine(6)
+
+        vqc_uccsd(p0, range(6), s_wires, d_wires, QTensor([1.0, 1, 0, 0, 0, 0]), qm)
+        m = MeasureAll(obs={"Z1": 1})
+        exp = m(q_machine=qm)
+        print(exp)
+
+        # [[0.963802]]
+
+
+vqc_zfeaturemap
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:function:: pyvqnet.qnn.vqc.tn.native.vqc_zfeaturemap(input_feat, q_machine: pyvqnet.qnn.vqc.tn.native.TNQMachine, data_map_func=None, rep: int = 2)
+   :noindex:
+
+    一阶泡利 Z 演化电路。
+
+    对于 3 个量子位和 2 次重复,电路表示为:
+
+    .. parsed-literal::
+
+        ┌───┐┌──────────────┐┌───┐┌──────────────┐
+        ┤ H ├┤ U1(2.0*x[0]) ├┤ H ├┤ U1(2.0*x[0]) ├
+        ├───┤├──────────────┤├───┤├──────────────┤
+        ┤ H ├┤ U1(2.0*x[1]) ├┤ H ├┤ U1(2.0*x[1]) ├
+        ├───┤├──────────────┤├───┤├──────────────┤
+        ┤ H ├┤ U1(2.0*x[2]) ├┤ H ├┤ U1(2.0*x[2]) ├
+        └───┘└──────────────┘└───┘└──────────────┘
+    
+    泡利弦固定为 ``Z``。 因此,一阶展开将是一个没有纠缠门的电路。
+
+    :param input_feat: 表示输入参数的数组。
+    :param q_machine: 量子虚拟机。
+    :param data_map_func: 参数映射矩阵, 为可调用函数, 设计方式为: ``data_map_func = lambda x: x``。
+    :param rep: 模块重复次数。
+    
+    Example::
+
+        import pyvqnet
+        pyvqnet.backends.set_backend("pyvqnet")
+        from pyvqnet.qnn.vqc.tn.native import vqc_zfeaturemap, TNQMachine, hadamard
+        from pyvqnet.tensor import QTensor
+        qm = TNQMachine(3)
+        for i in range(3):
+            hadamard(q_machine=qm, wires=[i])
+        vqc_zfeaturemap(input_feat=QTensor([[0.1,0.2,0.3]]),q_machine = qm)
+        print(qm.get_states())
+ 
+
+vqc_zzfeaturemap
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:function:: pyvqnet.qnn.vqc.tn.native.vqc_zzfeaturemap(input_feat, q_machine: pyvqnet.qnn.vqc.tn.native.TNQMachine, data_map_func=None, entanglement: Union[str, List[List[int]],Callable[[int], List[int]]] = "full",rep: int = 2)
+   :noindex:
+
+    二阶 Pauli-Z 演化电路。
+
+    对于 3 个量子位、1 个重复和线性纠缠,电路表示为:
+
+    .. parsed-literal::
+
+        ┌───┐┌─────────────────┐
+        ┤ H ├┤ U1(2.0*φ(x[0])) ├──■────────────────────────────■────────────────────────────────────
+        ├───┤├─────────────────┤┌─┴─┐┌──────────────────────┐┌─┴─┐
+        ┤ H ├┤ U1(2.0*φ(x[1])) ├┤ X ├┤ U1(2.0*φ(x[0],x[1])) ├┤ X ├──■────────────────────────────■──
+        ├───┤├─────────────────┤└───┘└──────────────────────┘└───┘┌─┴─┐┌──────────────────────┐┌─┴─┐
+        ┤ H ├┤ U1(2.0*φ(x[2])) ├──────────────────────────────────┤ X ├┤ U1(2.0*φ(x[1],x[2])) ├┤ X ├
+        └───┘└─────────────────┘                                  └───┘└──────────────────────┘└───┘
+    
+    其中 ``φ`` 是经典的非线性函数,如果输入两个值则 ``φ(x,y) = (pi - x)(pi - y)``, 输入一个则为 ``φ(x) = x``, 用 ``data_map_func`` 表示如下:
+    
+    .. code-block::
+        
+        def data_map_func(x):
+            coeff = x if x.shape[-1] == 1 else ft.reduce(lambda x, y: (np.pi - x) * (np.pi - y), x)
+            return coeff
+
+    :param input_feat: 表示输入参数的数组。
+    :param q_machine: 量子虚拟机。
+    :param data_map_func: 参数映射矩阵, 为可调用函数。 
+    :param entanglement: 指定的纠缠结构。
+    :param rep: 模块重复次数。
+    
+    Example::
+
+        import pyvqnet
+        pyvqnet.backends.set_backend("pyvqnet")
+        from pyvqnet.qnn.vqc.tn.native import vqc_zzfeaturemap, TNQMachine
+        from pyvqnet.tensor import QTensor
+
+        qm = TNQMachine(3)
+        vqc_zzfeaturemap(q_machine=qm, input_feat=QTensor([[0.1,0.2,0.3]]))
+        print(qm.get_states())
+
+
+vqc_allsinglesdoubles
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:function:: pyvqnet.qnn.vqc.tn.native.vqc_allsinglesdoubles(weights, q_machine: pyvqnet.qnn.vqc.tn.native.TNQMachine, hf_state, wires, singles=None, doubles=None)
+   :noindex:
+
+    在这种情况下,我们有四个单激发和双激发来保留 Hartree-Fock 态的总自旋投影。
+
+    由此产生的酉矩阵保留了粒子数量,并在初始 Hartree-Fock 状态和编码多激发配置的其他状态的叠加中准备了n量子位系统。
+      
+    :param weights: 大小为 ``(len(singles) + len(doubles),)`` 的QTensor,包含按顺序进入 vqc.qCircuit.single_excitation 和 vqc.qCircuit.double_excitation 操作的角度
+    :param q_machine: 量子虚拟机。
+    :param hf_state: 代表 Hartree-Fock 状态的长度 ``len(wires)`` 占用数向量, ``hf_state`` 用于初始化线路。
+    :param wires: 作用的量子位。
+    :param singles: 具有single_exitation操作所作用的两个量子位索引的列表序列。
+    :param doubles: 具有double_exitation操作所作用的两个量子位索引的列表序列。
+
+    例如,两个电子和六个量子位情况下的量子电路如下图所示:
+    
+.. image:: ./images/all_singles_doubles.png
+    :width: 600 px
+    :align: center
+
+|
+
+    Example::
+
+        import pyvqnet
+        pyvqnet.backends.set_backend("pyvqnet")
+        from pyvqnet.qnn.vqc.tn.native import vqc_allsinglesdoubles, TNQMachine
+
+        from pyvqnet.tensor import QTensor
+        qubits = 4
+        qm = TNQMachine(qubits)
+
+        vqc_allsinglesdoubles(q_machine=qm, weights=QTensor([0.55, 0.11, 0.53]), 
+                              hf_state = QTensor([1,1,0,0]), singles=[[0, 2], [1, 3]], doubles=[[0, 1, 2, 3]], wires=[0,1,2,3])
+        print(qm.get_states())
+
+vqc_basisrotation
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:function:: pyvqnet.qnn.vqc.tn.native.vqc_basisrotation(q_machine: pyvqnet.qnn.vqc.tn.native.TNQMachine, wires, unitary_matrix: QTensor, check=False)
+   :noindex:
+
+    实现一个电路,提供可用于执行精确的单体基础旋转的整体。线路来自于 `arXiv:1711.04789 <https://arxiv.org/abs/1711.04789>`_\ 中给出的单粒子费米子确定的酉变换 :math:`U(u)`
+    
+    .. math::
+
+        U(u) = \exp{\left( \sum_{pq} \left[\log u \right]_{pq} (a_p^\dagger a_q - a_q^\dagger a_p) \right)}.
+    
+    :math:`U(u)` 通过使用论文 `Optica, 3, 1460 (2016) <https://opg.optica.org/optica/fulltext.cfm?uri=optica-3-12-1460&id=355743>`_\ 中给出的方案。
+    
+
+    :param q_machine: 量子虚拟机。
+    :param wires: 作用的量子位。
+    :param unitary_matrix: 指定基础变换的矩阵。
+    :param check: 检测 `unitary_matrix` 是否为酉矩阵。
+
+    Example::
+
+        import pyvqnet
+
+        pyvqnet.backends.set_backend("pyvqnet")
+        from pyvqnet.qnn.vqc.tn.native import vqc_basisrotation, TNQMachine
+        from pyvqnet.tensor import QTensor
+        import numpy as np
+
+        V = np.array([[0.73678 + 0.27511j, -0.5095 + 0.10704j, -0.06847 + 0.32515j],
+                    [0.73678 + 0.27511j, -0.5095 + 0.10704j, -0.06847 + 0.32515j],
+                    [-0.21271 + 0.34938j, -0.38853 + 0.36497j, 0.61467 - 0.41317j]])
+
+        eigen_vals, eigen_vecs = np.linalg.eigh(V)
+        umat = eigen_vecs.T
+        wires = range(len(umat))
+
+        qm = TNQMachine(len(umat))
+
+        vqc_basisrotation(q_machine=qm,
+                        wires=wires,
+                        unitary_matrix=QTensor(umat, dtype=qm.dtype))
+
+        print(qm.get_states())
 
