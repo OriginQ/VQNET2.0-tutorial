@@ -57,11 +57,10 @@ exclude_patterns = []
 #
 html_theme = "sphinx_rtd_theme"
 
-html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static', 'rst\images']
+html_static_path = ['rst/images']
 
 # -- Options for PDF output --------------------------------------------------
  
@@ -162,10 +161,16 @@ latex_elements = {
 % Fix fancyhdr headheight warning
 \setlength{\headheight}{14pt}
 \addtolength{\topmargin}{-2pt}
-% Use fonts available on Windows
+% CJK fonts: prefer Windows fonts (SimSun/SimHei/YaHei), fall back to Noto CJK on Linux
+\IfFontExistsTF{SimSun}{%
 \setCJKmainfont[BoldFont=SimHei, ItalicFont=KaiTi]{SimSun}
 \setCJKsansfont{SimHei}
 \setCJKmonofont{Microsoft YaHei}
+}{%
+\setCJKmainfont[BoldFont=Noto Sans CJK SC, ItalicFont=Noto Serif CJK SC]{Noto Serif CJK SC}
+\setCJKsansfont{Noto Sans CJK SC}
+\setCJKmonofont{Noto Sans CJK SC}
+}
 \XeTeXlinebreaklocale "zh"
 \XeTeXlinebreakskip = 0pt plus 1pt
 \parindent 2em
@@ -175,9 +180,9 @@ latex_elements = {
 \renewcommand\CJKfamilydefault{\CJKrmdefault}
 % Completely fix repeating section titles - force static content everywhere
 \fancyhf{}
-\renewcommand{\leftmark}{VQNET v2.17.3}
+\renewcommand{\leftmark}{VQNET @@RELEASE@@}
 \renewcommand{\rightmark}{}
 \fancyfoot[C]{\thepage}
 \pagestyle{fancy}
-'''
+'''.replace('@@RELEASE@@', release),
 }

@@ -9360,4 +9360,3 @@ vqc_basisrotation
                         unitary_matrix=QTensor(umat, dtype=qm.dtype))
 
         print(qm.get_states())
-
