@@ -8100,7 +8100,7 @@ vqc_basisrotation
 .. note::
     本测试中 VQNet 的张量网络后端依赖 ``jax`` 与 ``tensornetwork`` ，安装方式参见上文 "张量网络后端变分量子线路模块" 章节中的说明。
 
-本测试沿用上节测试2的线路结构（RY(data) → [RY(param) → CRZ(param) → RY(param) → CRZ(param)] × L），评估张量网络（Tensor Network）模拟后端在变分量子线路批量数据梯度计算中的性能。测试在 Linux 系统下使用 GPU，对基于张量网络收缩模拟的 VQNet JAX TN 后端（ ``pyvqnet.qnn.vqc.tn.torch`` ，torch 前端 + JAX 收缩引擎）与 TensorCircuit（jax 后端），以及基于状态向量模拟的 VQNet（含 ``fused_multi_crz`` 融合算子版本）、TorchQuantum、PennyLane、DeepQuantum、MindQuantum 进行了对比。测试在量子比特数目 n = 4 与 n = 10 、线路深度 layer 10 、批量数据规模 batch size 512/128/32 的配置下分别进行，快速框架统计 20 次运行的平均耗时，较慢框架（PennyLane、MindQuantum）仅统计 2 次以节约时间。
+本测试沿用上节测试2的线路结构（RY(data) → [RY(param) → CRZ(param) → RY(param) → CRZ(param)] × L），评估张量网络（Tensor Network）模拟后端在变分量子线路批量数据梯度计算中的性能。测试在 Linux 系统下使用 GPU，对基于张量网络收缩模拟的 VQNet JAX TN 后端（ ``pyvqnet.qnn.vqc.tn.torch`` ，torch 前端 + JAX 收缩引擎）与 TensorCircuit（jax 后端），以及基于状态向量模拟的 VQNet（含 ``fused_multi_crz`` 融合算子版本）、TorchQuantum、PennyLane 等进行了对比。测试在量子比特数目 n = 4 与 n = 10 、线路深度 layer 10 、批量数据规模 batch size 512/128/32 的配置下分别进行，快速框架统计 20 次运行的平均耗时，较慢框架仅统计 2 次以节约时间。
 
 .. image:: ./images/grad_bench_full_n4.png
    :width: 600 px
@@ -8920,9 +8920,7 @@ vqc_basisrotation
 
     def plot_results_main(results, output_path="grad_benchmarks_main.png"):
         """
-        只画主力框架对比（7 个框架的分组柱状图）：
-        pyVQNet (fused CRZ) / VQNet JAX TN（TNQModule, torch 接口）/ TensorCircuit-NG（torch 接口）/
-        TorchQuantum / PennyLane / DeepQuantum / MindQuantum
+        只画主力框架对比。
         """
         plot_results(results, output_path,
                      frameworks=['new', 'vqnet-jax-tn-torch', 'tc-torch', 'torchquantum', 'pl', 'dq', 'mq'])

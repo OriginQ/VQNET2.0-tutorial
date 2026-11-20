@@ -5734,7 +5734,7 @@ QNSPSAOptimizer
 测试1：批量数据梯度对比
 ------------------------------------------------------------
 
-在量子机器学习中，梯度计算是影响变分量子线路效率的关键环节。为评估不同框架的量子梯度计算性能，本文在 Linux 系统下使用 GPU，对 VQNet、Deepquantum 与 Pennylane 进行了基准测试。测试在不同批量数据规模（batch size 16、32）、线路深度（layer 2、4）与量子比特数目（qubit 4、8、12、16）下分别进行，统计了各框架运行 10 次的平均耗时。线路结构为 CNOT + RX + RZ + RX 编码层。其中，Deepquantum 和 Pennylane 基于 Torch 的 GPU 后端实现，VQNet 则使用自研代码实现 GPU 运算。
+在量子机器学习中，梯度计算是影响变分量子线路效率的关键环节。为评估不同框架的量子梯度计算性能，本文在 Linux 系统下使用 GPU，对 VQNet 与 Pennylane 等进行了基准测试。测试在不同批量数据规模（batch size 16、32）、线路深度（layer 2、4）与量子比特数目（qubit 4、8、12、16）下分别进行，统计了各框架运行 10 次的平均耗时。线路结构为 CNOT + RX + RZ + RX 编码层。其中 Pennylane 等基于 Torch 的 GPU 后端实现，VQNet 则使用自研代码实现 GPU 运算。
 
 .. image:: ./images/grad-benchmarks.png
    :width: 600 px
@@ -5973,11 +5973,11 @@ QNSPSAOptimizer
 测试2：10量子比特 VQC 梯度对比
 ------------------------------------------------------------
 
-本测试基于本源量子大模型论文中的 10 量子比特、10 层 VQC 线路，对比 VQNet、TorchQuantum（TQ）、DeepQuantum（DQ）、Pennylane（PL）及 MindQuantum（MQ）五个框架的梯度计算性能。线路结构为：
+本测试基于本源量子大模型论文中的 10 量子比特、10 层 VQC 线路，对比 VQNet、TorchQuantum（TQ）、Pennylane（PL）等框架的梯度计算性能。线路结构为：
 
   RY(data) → [RY(param) → CRZ(param) → RY(param) → CRZ(param)] × L
 
-每层包含 40 个参数（4 组 × 10 qubit），参数总数 400。batch size 测试范围 1～1024。各框架 trials 次数：VQNet / TQ / DQ 为 20 次，PL / MQ 为 2 次（后两者在批量数据运行下较慢，仅运行 2 次节约时间）。
+每层包含 40 个参数（4 组 × 10 qubit），参数总数 400。batch size 测试范围 1～1024。各框架 trials 次数：VQNet / TQ 为 20 次，PL 等较慢框架为 2 次（仅运行 2 次以节约时间）。
 
 .. image:: ./images/grad_benchmarks_10q_ry_crz.png
    :width: 600 px
