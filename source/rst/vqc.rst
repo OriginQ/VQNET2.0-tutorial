@@ -4,7 +4,7 @@
 变分量子线路自动微分模拟
 ***********************************
 
-以下接口使用pyVQNet的QTensor接口构建常用量子逻辑门、量子线路以及测量方法,可使用自动微分模拟代替量子线路parameter-shift方法计算量子变分线路中参数的梯度。
+以下接口使用VQNet的QTensor接口构建常用量子逻辑门、量子线路以及测量方法,可使用自动微分模拟代替量子线路parameter-shift方法计算量子变分线路中参数的梯度。
 
 我们可以像其他 `Module` 一样,使用 ``pyvqnet.qnn.vqc`` 模块下的接口构成量子与经典混合神经网络模型。在 `Module` 中需要定义虚拟机 `QMachine`,并且需要对machine的量子态矢数据 `states` 根据输入的batchsize进行reset_states。请具体看下例:
 
@@ -82,8 +82,8 @@
             self.encode1 = RZ(wires=0)
             #基于VQC的RZ 在1比特上
             self.encode2 = RZ(wires=1)
-            #设置RZ 有要训练参数has_params = True,需要训练trainable= True
-            self.vqc = RZ(has_params = True,trainable = True,wires=1)
+            #设置RZ trainable= True
+            self.vqc = RZ(trainable = True,wires=1)
             #基于VQC的概率测量 在0,2比特上
             self.measure = Probability(wires=[0,2])
             #量子设备QMachine,使用4个比特。
@@ -134,8 +134,8 @@
             self.encode1 = RZ(wires=0)
             #基于VQC的RZ 在1比特上
             self.encode2 = RZ(wires=1)
-            #设置RZ 有要训练参数has_params = True,需要训练trainable= True
-            self.vqc = RZ(has_params = True,trainable = True,wires=1)
+            #设置RZ trainable= True
+            self.vqc = RZ(trainable = True,wires=1)
             #基于VQC的概率测量 在0,2比特上
             self.measure = Probability(wires=[0,2])
             #量子设备QMachine,使用4个比特。
@@ -257,11 +257,10 @@ i
 I
 ---------------------------------------------------------------
 
-.. py:class:: pyvqnet.qnn.vqc.I(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+.. py:class:: pyvqnet.qnn.vqc.I(trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
     定义一个I逻辑门类 。
 
-    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
     :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None,如果为p个参数的含参逻辑门,入参的数据维度需要为[1,p]或者[p]。
     :param wires: 线路作用的比特索引,默认为None。
@@ -315,11 +314,10 @@ hadamard
 Hadamard
 ---------------------------------------------------------------
 
-.. py:class:: pyvqnet.qnn.vqc.Hadamard(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+.. py:class:: pyvqnet.qnn.vqc.Hadamard(trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
     定义一个Hadamard逻辑门类 。
 
-    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
     :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None,如果为p个参数的含参逻辑门,入参的数据维度需要为[1,p]或者[p]。
     :param wires: 线路作用的比特索引,默认为None。
@@ -375,11 +373,10 @@ t
 T
 ---------------------------------------------------------------
 
-.. py:class:: pyvqnet.qnn.vqc.T(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+.. py:class:: pyvqnet.qnn.vqc.T(trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
     定义一个T逻辑门类 。
 
-    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
     :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None,如果为p个参数的含参逻辑门,入参的数据维度需要为[1,p]或者[p]。
     :param wires: 线路作用的比特索引,默认为None。
@@ -433,11 +430,10 @@ s
 S
 ---------------------------------------------------------------
 
-.. py:class:: pyvqnet.qnn.vqc.S(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+.. py:class:: pyvqnet.qnn.vqc.S(trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
     定义一个S逻辑门类 。
 
-    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
     :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None,如果为p个参数的含参逻辑门,入参的数据维度需要为[1,p]或者[p]。
     :param wires: 线路作用的比特索引,默认为None。
@@ -492,11 +488,10 @@ paulix
 PauliX
 ---------------------------------------------------------------
 
-.. py:class:: pyvqnet.qnn.vqc.PauliX(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+.. py:class:: pyvqnet.qnn.vqc.PauliX(trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
     定义一个PauliX逻辑门类 。
 
-    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
     :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None,如果为p个参数的含参逻辑门,入参的数据维度需要为[1,p]或者[p]。
     :param wires: 线路作用的比特索引,默认为None。
@@ -551,11 +546,10 @@ PauliY
 ---------------------------------------------------------------
 
 
-.. py:class:: pyvqnet.qnn.vqc.PauliY(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+.. py:class:: pyvqnet.qnn.vqc.PauliY(trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
     定义一个PauliY逻辑门类 。
 
-    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
     :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None,如果为p个参数的含参逻辑门,入参的数据维度需要为[1,p]或者[p]。
     :param wires: 线路作用的比特索引,默认为None。
@@ -611,11 +605,10 @@ PauliZ
 ---------------------------------------------------------------
 
 
-.. py:class:: pyvqnet.qnn.vqc.PauliZ(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+.. py:class:: pyvqnet.qnn.vqc.PauliZ(trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
     定义一个PauliZ逻辑门类 。
 
-    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
     :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None,如果为p个参数的含参逻辑门,入参的数据维度需要为[1,p]或者[p]。
     :param wires: 线路作用的比特索引,默认为None。
@@ -671,11 +664,10 @@ X1
 ---------------------------------------------------------------
 
 
-.. py:class:: pyvqnet.qnn.vqc.X1(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+.. py:class:: pyvqnet.qnn.vqc.X1(trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
     定义一个X1逻辑门类 。
 
-    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
     :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None,如果为p个参数的含参逻辑门,入参的数据维度需要为[1,p]或者[p]。
     :param wires: 线路作用的比特索引,默认为None。
@@ -732,11 +724,10 @@ RX
 ---------------------------------------------------------------
 
 
-.. py:class:: pyvqnet.qnn.vqc.RX(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+.. py:class:: pyvqnet.qnn.vqc.RX(trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
     定义一个RX逻辑门类 。
 
-    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
     :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None,如果为p个参数的含参逻辑门,入参的数据维度需要为[1,p]或者[p]。
     :param wires: 线路作用的比特索引,默认为None。
@@ -748,7 +739,7 @@ RX
 
         from pyvqnet.qnn.vqc import RX,QMachine
         device = QMachine(4)
-        layer = RX(has_params= True, trainable= True, wires=0)
+        layer = RX(trainable=True, wires=0)
         batchsize = 2
         device.reset_states(batchsize)
         layer(q_machine = device)
@@ -793,11 +784,10 @@ RY
 ---------------------------------------------------------------
 
 
-.. py:class:: pyvqnet.qnn.vqc.RY(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+.. py:class:: pyvqnet.qnn.vqc.RY(trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
     定义一个RY逻辑门类 。
 
-    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
     :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None,如果为p个参数的含参逻辑门,入参的数据维度需要为[1,p]或者[p]。
     :param wires: 线路作用的比特索引,默认为None。
@@ -809,7 +799,7 @@ RY
 
         from pyvqnet.qnn.vqc import RY,QMachine
         device = QMachine(4)
-        layer = RY(has_params= True, trainable= True, wires=0)
+        layer = RY(trainable=True, wires=0)
         batchsize = 2
         device.reset_states(batchsize)
         layer(q_machine = device)
@@ -854,11 +844,10 @@ RZ
 ---------------------------------------------------------------
 
 
-.. py:class:: pyvqnet.qnn.vqc.RZ(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+.. py:class:: pyvqnet.qnn.vqc.RZ(trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
     定义一个RZ逻辑门类 。
 
-    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
     :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None,如果为p个参数的含参逻辑门,入参的数据维度需要为[1,p]或者[p]。
     :param wires: 线路作用的比特索引,默认为None。
@@ -870,7 +859,7 @@ RZ
 
         from pyvqnet.qnn.vqc import RZ,QMachine
         device = QMachine(4)
-        layer = RZ(has_params= True, trainable= True, wires=0)
+        layer = RZ(trainable=True, wires=0)
         batchsize = 2
         device.reset_states(batchsize)
         layer(q_machine = device)
@@ -917,11 +906,10 @@ CRX
 ---------------------------------------------------------------
 
 
-.. py:class:: pyvqnet.qnn.vqc.CRX(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+.. py:class:: pyvqnet.qnn.vqc.CRX(trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
     定义一个CRX逻辑门类 。
 
-    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
     :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None,如果为p个参数的含参逻辑门,入参的数据维度需要为[1,p]或者[p]。
     :param wires: 线路作用的比特索引,默认为None。
@@ -933,7 +921,7 @@ CRX
 
         from pyvqnet.qnn.vqc import CRX,QMachine
         device = QMachine(4)
-        layer = CRX(has_params= True, trainable= True, wires=[0,2])
+        layer = CRX(trainable=True, wires=[0,2])
         batchsize = 2
         device.reset_states(batchsize)
         layer(q_machine = device)
@@ -979,11 +967,10 @@ CRY
 ---------------------------------------------------------------
 
 
-.. py:class:: pyvqnet.qnn.vqc.CRY(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+.. py:class:: pyvqnet.qnn.vqc.CRY(trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
     定义一个CRY逻辑门类 。
 
-    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
     :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None,如果为p个参数的含参逻辑门,入参的数据维度需要为[1,p]或者[p]。
     :param wires: 线路作用的比特索引,默认为None。
@@ -995,7 +982,7 @@ CRY
 
         from pyvqnet.qnn.vqc import CRY,QMachine
         device = QMachine(4)
-        layer = CRY(has_params= True, trainable= True, wires=[0,2])
+        layer = CRY(trainable=True, wires=[0,2])
         batchsize = 2
         device.reset_states(batchsize)
         layer(q_machine = device)
@@ -1041,11 +1028,10 @@ CRZ
 ---------------------------------------------------------------
 
 
-.. py:class:: pyvqnet.qnn.vqc.CRZ(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+.. py:class:: pyvqnet.qnn.vqc.CRZ(trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
     定义一个CRZ逻辑门类 。
 
-    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
     :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None,如果为p个参数的含参逻辑门,入参的数据维度需要为[1,p]或者[p]。
     :param wires: 线路作用的比特索引,默认为None。
@@ -1057,7 +1043,7 @@ CRZ
 
         from pyvqnet.qnn.vqc import CRZ,QMachine
         device = QMachine(4)
-        layer = CRZ(has_params= True, trainable= True, wires=[0,2])
+        layer = CRZ(trainable=True, wires=[0,2])
         batchsize = 2
         device.reset_states(batchsize)
         layer(q_machine = device)
@@ -1104,11 +1090,10 @@ U1
 ---------------------------------------------------------------
 
 
-.. py:class:: pyvqnet.qnn.vqc.U1(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+.. py:class:: pyvqnet.qnn.vqc.U1(trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
     定义一个U1逻辑门类 。
 
-    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
     :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None,如果为p个参数的含参逻辑门,入参的数据维度需要为[1,p]或者[p]。
     :param wires: 线路作用的比特索引,默认为None。
@@ -1120,7 +1105,7 @@ U1
 
         from pyvqnet.qnn.vqc import U1,QMachine
         device = QMachine(4)
-        layer = U1(has_params= True, trainable= True, wires=0)
+        layer = U1(trainable=True, wires=0)
         batchsize = 2
         device.reset_states(batchsize)
         layer(q_machine = device)
@@ -1165,11 +1150,10 @@ U2
 ---------------------------------------------------------------
 
 
-.. py:class:: pyvqnet.qnn.vqc.U2(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+.. py:class:: pyvqnet.qnn.vqc.U2(trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
     定义一个U2逻辑门类 。
 
-    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
     :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None,如果为p个参数的含参逻辑门,入参的数据维度需要为[1,p]或者[p]。
     :param wires: 线路作用的比特索引,默认为None。
@@ -1181,7 +1165,7 @@ U2
 
         from pyvqnet.qnn.vqc import U2,QMachine
         device = QMachine(4)
-        layer = U2(has_params= True, trainable= True, wires=0)
+        layer = U2(trainable=True, wires=0)
         batchsize = 2
         device.reset_states(batchsize)
         layer(q_machine = device)
@@ -1226,11 +1210,10 @@ U3
 ---------------------------------------------------------------
 
 
-.. py:class:: pyvqnet.qnn.vqc.U3(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+.. py:class:: pyvqnet.qnn.vqc.U3(trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
     定义一个U3逻辑门类 。
 
-    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
     :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None,如果为p个参数的含参逻辑门,入参的数据维度需要为[1,p]或者[p]。
     :param wires: 线路作用的比特索引,默认为None。
@@ -1242,7 +1225,7 @@ U3
 
         from pyvqnet.qnn.vqc import U3,QMachine
         device = QMachine(4)
-        layer = U3(has_params= True, trainable= True, wires=0)
+        layer = U3(trainable=True, wires=0)
         batchsize = 2
         device.reset_states(batchsize)
         layer(q_machine = device)
@@ -1285,11 +1268,10 @@ CY
 ---------------------------------------------------------------
 
 
-.. py:class:: pyvqnet.qnn.vqc.CY(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+.. py:class:: pyvqnet.qnn.vqc.CY(trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
     定义一个CY逻辑门类 。
 
-    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
     :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None,如果为p个参数的含参逻辑门,入参的数据维度需要为[1,p]或者[p]。
     :param wires: 线路作用的比特索引,默认为None。
@@ -1345,11 +1327,10 @@ CNOT
 ---------------------------------------------------------------
 
 
-.. py:class:: pyvqnet.qnn.vqc.CNOT(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+.. py:class:: pyvqnet.qnn.vqc.CNOT(trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
     定义一个CNOT逻辑门类 。
 
-    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
     :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None,如果为p个参数的含参逻辑门,入参的数据维度需要为[1,p]或者[p]。
     :param wires: 线路作用的比特索引,默认为None。
@@ -1406,11 +1387,10 @@ CR
 ---------------------------------------------------------------
 
 
-.. py:class:: pyvqnet.qnn.vqc.CR(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+.. py:class:: pyvqnet.qnn.vqc.CR(trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
     定义一个CR逻辑门类 。
 
-    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
     :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None,如果为p个参数的含参逻辑门,入参的数据维度需要为[1,p]或者[p]。
     :param wires: 线路作用的比特索引,默认为None。
@@ -1422,7 +1402,7 @@ CR
 
         from pyvqnet.qnn.vqc import CR,QMachine
         device = QMachine(4)
-        layer = CR(has_params= True, trainable= True, wires=[0,2])
+        layer = CR(trainable=True, wires=[0,2])
         batchsize = 2
         device.reset_states(batchsize)
         layer(q_machine = device)
@@ -1467,11 +1447,10 @@ SWAP
 ---------------------------------------------------------------
 
 
-.. py:class:: pyvqnet.qnn.vqc.SWAP(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+.. py:class:: pyvqnet.qnn.vqc.SWAP(trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
     定义一个SWAP逻辑门类 。
 
-    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
     :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None,如果为p个参数的含参逻辑门,入参的数据维度需要为[1,p]或者[p]。
     :param wires: 线路作用的比特索引,默认为None。
@@ -1527,7 +1506,7 @@ cswap
 CSWAP
 ---------------------------------------------------------------
 
-.. py:class:: pyvqnet.qnn.vqc.CSWAP(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+.. py:class:: pyvqnet.qnn.vqc.CSWAP(trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
     定义一个SWAP逻辑门类 。
 
@@ -1542,7 +1521,6 @@ CSWAP
             0 & 0 & 0 & 0 & 0 & 0 & 0 & 1
         \end{bmatrix}.
 
-    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
     :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None,如果为p个参数的含参逻辑门,入参的数据维度需要为[1,p]或者[p]。
     :param wires: 线路作用的比特索引,默认为None。
@@ -1663,11 +1641,10 @@ CZ
 ---------------------------------------------------------------
 
 
-.. py:class:: pyvqnet.qnn.vqc.CZ(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+.. py:class:: pyvqnet.qnn.vqc.CZ(trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
     定义一个CZ逻辑门类 。
 
-    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
     :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None,如果为p个参数的含参逻辑门,入参的数据维度需要为[1,p]或者[p]。
     :param wires: 线路作用的比特索引,默认为None。
@@ -1724,11 +1701,10 @@ RXX
 ---------------------------------------------------------------
 
 
-.. py:class:: pyvqnet.qnn.vqc.RXX(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+.. py:class:: pyvqnet.qnn.vqc.RXX(trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
     定义一个RXX逻辑门类 。
 
-    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
     :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None,如果为p个参数的含参逻辑门,入参的数据维度需要为[1,p]或者[p]。
     :param wires: 线路作用的比特索引,默认为None。
@@ -1740,7 +1716,7 @@ RXX
 
         from pyvqnet.qnn.vqc import RXX,QMachine
         device = QMachine(4)
-        layer = RXX(has_params= True, trainable= True, wires=[0,2])
+        layer = RXX(trainable=True, wires=[0,2])
         batchsize = 2
         device.reset_states(batchsize)
         layer(q_machine = device)
@@ -1785,11 +1761,10 @@ RYY
 ---------------------------------------------------------------
 
 
-.. py:class:: pyvqnet.qnn.vqc.RYY(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+.. py:class:: pyvqnet.qnn.vqc.RYY(trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
     定义一个RYY逻辑门类 。
 
-    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
     :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None,如果为p个参数的含参逻辑门,入参的数据维度需要为[1,p]或者[p]。
     :param wires: 线路作用的比特索引,默认为None。
@@ -1801,7 +1776,7 @@ RYY
 
         from pyvqnet.qnn.vqc import RYY,QMachine
         device = QMachine(4)
-        layer = RYY(has_params= True, trainable= True, wires=[0,2])
+        layer = RYY(trainable=True, wires=[0,2])
         batchsize = 2
         device.reset_states(batchsize)
         layer(q_machine = device)
@@ -1847,11 +1822,10 @@ RZZ
 ---------------------------------------------------------------
 
 
-.. py:class:: pyvqnet.qnn.vqc.RZZ(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+.. py:class:: pyvqnet.qnn.vqc.RZZ(trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
     定义一个RZZ逻辑门类 。
 
-    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
     :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None,如果为p个参数的含参逻辑门,入参的数据维度需要为[1,p]或者[p]。
     :param wires: 线路作用的比特索引,默认为None。
@@ -1863,7 +1837,7 @@ RZZ
 
         from pyvqnet.qnn.vqc import RZZ,QMachine
         device = QMachine(4)
-        layer = RZZ(has_params= True, trainable= True, wires=[0,2])
+        layer = RZZ(trainable=True, wires=[0,2])
         batchsize = 2
         device.reset_states(batchsize)
         layer(q_machine = device)
@@ -1907,11 +1881,10 @@ rzx
 RZX
 ---------------------------------------------------------------
 
-.. py:class:: pyvqnet.qnn.vqc.RZX(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+.. py:class:: pyvqnet.qnn.vqc.RZX(trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
     定义一个RZX逻辑门类 。
 
-    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
     :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None,如果为p个参数的含参逻辑门,入参的数据维度需要为[1,p]或者[p]。
     :param wires: 线路作用的比特索引,默认为None。
@@ -1923,7 +1896,7 @@ RZX
 
         from pyvqnet.qnn.vqc import RZX,QMachine
         device = QMachine(4)
-        layer = RZX(has_params= True, trainable= True, wires=[0,2])
+        layer = RZX(trainable=True, wires=[0,2])
         batchsize = 2
         device.reset_states(batchsize)
         layer(q_machine = device)
@@ -1968,11 +1941,10 @@ Toffoli
 ---------------------------------------------------------------
 
 
-.. py:class:: pyvqnet.qnn.vqc.Toffoli(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+.. py:class:: pyvqnet.qnn.vqc.Toffoli(trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
     定义一个Toffoli逻辑门类 。
 
-    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
     :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None,如果为p个参数的含参逻辑门,入参的数据维度需要为[1,p]或者[p]。
     :param wires: 线路作用的比特索引,默认为None。
@@ -2031,11 +2003,10 @@ IsingXX
 ---------------------------------------------------------------
 
 
-.. py:class:: pyvqnet.qnn.vqc.IsingXX(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+.. py:class:: pyvqnet.qnn.vqc.IsingXX(trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
     定义一个IsingXX逻辑门类 。
 
-    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
     :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None,如果为p个参数的含参逻辑门,入参的数据维度需要为[1,p]或者[p]。
     :param wires: 线路作用的比特索引,默认为None。
@@ -2047,7 +2018,7 @@ IsingXX
 
         from pyvqnet.qnn.vqc import IsingXX,QMachine
         device = QMachine(4)
-        layer = IsingXX(has_params= True, trainable= True, wires=[0,2])
+        layer = IsingXX(trainable=True, wires=[0,2])
         batchsize = 2
         device.reset_states(batchsize)
         layer(q_machine = device)
@@ -2094,11 +2065,10 @@ IsingYY
 ---------------------------------------------------------------
 
 
-.. py:class:: pyvqnet.qnn.vqc.IsingYY(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+.. py:class:: pyvqnet.qnn.vqc.IsingYY(trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
     定义一个IsingYY逻辑门类 。
 
-    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
     :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None,如果为p个参数的含参逻辑门,入参的数据维度需要为[1,p]或者[p]。
     :param wires: 线路作用的比特索引,默认为None。
@@ -2110,7 +2080,7 @@ IsingYY
 
         from pyvqnet.qnn.vqc import IsingYY,QMachine
         device = QMachine(4)
-        layer = IsingYY(has_params= True, trainable= True, wires=[0,2])
+        layer = IsingYY(trainable=True, wires=[0,2])
         batchsize = 2
         device.reset_states(batchsize)
         layer(q_machine = device)
@@ -2156,11 +2126,10 @@ IsingZZ
 ---------------------------------------------------------------
 
 
-.. py:class:: pyvqnet.qnn.vqc.IsingZZ(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+.. py:class:: pyvqnet.qnn.vqc.IsingZZ(trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
     定义一个IsingZZ逻辑门类 。
 
-    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
     :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None,如果为p个参数的含参逻辑门,入参的数据维度需要为[1,p]或者[p]。
     :param wires: 线路作用的比特索引,默认为None。
@@ -2172,7 +2141,7 @@ IsingZZ
 
         from pyvqnet.qnn.vqc import IsingZZ,QMachine
         device = QMachine(4)
-        layer = IsingZZ(has_params= True, trainable= True, wires=[0,2])
+        layer = IsingZZ(trainable=True, wires=[0,2])
         batchsize = 2
         device.reset_states(batchsize)
         layer(q_machine = device)
@@ -2217,11 +2186,10 @@ IsingXY
 ---------------------------------------------------------------
 
 
-.. py:class:: pyvqnet.qnn.vqc.IsingXY(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+.. py:class:: pyvqnet.qnn.vqc.IsingXY(trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
     定义一个IsingXY逻辑门类 。
 
-    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
     :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None,如果为p个参数的含参逻辑门,入参的数据维度需要为[1,p]或者[p]。
     :param wires: 线路作用的比特索引,默认为None。
@@ -2233,7 +2201,7 @@ IsingXY
 
         from pyvqnet.qnn.vqc import IsingXY,QMachine
         device = QMachine(4)
-        layer = IsingXY(has_params= True, trainable= True, wires=[0,2])
+        layer = IsingXY(trainable=True, wires=[0,2])
         batchsize = 2
         device.reset_states(batchsize)
         layer(q_machine = device)
@@ -2279,11 +2247,10 @@ PhaseShift
 ---------------------------------------------------------------
 
 
-.. py:class:: pyvqnet.qnn.vqc.PhaseShift(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+.. py:class:: pyvqnet.qnn.vqc.PhaseShift(trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
     定义一个PhaseShift逻辑门类 。
 
-    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
     :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None,如果为p个参数的含参逻辑门,入参的数据维度需要为[1,p]或者[p]。
     :param wires: 线路作用的比特索引,默认为None。
@@ -2295,7 +2262,7 @@ PhaseShift
 
         from pyvqnet.qnn.vqc import PhaseShift,QMachine
         device = QMachine(4)
-        layer = PhaseShift(has_params= True, trainable= True, wires=1)
+        layer = PhaseShift(trainable=True, wires=1)
         batchsize = 2
         device.reset_states(batchsize)
         layer(q_machine = device)
@@ -2341,11 +2308,10 @@ MultiRZ
 ---------------------------------------------------------------
 
 
-.. py:class:: pyvqnet.qnn.vqc.MultiRZ(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+.. py:class:: pyvqnet.qnn.vqc.MultiRZ(trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
     定义一个MultiRZ逻辑门类 。
 
-    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
     :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None,如果为p个参数的含参逻辑门,入参的数据维度需要为[1,p]或者[p]。
     :param wires: 线路作用的比特索引,默认为None。
@@ -2357,7 +2323,7 @@ MultiRZ
 
         from pyvqnet.qnn.vqc import MultiRZ,QMachine
         device = QMachine(4)
-        layer = MultiRZ(has_params= True, trainable= True, wires=[0,2])
+        layer = MultiRZ(trainable=True, wires=[0,2])
         batchsize = 2
         device.reset_states(batchsize)
         layer(q_machine = device)
@@ -2404,11 +2370,10 @@ SDG
 ---------------------------------------------------------------
 
 
-.. py:class:: pyvqnet.qnn.vqc.SDG(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+.. py:class:: pyvqnet.qnn.vqc.SDG(trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
     定义一个SDG逻辑门类 。
 
-    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
     :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None,如果为p个参数的含参逻辑门,入参的数据维度需要为[1,p]或者[p]。
     :param wires: 线路作用的比特索引,默认为None。
@@ -2465,11 +2430,10 @@ tdg
 TDG
 ---------------------------------------------------------------
 
-.. py:class:: pyvqnet.qnn.vqc.TDG(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+.. py:class:: pyvqnet.qnn.vqc.TDG(trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
     定义一个TDG逻辑门类 。
 
-    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
     :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None,如果为p个参数的含参逻辑门,入参的数据维度需要为[1,p]或者[p]。
     :param wires: 线路作用的比特索引,默认为None。
@@ -2530,11 +2494,10 @@ ControlledPhaseShift
 ---------------------------------------------------------------
 
 
-.. py:class:: pyvqnet.qnn.vqc.ControlledPhaseShift(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+.. py:class:: pyvqnet.qnn.vqc.ControlledPhaseShift(trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
     定义一个ControlledPhaseShift逻辑门类 。
 
-    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
     :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None,如果为p个参数的含参逻辑门,入参的数据维度需要为[1,p]或者[p]。
     :param wires: 线路作用的比特索引,默认为None。
@@ -2546,7 +2509,7 @@ ControlledPhaseShift
 
         from pyvqnet.qnn.vqc import ControlledPhaseShift,QMachine
         device = QMachine(4)
-        layer = ControlledPhaseShift(has_params= True, trainable= True, wires=[0,2])
+        layer = ControlledPhaseShift(trainable=True, wires=[0,2])
         batchsize = 2
         device.reset_states(batchsize)
         layer(q_machine = device)
@@ -2602,11 +2565,10 @@ multicontrolledx
 MultiControlledX
 ---------------------------------------------------------------
 
-.. py:class:: pyvqnet.qnn.vqc.MultiControlledX(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False,control_values=None)
+.. py:class:: pyvqnet.qnn.vqc.MultiControlledX(trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False,control_values=None)
     
     定义一个MultiControlledX逻辑门类 。
 
-    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
     :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None,如果为p个参数的含参逻辑门,入参的数据维度需要为[1,p]或者[p]。
     :param wires: 线路作用的比特索引,默认为None。
@@ -3081,8 +3043,7 @@ HermitianExpval
                 self._dtype = dtype
                 self.qm = QMachine(num_wires, dtype=dtype)
                 self.rx_layer1 = VQC_RotCircuit
-                self.ry_layer2 = RY(has_params=True,
-                                    trainable=True,
+                self.ry_layer2 = RY(trainable=True,
                                     wires=0,
                                     init_params=tensor.QTensor([-0.5]))
                 self.xlayer = PauliX(wires=0)
@@ -3183,13 +3144,13 @@ VQC_HardwareEfficientAnsatz
 VQC_BasicEntanglerTemplate
 -----------------------------------------
 
-.. py:class:: pyvqnet.qnn.vqc.VQC_BasicEntanglerTemplate(num_layer=1, num_qubits=1, rotation="RX", initial=None, dtype=None)
+.. py:class:: pyvqnet.qnn.vqc.VQC_BasicEntanglerTemplate(num_layers=1, num_qubits=1, rotation="RX", initial=None, dtype=None)
 
     由每个量子位上的单参数单量子位旋转组成的层,后跟一个闭合链或环组合的多个CNOT 门构成的类。
 
     CNOT 门环将每个量子位与其邻居连接起来,最后一个量子位被认为是第一个量子位的邻居。
 
-    :param num_layer: 量子比特线路层数。
+    :param num_layers: 量子比特线路层数。
     :param num_qubits: 量子比特数,默认为1。
     :param rotation: 使用单参数单量子比特门,``RX`` 被用作默认值。
     :param initial: 使用initial 初始化所有其中参数逻辑门的参数, 默认值: None, 此模块将随机初始化参数。
@@ -3234,17 +3195,17 @@ VQC_BasicEntanglerTemplate
 VQC_StronglyEntanglingTemplate
 ---------------------------------------------------------------
 
-.. py:class:: pyvqnet.qnn.vqc.VQC_StronglyEntanglingTemplate(num_layers=1, num_qubits=1, rotation = "RX", initial = None, dtype: = None)
+.. py:class:: pyvqnet.qnn.vqc.VQC_StronglyEntanglingTemplate(num_layers=1, num_qubits=1, ranges=None, initial=None, dtype=None)
 
     由单个量子比特旋转和纠缠器组成的层,参考 `circuit-centric classifier design <https://arxiv.org/abs/1804.00633>`__ .
 
  
     :param num_layers: 重复层数,默认值: 1。
     :param num_qubits: 量子比特数,默认值: 1。
-    :param rotation: 要使用的单参数单量子比特门,默认值: `RX`
+    :param ranges: 决定每个后续层的范围超参数的序列。默认值: None,对第 :math:`l` 层和 :math:`M` 个量子比特使用 :math:`r=l \mod M`。
     :param initial: 使用initial 初始化所有其中参数逻辑门的参数,默认值: None,此模块将随机初始化参数。
     :param dtype: 参数的数据类型,默认值: None,使用 float32。
-    :return: VQC_BasicEntanglerTemplate 实例
+    :return: VQC_StronglyEntanglingTemplate 实例
 
 
     Example::
@@ -3293,7 +3254,7 @@ VQC_QuantumEmbedding
 
  
     :param num_repetitions_input: 子模块中输入编码的重复次数。
-    :paramdepth_input: 输入维数。
+    :param depth_input: 输入维数。
     :param num_unitary_layers: 变分量子门的重复次数。
     :param num_repetitions: 子模块的重复次数。
     :param initial: 参数初始化值,默认为None
@@ -3484,7 +3445,7 @@ VQC_AngleEmbedding
 VQC_AmplitudeEmbedding
 ---------------------------------------------------------------
 
-.. py:function:: pyvqnet.qnn.vqc.VQC_AmplitudeEmbeddingCircuit(input_feature, q_machine)
+.. py:function:: pyvqnet.qnn.vqc.VQC_AmplitudeEmbedding(input_feature, q_machine)
 
     将 :math:`2^n` 特征编码为 ``q_machine``  :math:`n` 量子比特的振幅向量。
 
@@ -3577,9 +3538,9 @@ VQC_CRotCircuit
 ---------------------------------------------------------------
 
 
-.. py:function:: pyvqnet.qnn.vqc.VQC_CRotCircuit(para,control_qubits,rot_wire,q_machine)
+.. py:function:: pyvqnet.qnn.vqc.VQC_CRotCircuit(para,control_wire,rot_wire,q_machine)
 
-    在 ``q_machine`` 的比特 ``rot_wire`` 以及受控比特 ``control_qubits`` 上使用 ``params`` 进行受控Rot操作符。
+    在 ``q_machine`` 的比特 ``rot_wire`` 以及受控比特 ``control_wire`` 上使用 ``params`` 进行受控Rot操作符。
 
     .. math:: CR(\phi, \theta, \omega) = \begin{bmatrix}
             1 & 0 & 0 & 0 \\
@@ -3589,7 +3550,7 @@ VQC_CRotCircuit
         \end{bmatrix}.
     
     :param para: 表示参数的数组。
-    :param control_qubits: 控制量子比特索引。
+    :param control_wire: 控制量子比特索引。
     :param rot_wire: Rot量子比特索引。
     :param q_machine: 量子虚拟机设备。
     
@@ -4054,7 +4015,7 @@ vqc_qft_add_to_register
 vqc_qft_add_two_register
 -------------------------------------
 
-.. py:function:: vqc_qft_add_two_register(q_machine, m, k, wires_m, wires_k, wires_solution)
+.. py:function:: pyvqnet.qnn.vqc.vqc_qft_add_two_register(q_machine, m, k, wires_m, wires_k, wires_solution)
 
     在 ``q_machine`` 进行如下操作: 将两个量子比特wires_m, wires_k中编码的无符号整数m, k进行加法,结果存在wires_solution比特上。
 
@@ -4098,7 +4059,7 @@ vqc_qft_add_two_register
 vqc_qft_mul
 -------------------------------------
 
-.. py:function:: vqc_qft_mul(q_machine, m, k, wires_m, wires_k, wires_solution)
+.. py:function:: pyvqnet.qnn.vqc.vqc_qft_mul(q_machine, m, k, wires_m, wires_k, wires_solution)
 
     在 ``q_machine`` 进行如下操作: 将两个量子比特wires_m, wires_k中编码的数值m, k, 进行乘法,结果存在wires_solution比特上。
 
@@ -4174,7 +4135,7 @@ VQC_FABLE
 VQC_LCU
 --------------------
 
-.. py:class:: pyvqnet.qnn.vqc.VQC_LCU(wires)
+.. py:class:: pyvqnet.qnn.vqc.VQC_LCU(wires=None, check_hermitian=True)
 
     使用线性组合单元 (LCU) 构建基于 VQC 的 QCircuit,`通过量子比特化进行哈密顿模拟 <https://arxiv.org/abs/1610.06546>`_。
     输入 dtype 可以是 kfloat32、kfloat64、kcomplex64、kcomplex128
@@ -4264,15 +4225,15 @@ VQC_QSVT
 Quanvolution
 ---------------------------------------------------------------
 
-.. py:class:: pyvqnet.qnn.qcnn.Quanvolution(params_shape, stride=(1, 1), kernel_initializer=quantum_uniform, machine_type_or_cloud_token: str = "cpu")
+.. py:class:: pyvqnet.qnn.qcnn.Quanvolution(params_shape, strides=(1, 1), kernel_initializer=quantum_uniform, machine_type: str = "cpu")
 
 
     基于《Quanvolutional Neural Networks: Powering Image Recognition with Quantum Circuits》（https://arxiv.org/abs/1904.04767）实现的量子卷积，用变分量子电路替换经典的卷积滤波器，从而得到具有量子卷积滤波器的量子卷积神经网络。
 
     :param params_shape: 参数的形状，应为二维。
-    :param stride: 切片窗口的步长，默认为 (1,1)。
+    :param strides: 切片窗口的步长，默认为 (1,1)。
     :param kernel_initializer: 参数的卷积核初始化器。
-    :param machine_type_or_cloud_token: 机器类型字符串或 Qcloud 令牌，默认为“cpu”。
+    :param machine_type: 机器类型字符串，默认为“cpu”。
 
     Example::
 
@@ -4340,7 +4301,7 @@ QDRL
 QGRU
 ------------------------------------------------------------
 
-.. py:class:: pyvqnet.qnn.qgru.QGRU(para_num, num_of_qubits,input_size,hidden_size,batch_first=True)
+.. py:class:: pyvqnet.qnn.qgru.QGRU(para_num, num_of_qubits=4, input_size=100, hidden_size=100, batch_first=True)
 
     基于量子量子变分线路实现的GRU（门控循环单元），通过利用量子电路来进行状态更新和记忆保持。
 
@@ -4384,7 +4345,7 @@ QGRU
 QLSTM
 -------------------------------------------------------------
 
-.. py:class:: pyvqnet.qnn.qlstm.QLSTM(para_num, num_of_qubits,input_size, hidden_size,batch_first=True)
+.. py:class:: pyvqnet.qnn.qlstm.QLSTM(para_num, num_of_qubits=4, input_size=100, hidden_size=100, batch_first=True)
 
 
     QLSTM (Quantum Long Short-Term Memory) 是一种结合了量子计算和经典LSTM的混合模型，旨在利用量子计算的并行性和经典LSTM的记忆能力来处理序列数据。
@@ -4470,7 +4431,7 @@ QMLPModel
 QRLModel
 -------------------------------------------------------------
 
-.. py:class:: pyvqnet.qnn.qrl.QRLModel(num_qubits, n_layers)
+.. py:class:: pyvqnet.qnn.qrl.QRLModel(num_qubits, n_layers=2)
 
     使用变分量子电路的量子深度强化学习模型,参考 :ref:`QDRL_DEMO` 中的线路实现。
 
@@ -4581,13 +4542,12 @@ TTOLayer
 QuantumLayerAdjoint
 ---------------------------------------------------------------
 
-.. py:class:: pyvqnet.qnn.vqc.QuantumLayerAdjoint(general_module: pyvqnet.nn.Module,use_qpanda=False, name="")
+.. py:class:: pyvqnet.qnn.vqc.QuantumLayerAdjoint(vqc_module: pyvqnet.nn.Module, name="")
 
 
     使用伴随矩阵方式进行梯度计算的可自动微分的QuantumLayer层,参考  `Efficient calculation of gradients in classical simulations of variational quantum algorithms <https://arxiv.org/abs/2009.02823>`_ 。
 
-    :param general_module: 一个仅使用 ``pyvqnet.qnn.vqc`` 下量子线路接口搭建的 `pyvqnet.nn.Module` 实例。
-    :param use_qpanda: 是否使用qpanda线路进行前传,默认:False。
+    :param vqc_module: 一个仅使用 ``pyvqnet.qnn.vqc`` 下量子线路接口搭建的 `pyvqnet.nn.Module` 实例。
     :param name: 该层名字,默认为""。
     :return: 返回一个 QuantumLayerAdjoint 类实例。
 
@@ -4596,7 +4556,7 @@ QuantumLayerAdjoint
         
     .. note::
 
-        general_module 的 QMachine 应设置 grad_method = "adjoint".
+        vqc_module 的 QMachine 应设置 grad_method = "adjoint".
 
         当前支持由如下含参逻辑门 `RX`, `RY`, `RZ`, `PhaseShift`, `RXX`, `RYY`, `RZZ`, `RZX`, `U1`, `U2`, `U3` 以及其他不含参逻辑门构成的变分线路。
 
@@ -4615,10 +4575,10 @@ QuantumLayerAdjoint
                 self._num_wires = num_wires
                 self._dtype = dtype
                 self.qm = QMachine(num_wires, dtype=dtype, grad_mode=grad_mode)
-                self.rx_layer = RX(has_params=True, trainable=False, wires=0)
-                self.ry_layer = RY(has_params=True, trainable=False, wires=1)
-                self.rz_layer = RZ(has_params=True, trainable=False, wires=1)
-                self.rz_layer2 = RZ(has_params=True, trainable=True, wires=1)
+                self.rx_layer = RX(trainable=False, wires=0)
+                self.ry_layer = RY(trainable=False, wires=1)
+                self.rz_layer = RZ(trainable=False, wires=1)
+                self.rz_layer2 = RZ(trainable=True, wires=1)
 
                 self.rot = VQC_HardwareEfficientAnsatz(6, ["rx", "RY", "rz"],
                                                     entangle_gate="cnot",
@@ -4666,7 +4626,7 @@ QuantumLayerAdjoint
 DataParallelVQCAdjointLayer
 ---------------------------------------------------------------
 
-.. py:class:: pyvqnet.distributed.DataParallelVQCAdjointLayer(Comm_OP, vqc_module, name="")
+.. py:class:: pyvqnet.distributed.DataParallelVQCAdjointLayer(Comm_OP, vqc_module, name="", use_bucket_cpp_allreduce=True, bucket_bytes_cap=25*1024*1024, first_bucket_bytes_cap=1024*1024, find_unused_parameters=False, gradient_as_bucket_view=False)
 
 
     使用分布式数据并行对数据批次大小创建变分量子线路使用伴随梯度计算。其中 ``vqc_module`` 必须为 ``QuantumLayerAdjoint`` 类型的VQC模块.
@@ -4676,12 +4636,17 @@ DataParallelVQCAdjointLayer
     :param Comm_OP: 设置分布式环境的通信控制器。
     :param vqc_module: 带有 forward() 的 QuantumLayerAdjoint类型的VQC模块,确保qmachine 已正确设置。
     :param name: 模块的名称。默认值为空字符串。
+    :param use_bucket_cpp_allreduce: 是否使用 C++ 分桶 all-reduce 实现。当前必须为 True; 传 False 会抛出 NotImplementedError,因为旧的逐参数 all-reduce 已移除。默认值: True。
+    :param bucket_bytes_cap: 梯度桶的最大字节数。默认值: 25*1024*1024。
+    :param first_bucket_bytes_cap: 第一个梯度桶的最大字节数。默认值: 1024*1024。
+    :param find_unused_parameters: 是否查找 autograd 图中未使用的参数。默认值: False。
+    :param gradient_as_bucket_view: 是否将梯度暴露为通信桶的视图。默认值: False。
     :return: 可以计算量子电路的模块。
 
 
     Example::
 
-        #mpirun -n 2 python test.py
+        # vqnetrun --nproc_per_node 2 python test.py
 
         import sys
         sys.path.insert(0,"../../")
@@ -4704,12 +4669,12 @@ DataParallelVQCAdjointLayer
                 self._num_wires = num_wires
                 self._dtype = dtype
                 self.qm = QMachine(num_wires, dtype=dtype, grad_mode=grad_mode)
-                self.rx_layer = RX(has_params=True, trainable=False, wires=0)
-                self.ry_layer = RY(has_params=True, trainable=False, wires=1)
-                self.rz_layer = RZ(has_params=True, trainable=False, wires=1)
-                self.u1 = U1(has_params=True, trainable=True, wires=[2])
-                self.u2 = U2(has_params=True, trainable=True, wires=[3])
-                self.u3 = U3(has_params=True, trainable=True, wires=[1])
+                self.rx_layer = RX(trainable=False, wires=0)
+                self.ry_layer = RY(trainable=False, wires=1)
+                self.rz_layer = RZ(trainable=False, wires=1)
+                self.u1 = U1(trainable=True, wires=[2])
+                self.u2 = U2(trainable=True, wires=[3])
+                self.u3 = U3(trainable=True, wires=[1])
                 self.i = I(wires=[3])
                 self.s = S(wires=[3])
                 self.x1 = X1(wires=[3])
@@ -4720,11 +4685,11 @@ DataParallelVQCAdjointLayer
                 self.z = PauliZ(wires=[3])
                 self.swap = SWAP(wires=[2, 3])
                 self.cz = CZ(wires=[2, 3])
-                self.cr = CR(has_params=True, trainable=True, wires=[2, 3])
-                self.rxx = RXX(has_params=True, trainable=True, wires=[2, 3])
-                self.rzz = RYY(has_params=True, trainable=True, wires=[2, 3])
-                self.ryy = RZZ(has_params=True, trainable=True, wires=[2, 3])
-                self.rzx = RZX(has_params=True, trainable=False, wires=[2, 3])
+                self.cr = CR(trainable=True, wires=[2, 3])
+                self.rxx = RXX(trainable=True, wires=[2, 3])
+                self.rzz = RYY(trainable=True, wires=[2, 3])
+                self.ryy = RZZ(trainable=True, wires=[2, 3])
+                self.rzx = RZX(trainable=False, wires=[2, 3])
                 self.toffoli = Toffoli(wires=[2, 3, 4], use_dagger=True)
 
                 self.h = Hadamard(wires=[1])
@@ -4769,13 +4734,15 @@ DataParallelVQCAdjointLayer
 
         pyvqnet.utils.set_random_seed(42)
 
-        Comm_OP = CommController("mpi")
+        Comm_OP = CommController("nccl")
 
         input_x = tensor.QTensor([[0.1, 0.2, 0.3]])
         input_x = tensor.broadcast_to(input_x, [bsize, 3])
+        input_x = input_x.toGPU(Comm_OP.get_local_rank() + DEV_GPU_0)
         input_x.requires_grad = True
 
         qunatum_model = QModel(num_wires=6, dtype=pyvqnet.kcomplex64)
+        qunatum_model.toGPU(Comm_OP.get_local_rank() + DEV_GPU_0)
 
         l = DataParallelVQCAdjointLayer(
             Comm_OP,
@@ -4784,14 +4751,14 @@ DataParallelVQCAdjointLayer
         l.train()
         y = l(input_x)
 
-        y.backward()    
+        y.backward()
 
 
 
 DataParallelVQCLayer
 ---------------------------------------------------------------
 
-.. py:class:: pyvqnet.distributed.DataParallelVQCLayer(Comm_OP, vqc_module, name="")
+.. py:class:: pyvqnet.distributed.DataParallelVQCLayer(Comm_OP, vqc_module, name="", use_bucket_cpp_allreduce=True, bucket_bytes_cap=25*1024*1024, first_bucket_bytes_cap=1024*1024, find_unused_parameters=False, gradient_as_bucket_view=False)
 
 
     使用分布式数据并行对数据批次大小创建变分量子线路使用自动微分计算。 
@@ -4800,13 +4767,17 @@ DataParallelVQCLayer
 
     :param Comm_OP: 设置分布式环境的通信控制器。
     :param vqc_module: 带有 forward() 的 VQC模块,确保qmachine 已正确设置。
-    :param name: 模块的名称。默认值为空字符串。
+    :param use_bucket_cpp_allreduce: 是否使用 C++ 分桶 all-reduce 实现。当前必须为 True; 传 False 会抛出 NotImplementedError,因为旧的逐参数 all-reduce 已移除。默认值: True。
+    :param bucket_bytes_cap: 梯度桶的最大字节数。默认值: 25*1024*1024。
+    :param first_bucket_bytes_cap: 第一个梯度桶的最大字节数。默认值: 1024*1024。
+    :param find_unused_parameters: 是否查找 autograd 图中未使用的参数。默认值: False。
+    :param gradient_as_bucket_view: 是否将梯度暴露为通信桶的视图。默认值: False。
     :return: 可以计算量子电路的模块。
 
 
     Example::
 
-        #mpirun -n 2 python xxx.py
+        # vqnetrun --nproc_per_node 2 python xxx.py
 
         import pyvqnet.backends
 
@@ -4860,10 +4831,12 @@ DataParallelVQCLayer
 
         input = tensor.ones([b, 3 * n * l])
 
-        Comm = CommController("mpi")
-        
+        Comm = CommController("nccl")
+
+        input = input.toGPU(Comm.get_local_rank() + DEV_GPU_0)
         input.requires_grad = True
         qunatum_model = QModel(num_wires=n, num_layer=l, dtype=pyvqnet.kcomplex64)
+        qunatum_model.toGPU(Comm.get_local_rank() + DEV_GPU_0)
         
         layer = qunatum_model
 
@@ -4904,12 +4877,12 @@ vqc_to_originir_list
                 self._num_wires = num_wires
                 self._dtype = dtype
                 self.qm = QMachine(num_wires, dtype=dtype,grad_mode=grad_mode,save_ir=True)
-                self.rx_layer = RX(has_params=True, trainable=False, wires=0)
-                self.ry_layer = RY(has_params=True, trainable=False, wires=1)
-                self.rz_layer = RZ(has_params=True, trainable=False, wires=1)
-                self.u1 = U1(has_params=True,trainable=True,wires=[2])
-                self.u2 = U2(has_params=True,trainable=True,wires=[3])
-                self.u3 = U3(has_params=True,trainable=True,wires=[1])
+                self.rx_layer = RX(trainable=False, wires=0)
+                self.ry_layer = RY(trainable=False, wires=1)
+                self.rz_layer = RZ(trainable=False, wires=1)
+                self.u1 = U1(trainable=True,wires=[2])
+                self.u2 = U2(trainable=True,wires=[3])
+                self.u3 = U3(trainable=True,wires=[1])
                 self.i = I(wires=[3])
                 self.s = S(wires=[3])
                 self.x1 = X1(wires=[3])
@@ -4920,11 +4893,11 @@ vqc_to_originir_list
                 self.z = PauliZ(wires=[3])
                 self.swap = SWAP(wires=[2,3])
                 self.cz = CZ(wires=[2,3])
-                self.cr = CR(has_params=True,trainable=True,wires=[2,3])
-                self.rxx = RXX(has_params=True,trainable=True,wires=[2,3])
-                self.rzz = RYY(has_params=True,trainable=True,wires=[2,3])
-                self.ryy = RZZ(has_params=True,trainable=True,wires=[2,3])
-                self.rzx = RZX(has_params=True,trainable=False, wires=[2,3])
+                self.cr = CR(trainable=True,wires=[2,3])
+                self.rxx = RXX(trainable=True,wires=[2,3])
+                self.rzz = RYY(trainable=True,wires=[2,3])
+                self.ryy = RZZ(trainable=True,wires=[2,3])
+                self.rzx = RZX(trainable=False, wires=[2,3])
                 self.toffoli = Toffoli(wires=[2,3,4],use_dagger=True)
 
                 self.h =Hadamard(wires=[1])
@@ -4984,82 +4957,13 @@ vqc_to_originir_list
         batch_y = qunatum_model(input_x)
         batch_y.backward()
         ll = vqc_to_originir_list(qunatum_model)
-        from pyqpanda import CPUQVM,convert_originir_str_to_qprog,convert_qprog_to_originir
+        from pyqpanda3.intermediate_compiler import convert_originir_string_to_qprog
+
         for l in ll :
             print(l)
 
-            machine = CPUQVM()
-            machine.init_qvm()
-            prog, qv, cv = convert_originir_str_to_qprog(l, machine)
-            print(machine.prob_run_dict(prog,qv))
-
-        # QINIT 6
-        # CREG 6
-        # I q[3]
-        # S q[3]
-        # SWAP q[2],q[3]
-        # CZ q[2],q[3]
-        # X q[3]
-        # X1 q[3]
-        # Y q[3]
-        # Y1 q[3]
-        # Z q[3]
-        # Z1 q[3]
-        # RZZ q[2],q[3],(4.484121322631836)
-        # RXX q[2],q[3],(5.302337169647217)
-        # RYY q[2],q[3],(3.470322608947754)
-        # RZX q[2],q[3],(0.20000000298023224)
-        # CR q[2],q[3],(5.467087745666504)
-        # U1 q[2],(6.254804611206055)
-        # U2 q[3],(1.261604905128479,0.9901539087295532)
-        # U3 q[1],(5.290454387664795,6.182774543762207,1.1797739267349243)
-        # RX q[0],(0.10000000149011612)
-        # CNOT q[0],q[1]
-        # H q[1]
-        # ISWAP q[0],q[2]
-        # RY q[1],(0.20000000298023224)
-        # T q[1]
-        # RZ q[1],(0.30000001192092896)
-        # DAGGER
-        # TOFFOLI q[2],q[3],q[4]
-        # ENDDAGGER
-
-        # {'000000': 0.006448952789506197, '000001': 0.008877137190898976, '000010': 0.16608912704486037, '000011': 0.2286256412193044, '000100': 6.305162883375823e-05, '000101': 8.679206958650598e-05, '000110': 0.0003690135120983108, '000111': 0.0005079558928579155, '001000': 0.002377405289016277, '001001': 0.019580122608259993, '001010': 0.06122872689145276, '001011': 0.5042749695313318, '001100': 0.0, '001101': 0.0, '001110': 0.0, '001111': 0.0, '010000': 0.0, '010001': 0.0, '010010': 0.0, '010011': 0.0, '010100': 0.0, '010101': 0.0, '010110': 0.0, '010111': 0.0, '011000': 0.0, '011001': 0.0, '011010': 0.0, '011011': 0.0, '011100': 2.3243971659148392e-05, '011101': 0.00019143551883716285, '011110': 0.00013603676504013795, '011111': 0.0011203880764558683, '100000': 0.0, '100001': 0.0, '100010': 
-        # 0.0, '100011': 0.0, '100100': 0.0, '100101': 0.0, '100110': 0.0, '100111': 0.0, '101000': 0.0, '101001': 0.0, '101010': 0.0, '101011': 0.0, '101100': 0.0, '101101': 0.0, '101110': 0.0, '101111': 0.0, '110000': 0.0, '110001': 0.0, '110010': 0.0, '110011': 0.0, '110100': 0.0, '110101': 0.0, '110110': 0.0, '110111': 0.0, '111000': 0.0, '111001': 0.0, '111010': 0.0, '111011': 0.0, '111100': 0.0, '111101': 0.0, '111110': 0.0, '111111': 0.0}
-        # QINIT 6
-        # CREG 6
-        # I q[3]
-        # S q[3]
-        # SWAP q[2],q[3]
-        # CZ q[2],q[3]
-        # X q[3]
-        # X1 q[3]
-        # Y q[3]
-        # Y1 q[3]
-        # Z q[3]
-        # Z1 q[3]
-        # RZZ q[2],q[3],(4.484121322631836)
-        # RXX q[2],q[3],(5.302337169647217)
-        # RYY q[2],q[3],(3.470322608947754)
-        # RZX q[2],q[3],(0.20000000298023224)
-        # CR q[2],q[3],(5.467087745666504)
-        # U1 q[2],(6.254804611206055)
-        # U2 q[3],(1.261604905128479,0.9901539087295532)
-        # U3 q[1],(5.290454387664795,6.182774543762207,1.1797739267349243)
-        # RX q[0],(0.10000000149011612)
-        # CNOT q[0],q[1]
-        # H q[1]
-        # ISWAP q[0],q[2]
-        # RY q[1],(0.20000000298023224)
-        # T q[1]
-        # RZ q[1],(0.30000001192092896)
-        # DAGGER
-        # TOFFOLI q[2],q[3],q[4]
-        # ENDDAGGER
-
-        # {'000000': 0.006448952789506197, '000001': 0.008877137190898976, '000010': 0.16608912704486037, '000011': 0.2286256412193044, '000100': 6.305162883375823e-05, '000101': 8.679206958650598e-05, '000110': 0.0003690135120983108, '000111': 0.0005079558928579155, '001000': 0.002377405289016277, '001001': 0.019580122608259993, '001010': 0.06122872689145276, '001011': 0.5042749695313318, '001100': 0.0, '001101': 0.0, '001110': 0.0, '001111': 0.0, '010000': 0.0, '010001': 0.0, '010010': 0.0, '010011': 0.0, '010100': 0.0, '010101': 0.0, '010110': 0.0, '010111': 0.0, '011000': 0.0, '011001': 0.0, '011010': 0.0, '011011': 0.0, '011100': 2.3243971659148392e-05, '011101': 0.00019143551883716285, '011110': 0.00013603676504013795, '011111': 0.0011203880764558683, '100000': 0.0, '100001': 0.0, '100010': 
-        # 0.0, '100011': 0.0, '100100': 0.0, '100101': 0.0, '100110': 0.0, '100111': 0.0, '101000': 0.0, '101001': 0.0, '101010': 0.0, '101011': 0.0, '101100': 0.0, '101101': 0.0, '101110': 0.0, '101111': 0.0, '110000': 0.0, '110001': 0.0, '110010': 0.0, '110011': 0.0, '110100': 0.0, '110101': 0.0, '110110': 0.0, '110111': 0.0, '111000': 0.0, '111001': 0.0, '111010': 0.0, '111011': 0.0, '111100': 0.0, '111101': 0.0, '111110': 0.0, '111111': 0.0}
-
+            prog = convert_originir_string_to_qprog(l)
+            print(prog)
 
 
 originir_to_vqc
@@ -5135,12 +5039,10 @@ model_summary
                 self._num_wires = num_wires
                 self._dtype = dtype
                 self.qm = QMachine(num_wires, dtype=dtype)
-                self.rx_layer1 = RX(has_params=True,
-                                    trainable=True,
+                self.rx_layer1 = RX(trainable=True,
                                     wires=1,
                                     init_params=tensor.QTensor([0.5]))
-                self.ry_layer2 = RY(has_params=True,
-                                    trainable=True,
+                self.ry_layer2 = RY(trainable=True,
                                     wires=0,
                                     init_params=tensor.QTensor([-0.5]))
                 self.xlayer = PauliX(wires=0)
@@ -5212,13 +5114,13 @@ QNG
                 self._num_wires = num_wires
                 self._dtype = dtype
                 self.qm = QMachine(num_wires, dtype=dtype)
-                self.rz_layer1 = RZ(has_params=True, trainable=False, wires=0)
-                self.rz_layer2 = RZ(has_params=True, trainable=False, wires=1)
-                self.u2_layer1 = U2(has_params=True, trainable=False, wires=0)
-                self.l_train1 = RY(has_params=True, trainable=True, wires=1)
+                self.rz_layer1 = RZ(trainable=False, wires=0)
+                self.rz_layer2 = RZ(trainable=False, wires=1)
+                self.u2_layer1 = U2(trainable=False, wires=0)
+                self.l_train1 = RY(trainable=True, wires=1)
                 self.l_train1.params.init_from_tensor(
                     QTensor([333], dtype=pyvqnet.kfloat32))
-                self.l_train2 = RX(has_params=True, trainable=True, wires=2)
+                self.l_train2 = RX(trainable=True, wires=2)
                 self.l_train2.params.init_from_tensor(
                     QTensor([4444], dtype=pyvqnet.kfloat32))
                 self.xlayer = PauliX(wires=0)
@@ -5298,10 +5200,10 @@ wrapper_single_qubit_op_fuse
                 self._num_wires = num_wires
                 self._dtype = dtype
                 self.qm = QMachine(num_wires, dtype=dtype)
-                self.rx_layer = RX(has_params=True, trainable=False, wires=0, dtype=dtype)
-                self.ry_layer = RY(has_params=True, trainable=False, wires=1, dtype=dtype)
-                self.rz_layer = RZ(has_params=True, trainable=False, wires=1, dtype=dtype)
-                self.rz_layer2 = RZ(has_params=True, trainable=False, wires=1, dtype=dtype)
+                self.rx_layer = RX(trainable=False, wires=0, dtype=dtype)
+                self.ry_layer = RY(trainable=False, wires=1, dtype=dtype)
+                self.rz_layer = RZ(trainable=False, wires=1, dtype=dtype)
+                self.rz_layer2 = RZ(trainable=False, wires=1, dtype=dtype)
                 self.tlayer = T(wires=1)
                 self.cnot = CNOT(wires=[0, 1])
                 self.measure = MeasureAll(obs={
@@ -5392,9 +5294,9 @@ wrapper_commute_controlled
                 self.cz = CZ(wires=[0, 2])
                 self.paulix = PauliX(wires=2)
                 self.s = S(wires=0)
-                self.ps = PhaseShift(has_params=True, trainable= True, wires=0, dtype=dtype)
+                self.ps = PhaseShift(trainable= True, wires=0, dtype=dtype)
                 self.t = T(wires=0)
-                self.rz = RZ(has_params=True, wires=1, dtype=dtype)
+                self.rz = RZ(wires=1, dtype=dtype)
                 self.measure = MeasureAll(obs={
                     "X1":1
                 })
@@ -5579,17 +5481,15 @@ wrapper_compile
 
                 self.s = S(wires=0)
 
-                self.ps = PhaseShift(has_params=True,
-                                        trainable=True,
+                self.ps = PhaseShift(trainable=True,
                                         wires=0,
                                         dtype=dtype)
 
-                self.cps = ControlledPhaseShift(has_params=True,
-                                                trainable=True,
+                self.cps = ControlledPhaseShift(trainable=True,
                                                 wires=(1, 0),
                                                 dtype=dtype)
                 self.t = T(wires=0)
-                self.rz = RZ(has_params=True, wires=1, dtype=dtype)
+                self.rz = RZ(wires=1, dtype=dtype)
 
                 self.measure = MeasureAll(obs={
                     "X1":1
@@ -5641,17 +5541,15 @@ wrapper_compile
 
                 self.s = S(wires=0)
 
-                self.ps = PhaseShift(has_params=True,
-                                        trainable=True,
+                self.ps = PhaseShift(trainable=True,
                                         wires=0,
                                         dtype=dtype)
 
-                self.cps = ControlledPhaseShift(has_params=True,
-                                                trainable=True,
+                self.cps = ControlledPhaseShift(trainable=True,
                                                 wires=(1, 0),
                                                 dtype=dtype)
                 self.t = T(wires=0)
-                self.rz = RZ(has_params=True, wires=1, dtype=dtype)
+                self.rz = RZ(wires=1, dtype=dtype)
 
                 self.measure = MeasureAll(obs={
                     "X1":1
@@ -5744,7 +5642,7 @@ wrapper_compile
 QNSPSAOptimizer
 ---------------------------------------------------------------
 
-.. py:class:: pyvqnet.qnn.vqc.qng.QNSPSAOptimizer(stepsize=1e-3,regularization=1e-3,finite_diff_step=1e-2,resamplings=1,blocking=True,history_length=5,seed=None)
+.. py:class:: pyvqnet.qnn.vqc.QNSPSAOptimizer(stepsize=1e-3,regularization=1e-3,finite_diff_step=1e-2,resamplings=1,blocking=True,history_length=5,seed=None)
 
 
     ​​量子自然 SPSA (QNSPSA) 优化器
@@ -5836,7 +5734,7 @@ QNSPSAOptimizer
 测试1：批量数据梯度对比
 ------------------------------------------------------------
 
-在量子机器学习中，梯度计算是影响变分量子线路效率的关键环节。为评估不同框架的量子梯度计算性能，本文在 Linux 系统下使用 GPU，对 VQNet、Deepquantum 与 Pennylane 进行了基准测试。测试在不同批量数据规模（batch size 16、32）、线路深度（layer 2、4）与量子比特数目（qubit 4、8、12、16）下分别进行，统计了各框架运行 10 次的平均耗时。线路结构为 CNOT + RX + RZ + RX 编码层。其中，Deepquantum 和 Pennylane 基于 Torch 的 GPU 后端实现，VQNet 则使用自研代码实现 GPU 运算。
+在量子机器学习中，梯度计算是影响变分量子线路效率的关键环节。为评估不同框架的量子梯度计算性能，本文在 Linux 系统下使用 GPU，对 VQNet 与 Pennylane 等进行了基准测试。测试在不同批量数据规模（batch size 16、32）、线路深度（layer 2、4）与量子比特数目（qubit 4、8、12、16）下分别进行，统计了各框架运行 10 次的平均耗时。线路结构为 CNOT + RX + RZ + RX 编码层。其中 Pennylane 等基于 Torch 的 GPU 后端实现，VQNet 则使用自研代码实现 GPU 运算。
 
 .. image:: ./images/grad-benchmarks.png
    :width: 600 px
@@ -6075,11 +5973,11 @@ QNSPSAOptimizer
 测试2：10量子比特 VQC 梯度对比
 ------------------------------------------------------------
 
-本测试基于本源量子大模型论文中的 10 量子比特、10 层 VQC 线路，对比 VQNet、TorchQuantum（TQ）、DeepQuantum（DQ）、Pennylane（PL）及 MindQuantum（MQ）五个框架的梯度计算性能。线路结构为：
+本测试基于本源量子大模型论文中的 10 量子比特、10 层 VQC 线路，对比 VQNet、TorchQuantum（TQ）、Pennylane（PL）等框架的梯度计算性能。线路结构为：
 
   RY(data) → [RY(param) → CRZ(param) → RY(param) → CRZ(param)] × L
 
-每层包含 40 个参数（4 组 × 10 qubit），参数总数 400。batch size 测试范围 1～1024。各框架 trials 次数：VQNet / TQ / DQ 为 20 次，PL / MQ 为 2 次（后两者在批量数据运行下较慢，仅运行 2 次节约时间）。
+每层包含 40 个参数（4 组 × 10 qubit），参数总数 400。batch size 测试范围 1～1024。各框架 trials 次数：VQNet / TQ 为 20 次，PL 等较慢框架为 2 次（仅运行 2 次以节约时间）。
 
 .. image:: ./images/grad_benchmarks_10q_ry_crz.png
    :width: 600 px
@@ -6369,10 +6267,10 @@ QNSPSAOptimizer
 
                 for k in range(self.n_qlayers):
                     for i in range(self.n_wires):
-                        self.params_ry1_dct[str(i + k * self.n_wires)] = tq.RY(has_params=True, trainable=True)
-                        self.params_crx1_dct[str(i + k * self.n_wires)] = tq.CRZ(has_params=True, trainable=True)
-                        self.params_ry2_dct[str(i + k * self.n_wires)] = tq.RY(has_params=True, trainable=True)
-                        self.params_crx2_dct[str(i + k * self.n_wires)] = tq.CRZ(has_params=True, trainable=True)
+                        self.params_ry1_dct[str(i + k * self.n_wires)] = tq.RY(trainable=True)
+                        self.params_crx1_dct[str(i + k * self.n_wires)] = tq.CRZ(trainable=True)
+                        self.params_ry2_dct[str(i + k * self.n_wires)] = tq.RY(trainable=True)
+                        self.params_crx2_dct[str(i + k * self.n_wires)] = tq.CRZ(trainable=True)
 
                 self.measure = tq.MeasureMultipleTimes([{'wires': range(self.n_wires), 'observables': ['z'] * self.n_wires}])
 
@@ -6757,14 +6655,27 @@ TNQModule
 
 基于张量网络编写变分量子线路模型需要继承于 ``TNQModule``
 
-.. py:class:: pyvqnet.qnn.vqc.tn.native.TNQModule(use_jit=True,vectorized_argnums=0,name="")
+.. py:class:: pyvqnet.qnn.vqc.tn.native.TNQModule(use_jit=True,vectorized_argnums: Union[int, Sequence[int]]=0, name="", mesh=None, cotengra_options=None, tree_path=None)
 
     在 `pyvqnet` 后端（默认后端）下,定义张量网络下量子变分线路模型 `Module` 应该继承的基类。
     该类用于使用张量网络来模块来用语执行量子线路。
 
+    .. warning::
+
+        ``TNQModule`` 仅支持量子类型的子模块（``TNQMachine``、量子门、ansatz 模板、
+        测量模块与编码模块）。经典神经网络层（例如 ``Linear``）不可作为 ``TNQModule``
+        的子模块：JIT 编译的对象是纯量子线路，其中的经典计算将被忽略，或在编译时
+        被固定为常量。构建经典-量子混合模型时，应将经典层定义在外层普通
+        ``pyvqnet.nn.Module`` 中，并将 ``TNQModule`` 作为其子模块；如需不经 JIT
+        编译执行，可直接使用 ``TNQMachine``。正确的组织方式参见各 ansatz 接口示例
+        中 ``QPart``/``QM`` 的双层结构。
+
     :param use_jit: 开启即时编译功能, 默认为True。
     :param vectorized_argnums: 要被向量化的参数,这些参数应该在同一维共享相同的批次形状,默认值为0
     :param name: 模块名。
+    :param mesh: 用于分布式收缩的 ``jax.sharding.Mesh``。为 ``None`` 时使用单设备 JIT; 指定 mesh 时通过 SPMD 实现模型并行。
+    :param cotengra_options: 可选的字典,在指定 ``mesh`` 时传递给 ``cotengra.ReusableHyperOptimizer``。
+    :param tree_path: 可选的预计算收缩路径文件(``.pkl``),指定后将跳过运行时的 cotengra 搜索。
 
     .. note::
 
@@ -6942,7 +6853,7 @@ TNQMachine
 I
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:class:: pyvqnet.qnn.vqc.tn.native.I(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+.. py:class:: pyvqnet.qnn.vqc.tn.native.I(trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
     定义一个I逻辑门类 。
 
@@ -6951,7 +6862,6 @@ I
         该类继承于 ``pyvqnet.qnn.vqc.tn.native.QModule`` 以及 ``pyvqnet.nn.Module``。
         该类可以作为 ``pyvqnet.nn.Module`` 的一个子模块加入 ``TNQModule`` 的模型中。
 
-    :param has_params: 是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
     :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
     :param wires: 线路作用的比特索引,默认为None。
@@ -6975,7 +6885,7 @@ I
 Hadamard
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:class:: pyvqnet.qnn.vqc.tn.native.Hadamard(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+.. py:class:: pyvqnet.qnn.vqc.tn.native.Hadamard(trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
     定义一个Hadamard逻辑门类 。
 
@@ -6984,7 +6894,6 @@ Hadamard
         该类继承于 ``pyvqnet.qnn.vqc.tn.native.QModule`` 以及 ``pyvqnet.nn.Module``。
         该类可以作为 ``pyvqnet.nn.Module`` 的一个子模块加入 ``TNQModule`` 的模型中。
 
-    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
     :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
     :param wires: 线路作用的比特索引,默认为None。
@@ -7008,7 +6917,7 @@ Hadamard
 T
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:class:: pyvqnet.qnn.vqc.tn.native.T(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+.. py:class:: pyvqnet.qnn.vqc.tn.native.T(trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
     定义一个T逻辑门类 。
 
@@ -7017,7 +6926,6 @@ T
         该类继承于 ``pyvqnet.qnn.vqc.tn.native.QModule`` 以及 ``pyvqnet.nn.Module``。
         该类可以作为 ``pyvqnet.nn.Module`` 的一个子模块加入 ``TNQModule`` 的模型中。
 
-    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
     :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
     :param wires: 线路作用的比特索引,默认为None。
@@ -7041,7 +6949,7 @@ T
 S
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:class:: pyvqnet.qnn.vqc.tn.native.S(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+.. py:class:: pyvqnet.qnn.vqc.tn.native.S(trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
     定义一个S逻辑门类 。
 
@@ -7050,7 +6958,6 @@ S
         该类继承于 ``pyvqnet.qnn.vqc.tn.native.QModule`` 以及 ``pyvqnet.nn.Module``。
         该类可以作为 ``pyvqnet.nn.Module`` 的一个子模块加入 ``TNQModule`` 的模型中。
 
-    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
     :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
     :param wires: 线路作用的比特索引,默认为None。
@@ -7074,7 +6981,7 @@ S
 PauliX
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:class:: pyvqnet.qnn.vqc.tn.native.PauliX(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+.. py:class:: pyvqnet.qnn.vqc.tn.native.PauliX(trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
     定义一个PauliX逻辑门类 。
 
@@ -7084,7 +6991,6 @@ PauliX
         该类可以作为 ``pyvqnet.nn.Module`` 的一个子模块加入 ``TNQModule`` 的模型中。
 
 
-    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
     :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
     :param wires: 线路作用的比特索引,默认为None。
@@ -7108,7 +7014,7 @@ PauliX
 PauliY
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:class:: pyvqnet.qnn.vqc.tn.native.PauliY(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+.. py:class:: pyvqnet.qnn.vqc.tn.native.PauliY(trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
     定义一个PauliY逻辑门类 。
 
@@ -7118,7 +7024,6 @@ PauliY
         该类可以作为 ``pyvqnet.nn.Module`` 的一个子模块加入 ``TNQModule`` 的模型中。
 
 
-    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
     :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
     :param wires: 线路作用的比特索引,默认为None。
@@ -7142,7 +7047,7 @@ PauliY
 PauliZ
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:class:: pyvqnet.qnn.vqc.tn.native.PauliZ(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+.. py:class:: pyvqnet.qnn.vqc.tn.native.PauliZ(trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
     定义一个PauliZ逻辑门类 。
 
@@ -7152,7 +7057,6 @@ PauliZ
         该类可以作为 ``pyvqnet.nn.Module`` 的一个子模块加入 ``TNQModule`` 的模型中。
 
 
-    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
     :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
     :param wires: 线路作用的比特索引,默认为None。
@@ -7176,7 +7080,7 @@ PauliZ
 RX
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:class:: pyvqnet.qnn.vqc.tn.native.RX(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+.. py:class:: pyvqnet.qnn.vqc.tn.native.RX(trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
     定义一个RX逻辑门类 。
 
@@ -7186,7 +7090,6 @@ RX
         该类继承于 ``pyvqnet.qnn.vqc.tn.native.QModule`` 以及 ``pyvqnet.nn.Module``。
         该类可以作为 ``pyvqnet.nn.Module`` 的一个子模块加入 ``TNQModule`` 的模型中。
 
-    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
     :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
     :param wires: 线路作用的比特索引,默认为None。
@@ -7209,7 +7112,7 @@ RX
 RY
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:class:: pyvqnet.qnn.vqc.tn.native.RY(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+.. py:class:: pyvqnet.qnn.vqc.tn.native.RY(trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
     定义一个RY逻辑门类 。
 
@@ -7218,7 +7121,6 @@ RY
         该类继承于 ``pyvqnet.qnn.vqc.tn.native.QModule`` 以及 ``pyvqnet.nn.Module``。
         该类可以作为 ``pyvqnet.nn.Module`` 的一个子模块加入 ``TNQModule`` 的模型中。
 
-    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
     :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
     :param wires: 线路作用的比特索引,默认为None。
@@ -7241,7 +7143,7 @@ RY
 RZ
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:class:: pyvqnet.qnn.vqc.tn.native.RZ(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+.. py:class:: pyvqnet.qnn.vqc.tn.native.RZ(trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
     定义一个RZ逻辑门类 。
 
@@ -7250,7 +7152,6 @@ RZ
         该类继承于 ``pyvqnet.qnn.vqc.tn.native.QModule`` 以及 ``pyvqnet.nn.Module``。
         该类可以作为 ``pyvqnet.nn.Module`` 的一个子模块加入 ``TNQModule`` 的模型中。
 
-    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
     :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
     :param wires: 线路作用的比特索引,默认为None。
@@ -7273,7 +7174,7 @@ RZ
 CRX
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:class:: pyvqnet.qnn.vqc.tn.native.CRX(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+.. py:class:: pyvqnet.qnn.vqc.tn.native.CRX(trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
     定义一个CRX逻辑门类 。
 
@@ -7282,7 +7183,6 @@ CRX
         该类继承于 ``pyvqnet.qnn.vqc.tn.native.QModule`` 以及 ``pyvqnet.nn.Module``。
         该类可以作为 ``pyvqnet.nn.Module`` 的一个子模块加入 ``TNQModule`` 的模型中。
 
-    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
     :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
     :param wires: 线路作用的比特索引,默认为None。
@@ -7305,7 +7205,7 @@ CRX
 CRY
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:class:: pyvqnet.qnn.vqc.tn.native.CRY(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+.. py:class:: pyvqnet.qnn.vqc.tn.native.CRY(trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
     定义一个CRY逻辑门类 。
 
@@ -7314,7 +7214,6 @@ CRY
         该类继承于 ``pyvqnet.qnn.vqc.tn.native.QModule`` 以及 ``pyvqnet.nn.Module``。
         该类可以作为 ``pyvqnet.nn.Module`` 的一个子模块加入 ``TNQModule`` 的模型中。
 
-    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
     :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
     :param wires: 线路作用的比特索引,默认为None。
@@ -7338,7 +7237,7 @@ CRZ
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
 
-.. py:class:: pyvqnet.qnn.vqc.tn.native.CRZ(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+.. py:class:: pyvqnet.qnn.vqc.tn.native.CRZ(trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
     定义一个CRZ逻辑门类 。
 
@@ -7347,7 +7246,6 @@ CRZ
         该类继承于 ``pyvqnet.qnn.vqc.tn.native.QModule`` 以及 ``pyvqnet.nn.Module``。
         该类可以作为 ``pyvqnet.nn.Module`` 的一个子模块加入 ``TNQModule`` 的模型中。
 
-    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
     :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
     :param wires: 线路作用的比特索引,默认为None。
@@ -7370,7 +7268,7 @@ CRZ
 U1
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:class:: pyvqnet.qnn.vqc.tn.native.U1(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+.. py:class:: pyvqnet.qnn.vqc.tn.native.U1(trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
     定义一个U1逻辑门类 。
 
@@ -7379,7 +7277,6 @@ U1
         该类继承于 ``pyvqnet.qnn.vqc.tn.native.QModule`` 以及 ``pyvqnet.nn.Module``。
         该类可以作为 ``pyvqnet.nn.Module`` 的一个子模块加入 ``TNQModule`` 的模型中。
 
-    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
     :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
     :param wires: 线路作用的比特索引,默认为None。
@@ -7403,7 +7300,7 @@ U2
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
 
-.. py:class:: pyvqnet.qnn.vqc.tn.native.U2(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+.. py:class:: pyvqnet.qnn.vqc.tn.native.U2(trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
     定义一个U2逻辑门类 。
 
@@ -7412,7 +7309,6 @@ U2
         该类继承于 ``pyvqnet.qnn.vqc.tn.native.QModule`` 以及 ``pyvqnet.nn.Module``。
         该类可以作为 ``pyvqnet.nn.Module`` 的一个子模块加入 ``TNQModule`` 的模型中。
 
-    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
     :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
     :param wires: 线路作用的比特索引,默认为None。
@@ -7436,7 +7332,7 @@ U3
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
 
-.. py:class:: pyvqnet.qnn.vqc.tn.native.U3(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+.. py:class:: pyvqnet.qnn.vqc.tn.native.U3(trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
     定义一个U3逻辑门类 。
 
@@ -7445,7 +7341,6 @@ U3
         该类继承于 ``pyvqnet.qnn.vqc.tn.native.QModule`` 以及 ``pyvqnet.nn.Module``。
         该类可以作为 ``pyvqnet.nn.Module`` 的一个子模块加入 ``TNQModule`` 的模型中。
 
-    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
     :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
     :param wires: 线路作用的比特索引,默认为None。
@@ -7468,7 +7363,7 @@ U3
 CNOT
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:class:: pyvqnet.qnn.vqc.tn.native.CNOT(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+.. py:class:: pyvqnet.qnn.vqc.tn.native.CNOT(trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
     定义一个CNOT逻辑门类,也可称为CX。
 
@@ -7477,7 +7372,6 @@ CNOT
         该类继承于 ``pyvqnet.qnn.vqc.tn.native.QModule`` 以及 ``pyvqnet.nn.Module``。
         该类可以作为 ``pyvqnet.nn.Module`` 的一个子模块加入 ``TNQModule`` 的模型中。
 
-    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
     :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
     :param wires: 线路作用的比特索引,默认为None。
@@ -7500,7 +7394,7 @@ CNOT
 CY
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:class:: pyvqnet.qnn.vqc.tn.native.CY(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+.. py:class:: pyvqnet.qnn.vqc.tn.native.CY(trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
     定义一个CY逻辑门类 。
 
@@ -7509,7 +7403,6 @@ CY
         该类继承于 ``pyvqnet.qnn.vqc.tn.native.QModule`` 以及 ``pyvqnet.nn.Module``。
         该类可以作为 ``pyvqnet.nn.Module`` 的一个子模块加入 ``TNQModule`` 的模型中。
 
-    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
     :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
     :param wires: 线路作用的比特索引,默认为None。
@@ -7532,7 +7425,7 @@ CY
 CZ
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:class:: pyvqnet.qnn.vqc.tn.native.CZ(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+.. py:class:: pyvqnet.qnn.vqc.tn.native.CZ(trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
     定义一个CZ逻辑门类 。
 
@@ -7541,7 +7434,6 @@ CZ
         该类继承于 ``pyvqnet.qnn.vqc.tn.native.QModule`` 以及 ``pyvqnet.nn.Module``。
         该类可以作为 ``pyvqnet.nn.Module`` 的一个子模块加入 ``TNQModule`` 的模型中。
 
-    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
     :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
     :param wires: 线路作用的比特索引,默认为None。
@@ -7564,7 +7456,7 @@ CZ
 CR
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:class:: pyvqnet.qnn.vqc.tn.native.CR(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+.. py:class:: pyvqnet.qnn.vqc.tn.native.CR(trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
     定义一个CR逻辑门类 。
 
@@ -7573,7 +7465,6 @@ CR
         该类继承于 ``pyvqnet.qnn.vqc.tn.native.QModule`` 以及 ``pyvqnet.nn.Module``。
         该类可以作为 ``pyvqnet.nn.Module`` 的一个子模块加入 ``TNQModule`` 的模型中。
 
-    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
     :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
     :param wires: 线路作用的比特索引,默认为None。
@@ -7597,7 +7488,7 @@ SWAP
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
 
-.. py:class:: pyvqnet.qnn.vqc.tn.native.SWAP(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+.. py:class:: pyvqnet.qnn.vqc.tn.native.SWAP(trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
     定义一个SWAP逻辑门类 。
 
@@ -7606,7 +7497,6 @@ SWAP
         该类继承于 ``pyvqnet.qnn.vqc.tn.native.QModule`` 以及 ``pyvqnet.nn.Module``。
         该类可以作为 ``pyvqnet.nn.Module`` 的一个子模块加入 ``TNQModule`` 的模型中。
 
-    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
     :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
     :param wires: 线路作用的比特索引,默认为None。
@@ -7629,7 +7519,7 @@ SWAP
 CSWAP
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:class:: pyvqnet.qnn.vqc.tn.native.CSWAP(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+.. py:class:: pyvqnet.qnn.vqc.tn.native.CSWAP(trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
     定义一个SWAP逻辑门类 。
 
@@ -7649,7 +7539,6 @@ CSWAP
         该类继承于 ``pyvqnet.qnn.vqc.tn.native.QModule`` 以及 ``pyvqnet.nn.Module``。
         该类可以作为 ``pyvqnet.nn.Module`` 的一个子模块加入 ``TNQModule`` 的模型中。
 
-    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
     :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
     :param wires: 线路作用的比特索引,默认为None。
@@ -7673,7 +7562,7 @@ RXX
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
 
-.. py:class:: pyvqnet.qnn.vqc.tn.native.RXX(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+.. py:class:: pyvqnet.qnn.vqc.tn.native.RXX(trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
     定义一个RXX逻辑门类 。
 
@@ -7682,7 +7571,6 @@ RXX
         该类继承于 ``pyvqnet.qnn.vqc.tn.native.QModule`` 以及 ``pyvqnet.nn.Module``。
         该类可以作为 ``pyvqnet.nn.Module`` 的一个子模块加入 ``TNQModule`` 的模型中。
 
-    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
     :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
     :param wires: 线路作用的比特索引,默认为None。
@@ -7705,7 +7593,7 @@ RXX
 RYY
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:class:: pyvqnet.qnn.vqc.tn.native.RYY(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+.. py:class:: pyvqnet.qnn.vqc.tn.native.RYY(trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
     定义一个RYY逻辑门类 。
 
@@ -7714,7 +7602,6 @@ RYY
         该类继承于 ``pyvqnet.qnn.vqc.tn.native.QModule`` 以及 ``pyvqnet.nn.Module``。
         该类可以作为 ``pyvqnet.nn.Module`` 的一个子模块加入 ``TNQModule`` 的模型中。
 
-    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
     :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
     :param wires: 线路作用的比特索引,默认为None。
@@ -7737,7 +7624,7 @@ RYY
 RZZ
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:class:: pyvqnet.qnn.vqc.tn.native.RZZ(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+.. py:class:: pyvqnet.qnn.vqc.tn.native.RZZ(trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
     定义一个RZZ逻辑门类 。
 
@@ -7746,7 +7633,6 @@ RZZ
         该类继承于 ``pyvqnet.qnn.vqc.tn.native.QModule`` 以及 ``pyvqnet.nn.Module``。
         该类可以作为 ``pyvqnet.nn.Module`` 的一个子模块加入 ``TNQModule`` 的模型中。
 
-    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
     :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
     :param wires: 线路作用的比特索引,默认为None。
@@ -7769,7 +7655,7 @@ RZZ
 RZX
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:class:: pyvqnet.qnn.vqc.tn.native.RZX(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+.. py:class:: pyvqnet.qnn.vqc.tn.native.RZX(trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
     定义一个RZX逻辑门类 。
 
@@ -7778,7 +7664,6 @@ RZX
         该类继承于 ``pyvqnet.qnn.vqc.tn.native.QModule`` 以及 ``pyvqnet.nn.Module``。
         该类可以作为 ``pyvqnet.nn.Module`` 的一个子模块加入 ``TNQModule`` 的模型中。
 
-    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
     :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
     :param wires: 线路作用的比特索引,默认为None。
@@ -7802,7 +7687,7 @@ Toffoli
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
 
-.. py:class:: pyvqnet.qnn.vqc.tn.native.Toffoli(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+.. py:class:: pyvqnet.qnn.vqc.tn.native.Toffoli(trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
     定义一个Toffoli逻辑门类 。
 
@@ -7811,7 +7696,6 @@ Toffoli
         该类继承于 ``pyvqnet.qnn.vqc.tn.native.QModule`` 以及 ``pyvqnet.nn.Module``。
         该类可以作为 ``pyvqnet.nn.Module`` 的一个子模块加入 ``TNQModule`` 的模型中。
 
-    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
     :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
     :param wires: 线路作用的比特索引,默认为None。
@@ -7835,7 +7719,7 @@ IsingXX
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
 
-.. py:class:: pyvqnet.qnn.vqc.tn.native.IsingXX(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+.. py:class:: pyvqnet.qnn.vqc.tn.native.IsingXX(trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
     定义一个IsingXX逻辑门类 。
 
@@ -7844,7 +7728,6 @@ IsingXX
         该类继承于 ``pyvqnet.qnn.vqc.tn.native.QModule`` 以及 ``pyvqnet.nn.Module``。
         该类可以作为 ``pyvqnet.nn.Module`` 的一个子模块加入 ``TNQModule`` 的模型中。
 
-    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
     :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
     :param wires: 线路作用的比特索引,默认为None。
@@ -7868,7 +7751,7 @@ IsingYY
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
 
-.. py:class:: pyvqnet.qnn.vqc.tn.native.IsingYY(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+.. py:class:: pyvqnet.qnn.vqc.tn.native.IsingYY(trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
     定义一个IsingYY逻辑门类 。
 
@@ -7877,7 +7760,6 @@ IsingYY
         该类继承于 ``pyvqnet.qnn.vqc.tn.native.QModule`` 以及 ``pyvqnet.nn.Module``。
         该类可以作为 ``pyvqnet.nn.Module`` 的一个子模块加入 ``TNQModule`` 的模型中。
 
-    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
     :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
     :param wires: 线路作用的比特索引,默认为None。
@@ -7900,7 +7782,7 @@ IsingYY
 IsingZZ
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:class:: pyvqnet.qnn.vqc.tn.native.IsingZZ(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+.. py:class:: pyvqnet.qnn.vqc.tn.native.IsingZZ(trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
     定义一个IsingZZ逻辑门类 。
 
@@ -7910,7 +7792,6 @@ IsingZZ
         该类继承于 ``pyvqnet.qnn.vqc.tn.native.QModule`` 以及 ``pyvqnet.nn.Module``。
         该类可以作为 ``pyvqnet.nn.Module`` 的一个子模块加入 ``TNQModule`` 的模型中。
 
-    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
     :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
     :param wires: 线路作用的比特索引,默认为None。
@@ -7934,7 +7815,7 @@ IsingXY
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
 
-.. py:class:: pyvqnet.qnn.vqc.tn.native.IsingXY(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+.. py:class:: pyvqnet.qnn.vqc.tn.native.IsingXY(trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
     定义一个IsingXY逻辑门类 。
 
@@ -7943,7 +7824,6 @@ IsingXY
         该类继承于 ``pyvqnet.qnn.vqc.tn.native.QModule`` 以及 ``pyvqnet.nn.Module``。
         该类可以作为 ``pyvqnet.nn.Module`` 的一个子模块加入 ``TNQModule`` 的模型中。
 
-    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
     :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
     :param wires: 线路作用的比特索引,默认为None。
@@ -7967,7 +7847,7 @@ PhaseShift
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
 
-.. py:class:: pyvqnet.qnn.vqc.tn.native.PhaseShift(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+.. py:class:: pyvqnet.qnn.vqc.tn.native.PhaseShift(trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
     定义一个PhaseShift逻辑门类 。
 
@@ -7976,7 +7856,6 @@ PhaseShift
         该类继承于 ``pyvqnet.qnn.vqc.tn.native.QModule`` 以及 ``pyvqnet.nn.Module``。
         该类可以作为 ``pyvqnet.nn.Module`` 的一个子模块加入 ``TNQModule`` 的模型中。
 
-    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
     :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
     :param wires: 线路作用的比特索引,默认为None。
@@ -7999,7 +7878,7 @@ PhaseShift
 MultiRZ
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:class:: pyvqnet.qnn.vqc.tn.native.MultiRZ(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+.. py:class:: pyvqnet.qnn.vqc.tn.native.MultiRZ(trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
     定义一个MultiRZ逻辑门类 。
 
@@ -8008,7 +7887,6 @@ MultiRZ
         该类继承于 ``pyvqnet.qnn.vqc.tn.native.QModule`` 以及 ``pyvqnet.nn.Module``。
         该类可以作为 ``pyvqnet.nn.Module`` 的一个子模块加入 ``TNQModule`` 的模型中。
 
-    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
     :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
     :param wires: 线路作用的比特索引,默认为None。
@@ -8033,7 +7911,7 @@ SDG
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
 
-.. py:class:: pyvqnet.qnn.vqc.tn.native.SDG(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+.. py:class:: pyvqnet.qnn.vqc.tn.native.SDG(trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
     定义一个SDG逻辑门类 。
 
@@ -8042,7 +7920,6 @@ SDG
         该类继承于 ``pyvqnet.qnn.vqc.tn.native.QModule`` 以及 ``pyvqnet.nn.Module``。
         该类可以作为 ``pyvqnet.nn.Module`` 的一个子模块加入 ``TNQModule`` 的模型中。
 
-    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
     :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
     :param wires: 线路作用的比特索引,默认为None。
@@ -8066,7 +7943,7 @@ SDG
 TDG
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:class:: pyvqnet.qnn.vqc.tn.native.TDG(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+.. py:class:: pyvqnet.qnn.vqc.tn.native.TDG(trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
     定义一个SDG逻辑门类 。
 
@@ -8075,7 +7952,6 @@ TDG
         该类继承于 ``pyvqnet.qnn.vqc.tn.native.QModule`` 以及 ``pyvqnet.nn.Module``。
         该类可以作为 ``pyvqnet.nn.Module`` 的一个子模块加入 ``TNQModule`` 的模型中。
 
-    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
     :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
     :param wires: 线路作用的比特索引,默认为None。
@@ -8100,7 +7976,7 @@ ControlledPhaseShift
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
 
-.. py:class:: pyvqnet.qnn.vqc.tn.native.ControlledPhaseShift(has_params: bool = False,trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
+.. py:class:: pyvqnet.qnn.vqc.tn.native.ControlledPhaseShift(trainable: bool = False,init_params=None,wires=None,dtype=pyvqnet.kcomplex64,use_dagger=False)
     
     定义一个ControlledPhaseShift逻辑门类 。
 
@@ -8109,7 +7985,6 @@ ControlledPhaseShift
         该类继承于 ``pyvqnet.qnn.vqc.tn.native.QModule`` 以及 ``pyvqnet.nn.Module``。
         该类可以作为 ``pyvqnet.nn.Module`` 的一个子模块加入 ``TNQModule`` 的模型中。
 
-    :param has_params:  是否具有参数,例如RX,RY等门需要设置为True,不含参数的需要设置为False,默认为False。
     :param trainable: 是否自带含待训练参数,如果该层使用外部输入数据构建逻辑门矩阵,设置为False,如果待训练参数需要从该层初始化,则为True,默认为False。
     :param init_params: 初始化参数,用来编码经典数据QTensor,默认为None。
     :param wires: 线路作用的比特索引,默认为None。
@@ -8135,7 +8010,7 @@ ControlledPhaseShift
 VQC_Purity
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:function:: pyvqnet.qnn.vqc.tn.native.VQC_Purity(state, qubits_idx, num_wires, use_tn=False)
+.. py:function:: pyvqnet.qnn.vqc.tn.native.VQC_Purity(qubits_idx, num_wires, qmachine)
 
     从态矢中计算特定量子比特 ``qubits_idx`` 上的纯度。
 
@@ -8146,10 +8021,9 @@ VQC_Purity
     其中 :math:`d` 是希尔伯特空间的维数。
     纯态的纯度是1。
 
-    :param state: TNQMachine.get_states() 获取的量子态
     :param qubits_idx: 要计算纯度的量子比特位索引
     :param num_wires: 量子比特数
-    :param use_tn: 张量网络后端时改成True, 默认False
+    :param qmachine: TNQMachine 或 TNQModule 实例。
 
     :return: 对应比特位置上的纯度。
 
@@ -8186,67 +8060,16 @@ VQC_Purity
         y_tn.backward(pyvqnet.tensor.ones_like(y_tn))
         print(y_tn)
 
-VQC_VarMeasure
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-
-.. py:function:: pyvqnet.qnn.vqc.tn.native.VQC_VarMeasure(q_machine, obs)
-
-    提供的可观察量 ``obs`` 的方差。
-
-    :param q_machine: 从pyqpanda get_qstate()获取的量子态
-    :param obs: 测量观测量,当前支持Hadamard,I,PauliX,PauliY,PauliZ 几种Observable.
-
-    :return: 计算可观测量方差。
-
-    .. note::
-
-        测量结果一般为[b,1],其中b为 q_machine.reset_states(b)的批处理数量b。
-
-    Example::
-
-        import pyvqnet
-        from pyvqnet.qnn.vqc.tn.native import TNQMachine, qcircuit, TNQModule, PauliY
-        from pyvqnet.qnn.vqc import VQC_VarMeasure
-        from pyvqnet.tensor import QTensor
-        from pyvqnet import kfloat64
-        pyvqnet.backends.set_backend("pyvqnet")
-        x = QTensor([[0.7, 0.4], [0.6, 0.4]], requires_grad=True).toGPU()
-        x.requires_grad = True
-        class QM(TNQModule):
-            def __init__(self, name=""):
-                super().__init__(name)
-                self.device = TNQMachine(3)
-                
-            def forward(self, x):
-                self.device.reset_states(2)
-                qcircuit.rx(q_machine=self.device, wires=0, params=x[0])
-                qcircuit.ry(q_machine=self.device, wires=1, params=x[1])
-                qcircuit.ry(q_machine=self.device, wires=2, params=x[1])
-                qcircuit.cnot(q_machine=self.device, wires=[0, 1])
-                qcircuit.cnot(q_machine=self.device, wires=[2, 1])
-                return VQC_VarMeasure(q_machine= self.device, obs=PauliY(wires=0))
-            
-        model = QM().toGPU()
-        y = model(x)
-
-        y.backward(pyvqnet.tensor.ones_like(y))
-        print(y)
-
-        # [[0.9370641],
-        # [0.9516521]]
-
-
 VQC_DensityMatrixFromQstate
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:function:: pyvqnet.qnn.vqc.tn.native.VQC_DensityMatrixFromQstate(state, indices, use_tn=False)
+.. py:function:: pyvqnet.qnn.vqc.tn.native.VQC_DensityMatrixFromQstate(indices, num_wires, qmachine)
 
     计算量子态在一组特定量子比特上的密度矩阵。
 
-    :param state: 一维列表状态向量。 这个列表的大小应该是 ``(2**N,)`` 对于量子比特个数 ``N`` ,qstate 应该从 000 ->111 开始。
     :param indices: 所考虑子系统中的量子比特索引列表。
-    :param use_tn: 张量网络后端时改成True, 默认False.
+    :param num_wires: 量子比特数。
+    :param qmachine: TNQMachine 或 TNQModule 实例。
     :return: 大小为“(b, 2**len(indices), 2**len(indices))”的密度矩阵,其中b为 q_machine.reset_states(b)的批处理数量b。
 
     Example::
@@ -8301,7 +8124,7 @@ Probability
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
 
-.. py:class:: pyvqnet.qnn.vqc.tn.native.Probability(wires=None, name="")
+.. py:class:: pyvqnet.qnn.vqc.tn.native.Probability(wires, name="")
 
     计算量子线路在特定比特上概率测量结果。
 
@@ -8331,7 +8154,7 @@ Probability
 MeasureAll
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:class:: pyvqnet.qnn.vqc.tn.native.MeasureAll(obs=None, name="")
+.. py:class:: pyvqnet.qnn.vqc.tn.native.MeasureAll(obs, name="")
 
     计算量子线路的测量结果,支持输入obs为多个或单个泡利算子或哈密顿量。
     例如:
@@ -8405,7 +8228,7 @@ Samples
 HermitianExpval
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:class:: pyvqnet.qnn.vqc.tn.native.HermitianExpval(obs=None, name="")
+.. py:class:: pyvqnet.qnn.vqc.tn.native.HermitianExpval(obs, name="")
 
     计算量子线路某个厄密特量的期望。
 
@@ -8437,8 +8260,7 @@ HermitianExpval
                 self._dtype = dtype
                 self.qm = TNQMachine(num_wires, dtype=dtype)
                 self.rx_layer1 = VQC_RotCircuit
-                self.ry_layer2 = RY(has_params=True,
-                                    trainable=True,
+                self.ry_layer2 = RY(trainable=True,
                                     wires=0,
                                     init_params=tensor.QTensor([-0.5]))
                 self.xlayer = PauliX(wires=0)
@@ -8497,7 +8319,7 @@ VQC_HardwareEfficientAnsatz
 
     Example::
 
-        from pyvqnet.nn import Linear
+        from pyvqnet.nn import Linear, Module
         from pyvqnet.qnn.vqc.tn.native.qcircuit import VQC_HardwareEfficientAnsatz,RZZ,RZ
         from pyvqnet.qnn.vqc.tn.native import Probability,TNQMachine, TNQModule
         from pyvqnet import tensor
@@ -8505,10 +8327,10 @@ VQC_HardwareEfficientAnsatz
         pyvqnet.backends.set_backend("pyvqnet")
         pyvqnet.utils.set_random_seed(25)
 
-        class QM(TNQModule):
-            def __init__(self, name=""):
+        class QPart(TNQModule):
+            def __init__(self, batch_size, name=""):
                 super().__init__(name)
-                self.linearx = Linear(4,2)
+                self.batch_size = batch_size
                 self.ansatz = VQC_HardwareEfficientAnsatz(4, ["rx", "RY", "rz"],
                                             entangle_gate="cnot",
                                             entangle_rules="linear",
@@ -8517,18 +8339,25 @@ VQC_HardwareEfficientAnsatz
                 self.encode2 = RZ(wires=1)
                 self.measure = Probability(wires=[0, 2])
                 self.device = TNQMachine(4)
-            def forward(self, x, *args, **kwargs):
-                self.device.reset_states(bz)
-                y = self.linearx(x)
+            def forward(self, y, *args, **kwargs):
+                self.device.reset_states(self.batch_size)
                 self.encode1(params = y[0],q_machine = self.device,)
                 self.encode2(params = y[1],q_machine = self.device,)
                 self.ansatz(q_machine =self.device)
                 return self.measure(q_machine =self.device)
 
+        class QM(Module):
+            def __init__(self, batch_size, name=""):
+                super().__init__(name)
+                self.linearx = Linear(4,2)
+                self.qpart = QPart(batch_size)
+            def forward(self, x, *args, **kwargs):
+                return self.qpart(self.linearx(x))
+
         bz =3
         inputx = tensor.arange(1.0,bz*4+1).reshape([bz,4])
         inputx.requires_grad= True
-        qlayer = QM()
+        qlayer = QM(bz)
         y = qlayer(inputx)
         y.backward(pyvqnet.tensor.ones_like(y))
         print(y)
@@ -8537,7 +8366,7 @@ VQC_HardwareEfficientAnsatz
 VQC_BasicEntanglerTemplate
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:class:: pyvqnet.qnn.vqc.tn.native.VQC_BasicEntanglerTemplate(num_layer=1, num_qubits=1, rotation="RX", initial=None, dtype=None)
+.. py:class:: pyvqnet.qnn.vqc.tn.native.VQC_BasicEntanglerTemplate(num_layers=1, num_qubits=1, rotation="RX", initial=None, dtype=None)
 
     由每个量子位上的单参数单量子位旋转组成的层,后跟一个闭合链或环组合的多个CNOT门。
 
@@ -8549,7 +8378,7 @@ VQC_BasicEntanglerTemplate
         该类可以作为 ``pyvqnet.nn.Module`` 的一个子模块加入 ``TNQModule`` 的模型中。
 
 
-    :param num_layer: 量子比特线路层数。
+    :param num_layers: 量子比特线路层数。
     :param num_qubits: 量子比特数,默认为1。
     :param rotation: 使用单参数单量子比特门,``RX`` 被用作默认值。
     :param initial: 使用initial 初始化所有其中参数逻辑门的参数,默认值: None,此模块将随机初始化参数。
@@ -8593,7 +8422,7 @@ VQC_BasicEntanglerTemplate
 VQC_StronglyEntanglingTemplate
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:class:: pyvqnet.qnn.vqc.tn.native.VQC_StronglyEntanglingTemplate(num_layers=1, num_qubits=1, rotation = "RX", initial = None, dtype: = None)
+.. py:class:: pyvqnet.qnn.vqc.tn.native.VQC_StronglyEntanglingTemplate(num_layers=1, num_qubits=1, ranges=None, initial=None, dtype=None)
 
     由单个量子比特旋转和纠缠器组成的层,参考 `circuit-centric classifier design <https://arxiv.org/abs/1804.00633>`__ .
 
@@ -8605,10 +8434,10 @@ VQC_StronglyEntanglingTemplate
 
     :param num_layers: 重复层数,默认值: 1。
     :param num_qubits: 量子比特数,默认值: 1。
-    :param rotation: 要使用的单参数单量子比特门,默认值: `RX`
+    :param ranges: 决定每个后续层的范围超参数的序列。默认值: None,对第 :math:`l` 层和 :math:`M` 个量子比特使用 :math:`r=l \mod M`。
     :param initial: 使用initial 初始化所有其中参数逻辑门的参数,默认值: None,此模块将随机初始化参数。
     :param dtype: 参数的数据类型,默认值: None,使用 float32。
-    :return: VQC_BasicEntanglerTemplate 实例
+    :return: VQC_StronglyEntanglingTemplate 实例
 
 
     Example::
@@ -8661,7 +8490,7 @@ VQC_QuantumEmbedding
 
 
     :param num_repetitions_input: 子模块中输入编码的重复次数。
-    :paramdepth_input: 输入维数。
+    :param depth_input: 输入维数。
     :param num_unitary_layers: 变分量子门的重复次数。
     :param num_repetitions: 子模块的重复次数。
     :param initial: 参数初始化值,默认为None
@@ -8921,7 +8750,7 @@ vqc_crot_circuit
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
-.. py:function:: pyvqnet.qnn.vqc.tn.native.vqc_crot_circuit(para,control_qubits,rot_wire,q_machine)
+.. py:function:: pyvqnet.qnn.vqc.tn.native.vqc_crot_circuit(para,control_wire,rot_wire,q_machine)
    :noindex:
 
 	受控Rot单量子比特旋转的量子逻辑门组合。该函数别名:  ``VQC_CRotCircuit`` 。
@@ -8934,7 +8763,7 @@ vqc_crot_circuit
         \end{bmatrix}.
     
     :param para: 表示参数的数组。
-    :param control_qubits: 控制量子比特索引。
+    :param control_wire: 控制量子比特索引。
     :param rot_wire: Rot量子比特索引。
     :param q_machine: 量子虚拟机设备。
     

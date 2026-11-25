@@ -10,16 +10,14 @@ VQNet量子机器学习所使用的数据结构QTensor的python接口介绍。QT
 QTensor 的函数与属性
 ******************************************
 
-.. py:class:: pyvqnet.tensor.tensor.QTensor(data, requires_grad=False, nodes=None, device=pyvqnet.DEV_CPU, dtype=None, name="")
+.. py:class:: pyvqnet.tensor.tensor.QTensor(data, requires_grad=False, device=pyvqnet.DEV_CPU, dtype=None)
 
     具有动态计算图构造和自动微分的张量。
 
     :param data: 输入数据,可以是 _core.Tensor 或numpy 数组。
     :param requires_grad: 是否应该跟踪张量的梯度,默认为 False。
-    :param nodes: 计算图中的后继者列表,默认为无。
     :param device: 储存在哪个设备上,默认: pyvqnet.DEV_CPU,在CPU上。
     :param dtype: 参数的数据类型,默认: None,使用默认数据类型:kfloat32,代表32位浮点数。
-    :param name: QTensor的名字,default:""。
     :return: 输出 QTensor。
 
     Example::
@@ -520,11 +518,11 @@ QTensor 的函数与属性
  
 
 
-    .. py:method:: reshape(new_shape)
+    .. py:method:: reshape(shape)
 
         改变 QTensor 的形状, 返回一个新的张量。
 
-        :param new_shape: 新的形状。
+        :param shape: 新的形状。
 
         :return: 新形状的 QTensor 。
 
@@ -1113,13 +1111,13 @@ arange
 linspace
 ==============================
 
-.. py:function:: pyvqnet.tensor.linspace(start, end, num, device=pyvqnet.DEV_CPU,dtype=None,requires_grad= False)
+.. py:function:: pyvqnet.tensor.linspace(start, end, nums, device=pyvqnet.DEV_CPU,dtype=None,requires_grad= False)
 
-    创建一维 QTensor ,其中的元素为区间 start 和 end 上均匀间隔的共 num 个值。
+    创建一维 QTensor ,其中的元素为区间 start 和 end 上均匀间隔的共 nums 个值。
 
     :param start: 间隔开始。
     :param end: 间隔结束。
-    :param num: 间隔的个数。
+    :param nums: 间隔的个数。
     :param device: 要使用的设备,默认 = pyvqnet.DEV_CPU ,使用 CPU 设备。
     :param dtype: 参数的数据类型,默认: None,使用默认数据类型:kfloat32,代表32位浮点数。
     :param requires_grad: 是否计算梯度,默认为False。
@@ -1138,13 +1136,13 @@ linspace
 logspace
 ==============================
 
-.. py:function:: pyvqnet.tensor.logspace(start, end, num, base, device=pyvqnet.DEV_CPU,dtype=None, requires_grad)
+.. py:function:: pyvqnet.tensor.logspace(start, end, nums, base, device=pyvqnet.DEV_CPU,dtype=None, requires_grad= False)
 
     在对数刻度上创建具有均匀间隔值的一维 QTensor。
 
     :param start: ``base ** start`` 是起始值
     :param end: ``base ** end`` 是序列的最终值
-    :param num: 要生成的样本数
+    :param nums: 要生成的样本数
     :param base: 对数刻度的基数
     :param device: 要使用的设备,默认 = pyvqnet.DEV_CPU ,使用 CPU 设备。
     :param dtype: 参数的数据类型,默认: None,使用默认数据类型:kfloat32,代表32位浮点数。
@@ -3467,15 +3465,15 @@ unsqueeze
 
 moveaxis
 ==============================
-.. py:function:: pyvqnet.tensor.moveaxis(t, source: int, destination: int)
+.. py:function:: pyvqnet.tensor.moveaxis(t, src, dst)
 
-    将 `t` 的维度从 `source` 中的位置移动到 `destination` 中的位置。
+    将 `t` 的维度从 `src` 中的位置移动到 `dst` 中的位置。
 
-    `t` 的其他未明确移动的维度保持其原始顺序,并出现在 `destination` 中未指定的位置。
+    `t` 的其他未明确移动的维度保持其原始顺序,并出现在 `dst` 中未指定的位置。
 
     :param t: 输入 QTensor。
-    :param source: (整数或整数元组)要移动的维度的原始位置。这些位置必须是唯一的。
-    :param destination: (整数或整数元组)每个原始维度的目标位置。这些位置也必须是唯一的。
+    :param src: (整数或整数元组)要移动的维度的原始位置。这些位置必须是唯一的。
+    :param dst: (整数或整数元组)每个原始维度的目标位置。这些位置也必须是唯一的。
 
     :return: 新的QTensor
 
@@ -3581,12 +3579,12 @@ flatten
 reshape
 ==============================
 
-.. py:function:: pyvqnet.tensor.reshape(t: pyvqnet.tensor.QTensor,new_shape)
+.. py:function:: pyvqnet.tensor.reshape(t: pyvqnet.tensor.QTensor,shape)
 
     改变 QTensor 的形状,返回一个新的张量。
 
     :param t: 输入 QTensor 。
-    :param new_shape: 新的形状。
+    :param shape: 新的形状。
 
     :return: 新形状的 QTensor 。
 
@@ -3690,7 +3688,7 @@ gather
 scatter
 ==============================
 
-.. py:function:: pyvqnet.tensor.scatter(input, dim, index,src)
+.. py:function:: pyvqnet.tensor.scatter(input, dim, indices, src)
 
 
     将张量 src 中的所有值写入 indices 张量中指定的索引处的 input 中。

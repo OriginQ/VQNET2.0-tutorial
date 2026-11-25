@@ -421,7 +421,7 @@ Circuit-centric quantum classifiers算法示例
     import sys
     sys.path.insert(0, "../")
     import pyvqnet
-    from pyvqnet import _core
+
     from pyvqnet.dtype import *
 
     from pyvqnet.tensor.tensor import QTensor
@@ -2024,7 +2024,6 @@ VSQL量子整体模型如下:
     from pyvqnet.data.data import data_generator
     from pyvqnet.tensor import tensor
     from pyvqnet.qnn.measure import expval
-    from pyvqnet.qnn.quantumlayer import QuantumLayer
     from pyvqnet.qnn.template import AmplitudeEmbeddingCircuit
     from pyvqnet.nn.linear import Linear
     import numpy as np
@@ -3721,17 +3720,15 @@ VQNet当前提供4种方式对用户自定义的变分量子线路中的量子�
 
             self.s = S(wires=0)
 
-            self.ps = PhaseShift(has_params=True,
-                                    trainable=True,
+            self.ps = PhaseShift(trainable=True,
                                     wires=0,
                                     dtype=dtype)
 
-            self.cps = ControlledPhaseShift(has_params=True,
-                                            trainable=True,
+            self.cps = ControlledPhaseShift(trainable=True,
                                             wires=(1, 0),
                                             dtype=dtype)
             self.t = T(wires=0)
-            self.rz = RZ(has_params=True, wires=1, dtype=dtype)
+            self.rz = RZ(wires=1, dtype=dtype)
 
             self.measure = MeasureAll(obs={
                     "Z1":1
@@ -3783,17 +3780,15 @@ VQNet当前提供4种方式对用户自定义的变分量子线路中的量子�
 
             self.s = S(wires=0)
 
-            self.ps = PhaseShift(has_params=True,
-                                    trainable=True,
+            self.ps = PhaseShift(trainable=True,
                                     wires=0,
                                     dtype=dtype)
 
-            self.cps = ControlledPhaseShift(has_params=True,
-                                            trainable=True,
+            self.cps = ControlledPhaseShift(trainable=True,
                                             wires=(1, 0),
                                             dtype=dtype)
             self.t = T(wires=0)
-            self.rz = RZ(has_params=True, wires=1, dtype=dtype)
+            self.rz = RZ(wires=1, dtype=dtype)
 
             self.measure = MeasureAll(obs={
                 "Z1":1

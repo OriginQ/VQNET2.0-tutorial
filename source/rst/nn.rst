@@ -95,7 +95,7 @@ abstract calculation module
 Module
 =================================
 
-.. py:class:: pyvqnet.nn.module.Module
+.. py:class:: pyvqnet.nn.module.Module(name="", *args, **kwargs)
 
     所有神经网络模块的基类,包括量子模块或经典模块。您的模型也应该是此类的子类,用于 autograd 计算。
     模块还可以包含其他Module类,允许将它们嵌套在树状结构。 您可以将子模块分配为常规属性::
@@ -111,6 +111,8 @@ Module
                 return pyvqnet.nn.activation.relu(self.conv2(x))
 
     以这种方式分配的子模块将被注册。
+
+    :param name: 模块名,默认为""。
 
 forward
 =================================
@@ -160,13 +162,14 @@ forward
 state_dict 
 =================================
 
-.. py:function:: pyvqnet.nn.module.Module.state_dict(destination=None, prefix='')
+.. py:method:: pyvqnet.nn.module.Module.state_dict(destination=None, prefix="", keep_vars=False)
 
     返回包含模块整个状态的字典:包括参数和缓存值。
     键是对应的参数和缓存值名称。
 
     :param destination: 返回保存模型内部模块,参数的字典。
     :param prefix: 使用的参数和缓存值的命名前缀。
+    :param keep_vars: 如果为 ``False``,返回的张量将从自动微分中分离;如果为 ``True``,则不分离。默认值: ``False``。
 
     :return: 包含模块整个状态的字典。
 
@@ -198,7 +201,7 @@ toGPU
     Example::
 
         from pyvqnet.nn.conv import ConvT2D 
-        test_conv = ConvT2D(3, 2, [4,4], [2, 2], "same")
+        test_conv = ConvT2D(3, 2, [4,4], [2, 2], (1, 1))
         test_conv = test_conv.toGPU()
         print(test_conv.backend)
         #1000
@@ -216,7 +219,7 @@ toCPU
     Example::
 
         from pyvqnet.nn.conv import ConvT2D 
-        test_conv = ConvT2D(3, 2, [4,4], [2, 2], "same")
+        test_conv = ConvT2D(3, 2, [4,4], [2, 2], (1, 1))
         test_conv = test_conv.toCPU()
         print(test_conv.backend)
         #0
@@ -293,7 +296,7 @@ load_parameters
 
 ModuleList
 *********************************************************
-.. py:class:: pyvqnet.nn.module.ModuleList([pyvqnet.nn.module.Module])
+.. py:class:: pyvqnet.nn.module.ModuleList(modules=None)
 
 
     将子模块保存在列表中。 ModuleList 可以像普通的 Python 列表一样被索引, 它包含的Module的内部参数等可以被保存起来。
@@ -362,12 +365,12 @@ ModuleList
 
 ParameterList
 *********************************************************
-.. py:class:: pyvqnet.nn.module.ParameterList([pyvqnet.nn.module.Module])
+.. py:class:: pyvqnet.nn.module.ParameterList(values=None)
 
 
     将参数保存在列表中, ParameterList 可以像普通的 Python 列表一样被索引, 它包含的Parameter的内部参数等可以被保存起来。
 
-    :param modules: nn.Parameter 列表
+    :param values: nn.Parameter 列表
 
     :return: 一个参数列表
 
@@ -391,7 +394,7 @@ ParameterList
 
 Sequential
 *********************************************************
-.. py:class:: pyvqnet.nn.module.Sequential([pyvqnet.nn.module.Module])
+.. py:class:: pyvqnet.nn.module.Sequential(*args)
 
     模块将按照传递的顺序添加模块。或者,也可以将模块的 ``OrderedDict`` 传入。``Sequential`` 的 ``forward()`` 方法接受任何输入,并将其转发给它的第一个模块。
     然后将输出依次 "链 "到其后每个模块的输入、最后返回最后一个模块的输出。
@@ -547,7 +550,7 @@ ConvT2D
     :param output_channels: `int` - 输出数据的通道数。
     :param kernel_size: `tuple|list` - 卷积核的尺寸,卷积核形状 = [input_channels,output_channels/group,kernel_size,kernel_size]。 
     :param stride: `tuple|list` - 步长, 默认为 (1, 1)|[1,1]。
-    :param padding: `str|tuple` - 填充选项, 它可以是一个字符串 {'valid', 'same'} 或一个整数元组,给出在两边应用的隐式填充量。 默认 "valid"。
+    :param padding: `str|tuple` - 填充选项, 它可以是一个字符串 {'valid'} 或一个整数元组,给出在两边应用的隐式填充量。 默认 "valid"。
     :param use_bias: `bool` - 是否使用偏置项, 默认使用。
     :param kernel_initializer: `callable` - 卷积核初始化方法。默认为空,使用kaiming_uniform。
     :param bias_initializer: `callable` - 偏置项初始化方法。默认为空,使用kaiming_uniform。
@@ -562,7 +565,7 @@ ConvT2D
     .. note::
         ``padding='valid'`` 不进行填充。
 
-        ``padding='same'`` 补零填充输入,输出的height 为 = ceil(height / stride)。
+        ``padding='same'`` 不支持；请使用整数元组显式指定 padding。
 
     Example::
 
@@ -1240,7 +1243,7 @@ Linear
 Dropout
 =================================
 
-.. py:class:: pyvqnet.nn.dropout.Dropout(dropout_rate = 0.5)
+.. py:class:: pyvqnet.nn.dropout.Dropout(dropout_rate: float = 0.5, name: str = "")
 
     Dropout 模块。dropout 模块将一些单元的输出随机设置为零,同时根据给定的 dropout_rate 概率升级其他单元。
 
@@ -1354,7 +1357,7 @@ Pixel_Unshuffle
 GRU
 =================================
 
-.. py:class:: pyvqnet.nn.gru.GRU(input_size, hidden_size, num_layers=1, nonlinearity='tanh', batch_first=True, use_bias=True, bidirectional=False, dtype=None, name: str = "")
+.. py:class:: pyvqnet.nn.gru.GRU(input_size, hidden_size, num_layers=1, batch_first=True, use_bias=True, bidirectional=False, dtype=None, name: str = "")
 
 
     门控循环单元 (GRU) 模块。支持多层堆叠,双向配置。单层单向GRU的计算公式如下:
@@ -2790,9 +2793,11 @@ fused_moe (融合专家混合)
 
 Activation
 =================================
-.. py:class:: pyvqnet.nn.activation.Activation()
+.. py:class:: pyvqnet.nn.activation.Activation(name: str = "")
 
     激活的基类。 特定的激活函数继承了这个类。
+
+    :param name: 激活模块名,默认为""。
 
 Sigmoid
 =================================
@@ -3098,12 +3103,13 @@ Tanh
 
 Optimizer
 =================================
-.. py:class:: pyvqnet.optim.optimizer.Optimizer( params, lr=0.01)
+.. py:class:: pyvqnet.optim.optimizer.Optimizer(params, lr=0.1, defaults=None)
 
     所有优化器的基类。
 
     :param params: 需要优化的模型参数。
-    :param lr: 学习率,默认值:0.01。
+    :param lr: 学习率,默认值:0.1。
+    :param defaults: 优化器的默认超参数,默认值: None。
 
 Adadelta
 =================================
@@ -3539,8 +3545,6 @@ MSE
         import numpy as np
         from pyvqnet.tensor import tensor
         from pyvqnet.utils import metrics as vqnet_metrics
-        from pyvqnet import _core
-        _vqnet = _core.vqnet
 
         y_true_Qtensor = tensor.arange(1, 12)
         y_pred_Qtensor = tensor.arange(4, 15)
@@ -3572,8 +3576,6 @@ RMSE
         import numpy as np
         from pyvqnet.tensor import tensor
         from pyvqnet.utils import metrics as vqnet_metrics
-        from pyvqnet import _core
-        _vqnet = _core.vqnet
 
         y_true_Qtensor = tensor.arange(1, 12)
         y_pred_Qtensor = tensor.arange(4, 15)
@@ -3606,8 +3608,6 @@ MAE
         import numpy as np
         from pyvqnet.tensor import tensor
         from pyvqnet.utils import metrics as vqnet_metrics
-        from pyvqnet import _core
-        _vqnet = _core.vqnet
 
         y_true_Qtensor = tensor.arange(1, 12)
         y_pred_Qtensor = tensor.arange(4, 15)
@@ -3641,8 +3641,6 @@ R_Square
         import numpy as np
         from pyvqnet.tensor import tensor
         from pyvqnet.utils import metrics as vqnet_metrics
-        from pyvqnet import _core
-        _vqnet = _core.vqnet
 
         y_true_Qtensor = tensor.arange(1, 12)
         y_pred_Qtensor = tensor.arange(4, 15)
@@ -3676,8 +3674,6 @@ precision_recall_f1_2_score
         import numpy as np
         from pyvqnet.tensor import tensor
         from pyvqnet.utils import metrics as vqnet_metrics
-        from pyvqnet import _core
-        _vqnet = _core.vqnet
 
         y_true_Qtensor = tensor.QTensor([0, 0, 0, 0, 0, 1, 1, 1, 1, 1])
         y_pred_Qtensor = tensor.QTensor([0, 0, 1, 1, 1, 0, 0, 1, 1, 1])
@@ -3716,8 +3712,6 @@ precision_recall_f1_N_score
         import numpy as np
         from pyvqnet.tensor import tensor
         from pyvqnet.utils import metrics as vqnet_metrics
-        from pyvqnet import _core
-        _vqnet = _core.vqnet
 
         reference_list = [1, 1, 2, 2, 2, 3, 3, 3, 3, 3]
         prediciton_list = [1, 2, 2, 2, 3, 1, 2, 3, 3, 3]
@@ -3768,8 +3762,6 @@ precision_recall_f1_Multi_score
         import numpy as np
         from pyvqnet.tensor import tensor
         from pyvqnet.utils import metrics as vqnet_metrics
-        from pyvqnet import _core
-        _vqnet = _core.vqnet
 
         reference_list = [[1, 0], [0, 1], [0, 0], [1, 1], [1, 0]]
         prediciton_list = [[1, 0], [0, 0], [1, 0], [0, 0], [0, 0]]
@@ -3830,8 +3822,6 @@ auc_calculate
         import numpy as np
         from pyvqnet.tensor import tensor
         from pyvqnet.utils import metrics as vqnet_metrics
-        from pyvqnet import _core
-        _vqnet = _core.vqnet
 
         y = np.array([1, 1, 1, 1, 0, 1, 0, 0, 0, 0])
         pred = np.array([0.9, 0.8, 0.7, 0.6, 0.6, 0.4, 0.4, 0.3, 0.2, 0.1])
@@ -3878,7 +3868,6 @@ Triton 依赖于 PyTorch 的部分接口，VQNet 实现了类似 PyTorch 的接�
     import pyvqnet as torch
     import triton
     import triton.language as tl
-
 
 
     DEVICE = torch.DEV_GPU_0

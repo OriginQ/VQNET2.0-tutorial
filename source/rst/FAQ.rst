@@ -3,9 +3,9 @@
 
 **问: VQNet有哪些特性**
 
-答: VQNet是基于本源量子pyQPanda开发的量子机器学习工具集。VQNet提供了丰富、易用的经典神经网络计算模块接口,可以方便地进行机器学习的优化,
+答: VQNet是基于本源量子pyQPanda3开发的量子机器学习工具集。VQNet提供了丰富、易用的经典神经网络计算模块接口,可以方便地进行机器学习的优化,
 模型定义方式与主流机器学习框架一致,降低了用户学习成本。
-同时,基于本源量子研发的高性能量子模拟器pyQPanda,VQNet在普通电脑上也能支持大数量量子比特的运算。最后,VQNet还有丰富的 :doc:`./qml_demo` 供大家参考和学习。
+同时,基于本源量子研发的高性能量子模拟器pyQPanda3,VQNet在普通电脑上也能支持大数量量子比特的运算。最后,VQNet还有丰富的 :doc:`./qml_demo` 供大家参考和学习。
 
 
 **问: 如何使用VQNet进行量子机器学习模型的训练** 
@@ -38,61 +38,8 @@ VQNet提供的 :ref:`QuantumLayer_pq3` 下的接口已经封装了量子变分�
 答: 构建VQNet的模型需要保证其中所使用的所有模块是可微分。当模型某个模块无法计算梯度,则会导致该模块以及之前的模块无法使用链式法则计算梯度。
 若用户自定义一个量子变分线路,请使用VQNet提供的 :ref:`QuantumLayer_pq3` 下的接口。对于经典机器学习模块,需要使用 :doc:`./QTensor` 以及 :doc:`./nn` 定义的接口,这些接口封装了梯度计算的函数,VQNet可以进行自动微分。
 
-若用户想在 `Module` 中使用包含多个模块的列表作为子模块,请不要使用python自带的List,需要使用 pyvqnet.nn.module.ModuleList 代替 List。这样,子模块的训练参数可以被注册到整个模型中,可以进行自动微分训练。以下是例子: 
+若用户想在 `Module` 中使用包含多个模块的列表作为子模块,请不要使用python自带的List,需要使用 pyvqnet.nn.module.ModuleList 代替 List。这样,子模块的训练参数可以被注册到整个模型中,可以进行自动微分训练。
 
-    Example::
-
-        from pyvqnet.tensor import *
-        from pyvqnet.nn import Module,Linear,ModuleList
-        from pyvqnet.qnn import ProbsMeasure,QuantumLayer
-        import pyqpanda as pq #请自行安装pyqpanda
-        def pqctest (input,param,qubits,cbits,m_machine):
-            circuit = pq.QCircuit()
-            circuit.insert(pq.H(qubits[0]))
-            circuit.insert(pq.H(qubits[1]))
-            circuit.insert(pq.H(qubits[2]))
-            circuit.insert(pq.H(qubits[3]))
-
-            circuit.insert(pq.RZ(qubits[0],input[0]))
-            circuit.insert(pq.RZ(qubits[1],input[1]))
-            circuit.insert(pq.RZ(qubits[2],input[2]))
-            circuit.insert(pq.RZ(qubits[3],input[3]))
-
-            circuit.insert(pq.CNOT(qubits[0],qubits[1]))
-            circuit.insert(pq.RZ(qubits[1],param[0]))
-            circuit.insert(pq.CNOT(qubits[0],qubits[1]))
-
-            circuit.insert(pq.CNOT(qubits[1],qubits[2]))
-            circuit.insert(pq.RZ(qubits[2],param[1]))
-            circuit.insert(pq.CNOT(qubits[1],qubits[2]))
-
-            circuit.insert(pq.CNOT(qubits[2],qubits[3]))
-            circuit.insert(pq.RZ(qubits[3],param[2]))
-            circuit.insert(pq.CNOT(qubits[2],qubits[3]))
-
-
-            prog = pq.QProg()
-            prog.insert(circuit)
-
-            rlt_prob = ProbsMeasure([0,2],prog,m_machine,qubits)
-            return rlt_prob
-
-
-        class M(Module):
-            def __init__(self):
-                super(M, self).__init__()
-                #应该使用ModuleList构建
-                self.pqc2 = ModuleList([QuantumLayer(pqctest,3,"cpu",4,1), Linear(4,1)
-                ])
-                #直接使用list 是无法保存pqc3中的参数的。
-                #self.pqc3 = [QuantumLayer(pqctest,3,"cpu",4,1), Linear(4,1)
-                #]
-            def forward(self, x, *args, **kwargs):
-                y = self.pqc2[0](x)  + self.pqc2[1](x)
-                return y
-
-        mm = M()
-        print(mm.state_dict().keys())
 
 **问: 为什么原先的代码在2.0.7及以后版本无法运行**
 

@@ -3,6 +3,47 @@ VQNet Changelog
 ######################
 
 
+[v2.18.2] - 2026-08-17
+***************************
+
+Added
+===================
+- 新增统一量子层 ``VQCLayer``(``pyvqnet.qnn.pq3.vqclayer.VQCLayer``)接口，通过 ``submit_kwargs["backend"]`` 选择执行后端(``vqc_autograd`` / ``qcloud_fake`` / ``qcloud_service`` / ``qpanda_runtime``)，支持期望值与概率两种互斥测量方式。
+- 新增 torch 后端统一量子层 ``TorchVQCLayer`` ，与原生 ``VQCLayer`` 功能一致。
+- 新增混合量子+经典的多级分布式训练接口 `ParallelTrainingWrapper` 。
+
+Changed
+===================
+- 分布式计算模块移除 MPI 后端，CPU 通信统一使用 ``gloo``； ``CommController`` 默认 backend 从 ``mpi`` 改为 ``gloo``， ``init_groups`` 移除 MPI-only 限制。
+- ``VQCLayer`` / ``TorchVQCLayer`` 的 ``submit_kwargs["backend"]`` 参数值 ``vqc_autograd`` 重命名为 ``vqnet_native``，更准确地反映其"vqnet 原生执行引擎"的语义。
+- 同步量子逻辑门类 API 签名与源码一致：移除 ``has_params`` 参数， ``trainable`` 调整为第一位置参数。
+- 同步 ``QTensor`` 接口：移除 ``name``、 ``nodes`` 参数。
+- 同步 ``QuantumLayerAdjoint`` 接口：移除 ``use_qpanda`` 参数， ``general_module`` 重命名为 ``vqc_module``。
+- 移除源码中已删除接口的文档章节： ``QuantumLayer`` 、 ``NoiseQuantumLayer`` (含 MNIST 示例章节) 等pyqpanda2兼容接口，并删除整页 pqanda2 接口文档 ``qnn.rst``，仅保留pyqpanda3兼容接口。
+- 修正既有文档偏差：``nn`` 模块各层、 ``LayerNorm`` ``normalized_shape``、优化器 ``lr``、测量类 ``obs``/ ``wires`` 必填、 ``pq3`` 模板 ``qubits`` 改名为 ``qlist`` 等。
+- 同步 ``TNQModule`` 接口：新增 ``mesh``、 ``cotengra_options`` 、 ``tree_path`` 参数，修正 ``use_jit`` 默认值。
+- 同步 ``Module`` / ``state_dict`` 接口签名： ``Module(name="", *args, **kwargs)`` ， ``state_dict`` 新增 ``keep_vars`` 参数。
+- ``ConvT2D`` 接口的 ``padding`` 不再支持 ``"same"`` ，仅支持 ``"valid"`` 或整数元组，相关示例改为显式传入 ``(1, 1)`` 。
+- 文档中 ``pyQPanda`` 相关表述统一更新为 ``pyQPanda3`` ，并删除依赖旧版 pyqpanda 的示例。
+- 重写首页概览：按已实现的 2.18.2 接口分别说明 ``pyvqnet`` (原生) 与 ``torch`` 两种计算后端，分布式改为 gloo/NCCL 表述，补充张量网络后端 ``pyvqnet.qnn.vqc.tn`` 与大模型算子说明。
+- 分布式文档：删除 ``vqnetrun --backend`` 参数说明与命令示例（该参数已移除，后端由各 worker 进程在运行时确定），修正 ``split_groups`` / ``init_groups`` 的返回值与组通信 ``group`` 参数说明。
+- 按当前 launcher 实现清理 ``vqnetrun`` CLI 文档：删除不支持的 ``-H`` / ``--hosts``、host file、``--output-filename``、``--start-timeout``、``--disable-cache`` 参数；说明 ``--nproc_per_node`` 为 gloo 与 NCCL 都必须提供的参数；将 ``--verbose`` 修正为输出额外启动诊断信息而非连通性检测；并更新 ``-cb`` / ``--check-build`` 示例，补充必需的 ``--nproc_per_node`` 参数。
+
+Fixed
+===================
+- 修复 ``QuantumLayerV3`` 中 CRX/CRY/CRZ 参数移位规则系数错误。
+- 修复 ``CRot`` 默认模式梯度错误，启用 ``Rot``、 ``CR``、 ``CRot`` 的 adjoint 梯度，并为 ``CRX``、 ``CRY``、 ``CRZ`` 实现 ``generator()`` 方法。
+- 修复 ``he_uniform_for_linear`` 初始化器 fan 计算错误。
+- 修复 ``SPSA._step()`` 中 delta 未刷新及梯度公式错误导致的参数发散问题。
+- 修复张量别名场景下 ``setitem``/ ``copy`` 重叠检测误判导致的拷贝被静默跳过的问题。
+- 修复 ``cpu_basic_indexing`` 的 ``set-select`` 梯度回归问题。
+- 修复 CUDA ``expval`` 在 ``float64`` 元素数小于 4 时越界、以及 fused-crz 在 ``M>32`` 时零梯度的问题。
+- 修复 ``VQCQCloudLayer`` 真实芯片路径的结果展平、 ``batch=1`` 反向及线路提交问题。
+- 修复 ``qpanda3_runtime`` 路径缺失可配置提交参数的问题。
+- 修复 ``logger.info()`` 误用 print 风格逗号参数的问题。
+- 修复 ``allgather_group`` 示例中错误的(通信器, rank 列表)结构，示例改用 ``split_groups`` 的返回值。
+
+
 [v2.18.1] - 2026-07-08
 ***************************
 

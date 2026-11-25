@@ -2677,7 +2677,7 @@ QUnet主要是用于解决图像分割的技术。
             result3 = probs_measure(machine, cir, [qlist[3]])
 
             result = [result0[-1]+result1[-1]+result2[-1]+result3[-1]]
-        return result
+            return result
 
     def quanconv_(image):
         """Convolves the input image with many applications of the same quantum circuit."""
@@ -3390,13 +3390,13 @@ QUnet主要是用于解决图像分割的技术。
             print("epoch: ", epoch)
             print("{:.0f} loss is : {:.10f}".format(epoch, loss_list[-1]))
 
-            # -------------------- （epoch）-------------------- #
+            # -------------------- (epoch) -------------------- #
             model.eval()  # 
             test_loss = 0.0
             test_correct = 0
             test_total = 0
             with pyvqnet.no_grad():  # 
-                #  batch_size （，）
+                #  batch_size (批大小)
                 for x_batch, y_batch in data_generator(x_test,
                                                     y_test,
                                                     batch_size=batch_size,
@@ -3487,7 +3487,7 @@ QUnet主要是用于解决图像分割的技术。
     from pyvqnet.qnn.pq3.quantumlayer import QuantumLayer
     from pyvqnet.tensor import tensor
     from pyvqnet.qnn.pq3.measure import expval
-    from pyvqnet._core import Tensor as CoreTensor
+
     import matplotlib
     from matplotlib import pyplot as plt
     try:
@@ -4600,7 +4600,7 @@ QUnet主要是用于解决图像分割的技术。
     from scipy.stats import entropy
 
     import pyqpanda3.core as pq
-    from pyvqnet.qnn.ansatz import HardwareEfficientAnsatz
+    from pyvqnet.qnn.pq3.ansatz import HardwareEfficientAnsatz
     from pyvqnet.tensor import tensor
     from pyvqnet.qnn.quantum_expressibility.quantum_express import fidelity_of_cir, fidelity_harr_sample
     num_qubit = 1  # the number of qubit
@@ -4632,8 +4632,7 @@ QUnet主要是用于解决图像分割的技术。
 
         machine = pq.CPUQVM()
         qlist = range(num_qubits)
-        az = HardwareEfficientAnsatz(num_qubits, ["rx", "RY", "rz"],
-                                    qlist,
+        az = HardwareEfficientAnsatz(qlist, ["rx", "RY", "rz"],
                                     entangle_gate="cnot",
                                     entangle_rules="linear",
                                     depth=depth)
@@ -4968,10 +4967,9 @@ VQNet实现了该算法的一个示例: 使用VQE 求解目标Hamiltonian的基�
     import pyqpanda3.core as pq
     from pyvqnet.qnn.pq3.template import StronglyEntanglingTemplate
     from pyvqnet.qnn.measure import Hermitian_expval
-    from pyvqnet.qnn import QpandaQCircuitVQCLayerLite
+    from pyvqnet.qnn import QuantumLayer
     from pyvqnet.optim import SGD
-    import pyvqnet._core as _core
-    from pyvqnet.tensor import QTensor
+    from pyvqnet.tensor import QTensor,to_tensor
     from matplotlib import pyplot as plt
 
     num_layers = 2
@@ -5061,15 +5059,15 @@ vqe_func_analytic()函数是使用参数移位计算理论梯度,vqe_func_shots(
 
     ##############################################################################
     # Optimizing the circuit using gradient descent via the parameter-shift rule:
-    qlayer_ana = QpandaQCircuitVQCLayerLite(vqe_func_analytic, 2*2*3 )
-    qlayer_shots = QpandaQCircuitVQCLayerLite(vqe_func_shots, 2*2*3 )
+    qlayer_ana = QuantumLayer(vqe_func_analytic, 2*2*3 )
+    qlayer_shots = QuantumLayer(vqe_func_shots, 2*2*3 )
     cost_sgd = []
     cost_dsgd = []
-    temp = _core.Tensor(init_params)
-    _core.vqnet.copyTensor(temp, qlayer_ana.m_para.data)
+
+    qlayer_ana.m_para.init_from_tensor(to_tensor(init_params))
     opti_ana = SGD(qlayer_ana.parameters())
 
-    _core.vqnet.copyTensor(temp, qlayer_shots.m_para.data)
+    qlayer_shots.m_para.init_from_tensor(to_tensor(init_params))
     opti_shots = SGD(qlayer_shots.parameters())
 
     for i in range(steps):
@@ -5387,7 +5385,7 @@ vqe_func_analytic()函数是使用参数移位计算理论梯度,vqe_func_shots(
 在VQNet使用QuantumLayer进行模型训练
 ***************************************
 
-以下是使用 ``QuantumLayer``, ``NoiseQuantumLayer``,  等VQNet接口实现量子机器学习的例子。
+以下是使用 ``QuantumLayer`` 等VQNet接口实现量子机器学习的例子。
 
 在VQNet中使用QuantumLayer进行模型训练
 =========================================
@@ -5585,316 +5583,4 @@ vqe_func_analytic()函数是使用参数移位计算理论梯度,vqe_func_shots(
 	start testing..............
 	[0.3132616580]
 	test:--------------->loss:QTensor(0.3132616580, requires_grad=True) #####accuracy:1.0
-
-在VQNet中使用NoiseQuantumLayer进行模型训练
-=============================================
-
-使用 ``NoiseQuantumLayer`` 可以使用QPanda的噪声虚拟机构建含噪量子线路,并进行训练。
-
-一个完整的含噪模型量子机器学习模型的例子如下: 
-
-.. code-block::
-
-    import os
-    import numpy as np
-
-    from pyvqnet.nn.module import Module
-    from pyvqnet.nn.linear import Linear
-    from pyvqnet.nn.conv import Conv2D
-
-    from pyvqnet.nn import activation as F
-    from pyvqnet.nn.pooling import MaxPool2D
-    from pyvqnet.nn.loss import CategoricalCrossEntropy
-    from pyvqnet.optim.adam import Adam
-    from pyvqnet.data.data import data_generator
-    from pyvqnet.tensor import tensor
-
-    import pyqpanda as pq
-    from pyvqnet.qnn.quantumlayer import NoiseQuantumLayer
-    import matplotlib
-    try:
-        matplotlib.use('TkAgg')
-    except:
-        pass
-    import time
-    try:
-        matplotlib.use('TkAgg')
-    except:
-        pass
-
-    try:
-        import urllib.request
-    except ImportError:
-        raise ImportError('You should use Python 3.x')
-    import os.path
-    import gzip
-
-    url_base = 'https://ossci-datasets.s3.amazonaws.com/mnist/'
-    key_file = {
-        'train_img':'train-images-idx3-ubyte.gz',
-        'train_label':'train-labels-idx1-ubyte.gz',
-        'test_img':'t10k-images-idx3-ubyte.gz',
-        'test_label':'t10k-labels-idx1-ubyte.gz'
-    }
-
-
-
-    def _download(dataset_dir,file_name):
-        file_path = dataset_dir + "/" + file_name
-        
-        if os.path.exists(file_path):
-            with gzip.GzipFile(file_path) as f:
-                file_path_ungz = file_path[:-3].replace('\\', '/')
-                if not os.path.exists(file_path_ungz):
-                    open(file_path_ungz,"wb").write(f.read())
-            return
-
-        print("Downloading " + file_name + " ... ")
-        urllib.request.urlretrieve(url_base + file_name, file_path)
-        if os.path.exists(file_path):
-                with gzip.GzipFile(file_path) as f:
-                    file_path_ungz = file_path[:-3].replace('\\', '/')
-                    file_path_ungz = file_path_ungz.replace('-idx', '.idx')
-                    if not os.path.exists(file_path_ungz):
-                        open(file_path_ungz,"wb").write(f.read())
-        print("Done")
-        
-    def download_mnist(dataset_dir):
-        for v in key_file.values():
-            _download(dataset_dir,v)
-
-    #use qpanda to create quantum circuits
-    def circuit(weights,param,qubits,cbits,machine):
-
-        circuit = pq.QCircuit()
-        circuit.insert(pq.H(qubits[0]))
-        circuit.insert(pq.RY(qubits[0], weights[0]))
-        prog = pq.QProg()
-        prog.insert(circuit)
-        result = machine.run_with_configuration(prog, cbits, 100)
-        counts = np.array(list(result.values()))
-        states = np.array(list(result.keys())).astype(float)
-        # Compute probabilities for each state
-        probabilities = counts / 100
-        # Get state expectation
-        expectation = np.sum(states * probabilities)
-        return expectation
-
-
-
-    class Net(Module):
-        def __init__(self):
-            super(Net, self).__init__()
-            self.conv1 = Conv2D(input_channels=1, output_channels=6, kernel_size=(5, 5), stride=(1, 1), padding="valid")
-            self.maxpool1 = MaxPool2D([2, 2], [2, 2], padding="valid")
-            self.conv2 = Conv2D(input_channels=6, output_channels=16, kernel_size=(5, 5), stride=(1, 1), padding="valid")
-            self.maxpool2 = MaxPool2D([2, 2], [2, 2], padding="valid")
-            self.fc1 = Linear(input_channels=256, output_channels=64)
-            self.fc2 = Linear(input_channels=64, output_channels=1)
-            
-            self.hybrid = NoiseQuantumLayer(circuit,1,"noise",1)
-            self.fc3 = Linear(input_channels=1, output_channels=2)
-
-
-        def forward(self, x):
-            x = F.ReLu()(self.conv1(x))  
-            x = self.maxpool1(x)
-            x = F.ReLu()(self.conv2(x))  
-            x = self.maxpool2(x)
-            x = tensor.flatten(x, 1)  
-            x = F.ReLu()(self.fc1(x))  
-            x = self.fc2(x)    
-            x = self.hybrid(x)
-            x = self.fc3(x)
-
-            return x
-
-该模型为混合量子线路以及经典网络的模型,其中量子线路部分使用 ``NoiseQuantumLayer`` 对量子线路加噪声模型进行模拟。使用该模型对mnist数据库中中的0,1手写数字进行分类。
-
-.. code-block::
-
-    def load_mnist(dataset="training_data", digits=np.arange(2), path="./"):         # 下载数据
-        import os, struct
-        from array import array as pyarray
-        download_mnist(path)
-        if dataset == "training_data":
-            fname_image = os.path.join(path, 'train-images.idx3-ubyte').replace('\\', '/')
-            fname_label = os.path.join(path, 'train-labels.idx1-ubyte').replace('\\', '/')
-        elif dataset == "testing_data":
-            fname_image = os.path.join(path, 't10k-images.idx3-ubyte').replace('\\', '/')
-            fname_label = os.path.join(path, 't10k-labels.idx1-ubyte').replace('\\', '/')
-        else:
-            raise ValueError("dataset must be 'training_data' or 'testing_data'")
-
-        flbl = open(fname_label, 'rb')
-        _, size = struct.unpack(">II", flbl.read(8))
-        lbl = pyarray("b", flbl.read())
-        flbl.close()
-
-        fimg = open(fname_image, 'rb')
-        _, size, rows, cols = struct.unpack(">IIII", fimg.read(16))
-        img = pyarray("B", fimg.read())
-        fimg.close()
-
-        ind = [k for k in range(size) if lbl[k] in digits]
-        N = len(ind)
-        images = np.zeros((N, rows, cols))
-        labels = np.zeros((N, 1), dtype=int)
-        for i in range(len(ind)):
-            images[i] = np.array(img[ind[i] * rows * cols: (ind[i] + 1) * rows * cols]).reshape((rows, cols))
-            labels[i] = lbl[ind[i]]
-
-        return images, labels
-
-    def data_select(train_num, test_num):
-        x_train, y_train = load_mnist("training_data")  
-        x_test, y_test = load_mnist("testing_data")
-        idx_train = np.append(np.where(y_train == 0)[0][:train_num],
-                        np.where(y_train == 1)[0][:train_num])
-
-        x_train = x_train[idx_train]
-        y_train = y_train[idx_train]
-        
-        x_train = x_train / 255
-        y_train = np.eye(2)[y_train].reshape(-1, 2)
-
-        # Test Leaving only labels 0 and 1
-        idx_test = np.append(np.where(y_test == 0)[0][:test_num],
-                        np.where(y_test == 1)[0][:test_num])
-
-        x_test = x_test[idx_test]
-        y_test = y_test[idx_test]
-        x_test = x_test / 255
-        y_test = np.eye(2)[y_test].reshape(-1, 2)
-        
-        return x_train, y_train, x_test, y_test
-
-    if __name__=="__main__":
-        x_train, y_train, x_test, y_test = data_select(100, 50)
-        
-        model = Net()
-        optimizer = Adam(model.parameters(), lr=0.005)
-        loss_func = CategoricalCrossEntropy()
-
-        epochs = 10
-        loss_list = []
-        eval_loss_list = []
-        train_acc_list = []
-        eval_acc_list = []
-        model.train()
-        if not os.path.exists("./result"):
-            os.makedirs("./result")
-        else:
-            pass
-        eval_time = []
-        F1 = open("./result/hqcnn_train_rlt.txt","w")
-        F2 = open("./result/hqcnn_eval_rlt.txt","w")
-        for epoch in range(1, epochs):
-            total_loss = []
-            iter  = 0
-            correct = 0
-            n_train = 0
-            for x, y in data_generator(x_train, y_train, batch_size=1, shuffle=True):
-                iter +=1
-                start_time = time.time()
-                x = x.reshape(-1, 1, 28, 28)
-                optimizer.zero_grad()
-                # Forward pass
-                output = model(x)
-                # Calculating loss
-                loss = loss_func(y, output) 
-                loss_np = np.array(loss.data)
-                np_output = np.array(output.data, copy=False)
-                mask = (np_output.argmax(1) == y.argmax(1))
-                correct += np.sum(np.array(mask))
-                n_train += 1
-                
-                # Backward pass
-                loss.backward()
-                # Optimize the weights
-                optimizer._step()
-                total_loss.append(loss_np)
-            print("##########################")
-            print(f"Train Accuracy: {correct / n_train}")
-            loss_list.append(np.sum(total_loss) / len(total_loss))
-            train_acc_list.append(correct/n_train)
-            print("epoch: ", epoch)
-            print(100. * (epoch + 1) / epochs)
-            print("{:.0f} loss is : {:.10f}".format(epoch, loss_list[-1]))
-            F1.writelines(f"{epoch},{loss_list[-1]},{correct/n_train}\n")
-
-            model.eval()
-            correct = 0
-            total_eval_loss = []
-            n_eval = 0
-            
-            for x, y in data_generator(x_test, y_test, batch_size=1, shuffle=True):
-                start_time1 = time.time()
-                x = x.reshape(-1, 1, 28, 28)
-                output = model(x)
-                loss = loss_func(y, output)
-
-                np_output = np.array(output.data, copy=False)
-                mask = (np_output.argmax(1) == y.argmax(1))
-                correct += np.sum(np.array(mask))
-                n_eval += 1
-                
-                loss_np = np.array(loss.data)
-                total_eval_loss.append(loss_np)
-                eval_acc_list.append(correct/n_eval)
-            print(f"Eval Accuracy: {correct / n_eval}")
-            F2.writelines(f"{epoch},{np.sum(total_eval_loss) / len(total_eval_loss)},{correct/n_eval}\n")
-        F1.close()
-        F2.close()
-		
-对比含噪量子线路与理想量子线路的机器学习模型分类结果,其loss变化情况以及accuary变化情况如下: 
-
-.. code-block::
-
-    Train Accuracy: 0.715
-    epoch:  1
-    1 loss is : 0.6519572449
-    Eval Accuracy: 0.99
-    ##########################
-    Train Accuracy: 1.0
-    epoch:  2
-    2 loss is : 0.4458528900
-    Eval Accuracy: 1.0
-    ##########################
-    Train Accuracy: 1.0     
-    epoch:  3
-    3 loss is : 0.3142367172
-    Eval Accuracy: 1.0
-    ##########################
-    Train Accuracy: 1.0     
-    epoch:  4
-    4 loss is : 0.2259583092
-    Eval Accuracy: 1.0
-    ##########################
-    Train Accuracy: 1.0     
-    epoch:  5
-    5 loss is : 0.1661866951
-    Eval Accuracy: 1.0
-    ##########################
-    Train Accuracy: 1.0     
-    epoch:  6
-    6 loss is : 0.1306252861
-    Eval Accuracy: 1.0
-    ##########################
-    Train Accuracy: 1.0
-    epoch:  7
-    7 loss is : 0.0996847820
-    Eval Accuracy: 1.0
-    ##########################
-    Train Accuracy: 1.0
-    epoch:  8
-    8 loss is : 0.0801456261
-    Eval Accuracy: 1.0
-    ##########################
-    Train Accuracy: 1.0
-    epoch:  9
-    9 loss is : 0.0649107647
-    Eval Accuracy: 1.0
-
-|
 
